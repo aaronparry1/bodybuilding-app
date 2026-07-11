@@ -17,6 +17,7 @@ import {
 } from "@/domain/training/quality-of-execution-engine";
 import { getWorkSets } from "@/domain/training/workout-sets";
 import { trainingEvidenceFromCompletedSession, type TrainingEvidenceRecord } from "@/domain/training/training-evidence-record";
+import { resolveExecutableTargetReps } from "@/domain/training/planned-target-boundary";
 
 export interface FirstShippableCoachingLoopInput {
   session: WorkoutSession;
@@ -95,19 +96,19 @@ export function buildQualityInputFromWorkoutSession(
     (total, exercise) => total + Math.max(1, exercise.settings.requiredWorkSets),
     0,
   );
-  const sets = session.exercises.flatMap((exercise): ExecutionSetEvidence[] => {
-    const targetReps = exercise.settings.measurementType === "duration"
-      ? exercise.settings.repRange.min
-      : exercise.settings.repRange.max;
-    return getWorkSets(exercise.sets).map((set) => ({
-      prescribed_load: exercise.loadKnown === false ? null : exercise.load,
-      completed_load: set.load,
-      prescribed_reps: targetReps,
-      completed_reps: set.reps,
-      completed: true,
-      failed: set.reps < exercise.settings.repRange.min,
-    }));
-  });
+  const sets = session.exercises.flatMap((exercise): ExecutionSetEvidence[] =>
+    getWorkSets(exercise.sets).map((set, index) => {
+      const target = resolveExecutableTargetReps({ sessionKind: session.sessionKind, exercise, workSetIndex: index });
+      return {
+        prescribed_load: exercise.loadKnown === false ? null : exercise.load,
+        completed_load: set.load,
+        prescribed_reps: target.reps,
+        completed_reps: set.reps,
+        completed: true,
+        failed: target.reps != null ? set.reps < target.reps : false,
+      };
+    }),
+  );
   const completedSets = sets.filter((set) => set.completed).length;
 
   return {

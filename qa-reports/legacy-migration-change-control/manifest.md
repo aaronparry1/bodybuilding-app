@@ -50,6 +50,18 @@ Before every production or test edit:
 
 Do not copy environment files, credentials, build output, caches, generated binaries, or `node_modules`.
 
+## Phase 2 execution record
+
+| File | Pre-edit SHA-256 | Change reason | Post-edit SHA-256 | Focused tests |
+| --- | --- | --- | --- | --- |
+| `src/domain/training/models.ts` | `bddf4a37af3f7968e8ef1703808ca874d931fa62680451b1b2e1afff97398837` | Name stored exact planned targets explicitly. | `1de85039a6be628f9c49a1fc5662fdc87f1216a99c2185a9768bca6d67845e23` | `planned-target-boundary`, `session-construction` |
+| `src/domain/training/first-shippable-coaching-loop.ts` | `06d51d95105bc89a34713b6e07d03941379c739590c61a6f977acd0ac18154af` | Read stored exact targets before compatibility range metadata during completion-quality evaluation. | `1d44ca13d4e1d63a7eb82970ad52c35c03b245c7eb704e3cc8edc0681498a9f6` | `planned-target-boundary`, `quality-of-execution-engine` |
+| `src/domain/training/planned-target-boundary.ts` | New file | Explicit exact versus compatibility target-resolution contract. | `4f7b24ad276f49567a82b1a3ee809933136e97d1c74e22c9ec984f2b5cd55b4d` | `planned-target-boundary` |
+| `tests/planned-target-boundary.test.ts` | New file | Characterize target precedence, persistence stability, compatibility fallback, and constructor determinism. | `d9bf8ea2dfa22471aaadb1376f3611e3bafceffd73a9601014cbdb204ad389fe` | self |
+| `docs/exact-planned-target-boundary.md` | New file | Record Phase 2 authority and deferred callers. | `76c28bdd870f834b05f6e7cfdf053c7fcfc250faf6d5c203a85f6198e7f8b62a` | Documentation review |
+
+Original copies for modified existing files are stored below `originals/` and excluded from Git.
+
 ## Created-file checksums at last verification
 
 | File | SHA-256 |

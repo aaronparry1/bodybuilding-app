@@ -232,6 +232,9 @@ export interface NextLoadApproval {
   reviewedAt: string;
 }
 
+/** Exact executable targets for an already-constructed planned workout. */
+export type ExactPrescribedSetTargets = number[];
+
 export interface WorkoutExerciseLog {
   id: ID;
   exerciseId: ID;
@@ -240,7 +243,7 @@ export interface WorkoutExerciseLog {
   load: number;
   loadKnown?: boolean;
   /** Exact working-set targets from the prescribed-performance progression system. */
-  prescribedSetTargets?: number[];
+  prescribedSetTargets?: ExactPrescribedSetTargets;
   loadEstablishedFromLoggedWorkSet?: boolean;
   sets: SetLog[];
   status: "active" | "complete" | "shutdown" | "swapped";
