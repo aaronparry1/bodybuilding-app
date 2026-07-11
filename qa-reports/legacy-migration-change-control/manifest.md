@@ -1,5 +1,13 @@
 # Legacy migration change-control manifest
 
+## Stage 2C current-context seam
+
+| File | Old authority | Current replacement | Focused tests |
+| --- | --- | --- | --- |
+| `current-progress-context.ts` | Progress/volume callers reading active block state | Current snapshot/decision repository resolver | `current-progress-context` |
+
+The dashboard and volume formula adapters still require their separate formula-preserving migration. No Progress or volume mutation was introduced.
+
 ## Stage 2B completion/recommendation record
 
 | File | Old authority | New authority | Focused tests / Stage 3 condition |

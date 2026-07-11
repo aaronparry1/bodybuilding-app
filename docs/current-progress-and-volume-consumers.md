@@ -1,0 +1,11 @@
+# Current Progress and volume consumers
+
+Stage 2C introduces read-only current context resolvers for Progress and volume. They read the current plan identity, non-superseded readiness snapshot, and current persisted decision. They return explicit no-current, compatibility, invalid, in-progress, blocked, disrupted, insufficient, review-required, or ready states.
+
+The resolvers never create snapshots or decisions, evaluate readiness, apply a decision, select a successor, or mutate the plan. A conflicting legacy active-block ID is ignored by the current context boundary.
+
+Historical Progress authority remains stored exact planned targets and immutable workout summaries. Existing dashboard formula inputs have not been altered in this seam; their formula-preserving replacement is the remaining Stage 2C work.
+
+## Deferred adapters
+
+Stage 2C2 will migrate the Progress dashboard/view-model to consume this context. Stage 2C3 will replace only the legacy planning authority passed into volume adapters, without changing formulas. Neither migration is claimed by this context seam.
