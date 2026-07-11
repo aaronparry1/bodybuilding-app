@@ -42,7 +42,7 @@ export function useProgrammeLibrary() {
   );
 
   const startProgrammeDay = useCallback((programmeId: string, dayId: string) => {
-    programmeRepository.selectProgrammeDay({ programmeId, dayId });
+    programmeRepository.selectProgrammeDay({ programmeId, dayId, sessionKind: "custom" });
   }, []);
 
   return {

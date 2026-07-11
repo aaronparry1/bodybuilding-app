@@ -106,7 +106,6 @@ describe("session builder", () => {
       day.id,
       exerciseLibrary,
       { id: "session-generated", startedAt: "2026-06-01T08:00:00.000Z" },
-      createTrainingBlock("strength"),
     );
 
     expect(session?.exercises[0].settings.repRange).toEqual({ min: 8, max: 15 });

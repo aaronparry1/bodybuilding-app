@@ -41,7 +41,7 @@ export default function ProgrammeDetailScreen() {
             <Text selectable style={{ ...type.section, color: colors.text }}>
               {day.name}
             </Text>
-            <PrimaryButton label="Start" onPress={() => startDay(day.id)} compact />
+            <PrimaryButton label="Start custom session" onPress={() => startDay(day.id)} compact />
           </View>
           {day.exerciseSlots.map((slot) => {
             const exercise = exercises.find((candidate) => candidate.id === slot.exerciseId);
@@ -51,7 +51,7 @@ export default function ProgrammeDetailScreen() {
                   {slot.plannedOrder}. {exercise?.name ?? slot.exerciseId}
                 </Text>
                 <Text selectable style={{ color: colors.textSubtle, fontVariant: ["tabular-nums"] }}>
-                  {slot.settings.repRange.min}-{slot.settings.repRange.max}
+                  Guide {slot.settings.repRange.min}-{slot.settings.repRange.max}
                 </Text>
               </View>
             );

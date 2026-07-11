@@ -92,8 +92,7 @@ describe("active workout persistence", () => {
     programmeRepository.selectProgrammeDay({
       programmeId: "different-programme",
       dayId: "different-day",
-      planSessionIndex: 3,
-      sessionKind: "planned",
+      sessionKind: "custom",
     });
 
     const remountedWorkout = getLatestOpenSession(workoutSessionRepository.list());

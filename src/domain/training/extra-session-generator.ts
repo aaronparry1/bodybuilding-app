@@ -1,8 +1,6 @@
-import { createTrainingBlock } from "@/domain/training/annual-planner";
 import { generateWorkoutByFocus, type GeneratedWorkoutType } from "@/domain/training/ad-hoc-workout-generator";
 import { getCapacityRoutine, type CapacityFocusArea } from "@/domain/training/capacity-focus";
 import { resolveLoadIncrement, type LoadIncrementProfile } from "@/domain/training/load-increment-strategy";
-import type { BlockType } from "@/domain/training/annual-models";
 import type { Equipment, Exercise, ExperienceLevel, MuscleGroup, Programme, ProgramExercise, ProgressionSettings, UnitSystem, WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
 import { resolveRepRange } from "@/domain/training/rep-range-strategy";
 import { withSetPrescription } from "@/domain/training/set-prescription";
@@ -14,7 +12,6 @@ export type RecoveryCapacityExtraSessionType = "recovery_cardio" | "capacity_car
 
 export function buildExtraFullSessionProgramme(options: {
   type: ExtraFullSessionType;
-  blockType: BlockType;
   exercises: Exercise[];
   availableEquipment?: Equipment[];
   loadIncrementProfile?: Partial<LoadIncrementProfile>;
@@ -26,7 +23,6 @@ export function buildExtraFullSessionProgramme(options: {
   return markExtraProgramme(
     generateWorkoutByFocus(options.type, {
       exercises: options.exercises,
-      currentBlock: createTrainingBlock(options.blockType),
       availableEquipment: options.availableEquipment,
       experienceLevel: options.experienceLevel ?? "intermediate",
       name: options.type === "full_body" ? "Extra Full Body" : `Extra ${titleWorkout(options.type)}`,

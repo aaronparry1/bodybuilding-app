@@ -81,14 +81,29 @@ function createExerciseLogFromExercise(
 
 function createSessionFromProgrammeDay(
   userId?: string | null,
-  currentBlock?: TrainingBlock | null,
-  activePlan?: ActiveTrainingPlan | null,
-  appSettings?: AppSettings,
 ): WorkoutSession | null {
-  // Production recovery has one entry point: an active plan and its next role.
-  // Custom/ad-hoc programme selections must not create differently shaped workouts.
+  const selection = programmeRepository.getSelectedProgrammeDay();
+  if (!selection) return null;
+
+  const programme = programmeRepository.listAll().find((candidate) => candidate.id === selection.programmeId);
+  if (!programme) {
+    programmeRepository.clearSelectedProgrammeDay();
+    return null;
+  }
+
+  const session = buildWorkoutSessionFromProgrammeDay(
+    programme,
+    selection.dayId,
+    availableWorkoutExercises(),
+    {
+      id: makeId("custom-session"),
+      userId: userId ?? "guest-local",
+      startedAt: now(),
+      sessionKind: selection.sessionKind,
+    },
+  );
   programmeRepository.clearSelectedProgrammeDay();
-  return null;
+  return session;
 
   /*
   const selection = programmeRepository.getSelectedProgrammeDay();
@@ -160,6 +175,7 @@ function createSessionFromProgrammeDay(
 }
 
 function createSessionFromActivePlan(userId?: string | null, appSettings?: AppSettings): WorkoutSession | null {
+  // Production recovery has one entry point for authoritative planned workouts.
   const activePlan = activeTrainingPlanRepository.getOptional();
   if (!activePlan) return null;
   const availableExercises = availableWorkoutExercises();
@@ -516,7 +532,7 @@ export function useWorkoutLogger() {
     const latestOpenSession = getLatestOpenSession(sessions);
     if (latestOpenSession) return latestOpenSession;
 
-    const programmeSession = createSessionFromProgrammeDay(user?.id, currentBlock, activePlan, appSettings);
+    const programmeSession = createSessionFromProgrammeDay(user?.id);
     if (programmeSession) return programmeSession;
 
     const selectedExercise = availableExercises.find((candidate) => candidate.id === selectedExerciseId);
@@ -736,7 +752,7 @@ export function useWorkoutLogger() {
           return;
         }
 
-        const programmeSession = createSessionFromProgrammeDay(user?.id, currentBlock, activePlan, appSettings);
+        const programmeSession = createSessionFromProgrammeDay(user?.id);
         if (!programmeSession) return;
         setActiveExerciseIndex(0);
         persistSession(programmeSession);

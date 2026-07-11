@@ -15,7 +15,7 @@ export default function SessionBuilderScreen() {
   const startSession = () => {
     const firstExercise = exercises.find((exercise) => exercise.id === day.exerciseSlots[0]?.exerciseId);
     programmeRepository.save(sessionProgramme);
-    programmeRepository.selectProgrammeDay({ programmeId: sessionProgramme.id, dayId: day.id });
+    programmeRepository.selectProgrammeDay({ programmeId: sessionProgramme.id, dayId: day.id, sessionKind: "custom" });
     router.replace({
       pathname: "/(protected)/session-prep",
       params: {

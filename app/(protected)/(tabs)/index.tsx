@@ -18,7 +18,6 @@ import { detectPersonalRecords, type PersonalRecordItem } from "@/domain/trainin
 import type { ProgrammeSkeleton } from "@/domain/training/programme-skeleton";
 import { buildPrSharePayload, type BrandedSharePayload } from "@/domain/training/share-cards";
 import { displayWorkoutName, isLegacyPlaceholderWorkoutSession, workoutTypeForName } from "@/domain/training/planned-workout";
-import type { BlockType } from "@/domain/training/annual-models";
 import type { CapacityFocusArea } from "@/domain/training/capacity-focus";
 import {
   buildCapacitySessionProgramme,
@@ -55,7 +54,6 @@ export default function HomeScreen() {
   const [showExtraSession, setShowExtraSession] = useState(false);
   const [extraMode, setExtraMode] = useState<ExtraSessionMode>("full");
   const [extraFullType, setExtraFullType] = useState<ExtraFullSessionType>("upper");
-  const [extraBlockType, setExtraBlockType] = useState<BlockType>("hypertrophy");
   const [extraVolumeType, setExtraVolumeType] = useState<ExtraVolumeSessionType>("upper");
   const [capacityArea, setCapacityArea] = useState<CapacityFocusArea>("low_back");
   const [recoveryCapacityIgnore, setRecoveryCapacityIgnore] = useState(() => recoveryCapacityIgnoreRepository.get());
@@ -284,9 +282,8 @@ export default function HomeScreen() {
     const unit = settings.unit;
     const programme =
       selectedMode === "full"
-        ? buildExtraFullSessionProgramme({
+          ? buildExtraFullSessionProgramme({
             type: extraFullType,
-            blockType: extraBlockType,
             exercises,
             availableEquipment,
             loadIncrementProfile,
@@ -831,13 +828,11 @@ export default function HomeScreen() {
         visible={showExtraSession}
         mode={extraMode}
         fullType={extraFullType}
-        blockType={extraBlockType}
         volumeType={extraVolumeType}
         capacityArea={capacityArea}
         onClose={() => setShowExtraSession(false)}
         onMode={setExtraMode}
         onFullType={setExtraFullType}
-        onBlockType={setExtraBlockType}
         onVolumeType={setExtraVolumeType}
         onCapacityArea={setCapacityArea}
         onStart={startExtraSession}
@@ -1039,13 +1034,11 @@ function ExtraSessionModal({
   visible,
   mode,
   fullType,
-  blockType,
   volumeType,
   capacityArea,
   onClose,
   onMode,
   onFullType,
-  onBlockType,
   onVolumeType,
   onCapacityArea,
   onStart,
@@ -1053,13 +1046,11 @@ function ExtraSessionModal({
   visible: boolean;
   mode: ExtraSessionMode;
   fullType: ExtraFullSessionType;
-  blockType: BlockType;
   volumeType: ExtraVolumeSessionType;
   capacityArea: CapacityFocusArea;
   onClose(): void;
   onMode(mode: ExtraSessionMode): void;
   onFullType(type: ExtraFullSessionType): void;
-  onBlockType(type: BlockType): void;
   onVolumeType(type: ExtraVolumeSessionType): void;
   onCapacityArea(area: CapacityFocusArea): void;
   onStart(): void;
@@ -1100,16 +1091,6 @@ function ExtraSessionModal({
                   ]}
                   value={fullType}
                   onChange={onFullType}
-                />
-                <OptionRow
-                  options={[
-                    { value: "hypertrophy", label: "Hypertrophy" },
-                    { value: "powerbuilding", label: "Powerbuilding" },
-                    { value: "strength", label: "Strength" },
-                    { value: "power", label: "Power" },
-                  ]}
-                  value={blockType}
-                  onChange={onBlockType}
                 />
               </>
             ) : mode === "volume" ? (

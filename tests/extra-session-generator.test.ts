@@ -11,7 +11,6 @@ import {
 } from "@/domain/training/extra-session-generator";
 import { programmeRepository } from "@/data/local/programme-repository";
 import { buildWorkoutSessionFromProgrammeDay } from "@/domain/training/session-builder";
-import type { BlockType } from "@/domain/training/annual-models";
 import { createActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { exerciseLibrary } from "@/domain/training/presets";
 
@@ -31,7 +30,6 @@ describe("extra session generation", () => {
     const beforeBlocks = activePlan.blocks.map((block) => block.id);
     const programme = buildExtraFullSessionProgramme({
       type: "push",
-      blockType: "strength",
       exercises: exerciseLibrary,
       availableEquipment: activePlan.equipment,
     });
@@ -44,7 +42,6 @@ describe("extra session generation", () => {
   it.each(["upper", "lower", "push", "pull", "legs", "full_body"] as ExtraFullSessionType[])("generates full extra %s sessions", (type) => {
     const programme = buildExtraFullSessionProgramme({
       type,
-      blockType: "hypertrophy",
       exercises: exerciseLibrary,
       availableEquipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight"],
     });
@@ -53,10 +50,9 @@ describe("extra session generation", () => {
     expect(programme.days[0]?.exerciseSlots.length).toBeGreaterThan(0);
   });
 
-  it.each(["hypertrophy", "powerbuilding", "strength", "power"] as BlockType[])("generates full extra sessions in %s blocks", (blockType) => {
+  it("does not require a training block to generate a full extra session", () => {
     const programme = buildExtraFullSessionProgramme({
       type: "push",
-      blockType,
       exercises: exerciseLibrary,
       availableEquipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight"],
     });
@@ -81,14 +77,12 @@ describe("extra session generation", () => {
   it("extra sessions inherit experience level instead of hard-coding intermediate", () => {
     const beginnerFull = buildExtraFullSessionProgramme({
       type: "push",
-      blockType: "hypertrophy",
       exercises: exerciseLibrary,
       availableEquipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight"],
       experienceLevel: "beginner",
     });
     const advancedFull = buildExtraFullSessionProgramme({
       type: "push",
-      blockType: "hypertrophy",
       exercises: exerciseLibrary,
       availableEquipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight"],
       experienceLevel: "advanced",
@@ -182,7 +176,7 @@ describe("extra session generation", () => {
       ...(["upper", "lower", "push", "pull", "legs", "full_body"] as ExtraFullSessionType[]).map((type) => ({
         label: `full:${type}`,
         sessionKind: "extra_full" as const,
-        programme: buildExtraFullSessionProgramme({ ...common, type, blockType: "hypertrophy", history: [] }),
+        programme: buildExtraFullSessionProgramme({ ...common, type, history: [] }),
       })),
       ...(["upper", "lower", "push", "pull", "legs"] as ExtraVolumeSessionType[]).map((type) => ({
         label: `volume:${type}`,

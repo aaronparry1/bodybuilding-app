@@ -309,6 +309,8 @@ export interface CardioSessionLog {
   loggedAt: string;
 }
 
+export type WorkoutSessionKind = "planned" | "custom" | "extra_full" | "extra_volume" | "extra_capacity" | CardioSessionKind;
+
 export interface WorkoutSession {
   id: ID;
   userId?: ID | null;
@@ -319,7 +321,7 @@ export interface WorkoutSession {
   planMicrocycleNumber?: number;
   planBlockId?: ID;
   planWeekNumber?: number;
-  sessionKind?: "planned" | "extra_full" | "extra_volume" | "extra_capacity" | CardioSessionKind;
+  sessionKind?: WorkoutSessionKind;
   name: string;
   startedAt: string;
   completedAt?: string;

@@ -156,7 +156,6 @@ describe("end-to-end simulator QA regression", () => {
       generatedPush.days[0]!.id,
       exerciseLibrary,
       { id: "qa-session", userId: "guest-local", startedAt: "2026-06-02T10:00:00.000Z", defaultLoad: 100 },
-      createTrainingBlock("hypertrophy"),
     );
 
     expect(session).not.toBeNull();

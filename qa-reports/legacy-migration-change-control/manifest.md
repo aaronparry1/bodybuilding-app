@@ -157,3 +157,26 @@ Phase 4D makes Analytics and reporting read-only consumers of current planning c
 | `baseline-failures.md` | `8b5926580109a15cdba4a1161e0447f048097ef58eaa0f7d27943b29d82e62c5` |
 
 `manifest.md` is self-modifying and therefore its checksum is reported by the final verification command output rather than embedded recursively.
+
+## Phase 5 execution record
+
+Phase 5 isolates non-planned sessions and Programme Builder templates. It does not change active-plan construction, planned Train execution, review/progression/Analytics authority, evidence, interventions, or the quarantined Plan suite.
+
+| File | Pre-edit SHA-256 | Change reason | Post-edit SHA-256 | Focused tests |
+| --- | --- | --- | --- | --- |
+| `src/domain/training/models.ts` | `6ea13a242812ddafc70189fceec9167398fe4a39ef97d6de1fb46222a9b25b66` | Add an explicit `custom` non-planned session origin. | `3ed658cb2202aad1c6c13cca46a12016d11078e8c8411683145124923fdc1783` | non-planned authority, typecheck |
+| `src/domain/training/workout-origin.ts` | New file | Centralize planned/non-planned predicates and deterministic planned-only selection. | `4db4b6dc907f060fbd5a04c5ca24c9ba76347725d2943f2b84a293f4c1e1f041` | non-planned authority |
+| `src/data/local/programme-repository.ts` | `2974486d311a7be7dfcf250582fd7420d7bb38e9fa0350cc923ba2219516a8ba` | Restrict programme-day selection to explicit non-planned origins and adapt old missing-origin selections to custom. | `44d84d6283f6c1db119dbb4df2a393602dfa50f2a266e5a015e7c752f2399462` | non-planned authority, active workout persistence |
+| `src/domain/training/session-builder.ts` | `d64c9e9d463acd047e2a929f53689342ef46cc7aa08b9eefcc9a4facb5203a7a` | Remove unused block input and prevent template sessions from receiving planned identity. | `72650766b8d82f7087d75a6daa88737f43615fcf5bfdfe1a08d6b494c743466a` | session builder, extras |
+| `src/domain/training/extra-session-generator.ts` | `ab41491a0b7d84db332de55c0265abe86fff794b891ef51a1a6777a03aed79eb` | Remove block-type authority from full-extra generation. | `9226c6bff6d84d1ca9fea7d45709792b74dbee881ed62c80829778f099020ee2` | extra-session generator |
+| `src/domain/training/programme-builder.ts` | `68fe7dc0ce64e6565ba78d630301ee4940af3522c16f4773dc72804f2708f904` | Name builder exercise operations as draft operations and add draft-only validation. | `60d264b4262ad6a189fdc14f74c4b5fdcd2dec0afc19f64eeb6e14687f8ae5a5` | programme builder, non-planned authority |
+| `src/features/workout-logging/use-workout-logger.ts` | `e3d0e8f47dcb9cd074f24d960df6df61f260bc0aafac1718e1450ffb8e4e5516` | Restore only the explicit non-planned programme-day session bridge; planned construction remains recovery-constructor-only. | `20dcf7946b5928b73d17d9d2ba1bc9ac5a2915e3c09941920b334d7d1f00747b` | navigation UI, active workout persistence |
+| `app/(protected)/(tabs)/index.tsx` | `0a1a83e66ac54016dd8f56a8e799fcaaa95c10bcc8203bbf141bca44c38bee56` | Remove block chooser and block input from extra sessions; retain admission only. | `11a3fcc7edd432fac653a7b6a24b2e7f7281ebf371cbbafbe451489f3c179baf` | navigation UI, extras |
+| `app/(protected)/programmes/ai.tsx` | `bd7ecc5d0fc81a7d7ec0137c7e726f1969212f617ce06b6e3dbc8da74eb12a65` | Stop reading the training year for custom-session generation. | `f699f298c642e91cd6678ee92e371720adeced3ae9467e8616ff32d018beb2bd` | typecheck, extras |
+| `app/(protected)/programmes/builder.tsx`, `app/(protected)/programmes/[id].tsx`, `app/(protected)/programmes/session.tsx`, `src/features/programme-builder/use-programme-builder.ts` | Originals retained below `originals/` | Clarify draft/custom status and pass explicit custom selection kinds. | See final Phase 5 checksums | programme builder, navigation UI |
+| `tests/nonplanned-session-authority.test.ts` | New file | Cover planned selection isolation, non-planned identity, draft validation, and progression isolation. | `f92c99579d8c975558e3c12845d82a845af3821b071bc251fdc346db1852e393` | self |
+| `tests/active-workout-persistence.test.ts`, `tests/session-builder.test.ts`, `tests/extra-session-generator.test.ts`, `tests/programme-builder.test.ts`, `tests/rep-range-strategy.test.ts`, `tests/end-to-end-simulator-qa.test.ts`, `tests/workout-navigation-ui.test.ts` | Originals retained below `originals/` or earlier phase snapshots | Align direct boundary calls with the non-planned contract without changing unrelated baseline assertions. | See final Phase 5 checksums | focused suite |
+| `docs/nonplanned-sessions-programme-builder-authority.md` | New file | Record Phase 5 authority and compatibility boundaries. | `4b6430f13604e92060d5eefb9946cb8cf2d238fa0033cfc6e8d2acb04eb7d608` | Documentation review |
+| `qa-reports/legacy-migration-change-control/phase-5-nonplanned-builder-boundary-map.md` | New file | Record the pre-edit boundary audit. | `35cbddb4823ffc2eddbf204efbe1f9da25425f4b8e465e20f853695135791ebf` | Documentation review |
+
+The Phase 5 logger snapshot is additionally preserved at `originals/phase-5/src/features/workout-logging/use-workout-logger.ts`; pre-edit SHA-256: `e3d0e8f47dcb9cd074f24d960df6df61f260bc0aafac1718e1450ffb8e4e5516`.

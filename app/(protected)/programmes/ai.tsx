@@ -15,7 +15,6 @@ import {
 } from "@/domain/training/extra-session-generator";
 import { titleCase } from "@/domain/training/exercise-library";
 import { summarizeWorkoutHistory } from "@/domain/training/workout-history";
-import { useTrainingYear } from "@/features/training-year/use-training-year";
 import { AppScreen, HeroPanel, PrimaryButton, RowItem, SectionList, SecondaryButton } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
 
@@ -26,7 +25,6 @@ const workoutTypes: CreateSessionType[] = ["push", "pull", "legs", "upper", "low
 export default function AIWorkoutScreen() {
   const { user } = useAuth();
   const { settings } = useAppSettings();
-  const { currentBlock } = useTrainingYear();
   const exercises = customExerciseRepository.listAll();
   const history = useMemo(() => summarizeWorkoutHistory(workoutSessionRepository.list()), []);
   const [workoutType, setWorkoutType] = useState<CreateSessionType>("push");
@@ -56,14 +54,13 @@ export default function AIWorkoutScreen() {
               })
           : generateWorkoutByFocus(workoutType, {
               exercises,
-              currentBlock,
               history,
               createdByUserId: user?.id ?? null,
               variant,
               loadIncrementProfile: settings.loadIncrementProfile,
               unit: settings.unit,
             }),
-    [currentBlock, exercises, history, settings.experienceLevel, settings.loadIncrementProfile, settings.unit, user?.id, variant, workoutType],
+    [exercises, history, settings.experienceLevel, settings.loadIncrementProfile, settings.unit, user?.id, variant, workoutType],
   );
   const day = generated.days[0];
 
@@ -96,7 +93,7 @@ export default function AIWorkoutScreen() {
       <HeroPanel
         eyebrow="Create session"
         title={displayWorkoutName(generated.name)}
-        subtitle="Choose the focus. Adaptive Strength Coach builds a sensible session."
+        subtitle="Choose the focus. This is a custom session, separate from your scheduled plan."
       />
 
       <SectionList title="Workout type">

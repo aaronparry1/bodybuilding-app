@@ -1,5 +1,6 @@
 import { jsonStore } from "@/data/local/json-store";
-import type { Programme, WorkoutSession } from "@/domain/training/models";
+import type { Programme, WorkoutSessionKind } from "@/domain/training/models";
+import { isNonPlannedSessionKind, type NonPlannedSessionKind } from "@/domain/training/workout-origin";
 import { presetProgrammes } from "@/domain/training/presets";
 
 const customProgrammesKey = "iron-logic.custom-programmes";
@@ -10,11 +11,14 @@ let cachedAllProgrammes: Programme[] | null = null;
 export interface SelectedProgrammeDay {
   programmeId: string;
   dayId: string;
-  planSessionIndex?: number;
-  planBlockId?: string;
-  planWeekNumber?: number;
-  sessionKind?: WorkoutSession["sessionKind"];
+  sessionKind: NonPlannedSessionKind;
 }
+
+type PersistedSelectedProgrammeDay = {
+  programmeId: string;
+  dayId: string;
+  sessionKind?: WorkoutSessionKind;
+};
 
 export class LocalProgrammeRepository {
   listCustom(): Programme[] {
@@ -43,13 +47,11 @@ export class LocalProgrammeRepository {
   }
 
   selectProgrammeDay(selection: SelectedProgrammeDay): void {
+    if (!isNonPlannedSessionKind(selection.sessionKind)) return;
     const currentSelection = this.getSelectedProgrammeDay();
     if (
       currentSelection?.programmeId === selection.programmeId &&
       currentSelection.dayId === selection.dayId &&
-      currentSelection.planSessionIndex === selection.planSessionIndex &&
-      currentSelection.planBlockId === selection.planBlockId &&
-      currentSelection.planWeekNumber === selection.planWeekNumber &&
       currentSelection.sessionKind === selection.sessionKind
     ) {
       return;
@@ -58,7 +60,13 @@ export class LocalProgrammeRepository {
   }
 
   getSelectedProgrammeDay(): SelectedProgrammeDay | null {
-    return jsonStore.get<SelectedProgrammeDay | null>(selectedProgrammeDayKey, null);
+    const selection = jsonStore.get<PersistedSelectedProgrammeDay | null>(selectedProgrammeDayKey, null);
+    if (!selection || selection.sessionKind === "planned") return null;
+    return {
+      programmeId: selection.programmeId,
+      dayId: selection.dayId,
+      sessionKind: selection.sessionKind ?? "custom",
+    };
   }
 
   clearSelectedProgrammeDay(): void {

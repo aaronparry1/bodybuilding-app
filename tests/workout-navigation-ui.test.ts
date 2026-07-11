@@ -434,7 +434,7 @@ describe("workout navigation and logging UI contracts", () => {
   it("keeps active workout data ahead of programme-day creation when Train remounts", () => {
     expect(activeWorkoutSource).toContain("export function getLatestOpenSession");
     expect(workoutLoggerSource.indexOf("const latestOpenSession = getLatestOpenSession(sessions);")).toBeGreaterThan(-1);
-    expect(workoutLoggerSource.indexOf("const latestOpenSession = getLatestOpenSession(sessions);")).toBeLessThan(workoutLoggerSource.indexOf("const programmeSession = createSessionFromProgrammeDay(user?.id, currentBlock, activePlan, appSettings);"));
+    expect(workoutLoggerSource.indexOf("const latestOpenSession = getLatestOpenSession(sessions);")).toBeLessThan(workoutLoggerSource.indexOf("const programmeSession = createSessionFromProgrammeDay(user?.id);"));
     expect(workoutLoggerSource).toContain("const latestOpenSession = getLatestOpenSession(workoutSessionRepository.list());");
     expect(workoutLoggerSource).toContain("setSession(latestOpenSession);");
   });

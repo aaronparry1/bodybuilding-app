@@ -52,7 +52,7 @@ describe("rep range strategy", () => {
     const session = buildWorkoutSessionFromProgrammeDay(generated, generated.days[0]!.id, exerciseLibrary, {
       id: "session-rep-strategy",
       startedAt: "2026-06-04T12:00:00.000Z",
-    }, createTrainingBlock("strength"));
+    });
 
     expect(generated.days[0]?.exerciseSlots[0]?.settings.repRange).toEqual({ min: 6, max: 10 });
     expect(session?.exercises[0]?.settings.repRange).toEqual({ min: 6, max: 10 });

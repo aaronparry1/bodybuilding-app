@@ -6,7 +6,7 @@ import {
   moveExercise,
   removeExerciseFromDay,
   renameProgrammeDay,
-  updatePlannedExerciseSettings,
+  updateDraftExerciseSettings,
 } from "@/domain/training/programme-builder";
 import { exerciseLibrary, presetProgrammes } from "@/domain/training/presets";
 
@@ -27,7 +27,7 @@ describe("programme builder utilities", () => {
     const withRow = addExerciseToDay(withBench, dayId, exerciseLibrary.find((exercise) => exercise.id === "ex-chest-supported-row")!);
     const rowSlot = withRow.days[0].exerciseSlots[1];
     const moved = moveExercise(withRow, dayId, rowSlot.id, "up");
-    const edited = updatePlannedExerciseSettings(moved, dayId, rowSlot.id, {
+    const edited = updateDraftExerciseSettings(moved, dayId, rowSlot.id, {
       repRange: { min: 10, max: 15 },
       dropOffPercent: 12,
       loadIncrease: 5,

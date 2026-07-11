@@ -12,6 +12,11 @@ export interface CreateProgrammeInput {
   createdByUserId?: string | null;
 }
 
+export interface ProgrammeDraftValidation {
+  valid: boolean;
+  reason: string | null;
+}
+
 export function createCustomProgramme(input: CreateProgrammeInput): Programme {
   return {
     id: makeId("programme"),
@@ -26,6 +31,17 @@ export function createCustomProgramme(input: CreateProgrammeInput): Programme {
     isCustom: true,
     isPreset: false,
   };
+}
+
+/** A builder programme is a saved draft/template, never an active plan. */
+export function validateProgrammeDraft(programme: Programme): ProgrammeDraftValidation {
+  if (programme.days.length === 0) {
+    return { valid: false, reason: "Add at least one day before using this programme as a session template." };
+  }
+  if (!programme.days.some((day) => day.exerciseSlots.length > 0)) {
+    return { valid: false, reason: "Add at least one exercise before using this programme as a session template." };
+  }
+  return { valid: true, reason: null };
 }
 
 export function createProgrammeDay(name: string, order: number): SessionTemplate {
@@ -53,9 +69,9 @@ export function renameProgrammeDay(programme: Programme, dayId: string, name: st
   };
 }
 
-export function createPlannedExercise(exercise: Exercise, plannedOrder: number): ProgramExercise {
+export function createDraftExercise(exercise: Exercise, plannedOrder: number): ProgramExercise {
   return {
-    id: makeId("planned-exercise"),
+    id: makeId("draft-exercise"),
     exerciseId: exercise.id,
     plannedOrder,
     settings: withSetPrescription(exercise.defaultSettings, {
@@ -75,13 +91,13 @@ export function addExerciseToDay(programme: Programme, dayId: string, exercise: 
       if (day.id !== dayId) return day;
       return {
         ...day,
-        exerciseSlots: [...day.exerciseSlots, createPlannedExercise(exercise, day.exerciseSlots.length + 1)],
+        exerciseSlots: [...day.exerciseSlots, createDraftExercise(exercise, day.exerciseSlots.length + 1)],
       };
     }),
   };
 }
 
-export function updatePlannedExerciseSettings(
+export function updateDraftExerciseSettings(
   programme: Programme,
   dayId: string,
   slotId: string,

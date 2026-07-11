@@ -9,7 +9,7 @@ import {
   moveExercise,
   removeExerciseFromDay,
   renameProgrammeDay,
-  updatePlannedExerciseSettings,
+  updateDraftExerciseSettings,
 } from "@/domain/training/programme-builder";
 import { titleCase } from "@/domain/training/exercise-library";
 import type { Programme } from "@/domain/training/models";
@@ -31,7 +31,7 @@ export default function ProgrammeBuilderScreen() {
 
   return (
     <Screen>
-      <ScreenHeader eyebrow="Custom structure" title="Programme Builder" subtitle="Build a split, tune the targets, then let the logger do the coaching." />
+      <ScreenHeader eyebrow="Custom draft" title="Programme Builder" subtitle="Build a split and save it as a preview. A scheduled workout is created only through your active plan." />
 
       <AppInput label="Programme name" value={programme.name} onChangeText={(name) => setProgramme({ ...programme, name })} />
       <AppInput
@@ -83,22 +83,22 @@ export default function ProgrammeBuilderScreen() {
                 </Text>
                 <View style={{ flexDirection: "row", gap: 8 }}>
                   <SmallField
-                    label="Min"
+                    label="Guide min"
                     value={`${slot.settings.repRange.min}`}
                     onChangeText={(value) =>
                       setProgramme(
-                        updatePlannedExerciseSettings(programme, day.id, slot.id, {
+                        updateDraftExerciseSettings(programme, day.id, slot.id, {
                           repRange: { ...slot.settings.repRange, min: Number.parseInt(value, 10) || slot.settings.repRange.min },
                         }),
                       )
                     }
                   />
                   <SmallField
-                    label="Max"
+                    label="Guide max"
                     value={`${slot.settings.repRange.max}`}
                     onChangeText={(value) =>
                       setProgramme(
-                        updatePlannedExerciseSettings(programme, day.id, slot.id, {
+                        updateDraftExerciseSettings(programme, day.id, slot.id, {
                           repRange: { ...slot.settings.repRange, max: Number.parseInt(value, 10) || slot.settings.repRange.max },
                         }),
                       )
@@ -109,7 +109,7 @@ export default function ProgrammeBuilderScreen() {
                     value={`${slot.settings.dropOffPercent}`}
                     onChangeText={(value) =>
                       setProgramme(
-                        updatePlannedExerciseSettings(programme, day.id, slot.id, {
+                        updateDraftExerciseSettings(programme, day.id, slot.id, {
                           dropOffPercent: Number.parseFloat(value) || slot.settings.dropOffPercent,
                         }),
                       )
@@ -120,7 +120,7 @@ export default function ProgrammeBuilderScreen() {
                     value={`${slot.settings.loadIncrease}`}
                     onChangeText={(value) =>
                       setProgramme(
-                        updatePlannedExerciseSettings(programme, day.id, slot.id, {
+                        updateDraftExerciseSettings(programme, day.id, slot.id, {
                           loadIncrease: Number.parseFloat(value) || slot.settings.loadIncrease,
                         }),
                       )
@@ -137,7 +137,7 @@ export default function ProgrammeBuilderScreen() {
         </PremiumCard>
       ))}
 
-      <PrimaryButton label="Save Programme" onPress={save} />
+      <PrimaryButton label="Save Draft" onPress={save} />
     </Screen>
   );
 }

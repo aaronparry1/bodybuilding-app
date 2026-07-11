@@ -1,5 +1,5 @@
-import type { TrainingBlock } from "@/domain/training/annual-models";
 import type { Exercise, ProgramExercise, Programme, WorkoutExerciseLog, WorkoutSession } from "@/domain/training/models";
+import { isNonPlannedSessionKind, type NonPlannedSessionKind } from "@/domain/training/workout-origin";
 
 export interface SessionBuildOptions {
   id: string;
@@ -10,10 +10,7 @@ export interface SessionBuildOptions {
    * CoachingPacket or planned slot omitted it.
    */
   defaultLoad?: number;
-  planSessionIndex?: number;
-  planBlockId?: string;
-  planWeekNumber?: number;
-  sessionKind?: WorkoutSession["sessionKind"];
+  sessionKind?: NonPlannedSessionKind;
 }
 
 export function createWorkoutExerciseLog(
@@ -45,7 +42,6 @@ export function buildWorkoutSessionFromProgrammeDay(
   dayId: string,
   exercises: Exercise[],
   options: SessionBuildOptions,
-  currentBlock?: TrainingBlock | null,
 ): WorkoutSession | null {
   const day = programme.days.find((candidate) => candidate.id === dayId);
   if (!day) return null;
@@ -58,12 +54,9 @@ export function buildWorkoutSessionFromProgrammeDay(
     userId: options.userId ?? "guest-local",
     programmeId: programme.id,
     templateId: day.id,
-    planSessionIndex: options.planSessionIndex,
-    planBlockId: options.planBlockId,
-    planWeekNumber: options.planWeekNumber,
     // Programme-builder and ad-hoc sessions are never main-plan sessions.
     // The recovery constructor is the sole owner of planned workouts.
-    sessionKind: options.sessionKind && options.sessionKind !== "planned" ? options.sessionKind : "extra_full",
+    sessionKind: isNonPlannedSessionKind(options.sessionKind) ? options.sessionKind : "custom",
     name: `${programme.name} • ${day.name}`,
     startedAt: options.startedAt,
     exercises: plannedExercises.map((slot, index) => {
