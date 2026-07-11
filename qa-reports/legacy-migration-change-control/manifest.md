@@ -234,3 +234,7 @@ The Phase 9A Git commit is the pre-edit baseline for the constructor, logger, an
 | `src/domain/training/recovery-workout-constructor.ts` | `2dcb17a6573c2b00cee509eda39564f4bc4ff0115f0549cabd7da53f8108bd46` | `28b7bf66fe2bdf20c979d805235fad94dfc09f6b204fdac3bb13a2d6fbe35be5` | Replace ambiguous nullable outcome with a discriminated construction result. | Constructor, exact-target, intervention tests |
 | `src/features/workout-logging/use-workout-logger.ts` | `20dcf7946b5928b73d17d9d2ba1bc9ac5a2915e3c09941920b334d7d1f00747b` | `8ff3d5c339344ee70265103ec7d4185439efc59326eed49200624a8d1c284670` | Exhaustively handle construction outcomes at the existing no-session UI boundary. | Navigation architecture |
 | `tests/session-construction.test.ts` | `bb81d9c4a256306a90c9add44a6c62ede64205461ec1542ccea0c0bc9972dfd7` | `9c9ef583805407244dd9a30e54c61cabd0ecbd9a22d32d0074e38391bf7297d1` | Cover explicit constructed, blocked, and no-candidate results. | Self |
+
+## Phase 9C deletion audit
+
+No production file was deleted or edited. The repository-wide inventory found current Train/logger, ad-hoc, recommendation, settings, sync, and QA imports of annual/training-year or block modules. They do not meet the deletion gate and are documented in `phase-9c-final-deletion-inventory.md` and the certification document.

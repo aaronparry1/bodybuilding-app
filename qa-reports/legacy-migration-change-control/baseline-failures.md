@@ -27,3 +27,5 @@ Acceptance rule for every phase: no new failing file, no new failure in a previo
 Phase 9A removed seven obsolete Home view-model assertions from the frozen baseline. They asserted annual/block labels and next-block previews that no longer belong to the current Home contract; replacement current-authority coverage lives in `tests/home-dashboard-view-model.test.ts`. Final Phase 9A comparison: **15 failing files / 43 failing tests / 1,501 passing tests**; no other frozen failure changed.
 
 Phase 9B changes only the planned-session constructor result representation and its direct callers. It introduces focused result-contract coverage and does not alter a frozen failing suite.
+
+Phase 9C deletion audit found active annual/training-year and block-policy imports, so no failing suite is reclassified as safely removable in this phase.

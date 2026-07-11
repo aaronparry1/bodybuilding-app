@@ -10,6 +10,6 @@
 | Evidence | training evidence repository tests | Verified | V2/V3 comment/docs | Comment deletion-gated. |
 | Interventions | intervention resolver and explicit planned-construction result | Verified | Existing record schema lacks expiry/scope | Do not invent semantics. |
 | Home deprecated fields | `home-dashboard.ts` planning context and Phase 9A Home tests | Resolved | Historical labels have no active caller | Removed from default contract; no adapter required. |
-| Training-year/block utilities | legacy/QA/compatibility callers remain | Classified, not deleted | Compatibility, QA, historical, logger non-planned helpers | Deletion-gated. |
+| Training-year/block utilities | Current Train/logger, ad-hoc, recommendation, settings, sync, and QA callers remain | Not deletion-safe | Active legacy plus compatibility/QA | Migration blocker; retain until callers are isolated. |
 
 No active planned constructor, exact-target execution, historical review, Analytics, non-planned boundary, evidence store, or intervention selection path was found to use a parallel authority.
