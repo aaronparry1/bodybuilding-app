@@ -113,6 +113,32 @@ describe("post-workout review", () => {
     });
   });
 
+  it("keeps a planned review decision stable when current range and block context change", () => {
+    const completed = {
+      ...exercise("bench", "Bench Press", 100, [5, 7, 6]),
+      settings: { ...settings, repRange: { min: 12, max: 15 } },
+      prescribedSetTargets: [5, 7, 6],
+    };
+    const changedCurrentContext = {
+      ...completed,
+      settings: { ...completed.settings, repRange: { min: 1, max: 3 } },
+    };
+    const baseline = buildPostWorkoutReview({
+      session: session("stored-exact", [completed]),
+      previousSessions: [completedSession("previous", [exercise("bench", "Bench Press", 100, [5, 7, 6])])],
+      completedAt: "2026-06-08T11:00:00.000Z",
+      currentBlock: "hypertrophy",
+    });
+    const changed = buildPostWorkoutReview({
+      session: session("stored-exact", [changedCurrentContext]),
+      previousSessions: [completedSession("previous", [exercise("bench", "Bench Press", 100, [5, 7, 6])])],
+      completedAt: "2026-06-08T11:00:00.000Z",
+      currentBlock: "deload",
+    });
+
+    expect(changed.loadChanges).toEqual(baseline.loadChanges);
+  });
+
   it("can recommend a target-zone-aware increase without requiring the full top of the original range", () => {
     const approvedLowZone = (id: string, load: number, reps: number[], approvedLoad: number, completedAt: string) =>
       completedSession(

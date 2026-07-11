@@ -52,6 +52,52 @@ describe("workout history summaries", () => {
     });
   });
 
+  it("classifies planned progression from stored exact targets rather than the saved range", () => {
+    const exactSession: WorkoutSession = {
+      ...completedSession,
+      id: "exact-target-history",
+      sessionKind: "planned",
+      exercises: [{
+        ...completedSession.exercises[0]!,
+        settings: { ...defaultHypertrophySettings, repRange: { min: 12, max: 15 } },
+        prescribedSetTargets: [5, 7, 6],
+        sets: [
+          { id: "set-1", setNumber: 1, reps: 5, load: 100, loggedAt: "2026-06-01T10:05:00.000Z", type: "work" },
+          { id: "set-2", setNumber: 2, reps: 7, load: 100, loggedAt: "2026-06-01T10:10:00.000Z", type: "work" },
+          { id: "set-3", setNumber: 3, reps: 6, load: 100, loggedAt: "2026-06-01T10:15:00.000Z", type: "work" },
+        ],
+      }],
+    };
+
+    const summary = summarizeWorkoutSession(exactSession);
+
+    expect(summary?.exerciseSummaries[0]).toMatchObject({
+      prescribedSetTargets: [5, 7, 6],
+      qualitySets: 3,
+      progressionEarned: true,
+    });
+  });
+
+  it("does not treat a range-compatible planned set as successful when its stored exact target was missed", () => {
+    const exactSession: WorkoutSession = {
+      ...completedSession,
+      id: "exact-target-miss",
+      sessionKind: "planned",
+      exercises: [{
+        ...completedSession.exercises[0]!,
+        settings: { ...defaultHypertrophySettings, repRange: { min: 3, max: 5 } },
+        prescribedSetTargets: [5, 7, 6],
+        sets: [
+          { id: "set-1", setNumber: 1, reps: 5, load: 100, loggedAt: "2026-06-01T10:05:00.000Z", type: "work" },
+          { id: "set-2", setNumber: 2, reps: 5, load: 100, loggedAt: "2026-06-01T10:10:00.000Z", type: "work" },
+          { id: "set-3", setNumber: 3, reps: 5, load: 100, loggedAt: "2026-06-01T10:15:00.000Z", type: "work" },
+        ],
+      }],
+    };
+
+    expect(summarizeWorkoutSession(exactSession)?.exerciseSummaries[0]?.progressionEarned).toBe(false);
+  });
+
   it("preserves training-week identity for restore and current-week progression", () => {
     const summary = summarizeWorkoutSession({
       ...completedSession,

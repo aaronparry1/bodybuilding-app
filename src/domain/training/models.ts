@@ -340,6 +340,9 @@ export interface ExerciseHistorySummary {
   load: number;
   unit: UnitSystem;
   measurementType?: ExerciseMeasurementType;
+  /** Stored set-ordinal prescription when this summary came from a planned workout. */
+  prescribedSetTargets?: ExactPrescribedSetTargets;
+  prescriptionSource?: "stored_exact" | "compatibility";
   repRange?: { min: number; max: number };
   setsCompleted: number;
   repsCompleted: number;

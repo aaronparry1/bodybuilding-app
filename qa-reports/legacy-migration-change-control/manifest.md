@@ -120,6 +120,21 @@ Phase 4B changes only Train's planned work-set target reader. It does not change
 
 The pre-edit original of `app/(protected)/(tabs)/train.tsx` is preserved below `originals/` and is Git-ignored. The quarantined obsolete `tests/plan-page-view-model.test 2.ts` remains ignored and untouched.
 
+## Phase 4C execution record
+
+Phase 4C changes completed planned-workout classification only. It does not alter Train execution, logger persistence, Analytics/reporting, evidence, interventions, ad-hoc/custom construction, or the quarantined legacy Plan suite.
+
+| File | Pre-edit SHA-256 | Change reason | Post-edit SHA-256 | Focused tests |
+| --- | --- | --- | --- | --- |
+| `src/domain/training/models.ts` | `b0c2beea4ec5608ad761fe6b6dcc48e213154c48ab633f6267a68e071a0babad` | Retain stored exact target arrays and their source classification in history summaries. | `6ea13a242812ddafc70189fceec9167398fe4a39ef97d6de1fb46222a9b25b66` | workout history, Progress authority |
+| `src/domain/training/workout-history.ts` | `9125eca4d146b403cfa92f146468d4140e68eb5da2e57aac9b4bd6e3f8a40d36` | Evaluate completed planned sessions from stored exact targets by ordinal before compatibility range rules. | `f9d232f1c7efd7c65b7a77a3beaafd44534d8d6f73ffd37c080e3befd62239c1` | workout history, post-workout review |
+| `src/domain/training/post-workout-review.ts` | `5bfd6dc529e565f62b372410b8f33747543b7534ac82a393e6f8f516a055d58f` | Prevent current block/range target-zone and throttle inputs from reclassifying an exact stored prescription. | `c84fcf205e8db6db503e32151fb5b9c8eec86a30b3c9f780be45f464d07d3bbc` | post-workout review |
+| `tests/workout-history.test.ts` | `aaefeb7164cc0b8f5d78fe6e6eef2661b35ae5f5daeb4c24f7ed68fa24f682c6` | Characterize stored-target ordinal success and miss handling. | `7ab004a44c08b8401f687ed8af6201f3501d32531c285a670d04c8bc2a82e44d` | self |
+| `tests/post-workout-review.test.ts` | `79bb74e0dce27dfe7cfa8e0004cda5d9b24fac88ee11143f4e69ee209315cd30` | Characterize historical review invariance across changed range/block context. | `afc1ab640554b3d7eabc2e0d880be11f3aafd1ded5ef0f70dd39c8592c3e77a1` | self |
+| `tests/progress-dashboard.test.ts` | `b4901429efa689ebac605d51b945aeea02ff66a3accc0719594073ab20a647c0` | Characterize immutable stored prescription outcome consumption by Progress. | `1af62aa56e73f79d60c5d9c1d0b711443f434c3ecf6d1bcb9d61d4a2912105be` | Progress dashboard |
+| `docs/post-workout-progress-stored-prescription-authority.md` | New file | Record Phase 4C authority and explicit compatibility boundary. | `1fa6a4ba456a678d4a768c237606c8948f820354b22914e39d993faa17c7cdb8` | Documentation review |
+| `qa-reports/legacy-migration-change-control/phase-4c-review-progress-authority-map.md` | New file | Record Phase 4C pre-edit authority map. | `08dcfa5760097e903ce1a1808a6f9ea10c91e3f053d4079dcc7a39014ec7ac22` | Documentation review |
+
 | File | SHA-256 |
 | --- | --- |
 | `docs/legacy-planning-coaching-evidence-intervention-audit.md` | `f7543c9ac8f5dcc5f66d477b4c59afa2d8ebe52ccd2beddfd3bc00b2a2e7904c` |

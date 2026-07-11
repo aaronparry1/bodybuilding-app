@@ -69,6 +69,24 @@ describe("progress dashboard view model", () => {
     expect(progress.hiddenZeroSetWorkouts).toHaveLength(1);
   });
 
+  it("keeps stored planned prescription outcomes intact when current planning context changes", () => {
+    const historical = workout(1, [exerciseEntry(1, {
+      prescribedSetTargets: [5, 7, 6],
+      repRange: { min: 12, max: 15 },
+      qualitySets: 3,
+      progressionEarned: true,
+    })]);
+
+    const musclePlan = buildProgressDashboardViewModel([historical], exerciseLibrary, activePlan("build_muscle"));
+    const strengthPlan = buildProgressDashboardViewModel([historical], exerciseLibrary, activePlan("build_strength"));
+
+    expect(musclePlan.completedWorkouts[0]?.exerciseSummaries[0]).toMatchObject({
+      prescribedSetTargets: [5, 7, 6],
+      progressionEarned: true,
+    });
+    expect(strengthPlan.completedWorkouts[0]?.exerciseSummaries[0]).toEqual(musclePlan.completedWorkouts[0]?.exerciseSummaries[0]);
+  });
+
   it("cleans generated workout names before Progress displays them", () => {
     const progress = buildProgressDashboardViewModel([workout(1, [exerciseEntry(1)], { sessionName: "AI Arms • Arms" })], exerciseLibrary);
 

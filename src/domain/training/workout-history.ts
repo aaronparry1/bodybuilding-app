@@ -73,13 +73,16 @@ function summarizeExerciseLike(
 ): ExerciseHistorySummary {
   const workSets = getWorkSets(exercise.sets);
   const countsAsPlannedProgressionEvidence = session.sessionKind == null || session.sessionKind === "planned";
+  const storedExactTargets = storedExactTargetsForSummary(session, exercise, workSets.length);
+  const hasStoredExactTargets = storedExactTargets != null;
   const progression = evaluateExerciseProgression({
     exerciseName: exercise.exerciseName,
     currentLoad: exercise.load,
     settings: exercise.settings,
     sets: workSets,
+    prescribedSetTargets: hasStoredExactTargets ? storedExactTargets : undefined,
   });
-  const clearMissRecommendation = countsAsPlannedProgressionEvidence
+  const clearMissRecommendation = countsAsPlannedProgressionEvidence && !hasStoredExactTargets
     ? recommendLoadAfterClearRepRangeMiss({
         sets: exercise.sets,
         settings: exercise.settings,
@@ -124,10 +127,14 @@ function summarizeExerciseLike(
     load: exercise.load,
     unit: exercise.settings.unit,
     measurementType,
+    prescribedSetTargets: storedExactTargets ? [...storedExactTargets] : undefined,
+    prescriptionSource: hasStoredExactTargets ? "stored_exact" : "compatibility",
     repRange: exercise.settings.repRange,
     setsCompleted: workSets.length,
     repsCompleted,
-    qualitySets: progression.completedAcceptableSets,
+    qualitySets: storedExactTargets
+      ? workSets.filter((set, index) => set.reps >= (storedExactTargets[index] ?? Number.POSITIVE_INFINITY)).length
+      : progression.completedAcceptableSets,
     bestSetReps: progression.bestSetReps,
     dropOffThreshold: exercise.settings.dropOffPercent,
     stoppedByDropOff: exercise.status === "shutdown" || progression.shouldShutdown,
@@ -155,6 +162,16 @@ function summarizeExerciseLike(
     finishType: "finishType" in exercise ? exercise.finishType : undefined,
     notes: replacement ? exercise.notes : clearMissRecommendation?.action === "reduce" ? clearMissRecommendation.message : manualFinishLabel ?? ("shutdownReason" in exercise ? exercise.shutdownReason : exercise.notes),
   };
+}
+
+function storedExactTargetsForSummary(
+  session: WorkoutSession,
+  exercise: WorkoutExerciseLog | SwappedExerciseRecord,
+  workSetCount: number,
+): number[] | null {
+  if (session.sessionKind !== "planned" || !("prescribedSetTargets" in exercise)) return null;
+  const targets = exercise.prescribedSetTargets;
+  return targets && targets.length > 0 && targets.length === workSetCount ? targets : null;
 }
 
 function formatEquipmentSignature(equipment: Equipment[]): string {

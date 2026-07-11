@@ -239,24 +239,29 @@ function buildLoadChanges(
       if (!exercise || summary.setsCompleted === 0) return null;
       const currentLoad = exercise.load;
       if (!Number.isFinite(currentLoad) || !Number.isFinite(summary.nextRecommendedLoad)) return null;
+      const storedExactTargets = storedExactTargetsForCompletedExercise(session, exercise);
       const metadata = exerciseLibrary.find((candidate) => candidate.id === exercise.exerciseId);
       const exerciseHistory = history
         .filter((candidate) => candidate.sessionId !== session.id)
         .flatMap((candidate) => candidate.exerciseSummaries)
         .filter((candidate) => candidate.exerciseId === exercise.exerciseId);
       const canonicalPrior = resolveCanonicalLoadEvidence(history.filter((candidate) => candidate.sessionId !== session.id), exercise.exerciseId);
-      const targetZone = resolveExerciseTargetZone({
-        exercise: metadata,
-        exerciseId: exercise.exerciseId,
-        exerciseRole: metadata?.role,
-        exerciseFamily: metadata?.family,
-        movementPattern: metadata?.movementPattern,
-        block: context.currentBlock,
-        lane: exercise.settings.trainingLane,
-        repRange: exercise.settings.repRange,
-        recentExerciseHistory: canonicalPrior ? [canonicalPrior, ...exerciseHistory.filter((entry) => entry.sessionId !== canonicalPrior.sessionId)] : exerciseHistory,
-      });
-      const targetZoneEarnedIncrease = targetZoneEarnsIncrease(exercise, targetZone);
+      const targetZone = storedExactTargets
+        ? null
+        : resolveExerciseTargetZone({
+            exercise: metadata,
+            exerciseId: exercise.exerciseId,
+            exerciseRole: metadata?.role,
+            exerciseFamily: metadata?.family,
+            movementPattern: metadata?.movementPattern,
+            block: context.currentBlock,
+            lane: exercise.settings.trainingLane,
+            repRange: exercise.settings.repRange,
+            recentExerciseHistory: canonicalPrior ? [canonicalPrior, ...exerciseHistory.filter((entry) => entry.sessionId !== canonicalPrior.sessionId)] : exerciseHistory,
+          });
+      const targetZoneEarnedIncrease = storedExactTargets
+        ? storedExactTargets.every((target, index) => (getWorkSets(exercise.sets)[index]?.reps ?? 0) >= target)
+        : targetZone ? targetZoneEarnsIncrease(exercise, targetZone) : false;
       const targetZoneRecommendedLoad = Number((currentLoad + exercise.settings.loadIncrease).toFixed(2));
       const recommendedLoad = targetZoneEarnedIncrease && summary.nextRecommendedLoad <= currentLoad ? targetZoneRecommendedLoad : summary.nextRecommendedLoad;
       if (!Number.isFinite(recommendedLoad)) return null;
@@ -267,7 +272,7 @@ function buildLoadChanges(
       if (rawDirection === "increase" && firstExposure && !strongFirstBaseline) return null;
       if (rawDirection === "hold") return null;
       const throttle =
-        rawDirection === "increase"
+        rawDirection === "increase" && !storedExactTargets
           ? resolveProgressionThrottle({
               exerciseRole: metadata?.role,
               exerciseFamily: metadata?.family,
@@ -318,7 +323,7 @@ function buildLoadChanges(
               : [
                   `${summary.qualitySets} quality work set(s).`,
                   `Best set: ${formatMetricValue(summary.bestSetReps, summary.measurementType)}.`,
-                  ...(targetZoneEarnedIncrease ? [`Target zone: ${targetZoneLabel(targetZone.targetZone)} ${summary.measurementType === "duration" ? "sec" : "reps"}.`] : []),
+                  ...(targetZoneEarnedIncrease && targetZone ? [`Target zone: ${targetZoneLabel(targetZone.targetZone)} ${summary.measurementType === "duration" ? "sec" : "reps"}.`] : []),
                 ]
             : [summary.notes ?? "Recent work-set performance declined.", `${summary.setsCompleted} work set(s) logged.`],
       } satisfies PostWorkoutLoadChange;
@@ -338,6 +343,14 @@ function isStrongFirstBaseline(exercise: WorkoutExerciseLog): boolean {
   }
   const topEndSets = workSets.filter((set) => set.reps >= exercise.settings.repRange.max);
   return workSets.length >= requiredSets && topEndSets.length >= Math.max(2, requiredSets);
+}
+
+function storedExactTargetsForCompletedExercise(session: WorkoutSession, exercise: WorkoutExerciseLog): number[] | null {
+  if (session.sessionKind !== "planned") return null;
+  const workSets = getWorkSets(exercise.sets);
+  const targets = exercise.prescribedSetTargets;
+  if (!targets?.length || targets.length !== workSets.length) return null;
+  return targets;
 }
 
 function targetZoneEarnsIncrease(
