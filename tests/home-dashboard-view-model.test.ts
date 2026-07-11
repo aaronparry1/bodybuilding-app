@@ -5,7 +5,6 @@ import type { ExerciseHistorySummary, WorkoutHistorySummary, WorkoutSession } fr
 import { createActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { displayWorkoutName } from "@/domain/training/planned-workout";
 import { exerciseLibrary, presetProgrammes } from "@/domain/training/presets";
-import { advanceActivePlanBlock } from "@/domain/training/recommendation-actions";
 import { shouldAdvanceTrainingWeekAfterCompletedSession } from "@/domain/training/training-session-selection";
 
 const trainingYear = createAnnualPlan(naturalLifterAnnualPlan, "2026-06-01T00:00:00.000Z");
@@ -179,7 +178,7 @@ describe("Home dashboard view model", () => {
     expect(dashboard.todayWorkoutName).toBe("Set up your training plan");
     expect(dashboard.primaryActionLabel).toBe("Set up your training plan");
     expect(dashboard.thisWeek).toEqual([]);
-    expect(dashboard.currentBlock.name).toBe("No active plan");
+    expect(dashboard.planningContext.status).toBe("no_plan");
   });
 
   it("shows today's workout from the real active plan", () => {
@@ -195,10 +194,9 @@ describe("Home dashboard view model", () => {
 
     expect(dashboard.todayState).toBe("planned");
     expect(dashboard.todayWorkoutName).toBe("Upper");
-    expect(dashboard.currentBlock.name).toBe("Hypertrophy");
-    expect(dashboard.currentBlock.weekLabel).toBe("Week 1 of 4");
-    expect(dashboard.currentBlock.contextLabel).toBe("Hypertrophy · Week 1 of 4");
-    expect(dashboard.nextBlockPreview).toBe("Next: Hypertrophy · 8 weeks");
+    expect(dashboard.planningContext.status).toBe("incomplete");
+    expect("currentBlock" in dashboard).toBe(false);
+    expect("nextBlockPreview" in dashboard).toBe(false);
     expect(dashboard.primaryActionLabel).toBe("Start Upper");
     expect(dashboard.thisWeek).toEqual(["Upper", "Lower", "Upper", "Lower"]);
     expect(dashboard.recommendedSessionIndex).toBe(0);
@@ -322,7 +320,6 @@ describe("Home dashboard view model", () => {
       date: new Date("2026-06-15T12:00:00.000Z"),
     });
 
-    expect(dashboard.currentBlock.contextLabel).toBe("Hypertrophy · Week 1 of 4");
     expect(dashboard.todayWorkoutName).toBe("Lower");
     expect(dashboard.recommendedSessionIndex).toBe(1);
   });
@@ -429,120 +426,6 @@ describe("Home dashboard view model", () => {
 
     expect(sameCalendarWeek.recommendedSessionIndex).toBe(1);
     expect(afterCalendarRollover.recommendedSessionIndex).toBe(0);
-  });
-
-  it("uses actual active-plan blocks for current and next block context", () => {
-    const activePlan = plan(4, "upper_lower");
-    const first = activePlan.blocks[0]!;
-    const second = activePlan.blocks[1]!;
-    const dashboard = buildHomeDashboardViewModel({
-      trainingYear,
-      activePlan,
-      history: [],
-      exercises: exerciseLibrary,
-      programmes: presetProgrammes,
-      date: new Date("2026-06-04T09:00:00.000Z"),
-    });
-
-    expect(dashboard.currentBlock.contextLabel).toBe(`${first.name.replace(/\s+\d+\s+weeks$/i, "")} · Week ${first.currentWeek} of ${first.durationWeeks}`);
-    expect(dashboard.nextBlockPreview).toBe(`Next: ${second.name.replace(/\s+\d+\s+weeks$/i, "")} · ${second.durationWeeks} weeks`);
-  });
-
-  it("handles one-block plans without inventing a scheduled next block", () => {
-    const activePlan = createActiveTrainingPlan(
-      {
-        goal: "build_muscle",
-        planningChoice: "single_block",
-        singleBlockType: "hypertrophy",
-        equipmentPreset: "full_gym",
-        daysPerWeek: 4,
-        preferredSplit: "upper_lower",
-        experienceLevel: "intermediate",
-      },
-      "2026-06-01T00:00:00.000Z",
-    );
-    const dashboard = buildHomeDashboardViewModel({
-      trainingYear,
-      activePlan,
-      history: [],
-      exercises: exerciseLibrary,
-      programmes: presetProgrammes,
-      date: new Date("2026-06-04T09:00:00.000Z"),
-    });
-
-    expect(dashboard.currentBlock.contextLabel).toBe("Hypertrophy · Week 1 of 6");
-    expect(dashboard.nextBlockPreview).toBe("Next block decided later");
-  });
-
-  it("shows scheduled next block context for event plans", () => {
-    const activePlan = createActiveTrainingPlan(
-      {
-        goal: "build_strength",
-        planningChoice: "custom_date_event",
-        eventType: "powerlifting_meet",
-        targetDate: "2026-10-01T00:00:00.000Z",
-        equipmentPreset: "full_gym",
-        daysPerWeek: 4,
-        preferredSplit: "upper_lower",
-        experienceLevel: "intermediate",
-      },
-      "2026-06-01T00:00:00.000Z",
-    );
-    const dashboard = buildHomeDashboardViewModel({
-      trainingYear,
-      activePlan,
-      history: [],
-      exercises: exerciseLibrary,
-      programmes: presetProgrammes,
-      date: new Date("2026-06-04T09:00:00.000Z"),
-    });
-
-    expect(dashboard.currentBlock.contextLabel).toBe("Powerbuilding · Week 1 of 6 · 17 weeks out");
-    expect(dashboard.nextBlockPreview).toBe("Next: Strength · 4 weeks");
-  });
-
-  it("updates current and next block display after block transition", () => {
-    const activePlan = plan(4, "upper_lower");
-    const eligiblePlan = {
-      ...activePlan,
-      blocks: activePlan.blocks.map((block, index) => (index === 0 ? { ...block, currentWeek: block.durationWeeks } : block)),
-    };
-    const advanced = advanceActivePlanBlock(eligiblePlan, "2026-07-12T12:00:00.000Z");
-    const dashboard = buildHomeDashboardViewModel({
-      trainingYear,
-      activePlan: advanced,
-      history: [],
-      exercises: exerciseLibrary,
-      programmes: presetProgrammes,
-      date: new Date("2026-07-13T09:00:00.000Z"),
-    });
-
-    expect(dashboard.currentBlock.contextLabel).toBe("Hypertrophy · Week 1 of 8");
-    expect(dashboard.nextBlockPreview).toBe("Next: Strength · 6 weeks");
-  });
-
-  it("shows planned deload blocks as Recovery Window on Home", () => {
-    const activePlan = plan(4, "upper_lower");
-    const deloadBlock = activePlan.blocks.find((block) => block.type === "deload")!;
-    const recoveryPlan = {
-      ...activePlan,
-      activeBlockId: deloadBlock.id,
-      blocks: activePlan.blocks.map((block) =>
-        block.id === deloadBlock.id ? { ...block, status: "active" as const, currentWeek: 1 } : { ...block, status: "planned" as const },
-      ),
-    };
-    const dashboard = buildHomeDashboardViewModel({
-      trainingYear,
-      activePlan: recoveryPlan,
-      history: [],
-      exercises: exerciseLibrary,
-      programmes: presetProgrammes,
-      date: new Date("2026-07-13T09:00:00.000Z"),
-    });
-
-    expect(dashboard.currentBlock.name).toBe("Recovery Window");
-    expect(dashboard.currentBlock.contextLabel).toBe("Recovery Window · Week 1 of 2");
-    expect(dashboard.currentBlock.coachLine).toContain("Adaptive dose");
   });
 
   it("does not let completed extra sessions advance the main plan", () => {

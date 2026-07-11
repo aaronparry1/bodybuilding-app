@@ -14,8 +14,8 @@ Candidate resolution now distinguishes `candidates`, `blocked_by_intervention`, 
 
 ## Verification
 
-Migration-focused tests, typecheck, Expo public config, and web export pass. The final full-suite result is 16 failing files / 50 failing tests / 1,499 passing tests: one additional passing test is the intervention-result characterization added in Phase 8. The remaining failures are the frozen baseline, including the seven legacy Home assertions, workout-history prior-load expectation, and progress-dashboard recovery-window null access, as recorded in `baseline-failures.md`.
+Migration-focused tests, typecheck, Expo public config, and web export pass. After Phase 9A, the full-suite result is 15 failing files / 43 failing tests / 1,501 passing tests: the seven obsolete legacy Home assertions are resolved. The remaining failures include the workout-history prior-load expectation and progress-dashboard recovery-window null access, as recorded in `baseline-failures.md`.
 
 ## Residual risks
 
-Home compatibility fields and legacy annual utilities still require a dedicated compatibility-test/deletion phase. The constructor’s public `null` result remains ambiguous to external callers, although the intervention-aware resolver is explicit. No expiry, medical, or scope semantics were invented for interventions.
+Legacy annual utilities still require a dedicated compatibility-test/deletion phase. Phase 9A removed Home's deprecated compatibility fields and obsolete assertions. The constructor’s public `null` result remains ambiguous to external callers, although the intervention-aware resolver is explicit. No expiry, medical, or scope semantics were invented for interventions.

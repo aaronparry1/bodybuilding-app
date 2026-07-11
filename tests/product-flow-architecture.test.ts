@@ -180,7 +180,7 @@ describe("product flow architecture", () => {
     expect(normalizeActiveTrainingPlanEquipment(savedLimitedPlan).equipment).toEqual(fullGym);
   });
 
-  it("builds a home dashboard with today, current block, upcoming week, and strategic direction", () => {
+  it("builds a home dashboard with current planning context, upcoming week, and strategic direction", () => {
     const plan = createRecommendedAnnualPlan("2026-01-01T00:00:00.000Z");
     const dashboard = buildHomeDashboardViewModel({
       trainingYear: createAnnualPlan(naturalLifterAnnualPlan, "2026-01-01T00:00:00.000Z"),
@@ -197,12 +197,13 @@ describe("product flow architecture", () => {
     expect(dashboard.todayWorkoutName).toBeTruthy();
     expect(dashboard.todayGoal).toBeTruthy();
     expect(dashboard.currentDayIndex).toBeGreaterThanOrEqual(0);
-    expect(dashboard.currentBlock.name).toContain("Hypertrophy");
+    expect(dashboard.planningContext.status).toBe("ready");
+    expect(dashboard.planningContext.mesocyclePurpose).toBeTruthy();
     expect(dashboard.thisWeek).toEqual(weeklySplitForPlan(plan.daysPerWeek, plan.preferredSplit));
     expect(dashboard.recommendationLabel).toBeTruthy();
     expect(dashboard.hasTrainingDirection).toBe(true);
     expect(dashboard.recommendationReasons.length).toBeLessThanOrEqual(2);
-    expect(dashboard.nextBlockPreview).toBeTruthy();
+    expect(dashboard.approvedNextMesocycleLabel).toBeTruthy();
   });
 
   it.each([
@@ -241,7 +242,7 @@ describe("product flow architecture", () => {
     expect(dashboard.hasActivePlan).toBe(false);
     expect(dashboard.hasOpenWorkout).toBe(false);
     expect(dashboard.todayWorkoutName).toBe("Set up your training plan");
-    expect(dashboard.currentBlock.name).toBe("No active plan");
+    expect(dashboard.planningContext.status).toBe("no_plan");
     expect(dashboard.thisWeek).toEqual([]);
   });
 

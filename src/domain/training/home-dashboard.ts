@@ -1,4 +1,4 @@
-import type { TrainingBlock, TrainingYear } from "@/domain/training/annual-models";
+import type { TrainingYear } from "@/domain/training/annual-models";
 import type { Exercise, Programme, WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
 import { displayWorkoutName } from "@/domain/training/planned-workout";
 import { resolveEventTaper } from "@/domain/training/event-taper";
@@ -48,18 +48,6 @@ export interface HomeDashboardViewModel {
     exactTargets: string[];
     status: "ready" | "compatibility" | "incomplete" | "no_plan";
   };
-  /** @deprecated Compatibility-only test/report shape. Home does not render this. */
-  currentBlock: {
-    name: string;
-    weekLabel: string;
-    contextLabel: string;
-    goalLabel: string;
-    purposeLabel: string;
-    coachLine: string;
-    repFocusLabel: string;
-    dropOffLabel: string;
-    volumeLabel: string;
-  };
   thisWeek: string[];
   thisWeekItems: HomeWeekItem[];
   nextWorkout: string;
@@ -87,8 +75,6 @@ export interface HomeDashboardViewModel {
   emptyDirectionMessage: string;
   recentProgress: string;
   approvedNextMesocycleLabel: string;
-  /** @deprecated Compatibility-only test/report copy. Home does not render this. */
-  nextBlockPreview: string;
 }
 
 export function buildHomeDashboardViewModel({
@@ -158,8 +144,8 @@ export function buildHomeDashboardViewModel({
       })
     : null;
   const extraWorkWarning = buildExtraWorkWarning(history);
-  const muscleVolumeWarning = buildMuscleVolumeWarning({ history, exercises, activePlan, currentBlock: null, eventTaper });
-  const recoveryCapacityWarning = buildRecoveryCapacityWarning({ history, exercises, activePlan, currentBlock: null });
+  const muscleVolumeWarning = buildMuscleVolumeWarning({ history, exercises, activePlan, eventTaper });
+  const recoveryCapacityWarning = buildRecoveryCapacityWarning({ history, exercises, activePlan });
   const recoveryCapacityTarget = buildRecoveryCapacityWeeklyTarget({ activePlan, currentBlock: null, history, exercises, activeWorkout, date });
   const latestProgress = history[0]?.progressionHighlights[0] ?? `${history[0]?.setsCompleted ?? 0} sets logged recently`;
   const openPlannedWorkout = activeWorkout && !activeWorkout.completedAt && activeWorkout.sessionKind === "planned" ? activeWorkout : null;
@@ -230,17 +216,6 @@ export function buildHomeDashboardViewModel({
       exactTargets: Object.values(planning?.exactPrescribedTargets ?? {}).flat().map(String),
       status: !activePlan ? "no_plan" : planningReady ? "ready" : activePlan.currentMesocycleId || activePlan.currentMicrocycle ? "incomplete" : "compatibility",
     },
-    currentBlock: {
-      name: blockName,
-      weekLabel: microcycleLabel ?? (hasOpenWorkout ? "Active now" : "Plan needed"),
-      contextLabel: [blockName, microcycleLabel].filter(Boolean).join(" · "),
-      goalLabel: activePlan ? titleBlock(activePlan.goal) : "Set Up Training",
-      purposeLabel: purposeForBlock(blockName),
-      coachLine: coachingLineForBlock(blockName),
-      repFocusLabel: planning?.exactPrescribedTargets ? Object.values(planning.exactPrescribedTargets).flat().join(" / ") || "Exact targets in workout" : "Plan first",
-      dropOffLabel: "Performance based",
-      volumeLabel: "Autoregulated",
-    },
     thisWeek: split,
     thisWeekItems,
     nextWorkout,
@@ -268,7 +243,6 @@ export function buildHomeDashboardViewModel({
     emptyDirectionMessage: "Log a few sessions first. The app is smart, not psychic.",
     recentProgress: latestProgress,
     approvedNextMesocycleLabel,
-    nextBlockPreview: approvedNextMesocycleLabel,
   };
 }
 
@@ -276,12 +250,10 @@ function buildRecoveryCapacityWarning({
   history,
   exercises,
   activePlan,
-  currentBlock,
 }: {
   history: WorkoutHistorySummary[];
   exercises: Exercise[];
   activePlan?: ActiveTrainingPlan | null;
-  currentBlock: TrainingBlock | null;
 }): HomeDashboardViewModel["recoveryCapacityWarning"] {
   if (!activePlan) return undefined;
   const personalisedVolumeState = analyzePersonalisedVolume({
@@ -289,8 +261,7 @@ function buildRecoveryCapacityWarning({
     exercises,
     goal: activePlan.goal,
     experienceLevel: activePlan.experienceLevel,
-    block: currentBlock?.type,
-    deloadActive: currentBlock?.type === "deload" || activePlan.recommendationState?.deload?.status === "accepted",
+    deloadActive: activePlan.recommendationState?.deload?.status === "accepted",
     previousLadderActionsByMuscle: Object.fromEntries(
       exercises.flatMap((exercise) => exercise.primaryMuscles).map((muscle) => [muscle, previousVolumeLadderActions(activePlan, muscle)]),
     ),
@@ -299,11 +270,10 @@ function buildRecoveryCapacityWarning({
     workoutHistory: history,
     exercises,
     muscleVolumeSignals: personalisedVolumeState,
-    deloadActive: currentBlock?.type === "deload" || activePlan.recommendationState?.deload?.status === "accepted",
+    deloadActive: activePlan.recommendationState?.deload?.status === "accepted",
   });
   const result = resolveRecoveryCapacity({
     goal: activePlan.goal,
-    block: currentBlock?.type,
     eventType: activePlan.eventType,
     fatigueClassification,
     personalisedVolumeState,
@@ -333,13 +303,11 @@ function buildMuscleVolumeWarning({
   history,
   exercises,
   activePlan,
-  currentBlock,
   eventTaper,
 }: {
   history: WorkoutHistorySummary[];
   exercises: Exercise[];
   activePlan?: ActiveTrainingPlan | null;
-  currentBlock: TrainingBlock | null;
   eventTaper?: ReturnType<typeof resolveEventTaper> | null;
 }): HomeDashboardViewModel["muscleVolumeWarning"] {
   if (!activePlan) return undefined;
@@ -349,8 +317,7 @@ function buildMuscleVolumeWarning({
       exercises,
       goal: activePlan.goal,
       experienceLevel: activePlan.experienceLevel,
-      block: currentBlock?.type,
-      deloadActive: currentBlock?.type === "deload" || activePlan.recommendationState?.deload?.status === "accepted",
+      deloadActive: activePlan.recommendationState?.deload?.status === "accepted",
       eventTaper,
       previousLadderActionsByMuscle: Object.fromEntries(
         exercises.flatMap((exercise) => exercise.primaryMuscles).map((muscle) => [muscle, previousVolumeLadderActions(activePlan, muscle)]),
@@ -484,28 +451,4 @@ function goalForToday(state: HomeTodayState, workout: string, block: string, nex
   if (state === "completed_today") return nextWorkout ? `Today is done. Next session: ${nextWorkout}.` : "Today’s training is complete.";
   if (state === "rest_day") return nextWorkout ? `Recover today. Next session: ${nextWorkout}.` : "Recover so the next session works.";
   return goalForWorkout(workout, block);
-}
-
-function purposeForBlock(block: string): string {
-  const blockLabel = block.toLowerCase();
-  if (blockLabel.includes("no active plan")) return "Set up your training plan.";
-  if (blockLabel.includes("workout in progress")) return "Finish the session you already started.";
-  if (blockLabel.includes("powerbuilding")) return "Build muscle while increasing strength.";
-  if (blockLabel.includes("strength")) return "Convert muscle into force production.";
-  if (blockLabel.includes("power")) return "Convert strength into speed.";
-  if (blockLabel.includes("peak")) return "Express adaptations.";
-  if (blockLabel.includes("deload") || blockLabel.includes("recovery window")) return "Reduce fatigue, keep skill, and prepare for the next push.";
-  return "Build muscle.";
-}
-
-function coachingLineForBlock(block: string): string {
-  const blockLabel = block.toLowerCase();
-  if (blockLabel.includes("no active plan")) return "Home will brief real training once a plan exists.";
-  if (blockLabel.includes("workout in progress")) return "Pick up where you left off.";
-  if (blockLabel.includes("powerbuilding")) return "Heavy compounds. High-quality accessories.";
-  if (blockLabel.includes("strength")) return "Prioritise load. Maintain hypertrophy.";
-  if (blockLabel.includes("power")) return "You are not chasing fatigue. You are chasing force production.";
-  if (blockLabel.includes("peak")) return "Reduce fatigue. Demonstrate performance.";
-  if (blockLabel.includes("deload") || blockLabel.includes("recovery window")) return "Adaptive dose: easy enough to recover, useful enough to keep the pattern alive.";
-  return "Accumulate productive volume. Stop before junk volume begins.";
 }

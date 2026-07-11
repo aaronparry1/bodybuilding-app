@@ -213,3 +213,14 @@ Final verification introduced an explicit intervention candidate-resolution resu
 | `src/domain/training/exercise-intervention-selection.ts` | `3f67214ed9a3aff5611f1964de07c49ac5db7f9fb7abe2242518557129df143a` | `d13308385379fc44ea0a500757c5221137c2af7eaab398c467566aa02a9a90d6` | Distinguish intervention blocking from ordinary candidate absence. | `tests/exercise-intervention-selection.test.ts` |
 | `src/domain/training/recovery-workout-constructor.ts` | `70e131821feb15d539e1eb7f686e94dda6161f47f66bffcc100a4f88e58b73cc` | `2dcb17a6573c2b00cee509eda39564f4bc4ff0115f0549cabd7da53f8108bd46` | Consume the typed resolver without changing the nullable constructor API. | Session-construction and authority suites |
 | `tests/exercise-intervention-selection.test.ts` | `dc96573aae7a2f9aa3a4c058353e0f068fee92046046dac19537719c96a2aa55` | `07354518143f746dcd4913815ce788cf8cf4be872214a44f8336ed0bbf32f24f` | Prove blocked versus ordinarily empty candidate states. | Self |
+
+## Phase 9A Home compatibility cleanup
+
+Removed `currentBlock` and `nextBlockPreview` from the default Home contract. The existing Phase 4A originals preserve the pre-migration Home source and test suite; the Phase 8 commit is the immediate pre-edit Git baseline. No current caller required a historical-label adapter. Focused proof: `tests/home-dashboard-view-model.test.ts` and `tests/workout-navigation-ui.test.ts`.
+
+| File | Pre-edit SHA-256 (Phase 8) | Post-edit SHA-256 | Reason | Focused tests |
+| --- | --- | --- | --- | --- |
+| `src/domain/training/home-dashboard.ts` | `aec2ad5a3d3b32f2400d3a7ba0ed74208a2fb8a7bc7054a45091f8533ce367d2` | `efe0aab07e19555e0ea9f775f37e00898d69c7f6c269355bf7069fa0872845e7` | Remove deprecated output fields and internal block-label derivation. | Home view-model, navigation |
+| `tests/home-dashboard-view-model.test.ts` | `64fd827fb014a308a97e0a1da0e706dd5973561c548a0cfd89e8be9bd4b2b30d` | `2237ec763ce2ee81a181dd000499059bc99a19a3dbf9c215ddab7f6edee4a010` | Replace seven obsolete block assertions with current-authority coverage. | Home view-model |
+| `tests/product-flow-architecture.test.ts` | `b822ebbb595e623d687f025baf89b99889854f5470e28e7a1fe640948c21e627` | `aba17cfec67e2a26262d6b07ab1508386b8359eacff140872e95d384f7bed79c` | Remove now-invalid Home-contract references. | Typecheck; suite remains frozen-baseline failing elsewhere |
+| `tests/end-to-end-simulator-qa.test.ts` | `14742b522c4c72c0c29133cc6a620196898ab67bd6215ce86b6214d5e8e5080c` | `5d75ff226818ab13df170b19cc155039767a288122369ac19c713dd8052ae6ff` | Replace Home block fixture assertion with microcycle assertion. | Typecheck; suite remains frozen-baseline failing elsewhere |

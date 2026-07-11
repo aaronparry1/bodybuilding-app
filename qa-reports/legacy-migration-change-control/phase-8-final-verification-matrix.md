@@ -9,7 +9,7 @@
 | Non-planned / builder | origin helper and Phase 5 tests | Verified | Builder range guidance | Non-authoritative. |
 | Evidence | training evidence repository tests | Verified | V2/V3 comment/docs | Comment deletion-gated. |
 | Interventions | intervention resolver and constructor | Verified with typed blocked distinction | Existing record schema lacks expiry/scope | Do not invent semantics. |
-| Home deprecated fields | `home-dashboard.ts` still exposes compatibility labels | Unresolved compatibility/test debt | Seven baseline assertions | Not safe to delete in this final verification scope without Home migration. |
+| Home deprecated fields | `home-dashboard.ts` planning context and Phase 9A Home tests | Resolved | Historical labels have no active caller | Removed from default contract; no adapter required. |
 | Training-year/block utilities | legacy/QA/compatibility callers remain | Classified, not deleted | Compatibility, QA, historical, logger non-planned helpers | Deletion-gated. |
 
 No active planned constructor, exact-target execution, historical review, Analytics, non-planned boundary, evidence store, or intervention selection path was found to use a parallel authority.

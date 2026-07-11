@@ -107,8 +107,8 @@ describe("end-to-end simulator QA regression", () => {
     expect(activePlan.equipment).toEqual(["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight"]);
     expect(activePlan.daysPerWeek).toBe(4);
     expect(weeklySplitForPlan(activePlan.daysPerWeek, activePlan.preferredSplit)).toEqual(["Upper", "Lower", "Upper", "Lower"]);
-    expect(dashboard.todayWorkout).toContain("Hypertrophy");
-    expect(dashboard.currentBlock.weekLabel).toBe("Week 1 of 8");
+    expect(dashboard.planningContext.status).toBe("ready");
+    expect(dashboard.planningContext.microcycleLabel).toContain("Microcycle 1");
     expect(dashboard.thisWeek).toEqual(["Upper", "Lower", "Upper", "Lower"]);
     expect(dashboard.recommendationLabel).toBe("Log a few workouts first");
     expect(dashboard.primaryActionLabel).toBe("Start Upper");
