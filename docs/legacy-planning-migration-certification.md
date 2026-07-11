@@ -6,7 +6,7 @@
 
 ## Retained compatibility and blockers
 
-`annual-planner`, training-year storage/hooks, block review/display helpers, V2 QA modules, and range metadata remain. Some are active current legacy paths rather than saved-data compatibility only: Train and the workout logger still read training-year/block state; recommendation, ad-hoc, settings, sync, and QA code also import block utilities. They must be migrated or isolated before deletion.
+`annual-planner`, training-year storage/hooks, block review/display helpers, V2 QA modules, and range metadata remain. Phase 10A removed the Train/logger training-year dependency; recommendation, ad-hoc, settings, sync, and QA code still import block utilities or compatibility storage. They must be migrated or isolated before deletion.
 
 The V2/V3/living-athlete logger comment is executable-inert and its evidence context is archived in `docs/archive/retired-v2-v3-living-athlete-evidence-reference.md`, but it remains deletion-gated with adjacent active V2 policy helpers until their requirements are explicitly replaced.
 

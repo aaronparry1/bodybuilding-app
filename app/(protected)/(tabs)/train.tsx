@@ -46,7 +46,6 @@ import { manualExerciseFinishLabel } from "@/domain/training/workout-exercise-st
 import { createPlanningContext } from "@/domain/training/planning-context";
 import { BrandedShareCardPreviewModal } from "@/features/social-sharing/branded-share-card-preview";
 import { useWorkoutLogger } from "@/features/workout-logging/use-workout-logger";
-import { useTrainingYear } from "@/features/training-year/use-training-year";
 import { BottomActionBar, DetailToggle, PremiumCard, PrimaryButton, Screen, SecondaryButton, WorkoutSetRow } from "@/ui/primitives";
 import { getTabScreenBottomPadding } from "@/ui/layout";
 import { colors, radius, spacing, type } from "@/ui/theme";

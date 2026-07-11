@@ -38,7 +38,6 @@ import { buildDefaultPostWorkoutReviewAnswers, runFirstShippablePostWorkoutLoop 
 import { buildRecoveryWorkoutSession } from "@/domain/training/recovery-workout-constructor";
 import { resolveCanonicalLoadEvidence } from "@/domain/training/load-evidence-resolver";
 import type { PostWorkoutReviewAnswers } from "@/domain/training/post-workout-review-flow";
-import { useTrainingYear } from "@/features/training-year/use-training-year";
 import type { BlockType, TrainingBlock } from "@/domain/training/annual-models";
 import type { AdaptiveProgrammingGoal, AdaptiveTrainingPhase, RecentPerformanceSignal } from "@/domain/training/adaptive-rep-prescription";
 import type { AdaptiveStimulusKnownLimitation } from "@/domain/training/adaptive-stimulus-planner";
@@ -530,9 +529,8 @@ function recentExerciseEvidence(history: WorkoutHistorySummary[], sessionCount: 
 export function useWorkoutLogger() {
   const { user } = useAuth();
   const { settings: appSettings } = useAppSettings();
-  const { currentBlock: trainingYearBlock } = useTrainingYear();
   const [activePlan, setActivePlan] = useState(() => activeTrainingPlanRepository.getOptional());
-  const currentBlock = activePlan?.blocks.find((block) => block.id === activePlan.activeBlockId) ?? trainingYearBlock;
+  const currentBlock = activePlan?.blocks.find((block) => block.id === activePlan.activeBlockId) ?? null;
   const sessions = workoutSessionRepository.list();
   const availableExercises = availableWorkoutExercises();
   const selectedExerciseId = customExerciseRepository.getSelectedExerciseId();

@@ -238,3 +238,12 @@ The Phase 9A Git commit is the pre-edit baseline for the constructor, logger, an
 ## Phase 9C deletion audit
 
 No production file was deleted or edited. The repository-wide inventory found current Train/logger, ad-hoc, recommendation, settings, sync, and QA imports of annual/training-year or block modules. They do not meet the deletion gate and are documented in `phase-9c-final-deletion-inventory.md` and the certification document.
+
+## Phase 10A annual authority isolation
+
+Removed `useTrainingYear` from the active workout logger fallback and from Train's unused import. The current active-plan block may still serve non-planned/logging compatibility branches, but no training-year record can supply it. Focused Train, navigation, constructor, and non-planned suites pass.
+
+| File | Pre-edit SHA-256 (Phase 9C) | Post-edit SHA-256 | Reason | Focused tests |
+| --- | --- | --- | --- | --- |
+| `src/features/workout-logging/use-workout-logger.ts` | `8ff3d5c339344ee70265103ec7d4185439efc59326eed49200624a8d1c284670` | `23c03f018f05e8aa001266cadc2954cf794d5230ca11df0cc35d09c64e1a4ea9` | Prevent training-year state from becoming fallback workout authority. | Train/navigation/constructor/non-planned |
+| `app/(protected)/(tabs)/train.tsx` | `c5722a8d58d28f99ea7aae0552da21402afb42ee6dabbc8041aeaa9096c59a0d` | `d69e028da76811a8a0be530be2012c31e562a46f7bb111fe2cb17d046a488567` | Remove unused training-year import. | Typecheck |
