@@ -17,7 +17,7 @@ export type LegacyBlockDecisionShadow =
 
 export type LegacyShadowResult =
   | { status: "shadowed"; shadow: LegacyBlockDecisionShadow }
-  | { status: "unsupported_shadow"; outcome: "regress" | "review_required" };
+  | { status: "unsupported_shadow"; outcome: "review_required" };
 
 export type LegacyShadowWriter = (shadow: LegacyBlockDecisionShadow) => void;
 
@@ -54,7 +54,6 @@ export function toLegacyBlockDecisionShadow(
       return { status: "shadowed", shadow: { kind: "deload" } };
     case "advance":
       return { status: "shadowed", shadow: { kind: "advance" } };
-    case "regress":
     case "review_required":
       return { status: "unsupported_shadow", outcome: record.outcome };
   }

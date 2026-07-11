@@ -117,8 +117,6 @@ function isMesocycleDecision(value: Record<string, unknown>): value is Mesocycle
       );
     case "advance":
       return typeof value.targetMesocycleId === "string" && !("reason" in value) && !("prerequisite" in value);
-    case "regress":
-      return typeof value.targetMesocycleId === "string" && typeof value.prerequisite === "string" && !("reason" in value);
     case "review_required":
       return (
         ["maximum_exposure", "unsupported_compatibility", "no_safe_transition"].includes(String(value.reason)) &&

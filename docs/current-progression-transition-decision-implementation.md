@@ -6,4 +6,4 @@ The contract and persisted `CurrentMesocycleDecisionRecord` have no block ID, bl
 
 During the temporary bridge, `resolveCurrentDecisionFirst` returns a valid current record ahead of any legacy shadow. `current-progression-transition-legacy-shadow.ts` maps only `delay`, `continue`, `deload`, and `advance` after current persistence; `regress` and `review_required` return an explicit unsupported-shadow result. No current reader uses shadow state.
 
-Stage 2 migrates consumers to the current resolver and applies ready decisions through their existing controlled actions. Stage 3 removes legacy decision persistence only after all legacy readers and shadow writes are gone.
+`regress` was rejected as a current outcome: rebuilding must be an explicitly approved successor or produce `review_required`. Phase 11A.2A now supplies only pure planned-role evaluability; it does not persist evidence or apply decisions. Stage 2 migrates consumers after the remaining readiness producer exists.

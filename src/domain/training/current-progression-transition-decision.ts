@@ -8,7 +8,6 @@ export type MesocycleDecision =
   | { outcome: "continue" }
   | { outcome: "deload"; fatigue: PerformanceBasedFatigueTrend }
   | { outcome: "advance"; targetMesocycleId: MesocycleId }
-  | { outcome: "regress"; targetMesocycleId: MesocycleId; prerequisite: string }
   | { outcome: "review_required"; reason: "maximum_exposure" | "unsupported_compatibility" | "no_safe_transition" };
 
 export type MesocycleDecisionInput = {
@@ -34,7 +33,5 @@ export function decideMesocycleTransition(input: MesocycleDecisionInput): Mesocy
   if (input.purposeConcluded && successor) return { outcome: "advance", targetMesocycleId: successor };
   if (input.purposeConcluded && !successor) return { outcome: "delay", reason: "no_approved_successor" };
   if (input.currentStimulusProductive && input.completedMicrocycles < input.mesocycle.maximumWeeks) return { outcome: "continue" };
-  const prerequisite = input.approvedPrerequisites[0];
-  if (prerequisite) return { outcome: "regress", targetMesocycleId: prerequisite.id, prerequisite: prerequisite.deficiency };
   return { outcome: "review_required", reason: input.completedMicrocycles >= input.mesocycle.maximumWeeks ? "maximum_exposure" : "no_safe_transition" };
 }

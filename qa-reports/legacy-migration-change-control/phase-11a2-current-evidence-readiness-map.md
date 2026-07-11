@@ -12,3 +12,5 @@
 | prerequisites | no explicit current architecture mapping | N/A | empty list / explicit unavailable | do not infer from legacy order |
 
 Legacy block week/order and block decisions are excluded from the producer.
+
+Phase 11A.2A implements only role derivation, matching and evaluability. Trends, fatigue, exposure, snapshot persistence and writer integration remain deferred.

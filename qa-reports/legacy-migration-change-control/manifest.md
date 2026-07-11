@@ -256,6 +256,10 @@ No production file was changed. `ActiveTrainingPlan` still persists `blocks` and
 
 No production file was changed. The persisted block fields have direct runtime consumers in Train/logger, session selection, Progress/volume/recommendation, and design QA. A versioned current/legacy persistence adapter must migrate those selector and transition consumers atomically; this prompt excludes several of them.
 
+## Phase 11A.2A role evaluability
+
+`current-microcycle-role-evaluability.ts` derives and matches current planned role occurrences without block authority. Focused tests: current decision, persistence and role evaluability. Snapshot/trend/persistence work is intentionally deferred.
+
 ## Stage 1 current progression/transition decision persistence bridge
 
 The original evaluator contract remains pure. This bridge adds a separately versioned, current-only persistence repository, a single writer, validation-only hydration, and an isolated temporary legacy-shadow mapper. No existing recommendation, transition, Progress, volume, Train/logger, or block reader was migrated.

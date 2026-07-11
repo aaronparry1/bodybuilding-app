@@ -18,11 +18,11 @@ describe("current mesocycle decision", () => {
     expect(decideMesocycleTransition({ ...base, compatibility: "incomplete" })).toEqual({ outcome: "delay", reason: "incomplete_compatibility" });
   });
 
-  it("uses evaluated sustained fatigue, approved successors, continuation, regression, and review states distinctly", () => {
+  it("uses evaluated sustained fatigue, approved successors, continuation, and review states distinctly", () => {
     expect(decideMesocycleTransition({ ...base, fatigue: "deload_eligible" })).toEqual({ outcome: "deload", fatigue: "deload_eligible" });
     expect(decideMesocycleTransition({ ...base, purposeConcluded: true })).toEqual({ outcome: "advance", targetMesocycleId: "hypertrophy_consolidation" });
     expect(decideMesocycleTransition(base)).toEqual({ outcome: "continue" });
-    expect(decideMesocycleTransition({ ...base, currentStimulusProductive: false, approvedPrerequisites: [{ id: "hypertrophy_calibration", deficiency: "baseline quality" }] })).toEqual({ outcome: "regress", targetMesocycleId: "hypertrophy_calibration", prerequisite: "baseline quality" });
+    expect(decideMesocycleTransition({ ...base, currentStimulusProductive: false, approvedPrerequisites: [{ id: "hypertrophy_calibration", deficiency: "baseline quality" }] })).toEqual({ outcome: "review_required", reason: "no_safe_transition" });
     expect(decideMesocycleTransition({ ...base, currentStimulusProductive: false, completedMicrocycles: 5 })).toEqual({ outcome: "review_required", reason: "maximum_exposure" });
   });
 });
