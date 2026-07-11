@@ -251,3 +251,7 @@ Removed `useTrainingYear` from the active workout logger fallback and from Train
 ## Phase 10B boundary audit
 
 No production file was changed. `ActiveTrainingPlan` still persists `blocks` and `activeBlockId`, and `plan-setup` writes them through `annual-planner`. Reclassifying that executable legacy shape as a preference would be unsafe; the required plan-model/block-utility migration is deferred by scope. Sync retains training-year data as a separate compatibility record and restores an active plan independently.
+
+## Phase 10C active-plan model audit
+
+No production file was changed. The persisted block fields have direct runtime consumers in Train/logger, session selection, Progress/volume/recommendation, and design QA. A versioned current/legacy persistence adapter must migrate those selector and transition consumers atomically; this prompt excludes several of them.
