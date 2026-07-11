@@ -99,6 +99,10 @@ type CurrentVolumeContext = { goal: Goal; mesocyclePurpose: string; microcyclePr
 | Compatibility behaviour | resolved: unavailable/incomplete, never fabricated |
 | Precedence for advance plus fatigue | requires product-owner policy |
 
+## Stage 1 persistence bridge
+
+Stage 1 persists the evaluator's current decision as a schema-versioned record with plan, mesocycle and microcycle identity, lifecycle, structured evidence summary and outcome-specific target fields. Current records win over any temporary legacy shadow. A compatibility-only shadow may represent only safe equivalents; `regress` and `review_required` remain explicitly unsupported rather than being distorted into legacy block outcomes. Consumer application of ready decisions is deferred to Stage 2.
+
 ## Non-goals
 
 This design does not implement decisions, prescribe medical care, define universal thresholds, alter exact targets, or replace live coaching.

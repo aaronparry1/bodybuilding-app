@@ -29,3 +29,5 @@ Phase 9A removed seven obsolete Home view-model assertions from the frozen basel
 Phase 9B changes only the planned-session constructor result representation and its direct callers. It introduces focused result-contract coverage and does not alter a frozen failing suite.
 
 Phase 9C deletion audit found active annual/training-year and block-policy imports, so no failing suite is reclassified as safely removable in this phase.
+
+Stage 1 current decision persistence adds passing focused decision-record coverage only. It does not change any frozen baseline assertion or migrate a legacy consumer.

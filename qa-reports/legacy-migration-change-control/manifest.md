@@ -255,3 +255,17 @@ No production file was changed. `ActiveTrainingPlan` still persists `blocks` and
 ## Phase 10C active-plan model audit
 
 No production file was changed. The persisted block fields have direct runtime consumers in Train/logger, session selection, Progress/volume/recommendation, and design QA. A versioned current/legacy persistence adapter must migrate those selector and transition consumers atomically; this prompt excludes several of them.
+
+## Stage 1 current progression/transition decision persistence bridge
+
+The original evaluator contract remains pure. This bridge adds a separately versioned, current-only persistence repository, a single writer, validation-only hydration, and an isolated temporary legacy-shadow mapper. No existing recommendation, transition, Progress, volume, Train/logger, or block reader was migrated.
+
+| File | Pre-edit SHA-256 | Change reason | Post-edit SHA-256 | Affected callers / focused tests | Persistence / compatibility impact |
+| --- | --- | --- | --- | --- | --- |
+| `src/domain/training/current-progression-transition-decision-record.ts` | New file | Define schema-v1 current decision identity, lifecycle, outcome payload and structured evidence. | `9795c0738d870d64b4e1ac9ea515ccf4cbc53cd6e08c09cc3ee1212cc5c56418` | decision writer; persistence test | Current-only; contains no block authority. |
+| `src/data/local/current-mesocycle-decision-repository.ts` | New file | Persist, validate and hydrate current decision records; retain applied records and supersede unresolved records. | `e1254c2dcca93b6be3ad8eff33edd353d3b0e4dbc5fb9c59e0d268033252a934` | decision writer; persistence test | New storage key only; no legacy record rewrite. |
+| `src/domain/training/current-progression-transition-decision-writer.ts` | New file | Make evaluator-to-current-record persistence the sole normal writer. | `af4d1b685984710a68375c9f7eb1118fd7b8484541a94da87d171623c37f650f` | persistence test | Current save precedes optional compatibility shadow. |
+| `src/domain/training/current-progression-transition-decision-compatibility-resolver.ts` | New file | Resolve current decision ahead of explicitly supplied compatibility shadow. | `e88a22055a4dc4fbe2f7fd9233adb0a6455144d40179a02fdd05d17913dc5bef` | persistence test | Never merges current and legacy authority. |
+| `src/domain/training/current-progression-transition-legacy-shadow.ts` | New file | Map only safe equivalent outcomes to temporary legacy shadow vocabulary and enforce persist-before-shadow ordering. | `e3477077c58e9050696e59a85a2e156dd2baf3109da3cee3730e58559c28808c` | persistence test | `regress`/`review_required` remain explicit unsupported shadows. Delete in Stage 3. |
+| `tests/current-mesocycle-decision-persistence.test.ts` | New file | Prove record, lifecycle, hydration, precedence, shadow ordering/failure and no-side-effect contract. | `62df33e8015b7010342539bb6b72bd6ba71b1a6e95687a8181f7d11c5f2b6cf6` | self | No consumer migration. |
+| `docs/current-progression-transition-decision-implementation.md`, decision maps and baseline inventory | Originals retained where existing | Record Stage 1 bridge and Stage 2/3 gates. | See final verification checksums | documentation review | No runtime authority change outside new writer/repository. |

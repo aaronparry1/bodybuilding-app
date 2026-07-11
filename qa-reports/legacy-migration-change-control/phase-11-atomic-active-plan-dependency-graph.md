@@ -23,3 +23,7 @@ No safe partial production edit exists before steps 1–3 are complete.
 ## Missing decision-domain layer
 
 The block model currently carries transition, repeat/delay, deload, and volume-context identity. Before Phase 11 implementation, these must be represented by current decision lifecycle, mesocycle-readiness, fatigue-management microcycle, and volume-context types; see `docs/current-progression-transition-decision-design.md`.
+
+## Stage 1 decision persistence bridge
+
+The current decision evaluator now writes a versioned, block-free decision record before any optional compatibility shadow. Stage 2 consumer migrations must read the current record through the current-first resolver; no consumer may treat a legacy block decision as co-equal authority. Stage 3 may delete shadows only after every legacy reader has migrated.
