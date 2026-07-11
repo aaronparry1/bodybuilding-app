@@ -1,5 +1,13 @@
 # Legacy migration change-control manifest
 
+## Stage 2C2A0 dashboard projection record
+
+| File | Old authority | New authority | Historical authority | Tests |
+| --- | --- | --- | --- | --- |
+| `progress-dashboard.ts` | No current persisted-state projection | Read-only `currentProgressContext` field | Existing stored-target metrics unchanged | Progress dashboard projection |
+
+Strategic, recovery, rotation, and volume adapters remain legacy-shaped and are explicit later migration gates. This change adds no dashboard action or formula path.
+
 ## Stage 2C current-context seam
 
 | File | Old authority | Current replacement | Focused tests |

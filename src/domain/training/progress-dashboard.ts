@@ -15,6 +15,7 @@ import {
 import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { createPlanningContext } from "@/domain/training/planning-context";
 import { getBlockTransitionPreview, shouldSuppressRotationRecommendation } from "@/domain/training/recommendation-actions";
+import { resolveCurrentProgressContext, type CurrentProgressContext } from "@/domain/training/current-progress-context";
 import { evidence, fixtureSource, insufficientEvidence, type RecommendationEvidence } from "@/domain/training/recommendation-evidence";
 import { previousVolumeLadderActions } from "@/domain/training/volume-adjustments";
 import type { PrimaryLiftVariationSelection } from "@/domain/training/primary-lift-variations";
@@ -31,6 +32,7 @@ export interface ProgressWorkoutCard {
 }
 
 export interface ProgressDashboardViewModel {
+  currentProgressContext: CurrentProgressContext;
   completedWorkouts: WorkoutHistorySummary[];
   hiddenZeroSetWorkouts: WorkoutHistorySummary[];
   hasEnoughHistory: boolean;
@@ -106,6 +108,7 @@ export function buildProgressDashboardViewModel(
   exercises: Exercise[],
   activePlan?: ActiveTrainingPlan | null,
 ): ProgressDashboardViewModel {
+  const currentProgressContext = resolveCurrentProgressContext();
   const planningContext = activePlan ? createPlanningContext(activePlan) : null;
   const completedWorkouts = normalCompletedWorkouts(history);
   const plannedCompletedWorkouts = normalPlannedCompletedWorkouts(history);
@@ -206,6 +209,7 @@ export function buildProgressDashboardViewModel(
   });
 
   return {
+    currentProgressContext,
     completedWorkouts,
     hiddenZeroSetWorkouts,
     hasEnoughHistory: strategic.hasEnoughHistory,

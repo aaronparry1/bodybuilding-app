@@ -51,6 +51,13 @@ function workout(index: number, entries: ExerciseHistorySummary[] = [exerciseEnt
 }
 
 describe("progress dashboard view model", () => {
+  it("projects current context separately from immutable historical metrics", () => {
+    const progress = buildProgressDashboardViewModel([workout(1)], exerciseLibrary);
+
+    expect(progress.currentProgressContext).toMatchObject({ status: "compatibility" });
+    expect(progress.recentWorkouts[0]?.sessionId).toBe("session-1");
+  });
+
   it("excludes zero-set completed or abandoned sessions from normal recent workouts", () => {
     const zeroSet = workout(9, [], {
       sessionId: "zero",

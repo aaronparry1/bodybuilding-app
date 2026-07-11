@@ -8,4 +8,4 @@ Historical Progress authority remains stored exact planned targets and immutable
 
 ## Deferred adapters
 
-Stage 2C2 will migrate the Progress dashboard/view-model to consume this context. Stage 2C3 will replace only the legacy planning authority passed into volume adapters, without changing formulas. Neither migration is claimed by this context seam.
+Stage 2C2A0 exposes the context on the dashboard contract only. Strategic, recovery, rotation, and volume adapters remain separate migration gates. Stage 2C3 will replace only the legacy planning authority passed into volume adapters, without changing formulas.
