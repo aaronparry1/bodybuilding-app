@@ -82,6 +82,20 @@ Current planning authority now resolves before active construction. Original sna
 
 ## Created-file checksums at last verification
 
+## Phase 4A execution record
+
+| File | Pre-edit SHA-256 | Change reason | Post-edit SHA-256 | Focused tests |
+| --- | --- | --- | --- | --- |
+| `app/(protected)/(tabs)/index.tsx` | `007dc7a140a976b7aa1403d5aa7229a405f449421c58d234827ef92b62c48701` | Remove training-year and block-derived planned-preview authority from Home. | `0a1a83e66ac54016dd8f56a8e799fcaaa95c10bcc8203bbf141bca44c38bee56` | Home dashboard, navigation UI |
+| `app/(protected)/(tabs)/programmes.tsx` | `693e19730094878e82440243b4e26d4ebcc10f75f8fc6151b4bca242ba65a11b` | Remove training-year input and legacy roadmap from Plan. | `b347d164b570abb197dfcc3a852bf23b84039d32560166ae5c9288211f45e131` | Plan view model, navigation UI |
+| `src/domain/training/home-dashboard.ts` | `e8a513ff7c2959bb56e7a3def91e4b74fff6d70424299189dd1b3030af8b58a5` | Add current planning context and stop using block/year data as Home display authority. | `aec2ad5a3d3b32f2400d3a7ba0ed74208a2fb8a7bc7054a45091f8533ce367d2` | Home dashboard |
+| `src/domain/training/plan-page-view-model.ts` | `d5819ba7bae792175f540706b20c43b6fa08b398f15b39d925081a4666632e22` | Replace block roadmap contract with current planning, exact target, and approved-successor data. | `7147a173bc63c75e623796b3a8e407dd004f3147d6e688a2596dfaa50f1f991a` | Plan view model |
+| `tests/home-dashboard-view-model.test.ts` | `d90745b77597db78d6b7f688d5740438d7175bc72008262ff599813872add01e` | Add current-context and exact-target characterisation. | `64fd827fb014a308a97e0a1da0e706dd5973561c548a0cfd89e8be9bd4b2b30d` | self |
+| `tests/plan-page-view-model.test.ts` | `ef49f66d5b6549de7d7dfebea947baf21bb2e3b0baa33a7a97c8dfecda37dad6` | Replace obsolete roadmap/block assertions with current-authority assertions. | `f8b83f58194a20eeb9f7b97364cf825b99496a9099ed67526182405b6180f91a` | self |
+| `tests/workout-navigation-ui.test.ts` | `c7dde63ba90a1d335ded85c3e59afde7f6e936369c94c207d7dfd0114a9f951b` | Align source-structure assertions with current Home/Plan presentation. | `8b8dc791264c25956ceb55e33660fca0adb3c4f1abe603015d4cdbc6e81c51e4` | self |
+| `docs/home-plan-current-planning-context.md` | New file | Record Phase 4A authority and compatibility boundaries. | `78efa74d833e488d07548be0eec4623f2eb091f7105f90ea8ddccbb48303637c` | Documentation review |
+| `qa-reports/legacy-migration-change-control/phase-4a-home-plan-consumer-map.md` | New file | Record pre-edit Home/Plan consumer map. | `9896577e4324c7f0e7c1f9a95a068e65eae9618b27a748c1f21eb3cd53b605d2` | Documentation review |
+
 | File | SHA-256 |
 | --- | --- |
 | `docs/legacy-planning-coaching-evidence-intervention-audit.md` | `f7543c9ac8f5dcc5f66d477b4c59afa2d8ebe52ccd2beddfd3bc00b2a2e7904c` |

@@ -125,6 +125,46 @@ function activeWorkoutWithName(name: string): WorkoutSession {
 }
 
 describe("Home dashboard view model", () => {
+  it("uses current planning context rather than conflicting legacy block metadata", () => {
+    const activePlan = createActiveTrainingPlan(
+      {
+        goal: "build_strength",
+        planningChoice: "recommended_12_month",
+        equipmentPreset: "full_gym",
+        daysPerWeek: 4,
+        preferredSplit: "upper_lower",
+        experienceLevel: "intermediate",
+      },
+      "2026-06-01T00:00:00.000Z",
+    );
+    const conflicting = { ...activePlan, blocks: activePlan.blocks.map((block) => ({ ...block, type: "deload" as const })) };
+    const dashboard = buildHomeDashboardViewModel({ activePlan: conflicting, history: [], exercises: exerciseLibrary, programmes: presetProgrammes });
+
+    expect(dashboard.planningContext.status).toBe("ready");
+    expect(dashboard.planningContext.mesocyclePurpose).toBe("Build work capacity and movement tolerance");
+    expect(dashboard.planningContext.microcycleLabel).toContain("Microcycle 1");
+    expect(dashboard.planningContext.sessionRole).toBe("Squat emphasis");
+  });
+
+  it("shows stored exact targets from an open planned workout without reading its range", () => {
+    const activePlan = createActiveTrainingPlan(
+      { goal: "build_muscle", planningChoice: "recommended_12_month", equipmentPreset: "full_gym", daysPerWeek: 3, preferredSplit: "full_body", experienceLevel: "beginner" },
+      "2026-06-01T00:00:00.000Z",
+    );
+    const planned = {
+      ...activeWorkout(),
+      sessionKind: "planned" as const,
+      exercises: [{
+        ...activeWorkout().exercises[0]!,
+        settings: { ...activeWorkout().exercises[0]!.settings, repRange: { min: 12, max: 20 } },
+        prescribedSetTargets: [6, 6, 7],
+      }],
+    };
+    const dashboard = buildHomeDashboardViewModel({ activePlan, history: [], exercises: exerciseLibrary, programmes: presetProgrammes, activeWorkout: planned, hasOpenWorkout: true });
+
+    expect(dashboard.planningContext.exactTargets).toEqual(["6", "6", "7"]);
+  });
+
   it("does not invent a workout when there is no active plan", () => {
     const dashboard = buildHomeDashboardViewModel({
       trainingYear,

@@ -17,8 +17,7 @@ import { buildHomeDashboardViewModel } from "@/domain/training/home-dashboard";
 import { detectPersonalRecords, type PersonalRecordItem } from "@/domain/training/personal-records";
 import type { ProgrammeSkeleton } from "@/domain/training/programme-skeleton";
 import { buildPrSharePayload, type BrandedSharePayload } from "@/domain/training/share-cards";
-import { buildPlannedWorkoutProgramme, displayWorkoutName, isLegacyPlaceholderWorkoutSession, workoutTypeForName } from "@/domain/training/planned-workout";
-import { createTrainingBlock } from "@/domain/training/annual-planner";
+import { displayWorkoutName, isLegacyPlaceholderWorkoutSession, workoutTypeForName } from "@/domain/training/planned-workout";
 import type { BlockType } from "@/domain/training/annual-models";
 import type { CapacityFocusArea } from "@/domain/training/capacity-focus";
 import {
@@ -37,7 +36,6 @@ import { admitExtraSession, type ExtraSessionPurpose } from "@/domain/training/e
 import { approveVolumeAdjustment, ignoreVolumeAdjustment } from "@/domain/training/volume-adjustments";
 import { useProgrammeLibrary } from "@/features/programme-builder/use-programme-builder";
 import { BrandedShareCardPreviewModal } from "@/features/social-sharing/branded-share-card-preview";
-import { useTrainingYear } from "@/features/training-year/use-training-year";
 import { AppScreen, DetailToggle, PremiumCard, PrimaryButton, SecondaryButton, SectionList } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
 import { TrainingSystemGuideButton } from "@/ui/training-system-guide";
@@ -62,8 +60,6 @@ export default function HomeScreen() {
   const [capacityArea, setCapacityArea] = useState<CapacityFocusArea>("low_back");
   const [recoveryCapacityIgnore, setRecoveryCapacityIgnore] = useState(() => recoveryCapacityIgnoreRepository.get());
   const [sharePayload, setSharePayload] = useState<BrandedSharePayload | null>(null);
-  const { year } = useTrainingYear();
-  const currentBlock = activePlan?.blocks.find((block) => block.id === activePlan.activeBlockId) ?? activePlan?.blocks[0] ?? null;
   const { programmes } = useProgrammeLibrary();
   const exercises = customExerciseRepository.listAll();
   const completedHistory = useMemo(() => summarizeWorkoutHistory(workoutHistoryRepository.listCompletedSessions()), [sessions]);
@@ -77,7 +73,6 @@ export default function HomeScreen() {
   const dashboard = useMemo(
     () =>
       buildHomeDashboardViewModel({
-        trainingYear: year,
         activePlan,
         history: completedHistory,
         exercises,
@@ -88,43 +83,19 @@ export default function HomeScreen() {
         selectedSessionIndex,
         date: dashboardDate,
       }),
-    [activePlan, completedHistory, dashboardDate, exercises, hasOpenWorkout, openWorkout, openWorkout?.name, programmes, selectedSessionIndex, year],
+    [activePlan, completedHistory, dashboardDate, exercises, hasOpenWorkout, openWorkout, openWorkout?.name, programmes, selectedSessionIndex],
   );
   const workoutSourceName = dashboard.todayState === "completed_today" || dashboard.todayState === "rest_day" ? dashboard.nextWorkout : dashboard.todayWorkoutName;
-  const workoutType = workoutTypeForName(workoutSourceName);
   const todayWorkoutName = displayWorkoutName(dashboard.todayWorkoutName);
-  const todayProgramme = useMemo(
-    () =>
-      workoutType && activePlan
-        ? buildPlannedWorkoutProgramme({
-            activePlan,
-            exercises,
-            currentBlock,
-            variant: dashboard.currentDayIndex,
-            workoutName: workoutSourceName,
-            selectedSessionIndex: dashboard.currentDayIndex,
-            history: completedHistory,
-            loadIncrementProfile: settings.loadIncrementProfile,
-            unit: settings.unit,
-          })
-        : null,
-    [activePlan, completedHistory, currentBlock, dashboard.currentDayIndex, exercises, settings.loadIncrementProfile, settings.unit, workoutSourceName, workoutType],
-  );
   const todayExercises = useMemo(
     () => {
       if (openWorkout) return openWorkout.exercises.slice(0, 5).map((exercise) => ({ id: exercise.id, name: exercise.exerciseName }));
-      return todayProgramme?.days[0]?.exerciseSlots
-        .map((slot) => exercises.find((exercise) => exercise.id === slot.exerciseId))
-        .filter((exercise): exercise is NonNullable<typeof exercise> => Boolean(exercise))
-        .slice(0, 5) ?? [];
+      return [];
     },
-    [exercises, openWorkout, todayProgramme],
+    [openWorkout],
   );
-  const trainingGapNote = useMemo(
-    () => todayProgramme?.days[0]?.exerciseSlots.map((slot) => getTrainingGapNote(slot.notes)).find((note): note is string => Boolean(note)) ?? null,
-    [todayProgramme],
-  );
-  const totalExerciseCount = openWorkout?.exercises.length ?? todayProgramme?.days[0]?.exerciseSlots.length ?? todayExercises.length;
+  const trainingGapNote = null;
+  const totalExerciseCount = openWorkout?.exercises.length ?? todayExercises.length;
   const estimatedTime = totalExerciseCount <= 4 ? "35-45 mins" : "45-60 mins";
   const upNextName = displayWorkoutName(workoutSourceName || dashboard.todayWorkoutName);
   const upNextFocus = focusLabelForWorkout(upNextName, todayExercises.map((exercise) => exercise.name));
@@ -145,42 +116,6 @@ export default function HomeScreen() {
   );
 
   const startTodayWorkout = () => {
-    const day = todayProgramme?.days[0];
-    if (todayProgramme && day) {
-      if (!requirePremiumForTodayWorkout("start")) return;
-      const target: WorkoutStartTarget = {
-        name: displayWorkoutName(todayProgramme.name),
-        sessionKind: "planned",
-        planSessionIndex: dashboard.currentDayIndex,
-        planBlockId: currentBlock?.id,
-        planWeekNumber: currentBlock?.currentWeek,
-      };
-      const startSelectedWorkout = () => {
-        const firstExercise = exercises.find((exercise) => exercise.id === day.exerciseSlots[0]?.exerciseId);
-        programmeRepository.save(todayProgramme);
-        programmeRepository.selectProgrammeDay({
-          programmeId: todayProgramme.id,
-          dayId: day.id,
-          planSessionIndex: dashboard.currentDayIndex,
-          planBlockId: currentBlock?.id,
-          planWeekNumber: currentBlock?.currentWeek,
-          sessionKind: "planned",
-        });
-        router.push({
-          pathname: "/(protected)/session-prep",
-          params: {
-            workoutName: displayWorkoutName(todayProgramme.name),
-            workoutType: workoutType ?? undefined,
-            firstExerciseName: firstExercise?.name,
-            firstMovementPattern: firstExercise?.movementPattern,
-          },
-        });
-      };
-      if (handleActiveWorkoutConflict(target, startSelectedWorkout)) return;
-      startSelectedWorkout();
-      return;
-    }
-
     if (hasOpenWorkout) {
       if (!requirePremiumForTodayWorkout("continue")) return;
       router.push("/(protected)/(tabs)/train");
@@ -459,7 +394,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     setSelectedSessionIndex(null);
-  }, [activePlan?.activeBlockId, currentBlock?.currentWeek]);
+  }, [activePlan?.currentMesocycleId, activePlan?.currentMicrocycle?.sequenceNumber]);
 
   return (
     <AppScreen>
@@ -491,9 +426,9 @@ export default function HomeScreen() {
                   "Training complete"
                 )}
               </Text>
-              {dashboard.currentBlock.contextLabel ? (
+              {dashboard.planningContext.microcycleLabel ? (
                 <Text selectable style={{ color: colors.textSubtle, fontSize: 13, lineHeight: 18, fontWeight: "800" }}>
-                  {dashboard.currentBlock.contextLabel}
+                  {dashboard.planningContext.microcycleLabel}
                 </Text>
               ) : null}
             </View>
@@ -508,9 +443,9 @@ export default function HomeScreen() {
                   {dashboard.todayMeta}
                 </Text>
               ) : null}
-              {dashboard.nextBlockPreview ? (
+              {dashboard.approvedNextMesocycleLabel ? (
                 <Text selectable style={{ color: colors.textMuted, fontSize: 13, lineHeight: 18, fontWeight: "800" }}>
-                  {dashboard.nextBlockPreview}
+                  {dashboard.approvedNextMesocycleLabel}
                 </Text>
               ) : null}
               <SecondaryButton
@@ -538,15 +473,25 @@ export default function HomeScreen() {
                   {dashboard.todayMeta || (todayExercises.length > 0 ? estimatedTime : "Set up your plan first.")}
                 </Text>
               ) : null}
-              {dashboard.currentBlock.contextLabel ? (
+              {dashboard.planningContext.mesocyclePurpose ? (
                 <DetailToggle label="More" compact>
                   <View style={{ gap: spacing.xs }}>
                     <Text selectable style={{ color: colors.text, fontSize: 15, lineHeight: 20, fontWeight: "900" }}>
-                      {dashboard.currentBlock.contextLabel}
+                      {dashboard.planningContext.mesocyclePurpose}
                     </Text>
-                    {dashboard.nextBlockPreview ? (
+                    {dashboard.planningContext.microcycleLabel ? (
                       <Text selectable style={{ color: colors.textMuted, fontSize: 13, lineHeight: 18, fontWeight: "800" }}>
-                        {dashboard.nextBlockPreview}
+                        {dashboard.planningContext.microcycleLabel}
+                      </Text>
+                    ) : null}
+                    {dashboard.planningContext.sessionRole ? (
+                      <Text selectable style={{ color: colors.textMuted, fontSize: 13, lineHeight: 18, fontWeight: "800" }}>
+                        Session role: {dashboard.planningContext.sessionRole}
+                      </Text>
+                    ) : null}
+                    {dashboard.planningContext.exactTargets.length ? (
+                      <Text selectable style={{ color: colors.accent, fontSize: 13, lineHeight: 18, fontWeight: "800" }}>
+                        Today: {dashboard.planningContext.exactTargets.join(", ")}
                       </Text>
                     ) : null}
                   </View>
@@ -572,7 +517,7 @@ export default function HomeScreen() {
         </PremiumCard>
       )}
 
-      {programmeSkeleton ? (
+      {programmeSkeleton && !activePlan ? (
         <SectionList title="Programme Overview">
           <PremiumCard tone="quiet">
             <View style={{ gap: spacing.md }}>

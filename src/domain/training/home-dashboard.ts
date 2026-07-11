@@ -1,6 +1,4 @@
 import type { TrainingBlock, TrainingYear } from "@/domain/training/annual-models";
-import { getBlockDropOffPercentage, getBlockRepRange, getCurrentBlock } from "@/domain/training/annual-planner";
-import { displayBlockName, displayBlockType } from "@/domain/training/block-display";
 import type { Exercise, Programme, WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
 import { displayWorkoutName } from "@/domain/training/planned-workout";
 import { resolveEventTaper } from "@/domain/training/event-taper";
@@ -41,6 +39,16 @@ export interface HomeDashboardViewModel {
   activeWorkoutProgress?: string;
   currentDayIndex: number;
   recommendedSessionIndex: number;
+  planningContext: {
+    goal: string;
+    macrocycle: string;
+    mesocyclePurpose: string | null;
+    microcycleLabel: string | null;
+    sessionRole: string | null;
+    exactTargets: string[];
+    status: "ready" | "compatibility" | "incomplete" | "no_plan";
+  };
+  /** @deprecated Compatibility-only test/report shape. Home does not render this. */
   currentBlock: {
     name: string;
     weekLabel: string;
@@ -78,6 +86,8 @@ export interface HomeDashboardViewModel {
   hasTrainingDirection: boolean;
   emptyDirectionMessage: string;
   recentProgress: string;
+  approvedNextMesocycleLabel: string;
+  /** @deprecated Compatibility-only test/report copy. Home does not render this. */
   nextBlockPreview: string;
 }
 
@@ -93,7 +103,7 @@ export function buildHomeDashboardViewModel({
   selectedSessionIndex,
   date = new Date(),
 }: {
-  trainingYear: TrainingYear;
+  trainingYear?: TrainingYear;
   activePlan?: ActiveTrainingPlan | null;
   history: WorkoutHistorySummary[];
   exercises: Exercise[];
@@ -105,8 +115,8 @@ export function buildHomeDashboardViewModel({
   date?: Date;
 }): HomeDashboardViewModel {
   void programmes;
+  void trainingYear;
   const hasActivePlan = Boolean(activePlan);
-  const currentBlock = activePlan ? activePlan.blocks.find((block) => block.id === activePlan.activeBlockId) ?? activePlan.blocks[0] ?? getCurrentBlock(trainingYear) : null;
   const split = activePlan ? sessionRolesForPlan(activePlan) : [];
   const recommendedSessionIndex = activePlan ? resolveRecommendedSessionIndex({ activePlan, history, date }) : 0;
   const todayIndex = activePlan ? resolveSelectedSessionIndex({ activePlan, history, selectedSessionIndex, date }) : 0;
@@ -142,24 +152,22 @@ export function buildHomeDashboardViewModel({
     ? resolveEventTaper({
         eventType: activePlan.eventType,
         targetDate: activePlan.targetDate,
-        currentBlock: currentBlock?.type,
         goal: activePlan.goal,
         experienceLevel: activePlan.experienceLevel,
         referenceDate: date,
       })
     : null;
   const extraWorkWarning = buildExtraWorkWarning(history);
-  const muscleVolumeWarning = buildMuscleVolumeWarning({ history, exercises, activePlan, currentBlock, eventTaper });
-  const recoveryCapacityWarning = buildRecoveryCapacityWarning({ history, exercises, activePlan, currentBlock });
-  const recoveryCapacityTarget = buildRecoveryCapacityWeeklyTarget({ activePlan, currentBlock, history, exercises, activeWorkout, date });
+  const muscleVolumeWarning = buildMuscleVolumeWarning({ history, exercises, activePlan, currentBlock: null, eventTaper });
+  const recoveryCapacityWarning = buildRecoveryCapacityWarning({ history, exercises, activePlan, currentBlock: null });
+  const recoveryCapacityTarget = buildRecoveryCapacityWeeklyTarget({ activePlan, currentBlock: null, history, exercises, activeWorkout, date });
   const latestProgress = history[0]?.progressionHighlights[0] ?? `${history[0]?.setsCompleted ?? 0} sets logged recently`;
-  const planning = activePlan ? createPlanningContext(activePlan, activeWorkout) : null;
-  const repRange = currentBlock ? getBlockRepRange(currentBlock) : { min: 8, max: 12 };
-  const blockName = planning?.mesocyclePurpose ?? (currentBlock ? displayBlockName(currentBlock) : hasOpenWorkout ? "Workout in progress" : "No active plan");
-  const currentBlockContextLabel = currentBlock
-    ? `${blockName} · Week ${currentBlock.currentWeek} of ${currentBlock.durationWeeks}${eventTaper ? ` · ${eventCountdownLabel(eventTaper.weeksUntilEvent)}` : ""}`
-    : "";
-  const nextBlockPreview = buildNextBlockPreview(activePlan ?? null, currentBlock);
+  const openPlannedWorkout = activeWorkout && !activeWorkout.completedAt && activeWorkout.sessionKind === "planned" ? activeWorkout : null;
+  const planning = activePlan ? createPlanningContext(activePlan, openPlannedWorkout) : null;
+  const planningReady = Boolean(activePlan?.currentMesocycleId && activePlan.currentMicrocycle);
+  const blockName = !activePlan ? "No active plan" : planningReady ? planning?.mesocyclePurpose ?? "Current training phase" : hasOpenWorkout ? "Workout in progress" : "Plan details unavailable";
+  const microcycleLabel = planningReady && planning?.microcycle ? `Microcycle ${planning.microcycle.number} · ${planning.microcycle.priority}` : null;
+  const approvedNextMesocycleLabel = activePlan?.currentMesocycleId ? "Approved next mesocycle available in Plan" : "";
   const activeWorkoutProgress = activeWorkout
     ? `${countCompletedExercises(activeWorkout)} of ${activeWorkout.exercises.length} exercises complete`
     : undefined;
@@ -213,15 +221,24 @@ export function buildHomeDashboardViewModel({
     activeWorkoutProgress,
     currentDayIndex: todayIndex,
     recommendedSessionIndex,
+    planningContext: {
+      goal: activePlan ? titleBlock(activePlan.goal) : "Set up training",
+      macrocycle: planning ? titleBlock(planning.macrocycleEngine) : "-",
+      mesocyclePurpose: planningReady ? planning?.mesocyclePurpose ?? null : null,
+      microcycleLabel,
+      sessionRole: planningReady ? planning?.sessionRole ?? null : null,
+      exactTargets: Object.values(planning?.exactPrescribedTargets ?? {}).flat().map(String),
+      status: !activePlan ? "no_plan" : planningReady ? "ready" : activePlan.currentMesocycleId || activePlan.currentMicrocycle ? "incomplete" : "compatibility",
+    },
     currentBlock: {
       name: blockName,
-      weekLabel: currentBlock ? `Week ${currentBlock.currentWeek} of ${currentBlock.durationWeeks}` : hasOpenWorkout ? "Active now" : "Plan needed",
-      contextLabel: currentBlockContextLabel,
-      goalLabel: currentBlock ? titleBlock(currentBlock.goal) : hasOpenWorkout ? "Finish Today" : "Set Up Training",
+      weekLabel: microcycleLabel ?? (hasOpenWorkout ? "Active now" : "Plan needed"),
+      contextLabel: [blockName, microcycleLabel].filter(Boolean).join(" · "),
+      goalLabel: activePlan ? titleBlock(activePlan.goal) : "Set Up Training",
       purposeLabel: purposeForBlock(blockName),
       coachLine: coachingLineForBlock(blockName),
-      repFocusLabel: activeWorkout ? Object.values(planning?.exactPrescribedTargets ?? {}).flat().join(" / ") || "Exact targets in workout" : currentBlock ? "Exact targets in workout" : "Plan first",
-      dropOffLabel: currentBlock ? `${getBlockDropOffPercentage(currentBlock)}% drop-off` : "Performance based",
+      repFocusLabel: planning?.exactPrescribedTargets ? Object.values(planning.exactPrescribedTargets).flat().join(" / ") || "Exact targets in workout" : "Plan first",
+      dropOffLabel: "Performance based",
       volumeLabel: "Autoregulated",
     },
     thisWeek: split,
@@ -250,7 +267,8 @@ export function buildHomeDashboardViewModel({
     hasTrainingDirection: strategic.hasEnoughHistory,
     emptyDirectionMessage: "Log a few sessions first. The app is smart, not psychic.",
     recentProgress: latestProgress,
-    nextBlockPreview,
+    approvedNextMesocycleLabel,
+    nextBlockPreview: approvedNextMesocycleLabel,
   };
 }
 
@@ -309,15 +327,6 @@ function buildRecoveryCapacityWarning({
       actionAllowed: false,
     }),
   };
-}
-
-function buildNextBlockPreview(activePlan: ActiveTrainingPlan | null, currentBlock: TrainingBlock | null): string {
-  if (!activePlan || !currentBlock) return "";
-  const activeIndex = activePlan.blocks.findIndex((block) => block.id === currentBlock.id);
-  const nextBlock = activeIndex >= 0 ? activePlan.blocks[activeIndex + 1] : undefined;
-  if (nextBlock) return `Next: ${displayBlockName(nextBlock)} · ${formatWeeks(nextBlock.durationWeeks)}`;
-  if (activePlan.mode === "single_block") return "Next block decided later";
-  return "Final block";
 }
 
 function buildMuscleVolumeWarning({
@@ -442,17 +451,7 @@ function countCompletedExercises(session: WorkoutSession): number {
 }
 
 function titleBlock(value: string): string {
-  return displayBlockType(value);
-}
-
-function formatWeeks(weeks: number): string {
-  return `${weeks} ${weeks === 1 ? "week" : "weeks"}`;
-}
-
-function eventCountdownLabel(weeks: number): string {
-  if (weeks < 0) return "Post-event reset";
-  if (weeks <= 1) return "Event week";
-  return `${weeks} weeks out`;
+  return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function greetingForNow(date = new Date()): string {

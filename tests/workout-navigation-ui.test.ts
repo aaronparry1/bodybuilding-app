@@ -71,10 +71,12 @@ describe("workout navigation and logging UI contracts", () => {
     expect(xcodeProjectSource).toContain("CLANG_CXX_LIBRARY = \"libc++\";");
   });
 
-  it("shows current and next block context on Home without changing plan actions", () => {
-    expect(homeScreen).not.toContain("Current block\n                </Text>");
-    expect(homeScreen).toContain("dashboard.currentBlock.contextLabel");
-    expect(homeScreen).toContain("dashboard.nextBlockPreview");
+  it("shows current planning context on Home without changing plan actions", () => {
+    expect(homeScreen).toContain("dashboard.planningContext.mesocyclePurpose");
+    expect(homeScreen).toContain("dashboard.planningContext.microcycleLabel");
+    expect(homeScreen).toContain("dashboard.planningContext.sessionRole");
+    expect(homeScreen).not.toContain("dashboard.currentBlock.contextLabel");
+    expect(homeScreen).not.toContain("dashboard.nextBlockPreview");
   });
 
   it("renders completed Home state as a compact action-first status card", () => {
@@ -842,7 +844,7 @@ describe("workout navigation and logging UI contracts", () => {
     expect(homeScreen).toContain("Settings");
   });
 
-  it("keeps the Plan roadmap informational and presents planning context before approved choices", () => {
+  it("presents planning context before approved choices without a legacy roadmap", () => {
     expect(planScreen).toContain("PlanningContextCard");
     expect(planScreen).toContain("currentMesocyclePurpose");
     expect(planScreen).toContain("currentMicrocycle.number");
@@ -850,7 +852,7 @@ describe("workout navigation and logging UI contracts", () => {
     expect(planScreen).toContain('Session role: {viewModel.currentSessionRole ?? "Planned session"}');
     expect(planScreen).toContain("approvedNextMesocycles");
     expect(planScreen.indexOf("<PlanningContextCard")).toBeLessThan(planScreen.indexOf('title="Approved next mesocycle states"'));
-    expect(planScreen).toContain("<RoadmapStageCard");
+    expect(planScreen).not.toContain("<RoadmapStageCard");
     expect(planScreen).not.toContain("onSelectBlock");
     expect(planScreen).not.toContain("BlockExplanationModal");
     expect(planScreen).not.toContain("NextBlockChooserModal");

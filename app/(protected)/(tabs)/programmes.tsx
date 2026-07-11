@@ -5,16 +5,14 @@ import { activeTrainingPlanRepository } from "@/data/local/active-training-plan-
 import { workoutSessionRepository } from "@/data/local/workout-session-repository";
 import { buildPlanPageViewModel } from "@/domain/training/plan-page-view-model";
 import { transitionToApprovedMesocycle } from "@/domain/training/plan-setup";
-import { useTrainingYear } from "@/features/training-year/use-training-year";
 import { AppScreen, DetailToggle, EmptyActionState, HeroPanel, PremiumCard, SecondaryButton, SectionList } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
 import { TrainingSystemGuideButton } from "@/ui/training-system-guide";
 
 export default function PlanScreen() {
-  const { currentBlock } = useTrainingYear();
   const [activePlan, setActivePlan] = useState(() => activeTrainingPlanRepository.getOptional());
   const [workouts, setWorkouts] = useState(() => workoutSessionRepository.list());
-  const viewModel = buildPlanPageViewModel({ activePlan, currentBlock, workouts });
+  const viewModel = buildPlanPageViewModel({ activePlan, workouts });
 
   useEffect(() => activeTrainingPlanRepository.subscribe(() => setActivePlan(activeTrainingPlanRepository.getOptional())), []);
   useEffect(() => workoutSessionRepository.subscribe(() => setWorkouts(workoutSessionRepository.list())), []);
@@ -53,28 +51,16 @@ export default function PlanScreen() {
           <PremiumCard>
             <PlanSummaryRow label="Goal" value={viewModel.summary.goal} />
             <PlanSummaryRow label="Schedule" value={viewModel.summary.schedule} />
-            <PlanSummaryRow label="Current phase" value={viewModel.summary.currentPhase} />
-            <PlanSummaryRow label="Week" value={viewModel.summary.week} />
+            <PlanSummaryRow label="Macrocycle" value={viewModel.summary.macrocycle} />
             <DetailToggle label="Plan details" compact>
-              <PlanSummaryRow label="Plan style" value={viewModel.summary.planStyle} />
-              <PlanSummaryRow label="Plan duration" value={viewModel.summary.planDuration} />
               <PlanSummaryRow label="Split" value={viewModel.summary.split} />
             </DetailToggle>
           </PremiumCard>
 
-          <SectionList title="Current training week">
+          <SectionList title="Current microcycle">
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm }}>
               {viewModel.thisWeek.map((day, index) => (
                 <WeekMarker key={`${day.label}-${index}`} day={day.label} active={day.status === "current"} />
-              ))}
-            </View>
-          </SectionList>
-
-          <SectionList title="Training Roadmap">
-            <View style={{ gap: spacing.md }}>
-              <RoadmapSummaryCard summary={viewModel.roadmapSummary} />
-              {viewModel.roadmapStages.map((stage) => (
-                <RoadmapStageCard key={stage.id} stage={stage} />
               ))}
             </View>
           </SectionList>
@@ -92,7 +78,7 @@ export default function PlanScreen() {
                 </Text>
                 {viewModel.approvedNextMesocycles.length ? (
                   <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm }}>
-                    {viewModel.approvedNextMesocycles.map((mesocycle) => <SecondaryButton key={mesocycle.id} label={mesocycle.id.replaceAll("_", " ")} onPress={() => handleChooseMesocycle(mesocycle.id)} compact />)}
+                    {viewModel.approvedNextMesocycles.map((mesocycle) => <SecondaryButton key={mesocycle.id} label={mesocycle.purpose} onPress={() => handleChooseMesocycle(mesocycle.id)} compact />)}
                   </View>
                 ) : null}
               </PremiumCard>
@@ -119,10 +105,7 @@ function PlanSummaryRow({ label, value }: { label: string; value: string }) {
 }
 
 function PlanningContextCard({ viewModel }: { viewModel: ReturnType<typeof buildPlanPageViewModel> }) {
-  const targets: string[] = (viewModel.openPlannedWorkout?.exercises ?? []).flatMap((exercise): string[] => {
-    const exact = exercise.prescribedSetTargets ?? [];
-    return exact.length ? [`${exercise.exerciseName}: ${exercise.load}${exercise.settings.unit} × ${exact.join(", ")}`] : [];
-  });
+  const targets = viewModel.exactTargetSummary.map((target) => `${target.exerciseName}: ${target.load}${target.unit} × ${target.targets.join(", ")}`);
   return (
     <SectionList title="Current training context">
       <PremiumCard tone="quiet">
@@ -134,10 +117,6 @@ function PlanningContextCard({ viewModel }: { viewModel: ReturnType<typeof build
       </PremiumCard>
     </SectionList>
   );
-}
-
-function titleBlock(value: string): string {
-  return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function WeekMarker({ day, active }: { day: string; active: boolean }) {
@@ -156,110 +135,6 @@ function WeekMarker({ day, active }: { day: string; active: boolean }) {
         {active ? "▶ " : "○ "}
         {day}
       </Text>
-    </View>
-  );
-}
-
-function RoadmapSummaryCard({ summary }: { summary: ReturnType<typeof buildPlanPageViewModel>["roadmapSummary"] }) {
-  return (
-    <PremiumCard tone="locked">
-      <Text selectable style={{ color: colors.accent, fontSize: 13, lineHeight: 18, fontWeight: "900", textTransform: "uppercase", letterSpacing: 0 }}>
-        {summary.title}
-      </Text>
-      <Text selectable style={{ color: colors.text, fontSize: 22, lineHeight: 28, fontWeight: "900" }}>
-        {summary.currentPhase}
-      </Text>
-      <Text selectable style={{ ...type.body, color: colors.textMuted }}>
-        {summary.copy}
-      </Text>
-      <View style={{ gap: spacing.sm, paddingTop: spacing.xs }}>
-        <PlanSummaryRow label="Current phase" value={summary.currentPhase} />
-        <PlanSummaryRow label="Goal" value={summary.goal} />
-      </View>
-    </PremiumCard>
-  );
-}
-
-function RoadmapStageCard({
-  stage,
-}: {
-  stage: ReturnType<typeof buildPlanPageViewModel>["roadmapStages"][number];
-}) {
-  return (
-    <PremiumCard tone={stage.blocks.some((block) => block.status === "current") ? "locked" : "quiet"}>
-      <View style={{ gap: spacing.xs }}>
-        <Text selectable style={{ color: colors.accent, fontSize: 12, lineHeight: 16, fontWeight: "900", textTransform: "uppercase", letterSpacing: 0 }}>
-          {stage.title}
-        </Text>
-        <Text selectable style={{ ...type.body, color: colors.textMuted }}>
-          {stage.focus}
-        </Text>
-      </View>
-      <View style={{ gap: spacing.sm }}>
-        {stage.blocks.map((block, index) => (
-          <RoadmapRow
-            key={block.id}
-            label={block.label}
-            purpose={block.purpose}
-            duration={block.duration}
-            status={block.status}
-            displayStatus={block.displayStatus}
-            connector={index < stage.blocks.length - 1}
-          />
-        ))}
-      </View>
-    </PremiumCard>
-  );
-}
-
-function RoadmapRow({
-  label,
-  purpose,
-  duration,
-  status,
-  displayStatus,
-  connector,
-}: {
-  label: string;
-  purpose: string;
-  duration: string;
-  status: "done" | "current" | "upcoming";
-  displayStatus: string;
-  connector: boolean;
-}) {
-  const color = status === "current" ? colors.accent : status === "done" ? colors.success : colors.textSubtle;
-
-  return (
-    <View style={{ borderRadius: radius.md, backgroundColor: status === "current" ? colors.accentSoft : "transparent", padding: spacing.sm }}>
-      <View style={{ flexDirection: "row", gap: spacing.md }}>
-        <View style={{ alignItems: "center", width: 24 }}>
-          <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: color, marginTop: 4 }} />
-          {connector ? <View style={{ width: 2, flex: 1, minHeight: 38, backgroundColor: colors.line, marginTop: 6 }} /> : null}
-        </View>
-        <View style={{ flex: 1, gap: spacing.xs, minWidth: 0 }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", gap: spacing.md, alignItems: "flex-start" }}>
-            <View style={{ flex: 1, minWidth: 0 }}>
-              <Text selectable style={{ color: status === "current" ? colors.text : colors.textMuted, fontSize: 17, lineHeight: 22, fontWeight: "900" }}>
-                {label}
-              </Text>
-              <Text selectable style={{ color: colors.textSubtle, fontSize: 13, lineHeight: 18 }}>
-                {purpose}
-              </Text>
-            </View>
-            <View style={{ alignItems: "flex-end", gap: spacing.xs }}>
-              <Text selectable style={{ color, fontSize: 12, lineHeight: 16, fontWeight: "900" }}>
-                {displayStatus}
-              </Text>
-              <Text selectable style={{ color: colors.textSubtle, fontSize: 12, lineHeight: 16, fontWeight: "800" }}>
-                {duration}
-              </Text>
-            </View>
-          </View>
-          <Text selectable style={{ color: colors.textSubtle, fontSize: 12, lineHeight: 16, fontWeight: "900" }}>
-            ⓘ
-          </Text>
-        </View>
-      </View>
     </View>
   );
 }
