@@ -315,6 +315,8 @@ export interface WorkoutSession {
   templateId?: ID;
   programmeId?: ID;
   planSessionIndex?: number;
+  planMesocycleId?: string;
+  planMicrocycleNumber?: number;
   planBlockId?: ID;
   planWeekNumber?: number;
   sessionKind?: "planned" | "extra_full" | "extra_volume" | "extra_capacity" | CardioSessionKind;
@@ -372,6 +374,8 @@ export interface WorkoutHistorySummary {
   programmeId?: ID;
   programmeDayId?: ID;
   planSessionIndex?: number;
+  planMesocycleId?: string;
+  planMicrocycleNumber?: number;
   planBlockId?: ID;
   planWeekNumber?: number;
   sessionKind?: WorkoutSession["sessionKind"];

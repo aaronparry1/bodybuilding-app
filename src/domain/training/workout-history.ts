@@ -46,6 +46,8 @@ export function summarizeWorkoutSession(session: WorkoutSession): WorkoutHistory
     programmeId: session.programmeId,
     programmeDayId: session.templateId,
     planSessionIndex: session.planSessionIndex,
+    planMesocycleId: session.planMesocycleId,
+    planMicrocycleNumber: session.planMicrocycleNumber,
     planBlockId: session.planBlockId,
     planWeekNumber: session.planWeekNumber,
     sessionKind: session.sessionKind,

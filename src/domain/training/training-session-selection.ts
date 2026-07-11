@@ -1,4 +1,5 @@
 import type { WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
+import { resolveCurrentPlanningInput } from "@/domain/training/current-planning-input";
 import { sessionRolesForPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { displayWorkoutName } from "@/domain/training/workout-name";
 
@@ -11,7 +12,7 @@ export function resolveRecommendedSessionIndex({
   history: WorkoutHistorySummary[];
   date?: Date;
 }): number {
-  const split = sessionRolesForPlan(activePlan);
+  const split = sessionRolesForCurrentPlanning(activePlan);
   if (split.length === 0) return 0;
 
   const completed = completedPlanSessionIndexes({ activePlan, split, history, date });
@@ -31,7 +32,7 @@ export function hasCompletedAllPlanSessionsThisWeek({
   history: WorkoutHistorySummary[];
   date?: Date;
 }): boolean {
-  const split = sessionRolesForPlan(activePlan);
+  const split = sessionRolesForCurrentPlanning(activePlan);
   if (split.length === 0) return false;
   return completedPlanSessionIndexes({ activePlan, split, history, date }).size >= split.length;
 }
@@ -48,9 +49,14 @@ export function shouldAdvanceTrainingWeekAfterCompletedSession({
   date?: Date;
 }): boolean {
   if (!completedSession.completedAt || completedSession.sessionKind !== "planned") return false;
-  const currentBlock = activePlan.blocks.find((block) => block.id === activePlan.activeBlockId);
-  if (!currentBlock) return false;
-  if (completedSession.planBlockId !== currentBlock.id || completedSession.planWeekNumber !== currentBlock.currentWeek) return false;
+  const currentMesocycleId = activePlan.currentMesocycleId;
+  const currentMicrocycleNumber = activePlan.currentMicrocycle?.sequenceNumber;
+  const hasCurrentIdentity = Boolean(currentMesocycleId) && typeof currentMicrocycleNumber === "number";
+  if (hasCurrentIdentity) {
+    if (completedSession.planMesocycleId !== currentMesocycleId || completedSession.planMicrocycleNumber !== currentMicrocycleNumber) return false;
+  } else if (!matchesLegacyPlanningCompatibility(completedSession, activePlan)) {
+    return false;
+  }
 
   return hasCompletedAllPlanSessionsThisWeek({ activePlan, history, date });
 }
@@ -66,7 +72,7 @@ export function resolveSelectedSessionIndex({
   selectedSessionIndex?: number | null;
   date?: Date;
 }): number {
-  const split = sessionRolesForPlan(activePlan);
+  const split = sessionRolesForCurrentPlanning(activePlan);
   if (split.length === 0) return 0;
   if (typeof selectedSessionIndex === "number" && selectedSessionIndex >= 0 && selectedSessionIndex < split.length) {
     return selectedSessionIndex;
@@ -86,12 +92,12 @@ export function completedPlanSessionIndexes({
   date?: Date;
 }): Set<number> {
   const completed = new Set<number>();
-  const currentBlock = activePlan.blocks.find((block) => block.id === activePlan.activeBlockId) ?? activePlan.blocks[0] ?? null;
-  const currentWeekNumber = currentBlock?.currentWeek ?? 1;
+  const currentMesocycleId = activePlan.currentMesocycleId;
+  const currentMicrocycleNumber = activePlan.currentMicrocycle?.sequenceNumber;
 
   for (const summary of history) {
     if (!isPlannedSessionSummary(summary)) continue;
-    if (!matchesCurrentTrainingWeek(summary, activePlan.activeBlockId, currentWeekNumber, date)) continue;
+    if (!matchesCurrentPlanningCycle(summary, activePlan, currentMesocycleId, currentMicrocycleNumber, date)) continue;
     if (typeof summary.planSessionIndex === "number" && summary.planSessionIndex >= 0 && summary.planSessionIndex < split.length) {
       completed.add(summary.planSessionIndex);
       continue;
@@ -112,18 +118,26 @@ export function isPlannedSessionSummary(summary: WorkoutHistorySummary): boolean
   return true;
 }
 
-export function matchesCurrentTrainingWeek(
+export function matchesCurrentPlanningCycle(
   summary: WorkoutHistorySummary,
-  activeBlockId: string,
-  currentWeekNumber: number,
+  activePlan: ActiveTrainingPlan,
+  currentMesocycleId: string | undefined,
+  currentMicrocycleNumber: number | undefined,
   date = new Date(),
 ): boolean {
-  const hasTrainingWeekIdentity = Boolean(summary.planBlockId) || typeof summary.planWeekNumber === "number";
-  if (hasTrainingWeekIdentity) {
-    return summary.planBlockId === activeBlockId && summary.planWeekNumber === currentWeekNumber;
+  const hasCurrentPlanningIdentity = Boolean(summary.planMesocycleId) || typeof summary.planMicrocycleNumber === "number";
+  if (hasCurrentPlanningIdentity) {
+    return summary.planMesocycleId === currentMesocycleId && summary.planMicrocycleNumber === currentMicrocycleNumber;
   }
 
+  if (matchesLegacyPlanningCompatibility(summary, activePlan)) return true;
   return isLegacyCurrentCalendarWeek(summary.completedAt, date);
+}
+
+function matchesLegacyPlanningCompatibility(summary: Pick<WorkoutHistorySummary, "planBlockId" | "planWeekNumber">, activePlan: ActiveTrainingPlan): boolean {
+  if (!summary.planBlockId || typeof summary.planWeekNumber !== "number") return false;
+  const activeBlock = activePlan.blocks.find((block) => block.id === activePlan.activeBlockId);
+  return activeBlock?.id === summary.planBlockId && activeBlock.currentWeek === summary.planWeekNumber;
 }
 
 function isLegacyCurrentCalendarWeek(completedAtIso: string, date: Date): boolean {
@@ -141,4 +155,11 @@ export function startOfWeek(date: Date): Date {
   start.setDate(start.getDate() + diff);
   start.setHours(0, 0, 0, 0);
   return start;
+}
+
+function sessionRolesForCurrentPlanning(activePlan: ActiveTrainingPlan): string[] {
+  const resolved = resolveCurrentPlanningInput(activePlan, 0);
+  if (resolved.status === "ready") return resolved.planning.microcycle.sessionRoles;
+  // Compatibility-only: older persisted plans may not yet have a microcycle.
+  return sessionRolesForPlan(activePlan);
 }

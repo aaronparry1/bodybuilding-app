@@ -32,7 +32,7 @@ import { resolveTrainingGapAdjustment } from "@/domain/training/training-gap-adj
 import { exerciseLibrary } from "@/domain/training/presets";
 import { buildPlannedWorkoutProgramme, resolveNextTrainableWorkoutName, workoutTypeForName } from "@/domain/training/planned-workout";
 import { resolveRecommendedSessionIndex, shouldAdvanceTrainingWeekAfterCompletedSession } from "@/domain/training/training-session-selection";
-import { advanceCompletedMicrocycle, completeCurrentPlanWeek, type ActiveTrainingPlan, type TrainingSetupGoal } from "@/domain/training/plan-setup";
+import { advanceCompletedMicrocycle, type ActiveTrainingPlan, type TrainingSetupGoal } from "@/domain/training/plan-setup";
 import type { TrainingGoalId } from "@/domain/training/training-goals";
 import { buildDefaultPostWorkoutReviewAnswers, runFirstShippablePostWorkoutLoop } from "@/domain/training/first-shippable-coaching-loop";
 import { buildRecoveryWorkoutSession } from "@/domain/training/recovery-workout-constructor";
@@ -159,7 +159,7 @@ function createSessionFromProgrammeDay(
   */
 }
 
-function createSessionFromActivePlan(userId?: string | null, currentBlock?: TrainingBlock | null, appSettings?: AppSettings): WorkoutSession | null {
+function createSessionFromActivePlan(userId?: string | null, appSettings?: AppSettings): WorkoutSession | null {
   const activePlan = activeTrainingPlanRepository.getOptional();
   if (!activePlan) return null;
   const availableExercises = availableWorkoutExercises();
@@ -171,7 +171,6 @@ function createSessionFromActivePlan(userId?: string | null, currentBlock?: Trai
     userId,
     startedAt: timestamp,
     activePlan,
-    currentBlock,
     appSettings: appSettings ?? defaultAppSettings,
     exercises: availableExercises,
     history,
@@ -521,7 +520,7 @@ export function useWorkoutLogger() {
     if (programmeSession) return programmeSession;
 
     const selectedExercise = availableExercises.find((candidate) => candidate.id === selectedExerciseId);
-    if (!selectedExercise) return createSessionFromActivePlan(user?.id, currentBlock, appSettings) ?? createSelectedFallbackSession(user?.id, appSettings, currentBlock);
+    if (!selectedExercise) return createSessionFromActivePlan(user?.id, appSettings) ?? createSelectedFallbackSession(user?.id, appSettings, currentBlock);
 
     const timestamp = now();
     return {
@@ -716,14 +715,11 @@ export function useWorkoutLogger() {
 
   const advanceTrainingWeekIfEarned = (completedSession: WorkoutSession) => {
     if (completedSession.sessionKind !== "planned" || !activePlan) return;
-    const activeBlock = activePlan.blocks.find((block) => block.id === activePlan.activeBlockId);
-    if (!activeBlock) return;
-    if (completedSession.planBlockId !== activeBlock.id || completedSession.planWeekNumber !== activeBlock.currentWeek) return;
 
     const completedHistory = summarizeWorkoutHistory(workoutSessionRepository.list());
     if (!shouldAdvanceTrainingWeekAfterCompletedSession({ activePlan, completedSession, history: completedHistory })) return;
 
-    const nextPlan = advanceCompletedMicrocycle(completeCurrentPlanWeek(activePlan, completedSession.completedAt));
+    const nextPlan = advanceCompletedMicrocycle(activePlan);
     if (nextPlan === activePlan) return;
     activeTrainingPlanRepository.save(nextPlan);
     setActivePlan(nextPlan);
@@ -938,7 +934,7 @@ export function useWorkoutLogger() {
   };
 
   const resetSession = () => {
-    const nextSession = createSessionFromActivePlan(user?.id, currentBlock, appSettings);
+    const nextSession = createSessionFromActivePlan(user?.id, appSettings);
     if (!nextSession) return;
     setActiveExerciseIndex(0);
     setRestTimer(null);

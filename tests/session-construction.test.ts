@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { defaultAppSettings } from "@/application/settings/app-settings";
 import { createActiveTrainingPlan } from "@/domain/training/plan-setup";
+import { resolveCurrentPlanningInput } from "@/domain/training/current-planning-input";
 import { exerciseLibrary } from "@/domain/training/presets";
 import { buildRecoveryWorkoutSession, constructSessionContract, isValidRecoveryWorkout } from "@/domain/training/recovery-workout-constructor";
 
@@ -18,7 +19,9 @@ function plan(goal: "build_muscle" | "build_strength" = "build_muscle") {
 describe("production session construction", () => {
   it("builds an ordered, bounded session contract from the microcycle role", () => {
     const activePlan = plan();
-    const contract = constructSessionContract(activePlan, 0);
+    const planning = resolveCurrentPlanningInput(activePlan, 0);
+    if (planning.status !== "ready") throw new Error("Expected a current planning input.");
+    const contract = constructSessionContract(planning.planning);
 
     expect(contract.role).toBe("upper");
     expect(contract.primaryTarget).toBe("upper-body pressing");
@@ -31,7 +34,7 @@ describe("production session construction", () => {
     const activePlan = plan();
     const session = buildRecoveryWorkoutSession({
       id: "session-1", userId: "user-1", startedAt: "2026-07-11T09:00:00.000Z", activePlan,
-      currentBlock: activePlan.blocks[0], appSettings: defaultAppSettings, exercises: exerciseLibrary, history: [], sessionIndex: 0,
+      appSettings: defaultAppSettings, exercises: exerciseLibrary, history: [], sessionIndex: 0,
     });
 
     expect(session).not.toBeNull();
@@ -45,7 +48,7 @@ describe("production session construction", () => {
     const activePlan = plan("build_strength");
     const session = buildRecoveryWorkoutSession({
       id: "session-2", startedAt: "2026-07-11T09:00:00.000Z", activePlan,
-      currentBlock: activePlan.blocks[0], appSettings: defaultAppSettings, exercises: exerciseLibrary, history: [], sessionIndex: 0,
+      appSettings: defaultAppSettings, exercises: exerciseLibrary, history: [], sessionIndex: 0,
     });
 
     expect(session?.exercises[0]?.notes).toContain("primary_strength · protected work");

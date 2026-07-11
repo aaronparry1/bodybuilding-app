@@ -70,7 +70,6 @@ describe("planned exact-target boundary", () => {
       userId: "user-1",
       startedAt: "2026-07-11T09:00:00.000Z",
       activePlan,
-      currentBlock: activePlan.blocks[0],
       appSettings: defaultAppSettings,
       exercises: exerciseLibrary,
       history: [],
