@@ -280,7 +280,8 @@ describe("product flow architecture", () => {
     expect(deloadActionBlock).not.toContain("secondaryLabel");
     expect(deloadActionBlock).not.toContain("Ignore for now");
     expect(progressSource).toContain('progress.actionFlow.type === "deload"');
-    expect(progressSource).toContain("startDeloadPlan(activePlan");
+    expect(progressSource).not.toContain("startDeloadPlan(activePlan");
+    expect(progressSource).toContain('href="/(protected)/(tabs)/programmes"');
   });
 
   it("does not ask users to choose available equipment during onboarding", () => {

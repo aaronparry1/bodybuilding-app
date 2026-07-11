@@ -135,6 +135,22 @@ Phase 4C changes completed planned-workout classification only. It does not alte
 | `docs/post-workout-progress-stored-prescription-authority.md` | New file | Record Phase 4C authority and explicit compatibility boundary. | `1fa6a4ba456a678d4a768c237606c8948f820354b22914e39d993faa17c7cdb8` | Documentation review |
 | `qa-reports/legacy-migration-change-control/phase-4c-review-progress-authority-map.md` | New file | Record Phase 4C pre-edit authority map. | `08dcfa5760097e903ce1a1808a6f9ea10c91e3f053d4079dcc7a39014ec7ac22` | Documentation review |
 
+## Phase 4D execution record
+
+Phase 4D makes Analytics and reporting read-only consumers of current planning context and stored history. It does not alter planning, Train execution, progression authority, evidence, interventions, builder, or ad-hoc paths.
+
+| File | Pre-edit SHA-256 | Change reason | Post-edit SHA-256 | Focused tests |
+| --- | --- | --- | --- | --- |
+| `app/(protected)/(tabs)/analytics.tsx` | `7ca31f2add4b77fc6322c195fbd9b1c709043f2aca1ff71562e81222acf23e92` | Replace raw block context and Analytics plan/training-year writes with read-only current planning context and Plan navigation. | `e8412360551305af99e1d08afe280c83362d5b49069e54f71761b504ec57849d` | analytics context, reporting isolation |
+| `src/domain/training/advanced-reporting.ts` | `af9746b781e052bd95a38f2d634f93658c75affbcf954aa00730e24b44ef90e6` | Remove `TrainingBlock` reporting input. | `34e73195ee71b5196a54479bac80c487d8b7b8b055637d718589f5dc76dc9aeb` | advanced reporting, reporting isolation |
+| `src/domain/training/analytics-planning-context.ts` | New file | Narrow current Analytics context from current planning authority. | `ef6d7d8e5cabf83f3f3363e30c6031bb822dda90bbf49ce2bacea1c8888abcb2` | analytics planning context |
+| `tests/advanced-reporting.test.ts` | `cee65c08884e1a64142158d8ce89041ff137a03e795b946b9cda7bcd0a4b299e` | Snapshot preserved; report outputs remain covered. | Unchanged | advanced reporting |
+| `tests/analytics-planning-context.test.ts` | New file | Verify current context ignores legacy block metadata. | `7d93d420f32d842bd1fbf789ac07704cd4e744e5c319f667658afd327d61d383` | self |
+| `tests/analytics-reporting-isolation.test.ts` | New file | Verify Analytics/reporting cannot mutate planning or consume TrainingBlock. | `bb030bbfd753b0f8ce21eea9e03b94a7cbd0130192e779c2aa1f09db6ce10d79` | self |
+| `tests/product-flow-architecture.test.ts` | `918804f811bcb35fee3ed96ee1b1822eff3398300305ef4ef8e761b0c66117c7` | Replace the obsolete Analytics auto-deload expectation with the stronger read-only Plan-navigation contract. | `b822ebbb595e623d687f025baf89b99889854f5470e28e7a1fe640948c21e627` | product-flow architecture |
+| `docs/analytics-reporting-historical-authority.md` | New file | Record Analytics/reporting authority and compatibility grouping. | `7f84b72032dcaee18be0e57db1b020bbe400bddf2393c337f7440428fbb3a9e1` | Documentation review |
+| `qa-reports/legacy-migration-change-control/phase-4d-analytics-reporting-authority-map.md` | New file | Record Phase 4D authority audit. | `dd53d59c74644bb0e36bbcc55adcd346d63ba60377865af598715090cf24ddfb` | Documentation review |
+
 | File | SHA-256 |
 | --- | --- |
 | `docs/legacy-planning-coaching-evidence-intervention-audit.md` | `f7543c9ac8f5dcc5f66d477b4c59afa2d8ebe52ccd2beddfd3bc00b2a2e7904c` |

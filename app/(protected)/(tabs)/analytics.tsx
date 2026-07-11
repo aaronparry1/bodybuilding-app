@@ -4,19 +4,12 @@ import { Alert, Pressable, Text, View } from "react-native";
 import { PremiumRequiredScreen, usePremiumAccess } from "@/application/billing/premium-access";
 import { activeTrainingPlanRepository } from "@/data/local/active-training-plan-repository";
 import { customExerciseRepository } from "@/data/local/custom-exercise-repository";
-import { trainingYearRepository } from "@/data/local/training-year-repository";
 import { workoutHistoryRepository } from "@/data/local/workout-history-repository";
 import { buildAdvancedReports, type AdvancedReports } from "@/domain/training/advanced-reporting";
+import { buildAnalyticsPlanningContext } from "@/domain/training/analytics-planning-context";
 import { buildProgressDashboardViewModel } from "@/domain/training/progress-dashboard";
-import {
-  keepExerciseDespiteRotationRecommendation,
-  replaceExerciseForFutureSessions,
-  startDeloadPlan,
-  startDeloadTrainingYear,
-} from "@/domain/training/recommendation-actions";
 import { buildPowerliftingTotalSharePayload, buildPrSharePayload, buildStrengthProgressSharePayload, type BrandedSharePayload } from "@/domain/training/share-cards";
 import { buildStrengthDashboard, type StrengthDashboard, type StrengthLiftDashboardItem, type StrengthPrItem } from "@/domain/training/strength-dashboard";
-import { approveVolumeAdjustment, ignoreVolumeAdjustment } from "@/domain/training/volume-adjustments";
 import { summarizeWorkoutHistory } from "@/domain/training/workout-history";
 import { BrandedShareCardPreviewModal } from "@/features/social-sharing/branded-share-card-preview";
 import {
@@ -63,72 +56,11 @@ function ProgressContent() {
   const history = useMemo(() => summarizeWorkoutHistory(sessions), [sessions]);
   const progress = useMemo(() => buildProgressDashboardViewModel(history, exercises, activePlan), [activePlan, exercises, history]);
   const strengthDashboard = useMemo(() => buildStrengthDashboard({ sessions, goal: activePlan?.goal }), [activePlan?.goal, sessions]);
-  const currentBlock = activePlan?.blocks.find((block) => block.id === activePlan.activeBlockId) ?? activePlan?.blocks[0] ?? null;
+  const analyticsContext = useMemo(() => buildAnalyticsPlanningContext({ activePlan }), [activePlan]);
   const reports = useMemo(
-    () => buildAdvancedReports({ sessions, history, exercises, activePlan, currentBlock }),
-    [activePlan, currentBlock, exercises, history, sessions],
+    () => buildAdvancedReports({ sessions, history, exercises, activePlan }),
+    [activePlan, exercises, history, sessions],
   );
-
-  const savePlan = (nextPlan: NonNullable<typeof activePlan>) => {
-    activeTrainingPlanRepository.save(nextPlan);
-    setActivePlan(nextPlan);
-  };
-
-  useEffect(() => {
-    if (!activePlan || progress.actionFlow?.type !== "deload") return;
-    savePlan(startDeloadPlan(activePlan, new Date().toISOString(), progress.actionFlow.deloadProfile));
-    trainingYearRepository.save(startDeloadTrainingYear(trainingYearRepository.getActiveYear()));
-  }, [activePlan, progress.actionFlow]);
-
-  const handlePrimaryAction = () => {
-    if (!progress.actionFlow) return;
-    if (progress.actionFlow.type === "rotation") {
-      if (!activePlan || !progress.actionFlow.replacementExerciseId) return;
-      savePlan(
-        replaceExerciseForFutureSessions(
-          activePlan,
-          progress.actionFlow.currentExerciseId,
-          progress.actionFlow.replacementExerciseId,
-          progress.actionFlow.reason,
-          new Date().toISOString(),
-          progress.actionFlow.structuredPrimaryLiftVariation,
-        ),
-      );
-      Alert.alert("Exercise replaced", `${progress.actionFlow.currentExerciseName} will be replaced by ${progress.actionFlow.replacementExerciseName} in future planned sessions.`);
-      return;
-    }
-    if (progress.actionFlow.type === "volume") {
-      if (!activePlan) return;
-      const nextPlan = approveVolumeAdjustment(activePlan, progress.actionFlow.recommendation);
-      if (nextPlan === activePlan) {
-        Alert.alert("No change applied", "That volume change is blocked by the current safety rules.");
-        return;
-      }
-      savePlan(nextPlan);
-      Alert.alert("Volume change applied", "Future planned sessions will use this adjustment. Active workouts and history stay unchanged.");
-    }
-  };
-
-  const handleSecondaryAction = () => {
-    if (!progress.actionFlow || !activePlan) return;
-    if (progress.actionFlow.type === "rotation") {
-      savePlan(
-        keepExerciseDespiteRotationRecommendation(
-          activePlan,
-          progress.actionFlow.currentExerciseId,
-          progress.actionFlow.reason,
-          new Date().toISOString(),
-          progress.actionFlow.structuredPrimaryLiftVariation,
-        ),
-      );
-      Alert.alert("Exercise kept", "Noted. Adaptive Strength Coach will not repeat this rotation prompt immediately.");
-      return;
-    }
-    if (progress.actionFlow.type === "volume") {
-      savePlan(ignoreVolumeAdjustment(activePlan, progress.actionFlow.recommendation));
-      Alert.alert("Ignored for now", "No future session changes were applied. The evidence stays in Progress.");
-    }
-  };
 
   return (
     <AppScreen>
@@ -137,6 +69,8 @@ function ProgressContent() {
         title="Is training working?"
         subtitle="A simple verdict from your logged workouts."
       />
+
+      <AnalyticsPlanningContextCard context={analyticsContext} />
 
       <StrengthDashboardSection dashboard={strengthDashboard} onShare={setSharePayload} />
 
@@ -249,10 +183,9 @@ function ProgressContent() {
                   <SecondaryButton label={progress.actionFlow.primaryLabel} onPress={() => {}} compact />
                 </Link>
               ) : (
-                <View style={{ flexDirection: "row", gap: spacing.sm, flexWrap: "wrap" }}>
-                  <SecondaryButton label={progress.actionFlow.primaryLabel} onPress={handlePrimaryAction} disabled={!progress.actionFlow.evidence.actionAllowed} compact />
-                  <SecondaryButton label={progress.actionFlow.secondaryLabel} onPress={handleSecondaryAction} compact />
-                </View>
+                <Link href="/(protected)/(tabs)/programmes" asChild>
+                  <SecondaryButton label="View plan" onPress={() => {}} compact />
+                </Link>
               )}
             </View>
           ) : null}
@@ -345,6 +278,30 @@ function AdvancedReportsSection({ reports }: { reports: AdvancedReports }) {
         <ReportCard title={reports.recovery.title} headline={reports.recovery.headline} metric={reports.recovery.keyMetric} detail={reports.recovery.detail} details={reports.recovery.details} />
         <ReportCard title={reports.consistency.title} headline={reports.consistency.headline} metric={reports.consistency.keyMetric} detail={reports.consistency.detail} details={reports.consistency.details} />
       </View>
+    </SectionList>
+  );
+}
+
+function AnalyticsPlanningContextCard({ context }: { context: ReturnType<typeof buildAnalyticsPlanningContext> }) {
+  if (context.status === "no_plan") return null;
+  if (context.status === "incomplete") {
+    return (
+      <SectionList title="Current training context">
+        <PremiumCard tone="quiet">
+          <Text selectable style={{ ...type.body, color: colors.textMuted }}>Your current plan details are being restored.</Text>
+        </PremiumCard>
+      </SectionList>
+    );
+  }
+  return (
+    <SectionList title="Current training context">
+      <PremiumCard tone="quiet">
+        <View style={{ gap: spacing.xs }}>
+          <Text selectable style={{ color: colors.text, fontSize: 17, lineHeight: 22, fontWeight: "900" }}>{context.mesocyclePurpose}</Text>
+          <Text selectable style={{ ...type.body, color: colors.textMuted }}>Microcycle {context.microcycle.number} · {context.microcycle.priority}</Text>
+          <Text selectable style={{ ...type.body, color: colors.textMuted }}>Session role: {context.sessionRole}</Text>
+        </View>
+      </PremiumCard>
     </SectionList>
   );
 }

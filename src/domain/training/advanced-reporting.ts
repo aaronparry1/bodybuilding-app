@@ -1,4 +1,3 @@
-import type { TrainingBlock } from "@/domain/training/annual-models";
 import type { Exercise, MuscleGroup, WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
 import { buildRecoveryCapacityWeeklyTarget, type RecoveryCapacityWeeklyTarget } from "@/domain/training/recovery-capacity-delivery";
 import { buildStrengthDashboard, type StrengthDashboard } from "@/domain/training/strength-dashboard";
@@ -56,7 +55,6 @@ export function buildAdvancedReports({
   history,
   exercises,
   activePlan,
-  currentBlock,
   activeWorkout,
   date = new Date(),
 }: {
@@ -64,12 +62,11 @@ export function buildAdvancedReports({
   history: WorkoutHistorySummary[];
   exercises: Exercise[];
   activePlan?: ActiveTrainingPlan | null;
-  currentBlock?: TrainingBlock | null;
   activeWorkout?: WorkoutSession | null;
   date?: Date;
 }): AdvancedReports {
   const strengthDashboard = buildStrengthDashboard({ sessions, goal: activePlan?.goal, now: date.toISOString() });
-  const recoveryTarget = buildRecoveryCapacityWeeklyTarget({ activePlan, currentBlock, history, exercises, activeWorkout, date });
+  const recoveryTarget = buildRecoveryCapacityWeeklyTarget({ activePlan, history, exercises, activeWorkout, date });
   return {
     strength: buildStrengthReport(strengthDashboard),
     volume: buildVolumeReport({ history, exercises, date }),
