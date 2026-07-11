@@ -1,0 +1,5 @@
+import { describe, expect, it } from "vitest";
+import { derivePerformanceTrendSeries } from "@/domain/training/current-performance-trend-series";
+import type { PerformanceWindowResult } from "@/domain/training/current-performance-window";
+const ready=(directions:string[]):PerformanceWindowResult=>({status:"ready",policy:{version:1,id:"p",minimumValidSets:1,minimumExercises:1,minimumSessions:1,positiveSets:1,negativeSets:1},windows:directions.map((direction,index)=>({window:{id:String(index),planId:"p",mesocycleId:"m",microcycleNumber:index,evaluatedAt:String(index),evidence:{} as never},direction:direction as never,trace:{validSets:2,reasons:[]}}))}); const policy={positiveWindows:3,negativeWindows:3,severeNegativeWindow:4};
+describe("performance trend series",()=>{ it("keeps ordinary poor windows out of decline",()=>{ expect(derivePerformanceTrendSeries(ready(["negative","maintained","negative"]),policy).trend).toBe("stable"); }); it("requires a sustained negative tail",()=>{ expect(derivePerformanceTrendSeries(ready(["negative","negative","negative"]),policy).trend).toBe("declining"); }); });
