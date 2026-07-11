@@ -1,5 +1,16 @@
 # Legacy migration change-control manifest
 
+## Phase 11A.2C2 execution record
+
+| File | Pre-edit SHA-256 | Change reason | Post-edit checksum / focused tests |
+| --- | --- | --- | --- |
+| `src/domain/training/current-mesocycle-readiness-context.ts` | New file | Pure current-snapshot exposure, successor validation, and objective-policy boundary; no writer or transition behaviour. | `8a682ce…873ac7e`; `current-mesocycle-readiness-context` |
+| `tests/current-mesocycle-readiness-context.test.ts` | New file | Cover explicit policy, snapshot-only counting, graph candidates and objective-policy honesty. | `e2ac4e…2ae301`; focused pass |
+| `docs/current-mesocycle-exposure-successor-objective.md` | New file | Define C2 authority and C3 hand-off. | Documentation review |
+| `phase-11a2c2-exposure-successor-objective-map.md` | New file | Map field authorities and missing-policy behaviour. | Documentation review |
+
+Verified C1B baseline before C2: 15 failing files / 43 failing tests / 1,529 passing tests; typecheck, Expo public config, and web export passed. C2 requires C3 to persist/produce new snapshots and integrate the decision writer.
+
 Created: 2026-07-11 (Europe/London)  
 Repository root: `/Users/aaronparry/Documents/Bodybuilding App`  
 Branch: `main`  

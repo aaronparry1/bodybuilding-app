@@ -31,3 +31,5 @@ Phase 9B changes only the planned-session constructor result representation and 
 Phase 9C deletion audit found active annual/training-year and block-policy imports, so no failing suite is reclassified as safely removable in this phase.
 
 Stage 1 current decision persistence adds passing focused decision-record coverage only. It does not change any frozen baseline assertion or migrate a legacy consumer.
+
+Phase 11A.2C1B verification: **15 failing files / 43 failing tests / 1,529 passing tests**. Typecheck, Expo public config, and web export passed. Phase 11A.2C2 must retain this comparison baseline.

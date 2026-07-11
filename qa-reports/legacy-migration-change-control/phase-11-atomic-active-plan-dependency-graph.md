@@ -27,3 +27,7 @@ The block model currently carries transition, repeat/delay, deload, and volume-c
 ## Stage 1 decision persistence bridge
 
 The current decision evaluator now writes a versioned, block-free decision record before any optional compatibility shadow. Stage 2 consumer migrations must read the current record through the current-first resolver; no consumer may treat a legacy block decision as co-equal authority. Stage 3 may delete shadows only after every legacy reader has migrated.
+
+## Phase 11A.2C2
+
+Persisted readiness history now feeds pure exposure context; current mesocycle `nextStates` feed candidate validation; machine-evaluable objective policy remains an explicit gap. Neither edge writes a decision or touches legacy active-plan progression.

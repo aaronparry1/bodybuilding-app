@@ -25,3 +25,7 @@ Current production readers must receive a hydrated current decision (or explicit
 Stage 1 has no canonical writer for `MicrocycleEvaluationState` or `PerformanceBasedFatigueTrend` from persisted planned-session evidence. The only live completion path currently calls `advanceCompletedMicrocycle`, which applies a default-week/first-successor rule without producing the minimum exposure, required-role, completion-quality, target-achievement, trend, or approved-prerequisite inputs required by `evaluateAndPersistMesocycleDecision`.
 
 Using that legacy auto-advance as a substitute would either fabricate `continue`/`advance`/`deload` inputs or preserve the block/array authority Stage 2 is meant to retire. The next safe implementation unit is therefore a current microcycle evidence/readiness producer, with product-approved derivation policy for objective conclusion, productive stimulus, fatigue trend, and approved prerequisites. Until it exists, a decision application service cannot safely be connected to Plan, Train/logger, Progress, volume, or recommendation consumers.
+
+## C2 dependency note
+
+Consumers still cannot produce decisions. C2 adds only pure context for C3: snapshot-derived exposure, non-selected approved successor candidates, and explicit objective-policy absence.

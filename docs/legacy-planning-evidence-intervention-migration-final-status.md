@@ -19,3 +19,7 @@ Migration-focused tests, typecheck, Expo public config, and web export pass. Aft
 ## Residual risks
 
 Phase 10A removed the current Train/logger training-year dependency. Ad-hoc, recommendation, settings, sync, and QA paths still retain annual/block utilities or compatibility storage. Phase 9A removed Home's deprecated compatibility fields and Phase 9B replaced the public planned-session constructor's ambiguous nullable result with explicit outcomes. No expiry, medical, or scope semantics were invented for interventions.
+
+## Phase 11A.2C2 status
+
+Exposure, successor validation, and objective-status boundaries are current-only and pure. Stage 2 consumer migration remains blocked on C3 canonical readiness production and authoritative decision-writer integration.

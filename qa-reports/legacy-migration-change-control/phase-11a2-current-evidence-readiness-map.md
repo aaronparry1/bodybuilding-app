@@ -13,4 +13,4 @@
 
 Legacy block week/order and block decisions are excluded from the producer.
 
-Phase 11A.2A implements only role derivation, matching and evaluability. Trends, fatigue, exposure, snapshot persistence and writer integration remain deferred.
+Phase 11A.2C2 derives exposure only from retained C1B snapshots and validates graph candidates without selecting one. Existing textual mesocycle success criteria remain non-machine-evaluable; the objective boundary therefore reports missing policy rather than inferring success. Canonical readiness production and decision-writer integration remain deferred to C3.
