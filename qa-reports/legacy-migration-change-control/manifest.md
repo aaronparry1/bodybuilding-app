@@ -1,5 +1,13 @@
 # Legacy migration change-control manifest
 
+## Stage 2B completion/recommendation record
+
+| File | Old authority | New authority | Focused tests / Stage 3 condition |
+| --- | --- | --- | --- |
+| `current-completion-orchestration.ts` | Default-week advancement | Persisted workout → current readiness producer → current writer | Completion architecture; retain until Stage 3 persistence migration. |
+| `use-workout-logger.ts` | `advanceCompletedMicrocycle` | Current completion orchestration only | Logger completion regression; no display migration. |
+| `current-decision-recommendation.ts` | None; legacy actions remain isolated | Current decision repository + application boundary | Consumer facade; migrate UI consumers in 2C/2D. |
+
 ## Stage 2 application-boundary record
 
 | File | Reason | Focused tests | Stage 3 condition |

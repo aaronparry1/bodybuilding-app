@@ -6,6 +6,8 @@ Stage 2 introduces one explicit application boundary: `applyCurrentMesocycleDeci
 
 The application boundary is complete, but direct recommendation, completion, Progress, volume, Train/logger, and Plan/Home consumer migration remains pending. They continue to be Stage 2 work and must be routed to the current producer/writer/application boundaries before legacy block authority can be retired.
 
+Stage 2B routes final planned-workout completion through the current completion orchestration boundary and exposes a current-only recommendation facade. Progress, volume, and display consumers remain deferred.
+
 ## Stage 2A application contract
 
 The application service returns explicit delay/review no-ops, identity failures, stale/superseded decisions, snapshot failures, and applied lifecycle results. It persists the plan first and then marks a decision applied. Since local repositories are not transactional, a lifecycle persistence failure is reported as an application failure; recovery must inspect current identities rather than replaying the mutation.

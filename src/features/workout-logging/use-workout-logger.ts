@@ -31,8 +31,9 @@ import { resolveSetPrescription } from "@/domain/training/set-prescription";
 import { resolveTrainingGapAdjustment } from "@/domain/training/training-gap-adjustment";
 import { exerciseLibrary } from "@/domain/training/presets";
 import { buildPlannedWorkoutProgramme, resolveNextTrainableWorkoutName, workoutTypeForName } from "@/domain/training/planned-workout";
-import { resolveRecommendedSessionIndex, shouldAdvanceTrainingWeekAfterCompletedSession } from "@/domain/training/training-session-selection";
-import { advanceCompletedMicrocycle, type ActiveTrainingPlan, type TrainingSetupGoal } from "@/domain/training/plan-setup";
+import { resolveRecommendedSessionIndex } from "@/domain/training/training-session-selection";
+import { type ActiveTrainingPlan, type TrainingSetupGoal } from "@/domain/training/plan-setup";
+import { orchestrateCompletedPlannedWorkout } from "@/domain/training/current-completion-orchestration";
 import type { TrainingGoalId } from "@/domain/training/training-goals";
 import { buildDefaultPostWorkoutReviewAnswers, runFirstShippablePostWorkoutLoop } from "@/domain/training/first-shippable-coaching-loop";
 import { buildRecoveryWorkoutSession } from "@/domain/training/recovery-workout-constructor";
@@ -735,16 +736,15 @@ export function useWorkoutLogger() {
     }
   };
 
-  const advanceTrainingWeekIfEarned = (completedSession: WorkoutSession) => {
+  const produceCurrentDecisionAfterPlannedCompletion = (completedSession: WorkoutSession) => {
     if (completedSession.sessionKind !== "planned" || !activePlan) return;
-
-    const completedHistory = summarizeWorkoutHistory(workoutSessionRepository.list());
-    if (!shouldAdvanceTrainingWeekAfterCompletedSession({ activePlan, completedSession, history: completedHistory })) return;
-
-    const nextPlan = advanceCompletedMicrocycle(activePlan);
-    if (nextPlan === activePlan) return;
-    activeTrainingPlanRepository.save(nextPlan);
-    setActivePlan(nextPlan);
+    orchestrateCompletedPlannedWorkout({
+      plan: activePlan,
+      completedSession,
+      snapshotId: makeId("readiness"),
+      decisionId: makeId("decision"),
+      createdAt: completedSession.completedAt ?? now(),
+    });
   };
 
   useEffect(
@@ -997,7 +997,7 @@ export function useWorkoutLogger() {
     });
     trainingEvidenceRepository.add(loopResult.trainingEvidence);
     persistSession(nextSession);
-    advanceTrainingWeekIfEarned(nextSession);
+    produceCurrentDecisionAfterPlannedCompletion(nextSession);
   };
 
   const cancelWorkout = () => {
