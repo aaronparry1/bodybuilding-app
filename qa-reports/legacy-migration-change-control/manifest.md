@@ -180,3 +180,17 @@ Phase 5 isolates non-planned sessions and Programme Builder templates. It does n
 | `qa-reports/legacy-migration-change-control/phase-5-nonplanned-builder-boundary-map.md` | New file | Record the pre-edit boundary audit. | `35cbddb4823ffc2eddbf204efbe1f9da25425f4b8e465e20f853695135791ebf` | Documentation review |
 
 The Phase 5 logger snapshot is additionally preserved at `originals/phase-5/src/features/workout-logging/use-workout-logger.ts`; pre-edit SHA-256: `e3d0e8f47dcb9cd074f24d960df6df61f260bc0aafac1718e1450ffb8e4e5516`.
+
+## Phase 6 execution record
+
+Phase 6 consolidates completed-workout evidence provenance and lookup. It does not change coaching-rule decisions, planned targets, progression, session construction, evidence ingestion policy, interventions, or the V2/V3 runtime policy.
+
+| File | Pre-edit SHA-256 | Change reason | Post-edit SHA-256 | Focused tests |
+| --- | --- | --- | --- | --- |
+| `src/domain/training/training-evidence-record.ts` | `a009ed2644a29767f2026fc1e41d5401b320818ba2296f32806a2f5e1e7263b0` | Add stable schema/source/rule provenance to new completed-workout evidence. | `c745e5d04fb7da61ea8c6ac8edb01ecc886191d093a7a6a8f56d101582d9facd` | training evidence repository |
+| `src/data/local/training-evidence-repository.ts` | `d9eedbeba58a0265f68ec2c31043ba0bda9548a17178c686b7f3583efb13f73c` | Add deterministic lookup, duplicate rejection, explicit missing IDs, compatibility normalization, and defensive reads. | `6015b318a671e30fe76f2fdf02e618891486fca2a29543559704ca9fded42abc` | training evidence repository |
+| `src/domain/training/coaching-evidence-engine.ts` | `a778242bca9fce2dfbf826b84a0f31be94f1f1065d1be6e133b3adeaf1b338f7` | Replace retired living-athlete proposal terminology with training-evidence provenance wording only. | `80abb810efa7cfa36658fd4a9cd49024dc478725a8ee7e502d8abe9a090db3c6` | coaching evidence engine |
+| `tests/training-evidence-repository.test.ts`, `tests/coaching-evidence-engine.test.ts` | New files | Characterize lookup, duplicate/missing handling, immutability, provenance, and retired terminology removal. | See current checksums in Phase 6 verification output | self |
+| `docs/evidence-repository-runtime-authority.md`, `docs/archive/retired-v2-v3-living-athlete-evidence-reference.md`, `qa-reports/legacy-migration-change-control/phase-6-evidence-repository-authority-map.md` | New files | Record authority, archive review, and deletion gates. | See current checksums in Phase 6 verification output | Documentation review |
+
+The Phase 6 originals are preserved below `originals/phase-6/`. The V2/V3/living-athlete logger comment was classified as deletion-gated: it contains no evidence IDs or repository writes, but it also contains unrelated retired policy/generation material that must be handled in a separate scoped cleanup.

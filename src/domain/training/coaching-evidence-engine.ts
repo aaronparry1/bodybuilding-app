@@ -61,7 +61,7 @@ export type CoachingEvidenceReasonCode =
   | "contradiction_recorded"
   | "evidence_decay_applied"
   | "stable_traits_not_modified"
-  | "living_athlete_model_update_proposed";
+  | "training_evidence_proposal_created";
 
 export interface RawCoachingEvidence {
   sessionId: string;
@@ -233,7 +233,7 @@ function proposalsFor(
     }
     const contradictionCount = countContradictions(items);
     const evidenceWeight = evidenceWeightFor(items);
-    reasons.push("living_athlete_model_update_proposed");
+    reasons.push("training_evidence_proposal_created");
     const reasonCodes = unique(items.flatMap((item) => item.reason_codes));
     const sessions = unique(items.flatMap((item) => item.supporting_sessions));
     if (target === "pain_trigger") {
