@@ -252,6 +252,8 @@ describe("workout navigation and logging UI contracts", () => {
   });
 
   it("shows prescribed work-set reps beside load without duplicate set-summary copy", () => {
+    expect(trainScreen).toContain("const currentPlannedWorkTarget = resolveTrainExecutionTarget");
+    expect(trainScreen).toContain("const plannedWorkTargetMissing = setMode === \"work\" && currentPlannedWorkTarget.source === \"planned_target_missing\"");
     expect(trainScreen).toContain("function formatPlannedWorkSetDisplay");
     expect(trainScreen).toContain("return `${loadLabel} × ${reps}${suffix}`;");
     expect(trainScreen).toContain("activeUnknownLoadLabel(exercise)");
@@ -265,7 +267,7 @@ describe("workout navigation and logging UI contracts", () => {
 
   it("keeps active exercise More detail athlete-facing and blocks raw engine text", () => {
     expect(sessionExerciseRowSource).toContain("ExerciseMorePanel");
-    expect(sessionExerciseRowSource).toContain("buildExerciseMorePanelRows(exercise, metadata, index)");
+    expect(sessionExerciseRowSource).toContain("buildExerciseMorePanelRows(exercise, metadata, index, sessionKind)");
     expect(sessionExerciseRowSource).toContain('label={showDetails ? "Hide more" : "More"}');
     expect(sessionExerciseRowSource).toContain('label="Open detail"');
     expect(sessionExerciseRowSource).toContain('label={actionsOpen ? "Hide actions" : "Actions"}');

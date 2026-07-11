@@ -15,7 +15,8 @@ import { exerciseReasonOptions, scoreExercisePreference, type ExercisePreference
 import { evaluateCardioInterference, type CardioInterferenceResult } from "@/domain/training/cardio-interference";
 import { resolveNextLiftingContext } from "@/domain/training/recovery-capacity-delivery";
 import { resolveEventTaper } from "@/domain/training/event-taper";
-import type { CardioEase, CardioModality, CardioSessionKind, Equipment, Exercise, ManualExerciseFinishReason, MuscleGroup, SetLog, UnitSystem, WorkoutExerciseLog } from "@/domain/training/models";
+import type { CardioEase, CardioModality, CardioSessionKind, Equipment, Exercise, ManualExerciseFinishReason, MuscleGroup, SetLog, UnitSystem, WorkoutExerciseLog, WorkoutSession } from "@/domain/training/models";
+import { resolveTrainExecutionTarget } from "@/domain/training/train-execution-target";
 import { getExerciseSwapSuggestions } from "@/domain/training/exercise-swaps";
 import { resolveExerciseTargetZone, targetZoneLabel } from "@/domain/training/exercise-target-zone";
 import { hasFutureUncompletedWorkSetAfterLog } from "@/domain/training/in-session-escalation";
@@ -284,16 +285,30 @@ function WorkoutLoggingContent() {
   const isShutdown = exercise.status === "shutdown";
   const isReadOnly = exercise.status !== "active" || Boolean(session.completedAt);
   const hasUsableLoad = exercise.loadKnown !== false || Number.isFinite(Number.parseFloat(loadInput));
-  const canLogSet = Number.isInteger(reps) && reps >= 0 && !isReadOnly && hasUsableLoad;
   const warmupSets = useMemo(() => getWarmupSets(exercise.sets), [exercise.sets]);
   const workSets = useMemo(() => getWorkSets(exercise.sets), [exercise.sets]);
+  const currentPlannedWorkTarget = resolveTrainExecutionTarget({
+    sessionKind: session.sessionKind,
+    exercise,
+    workSetIndex: workSets.length,
+  });
+  const plannedWorkTargetMissing = setMode === "work" && currentPlannedWorkTarget.source === "planned_target_missing";
+  const executionTargetDisplay = currentPlannedWorkTarget.reps != null
+    ? `${currentPlannedWorkTarget.reps}${measurementType === "duration" ? " sec" : ""}`
+    : "Exact target unavailable";
+  const canLogSet = Number.isInteger(reps) && reps >= 0 && !isReadOnly && hasUsableLoad && !plannedWorkTargetMissing;
   const currentSetNumber = exercise.status === "active" ? (setMode === "warmup" ? warmupSets.length : workSets.length) + 1 : Math.max(1, workSets.length);
   const completedCount = session.exercises.filter((candidate) => candidate.status === "complete" || candidate.status === "shutdown" || candidate.status === "swapped").length;
   const hasAnyLoggedSets = session.exercises.some((candidate) => candidate.sets.length > 0);
   const plannedWorkComplete = session.exercises.length > 0 && session.exercises.every(isExercisePlannedWorkComplete);
   const nextExercise = session.exercises[activeExerciseIndex + 1];
   const finalExercise = activeExerciseIndex >= session.exercises.length - 1;
-  const quickReps = useMemo(() => getQuickRepButtons(exercise.settings.repRange.min, exercise.settings.repRange.max), [exercise.settings.repRange.max, exercise.settings.repRange.min]);
+  const quickReps = useMemo(
+    () => session.sessionKind === "planned" && setMode === "work" && currentPlannedWorkTarget.reps != null
+      ? [currentPlannedWorkTarget.reps]
+      : getQuickRepButtons(exercise.settings.repRange.min, exercise.settings.repRange.max),
+    [currentPlannedWorkTarget.reps, exercise.settings.repRange.max, exercise.settings.repRange.min, session.sessionKind, setMode],
+  );
   const sessionBriefing = useMemo(() => buildSessionBriefing(session.exercises), [session.exercises]);
   const cardioSessionKind = isCardioSessionKind(session.sessionKind) ? session.sessionKind : null;
   const nextLiftingContext = useMemo(
@@ -398,6 +413,8 @@ function WorkoutLoggingContent() {
     activeExerciseMetadata,
     currentBlock?.type,
     warmupRowCounts[exercise.id],
+    0,
+    session.sessionKind,
   ).workRows;
   const activeHasNextWorkSet = activeWorkRows.some((row) => !row.set);
 
@@ -1025,7 +1042,7 @@ function WorkoutLoggingContent() {
             <NextExerciseCard
               exerciseName={exercise.exerciseName}
               loadLabel={activeLoadDisplay.kind === "unknown" ? activeUnknownLoadLabel(exercise) : activeLoadDisplay.label}
-              repLabel={targetRangeDisplay}
+              repLabel={session.sessionKind === "planned" ? executionTargetDisplay : targetRangeDisplay}
               setLabel={`Set ${currentSetNumber}`}
               onOpen={() => handleOpenExercise(activeExerciseIndex)}
             />
@@ -1072,6 +1089,7 @@ function WorkoutLoggingContent() {
               productiveGuidance={summary.productiveGuidance}
               metadata={availableExercises.find((candidate) => candidate.id === summary.exercise.exerciseId)}
               blockType={currentBlock?.type}
+              sessionKind={session.sessionKind}
               warmupRowCount={warmupRowCounts[summary.exercise.id]}
               warmupExpanded={warmupExpansionOverrides[summary.exercise.id] ?? summary.index === 0}
               onAddWarmupRow={() => handleAddWarmupRow(summary.exercise.id)}
@@ -1137,6 +1155,7 @@ function WorkoutLoggingContent() {
             exercise={session.exercises[performanceDrawer.exerciseIndex]!}
             metadata={availableExercises.find((candidate) => candidate.id === session.exercises[performanceDrawer.exerciseIndex]?.exerciseId) ?? null}
             exerciseIndex={performanceDrawer.exerciseIndex}
+            sessionKind={session.sessionKind}
             setNumber={performanceDrawer.setNumber}
             visible={Boolean(performanceDrawer)}
             restTimer={restTimer}
@@ -1284,7 +1303,7 @@ function WorkoutLoggingContent() {
 
         <View style={cockpitMetricsStyle}>
           <CockpitMetric label="Load" value={activeLoadDisplay.kind === "unknown" ? activeUnknownMetricLabel(exercise) : activeLoadDisplay.label} />
-          <CockpitMetric label={measurementType === "duration" ? "Duration" : "Reps"} value={targetRangeDisplay} />
+          <CockpitMetric label={measurementType === "duration" ? "Duration" : "Reps"} value={session.sessionKind === "planned" ? executionTargetDisplay : targetRangeDisplay} />
           <CockpitMetric label="Set" value={`${currentSetNumber}`} />
         </View>
         <DetailToggle label="Coach note" compact>
@@ -1398,15 +1417,20 @@ function WorkoutLoggingContent() {
               <Text selectable style={{ ...type.label, color: colors.textMuted }}>
                 {metricLabel}
               </Text>
+              {plannedWorkTargetMissing ? (
+                <Text selectable style={{ color: colors.warning, fontSize: 13, lineHeight: 18, fontWeight: "800" }}>
+                  Exact target unavailable. Restore a compatible prescription before logging this planned set.
+                </Text>
+              ) : null}
               <View style={{ flexDirection: "row", gap: spacing.sm, alignItems: "center" }}>
                 {quickReps.map((value) => (
                   <Pressable
                     key={value}
                     accessibilityRole="button"
                     accessibilityLabel={`Log ${value} ${metricUnit}`}
-                    disabled={isReadOnly || !hasUsableLoad}
+                    disabled={isReadOnly || !hasUsableLoad || plannedWorkTargetMissing}
                     onPress={() => handleQuickLogSet(value)}
-                    style={({ pressed }) => quickRepStyle(pressed, isReadOnly || !hasUsableLoad)}
+                    style={({ pressed }) => quickRepStyle(pressed, isReadOnly || !hasUsableLoad || plannedWorkTargetMissing)}
                   >
                     <Text style={{ color: colors.text, fontWeight: "900" }}>{value}</Text>
                     <Text style={{ color: colors.textSubtle, fontSize: 11, fontWeight: "800" }}>log</Text>
@@ -1511,6 +1535,7 @@ function SessionExerciseRow({
   productiveGuidance,
   metadata,
   blockType,
+  sessionKind,
   warmupRowCount,
   warmupExpanded,
   onAddWarmupRow,
@@ -1533,6 +1558,7 @@ function SessionExerciseRow({
   productiveGuidance: { target: { targetMin: number; targetMax: number }; targetText: string };
   metadata?: Exercise;
   blockType?: BlockType | null;
+  sessionKind?: WorkoutSession["sessionKind"];
   warmupRowCount?: number;
   warmupExpanded: boolean;
   onAddWarmupRow(): void;
@@ -1549,14 +1575,14 @@ function SessionExerciseRow({
   const warmupSets = getWarmupSets(exercise.sets);
   const latestWorkSet = workSets.at(-1);
   const restingStateLabel = isCalibrationLoadExercise(exercise) ? "Calibrate" : "Ready";
-  const morePanelRows = buildExerciseMorePanelRows(exercise, metadata, index);
+  const morePanelRows = buildExerciseMorePanelRows(exercise, metadata, index, sessionKind);
   const setPrescription = resolveSetPrescription(exercise.settings, {
     blockType,
     exerciseRole: metadata?.role,
     exerciseFamily: metadata?.family,
     primaryMuscles: metadata?.primaryMuscles,
   });
-  const plannedRows = buildOverviewSetRows(exercise, setPrescription.recommendedMinSets, setPrescription.recommendedMaxSets, metadata, blockType, warmupRowCount, index);
+  const plannedRows = buildOverviewSetRows(exercise, setPrescription.recommendedMinSets, setPrescription.recommendedMaxSets, metadata, blockType, warmupRowCount, index, sessionKind);
   const isFinishedEarly = exercise.status === "shutdown" || Boolean(exercise.finishedManually);
   const visibleWorkRows = isFinishedEarly ? plannedRows.workRows.filter((row) => row.set) : plannedRows.workRows;
   const canRemoveWarmupRow = plannedRows.warmupRows.length > warmupSets.length;
@@ -2049,6 +2075,7 @@ function buildOverviewSetRows(
   blockType?: BlockType | null,
   warmupRowCount?: number,
   exerciseIndex = 0,
+  sessionKind?: WorkoutSession["sessionKind"],
 ): { warmupRows: OverviewSetRowModel[]; workRows: OverviewSetRowModel[] } {
   const warmupSets = getWarmupSets(exercise.sets);
   const workSets = getWorkSets(exercise.sets);
@@ -2072,10 +2099,10 @@ function buildOverviewSetRows(
   }));
   const workLoad = loadDisplayForExercise(exercise, metadata, exercise.settings.unit, { preserveExact: true });
   const removedFutureWorkSetNumbers = new Set(exercise.removedFutureWorkSetNumbers ?? []);
-  const prescribedWorkReps = resolvePrescribedWorkSetReps(exercise);
   const workRows = Array.from({ length: rowCount }, (_, index) => {
     const set = workSets[index];
-    const setTarget = exercise.prescribedSetTargets?.[index] ?? prescribedWorkReps;
+    const target = resolveTrainExecutionTarget({ sessionKind, exercise, workSetIndex: index });
+    const setTarget = target.reps;
     const plannedLoadLabel = workLoad.kind === "unknown"
       ? formatPlannedWorkSetDisplay(activeUnknownLoadLabel(exercise), setTarget, exercise)
       : formatPlannedWorkSetDisplay(workLoad.label, setTarget, exercise);
@@ -2086,7 +2113,9 @@ function buildOverviewSetRows(
       set,
       suggestedLoad: workLoad.kind === "unknown" ? null : workLoad.value,
       suggestedReps: setTarget,
-      suggestionDisplay: `Suggested: ${plannedLoadLabel}`,
+      suggestionDisplay: target.source === "planned_target_missing"
+        ? "Exact target unavailable. Restore a compatible prescription before logging this set."
+        : `Suggested: ${plannedLoadLabel}`,
       loadLabel: plannedLoadLabel,
       hasNextWorkSet: index < rowCount - 1,
     };
@@ -2094,17 +2123,8 @@ function buildOverviewSetRows(
   return { warmupRows, workRows };
 }
 
-function resolvePrescribedWorkSetReps(exercise: Pick<WorkoutExerciseLog, "settings" | "prescribedSetTargets">): number {
-  const exact = exercise.prescribedSetTargets?.[0];
-  if (Number.isFinite(exact) && exact! > 0) return exact!;
-  const max = exercise.settings.repRange.max;
-  if (Number.isFinite(max) && max > 0) return max;
-  const min = exercise.settings.repRange.min;
-  return Number.isFinite(min) && min > 0 ? min : 0;
-}
-
-function formatPlannedWorkSetDisplay(loadLabel: string, reps: number, exercise: Pick<WorkoutExerciseLog, "settings">): string {
-  if (!Number.isFinite(reps) || reps <= 0) return loadLabel;
+function formatPlannedWorkSetDisplay(loadLabel: string, reps: number | null, exercise: Pick<WorkoutExerciseLog, "settings">): string {
+  if (typeof reps !== "number" || !Number.isFinite(reps) || reps <= 0) return loadLabel;
   const suffix = getExerciseMeasurementType(exercise.settings) === "duration" ? " sec" : "";
   return `${loadLabel} × ${reps}${suffix}`;
 }
@@ -2143,10 +2163,10 @@ function ExerciseMorePanel({ rows }: { rows: ExerciseMorePanelRow[] }) {
   );
 }
 
-function buildExerciseMorePanelRows(exercise: WorkoutExerciseLog, metadata: Exercise | undefined, index: number): ExerciseMorePanelRow[] {
+function buildExerciseMorePanelRows(exercise: WorkoutExerciseLog, metadata: Exercise | undefined, index: number, sessionKind?: WorkoutSession["sessionKind"]): ExerciseMorePanelRow[] {
   const rows: ExerciseMorePanelRow[] = [
     { label: "Why this exercise", text: athleteFacingExerciseReason(exercise, metadata, index) },
-    { label: "Today’s target", text: athleteFacingExerciseTarget(exercise) },
+    { label: "Today’s target", text: athleteFacingExerciseTarget(exercise, sessionKind) },
   ];
   const cue = athleteFacingTechniqueCue(metadata);
   if (cue) rows.push({ label: "Technique", text: cue });
@@ -2176,9 +2196,11 @@ function titlePanelText(value: string): string {
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function athleteFacingExerciseTarget(exercise: WorkoutExerciseLog): string {
+function athleteFacingExerciseTarget(exercise: WorkoutExerciseLog, sessionKind?: WorkoutSession["sessionKind"]): string {
   const sets = Math.max(1, exercise.settings.requiredWorkSets);
-  const reps = resolvePrescribedWorkSetReps(exercise);
+  const target = resolveTrainExecutionTarget({ sessionKind, exercise, workSetIndex: 0 });
+  if (target.source === "planned_target_missing") return "This planned workout needs a compatible exact prescription before you log it.";
+  const reps = target.reps ?? 0;
   const metric = getExerciseMeasurementType(exercise.settings) === "duration" ? `${reps} sec` : `${reps}`;
   if (isCalibrationLoadExercise(exercise)) return `${sets} × ${metric}. Find a working load.`;
   return `${sets} × ${metric} with controlled reps.`;
@@ -2218,6 +2240,7 @@ function PerformanceLoggingDrawer({
   exercise,
   metadata,
   exerciseIndex,
+  sessionKind,
   setNumber,
   visible,
   productiveSetGuidance,
@@ -2245,6 +2268,7 @@ function PerformanceLoggingDrawer({
   exercise: WorkoutExerciseLog;
   metadata?: Exercise | null;
   exerciseIndex: number;
+  sessionKind?: WorkoutSession["sessionKind"];
   setNumber: number;
   visible: boolean;
   productiveSetGuidance: { softCapReached: boolean; softCapText?: string; targetText: string } | null;
@@ -2290,7 +2314,13 @@ function PerformanceLoggingDrawer({
   const isReadOnly = displayExercise.status !== "active";
   const hasUsableLoad = displayExercise.loadKnown !== false || Number.isFinite(Number.parseFloat(loadInputValue));
   const parsedReps = Number.parseInt(repsInput, 10);
-  const canLog = !isReadOnly && hasUsableLoad && Number.isInteger(parsedReps) && parsedReps >= 0;
+  const executionTarget = resolveTrainExecutionTarget({
+    sessionKind,
+    exercise: displayExercise,
+    workSetIndex: Math.max(0, setNumber - 1),
+  });
+  const plannedWorkTargetMissing = initialSetType === "work" && executionTarget.source === "planned_target_missing";
+  const canLog = !isReadOnly && hasUsableLoad && Number.isInteger(parsedReps) && parsedReps >= 0 && !plannedWorkTargetMissing;
   const restApplies = restTimer?.exerciseId === displayExercise.id;
   const drawerIdentity = `${exercise.id}:${setNumber}:${initialSetType}:${suggestedLoad ?? "none"}:${suggestedReps ?? "none"}:${initialEditSetId ?? "none"}:${exercise.loadKnown === false ? "unknown" : "known"}`;
   const inputAccessoryViewID = `performance-drawer-keyboard-${displayExercise.id}`;
@@ -2626,9 +2656,11 @@ function PerformanceLoggingDrawer({
                       </View>
 
                       <Text selectable style={{ color: colors.textMuted, fontSize: 13, lineHeight: 18, fontWeight: "800" }}>
-                        {displayExercise.prescribedSetTargets?.length
-                          ? `Today: ${displayExercise.load}${displayExercise.settings.unit} × ${displayExercise.prescribedSetTargets.join(", ")}. Exact targets are today’s progression opportunity.`
-                          : `Calibration boundary: ${formatTargetRange(displayExercise.settings.repRange, measurementType)}`}
+                        {sessionKind === "planned" && executionTarget.source === "planned_target_missing"
+                          ? "Exact target unavailable. Restore a compatible prescription before logging this planned set."
+                          : displayExercise.prescribedSetTargets?.length
+                            ? `Today: ${displayExercise.load}${displayExercise.settings.unit} × ${displayExercise.prescribedSetTargets.join(", ")}. Exact targets are today’s progression opportunity.`
+                            : `Calibration boundary: ${formatTargetRange(displayExercise.settings.repRange, measurementType)}`}
                       </Text>
 
                       {suggestionDisplay || loadHelperText ? (

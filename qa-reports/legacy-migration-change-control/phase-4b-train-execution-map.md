@@ -1,0 +1,22 @@
+# Phase 4B — Train execution authority map
+
+Scope: planned-workout execution only. This map excludes post-workout review, reporting, evidence, interventions, and the quarantined duplicate Plan suite.
+
+| Stage | File / symbol | Inputs → output | Current dependency classification | Phase 4B action |
+| --- | --- | --- | --- | --- |
+| Home / Plan entry | `app/(protected)/(tabs)/index.tsx`, `app/(protected)/(tabs)/programmes.tsx` Train links | Route to `/(protected)/(tabs)/train` | Display/navigation only; no prescription passed in the route | Retain. Train must load the persisted session rather than a preview. |
+| Open-session restoration | `src/features/workout-logging/use-workout-logger.ts` / `getLatestOpenSession` | Persisted sessions → open session | Active authority for resume; currently preserves any open session, including separately scoped extra sessions | Retain in this phase. It does not reconstruct a planned prescription. |
+| Current planned construction | `createSessionFromActivePlan` → `buildRecoveryWorkoutSession` | Active plan/current planning input/history → planned `WorkoutSession` | Active planned construction; Phase 3 current mesocycle/microcycle/session-role authority; produces `prescribedSetTargets` | Retain. No construction is performed by the Train target reader. |
+| Train state | `app/(protected)/(tabs)/train.tsx` / `WorkoutLoggingContent` | Logger session/current exercise → UI rows | Active planned execution | Keep session identity and stored exercise order. Do not introduce route-preview authority. |
+| Overview target resolution | `train.tsx` / `buildOverviewSetRows`, `resolvePrescribedWorkSetReps` | Exercise settings and target array → visible working-set target | **Active planned execution leak:** missing per-set target falls back to `repRange`; first target is reused for later sets | Replace with a narrow set-ordinal resolver: planned exact target wins; a planned record with no exact target is explicit compatibility/unavailable, never range-derived. Retain range fallback for non-planned presentation only. |
+| Exercise detail copy | `train.tsx` / `athleteFacingExerciseTarget` | Exercise target data → explanatory copy | Display only, currently range-backed | Route through the same target resolution semantics so planned copy cannot claim a range-derived executable target. |
+| Current set and logging | `useWorkoutLogger` / logged `SetLog`, persistence | Session/exercise/set performance → saved session | Active execution and persistence | Retain. It records actual performance; Phase 4B does not alter live-coaching or completion rules. |
+| Live coaching | `useWorkoutLogger`, `in-session-escalation` | Completed performance/current set → next-set instruction | Active live coaching | Retain. Existing adjustments remain separate from the original `prescribedSetTargets` array; no schema migration in this phase. |
+| Resume | `workoutSessionRepository` + `getLatestOpenSession` | Stored open session → session/exercise state | Active authority for persisted session | Retain. New tests prove that the exact target array is read from the stored workout, not recalculated. |
+| Compatibility target helper | `src/domain/training/planned-target-boundary.ts` / `resolveExecutableTargetReps` | Target array plus `repRange` → exact or deterministic compatibility result | Compatibility boundary from Phase 2 | Retain unchanged for review/legacy compatibility. Add a Train-specific resolver rather than changing its documented legacy fallback. |
+| Legacy planning values | `train.tsx` / `currentBlock`, `useTrainingYear`, `BlockType` | Block/year values → cardio, warmups, swaps, target-zone and post-workout helpers | Mixed: active non-prescription and deferred legacy callers | Do not migrate in Phase 4B. These values must not decide planned set targets after this patch. |
+| Historical V2/V3 comment | `use-workout-logger.ts` | Comment only | Historical/commented | Leave untouched and deletion-gated. |
+
+## Contract established by this phase
+
+For `sessionKind === "planned"`, a visible executable work-set target is supplied only by `WorkoutExerciseLog.prescribedSetTargets[workSetIndex]`. A missing target remains an explicit compatibility/unavailable state; Train does not select a value from `repRange`, block data, templates, or preview state. Non-planned presentation retains its existing range metadata path and remains out of scope.

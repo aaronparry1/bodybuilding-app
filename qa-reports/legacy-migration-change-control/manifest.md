@@ -104,6 +104,22 @@ The file's checksum matches the pre-edit checksum recorded for `tests/plan-page-
 | `docs/home-plan-current-planning-context.md` | New file | Record Phase 4A authority and compatibility boundaries. | `78efa74d833e488d07548be0eec4623f2eb091f7105f90ea8ddccbb48303637c` | Documentation review |
 | `qa-reports/legacy-migration-change-control/phase-4a-home-plan-consumer-map.md` | New file | Record pre-edit Home/Plan consumer map. | `9896577e4324c7f0e7c1f9a95a068e65eae9618b27a748c1f21eb3cd53b605d2` | Documentation review |
 
+## Phase 4B execution record
+
+Phase 4B changes only Train's planned work-set target reader. It does not change planned construction, selection, logging persistence, live coaching, ad-hoc behaviour, or the commented V2/V3 implementation.
+
+| File | Pre-edit SHA-256 | Change reason | Post-edit SHA-256 | Focused tests |
+| --- | --- | --- | --- | --- |
+| `app/(protected)/(tabs)/train.tsx` | `4f331cef8604c02ff5066698eb5e53b349b2e0118032bbf19f6ac389b733c19e` | Resolve planned working-set display/input targets only from the stored per-set exact prescription; make missing planned targets explicit. | `c5722a8d58d28f99ea7aae0552da21402afb42ee6dabbc8041aeaa9096c59a0d` | `train-execution-target`, `planned-target-boundary`, `session-construction`, `active-workout-persistence`, navigation UI |
+| `src/domain/training/train-execution-target.ts` | New file | Narrow pure execution resolver separating planned exact targets from non-planned boundary metadata. | `4e9bb87d9423f5cbf00faf812ef7459255f45649bacc326044dc2561b1bf953c` | `train-execution-target` |
+| `tests/train-execution-target.test.ts` | New file | Characterize per-set planned target precedence, range isolation, explicit compatibility state, and non-planned separation. | `c2afa61ebf35a800d2b019e1524e6ff4fb9d8f91b70a080cccc123e3693b4c10` | self |
+| `tests/workout-navigation-ui.test.ts` | `8b8dc791264c25956ceb55e33660fca0adb3c4f1abe603015d4cdbc6e81c51e4` | Preserve the athlete-facing More-panel assertion after adding the typed session-kind argument and assert Train's planned-target gate. | `a0235d32c1eb30800be2620ed3da7d4ebb72d1527c63c56d77785237e68fb076` | navigation UI |
+| `vitest.config.ts` | `083cc95351da8704b361d5f315652fe85edc40358ba68d5facd7edb3c32f4320` | Exclude ignored local original backups so they cannot be discovered as duplicate tests. | `ae3462d709779a5b80c65cc3a7e48a3a5182e0d943ad52ec8254033a7a54f1fc` | full suite |
+| `docs/train-exact-planned-execution.md` | New file | Record Train execution authority and deferred scope. | `4120bc50b2b0dd27411c1c4add0bcc94dd29bebf2158d2637643c06801cf276a` | Documentation review |
+| `qa-reports/legacy-migration-change-control/phase-4b-train-execution-map.md` | New file | Record the pre-edit Train execution authority map. | `10c628ddd69be7a4601400b7ea13c561ef717d19d7bbbbe43804683ae72327ed` | Documentation review |
+
+The pre-edit original of `app/(protected)/(tabs)/train.tsx` is preserved below `originals/` and is Git-ignored. The quarantined obsolete `tests/plan-page-view-model.test 2.ts` remains ignored and untouched.
+
 | File | SHA-256 |
 | --- | --- |
 | `docs/legacy-planning-coaching-evidence-intervention-audit.md` | `f7543c9ac8f5dcc5f66d477b4c59afa2d8ebe52ccd2beddfd3bc00b2a2e7904c` |
