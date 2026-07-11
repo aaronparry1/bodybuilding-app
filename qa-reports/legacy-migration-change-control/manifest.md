@@ -1,5 +1,14 @@
 # Legacy migration change-control manifest
 
+## Stage 2 application-boundary record
+
+| File | Reason | Focused tests | Stage 3 condition |
+| --- | --- | --- | --- |
+| `current-decision-application.ts` | Sole current decision mutation boundary; no block decision write. | `current-decision-application` | Retain legacy plan fields until persisted active-plan migration. |
+| `current-decision-application.test.ts` | Continue/idempotency and legacy-block isolation coverage. | self | Extend with migrated consumer coverage. |
+
+Direct consumer migration remains pending; this commit does not alter recommendation, logger, Progress, volume, or UI authority.
+
 ## Phase 11A.2C3 execution record
 
 | File | Reason | Focused tests |

@@ -1,6 +1,6 @@
 # Phase 11B current decision consumer map
 
-Stage 1 persists current decisions but does not yet migrate readers. This map separates the executable decision readers targeted in Stage 2 from retained plan-shape compatibility and deferred V2/annual policy.
+Stage 2 now has an explicit current decision application boundary. It validates persisted current decision/snapshot/plan identity and applies only current `continue`, `deload`, or explicitly targeted `advance`; delay and review remain no-action states. Direct consumer migration remains pending for recommendation, completion, Progress, volume, Train/logger, and surfaces.
 
 | File / symbol | Legacy input and mutation | Current equivalent | Lifecycle / shadow | Tests | Order / risk |
 | --- | --- | --- | --- | --- | --- |
@@ -14,6 +14,7 @@ Stage 1 persists current decisions but does not yet migrate readers. This map se
 | `design-qa-fixtures.ts` | Uses legacy action functions to seed block transition/deload fixtures | Seed current decision records and invoke application service where fixture requires applied state | Legacy fixture labels stay deferred V2/historical only | design QA fixtures | 7 / medium |
 | volume/recovery/fatigue calls in `progress-dashboard.ts` | Pass active block type / block deload state | Narrow current volume context maps mesocycle/microcycle and current decision/fatigue; underlying formulas unchanged | Current decision wins; legacy block is no longer decision authority | volume, Progress | 4 / high |
 | `current-mesocycle-decision-repository.ts` and resolver | Stage 1 current state; legacy supplied explicitly | Canonical decision read path | Current first; shadow bridge only writes safe mappings | persistence suite | foundation / low |
+| `current-decision-application.ts` | No prior current mutation boundary | Persisted decision + referenced readiness snapshot + current plan identity | Applies once and marks lifecycle applied; never writes legacy block decision | application suite | Stage 2 foundation / critical |
 | `annual-planner.ts`, `training-year`, strategic/V2 policy | Annual block policy, QA, historical lanes | Deferred; not a Stage 2 current decision reader migration | Retained compatibility/deferred V2 | legacy/V2 suites | out of scope |
 
 ## Migration rule
