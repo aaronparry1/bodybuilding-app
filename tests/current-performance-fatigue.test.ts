@@ -1,0 +1,4 @@
+import { describe, expect, it } from "vitest";
+import { classifyPerformanceFatigue } from "@/domain/training/current-performance-fatigue";
+const policy={version:1 as const,id:"p",watchNegativeWindows:3,eligibleNegativeWindows:4,requiredNegativeWindows:5,allowSevereAcute:true,reboundClearsWatch:true}; const base={lowStressSuccessor:{status:"unknown" as const,candidateIds:[]}};
+describe("performance based fatigue",()=>{it("does not elevate ordinary negative evidence",()=>{expect(classifyPerformanceFatigue({...base,trend:"declining",rebound:"no_rebound",negativeWindows:2,policy}).state).toBe("normal");});it("uses explicit convergence and rebound",()=>{expect(classifyPerformanceFatigue({...base,trend:"declining",rebound:"no_rebound",negativeWindows:4,policy}).state).toBe("deload_eligible");expect(classifyPerformanceFatigue({...base,trend:"declining",rebound:"full_rebound",negativeWindows:5,policy}).state).toBe("normal");});});
