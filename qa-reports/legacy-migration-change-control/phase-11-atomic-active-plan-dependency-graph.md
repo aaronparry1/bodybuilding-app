@@ -19,3 +19,7 @@
 5. Verify every remaining block reference is compatibility, historical, ad-hoc, or deferred V2 QA only.
 
 No safe partial production edit exists before steps 1–3 are complete.
+
+## Missing decision-domain layer
+
+The block model currently carries transition, repeat/delay, deload, and volume-context identity. Before Phase 11 implementation, these must be represented by current decision lifecycle, mesocycle-readiness, fatigue-management microcycle, and volume-context types; see `docs/current-progression-transition-decision-design.md`.
