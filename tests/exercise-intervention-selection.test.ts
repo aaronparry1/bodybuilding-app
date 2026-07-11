@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveInterventionCandidates } from "@/domain/training/exercise-intervention-selection";
+import { resolveInterventionCandidateResolution, resolveInterventionCandidates } from "@/domain/training/exercise-intervention-selection";
 import type { Exercise } from "@/domain/training/models";
 import type { ExerciseInterventionRecord } from "@/domain/training/plan-setup";
 import { exerciseLibrary } from "@/domain/training/presets";
@@ -40,5 +40,10 @@ describe("exercise intervention candidate selection", () => {
       currentMesocycleId: "hypertrophy_accumulation",
     });
     expect(result).toEqual([]);
+    expect(resolveInterventionCandidateResolution({ candidates: push, interventions: push.map((exercise) => intervention({ exerciseId: exercise.id, decision: "replace", reason: "pain" })), currentMesocycleId: "hypertrophy_accumulation" }).status).toBe("blocked_by_intervention");
+  });
+
+  it("distinguishes ordinary lack of eligibility from intervention blocking", () => {
+    expect(resolveInterventionCandidateResolution({ candidates: [], interventions: [], currentMesocycleId: "hypertrophy_accumulation" })).toEqual({ status: "no_eligible_candidate" });
   });
 });

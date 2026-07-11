@@ -203,3 +203,13 @@ The Phase 6 originals are preserved below `originals/phase-6/`. The V2/V3/living
 | `src/domain/training/exercise-intervention-selection.ts` | New file | Centralize active intervention filtering/modifiers and derived provenance key. | intervention selection |
 | `tests/exercise-intervention-selection.test.ts` | New file | Cover hard exclusion, substitute preference, invalid replacement, no-op, determinism, and empty safe outcome. | self |
 | `docs/exercise-intervention-session-construction.md`, `qa-reports/legacy-migration-change-control/phase-7-exercise-intervention-integration-map.md` | New files | Record supported schema, precedence, timing boundary, and deferred work. | Documentation review |
+
+## Phase 8 verification record
+
+Final verification introduced an explicit intervention candidate-resolution result (`candidates`, `blocked_by_intervention`, `no_eligible_candidate`) immediately before the nullable recovery-constructor boundary. The public constructor remains nullable for compatibility; this explicit result is the deletion gate for a future constructor-result API migration. Focused authority suites pass; full-suite results are compared to the approved Phase 7 baseline.
+
+| File | Pre-edit SHA-256 (Phase 7) | Post-edit SHA-256 | Reason | Focused proof |
+| --- | --- | --- | --- | --- |
+| `src/domain/training/exercise-intervention-selection.ts` | `3f67214ed9a3aff5611f1964de07c49ac5db7f9fb7abe2242518557129df143a` | `d13308385379fc44ea0a500757c5221137c2af7eaab398c467566aa02a9a90d6` | Distinguish intervention blocking from ordinary candidate absence. | `tests/exercise-intervention-selection.test.ts` |
+| `src/domain/training/recovery-workout-constructor.ts` | `70e131821feb15d539e1eb7f686e94dda6161f47f66bffcc100a4f88e58b73cc` | `2dcb17a6573c2b00cee509eda39564f4bc4ff0115f0549cabd7da53f8108bd46` | Consume the typed resolver without changing the nullable constructor API. | Session-construction and authority suites |
+| `tests/exercise-intervention-selection.test.ts` | `dc96573aae7a2f9aa3a4c058353e0f068fee92046046dac19537719c96a2aa55` | `07354518143f746dcd4913815ce788cf8cf4be872214a44f8336ed0bbf32f24f` | Prove blocked versus ordinarily empty candidate states. | Self |

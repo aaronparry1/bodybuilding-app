@@ -173,3 +173,7 @@ Failures are pre-existing for this audit and largely prove the migration is inco
 3. Large commented V2/V3 code in the logger is a future accidental-revival risk.
 4. Intervention records can be written but have no selection effect; safety expectations exceed schema capability.
 5. Full tests encode conflicting historical product promises, so deleting modules before test migration will increase breakage.
+
+## Final migration status (Phase 8)
+
+Phases 2–7 established current planning construction, exact-target execution, stored-prescription review, read-only Analytics, non-planned boundaries, evidence repository provenance, and intervention-aware planned selection. Remaining annual/block utilities, Home compatibility fields, V2/V3 comment material, and stale tests are deletion-gated compatibility/QA debt rather than current planned-workout authority.

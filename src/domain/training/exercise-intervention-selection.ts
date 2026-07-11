@@ -3,6 +3,22 @@ import type { Exercise } from "@/domain/training/models";
 import type { ExerciseInterventionRecord } from "@/domain/training/plan-setup";
 
 export type InterventionCandidate = { exercise: Exercise; score: number; interventionKey?: string };
+export type InterventionCandidateResolution =
+  | { status: "candidates"; candidates: InterventionCandidate[] }
+  | { status: "blocked_by_intervention"; excludedExerciseIds: string[]; interventionKeys: string[] }
+  | { status: "no_eligible_candidate" };
+
+export function resolveInterventionCandidateResolution(input: {
+  candidates: Exercise[];
+  interventions: ExerciseInterventionRecord[];
+  currentMesocycleId: string;
+}): InterventionCandidateResolution {
+  if (input.candidates.length === 0) return { status: "no_eligible_candidate" };
+  const candidates = resolveInterventionCandidates(input);
+  if (candidates.length > 0) return { status: "candidates", candidates };
+  const active = input.interventions.filter((record) => isExerciseInterventionActive(record, { currentMesocycleId: input.currentMesocycleId, comparableExposuresSinceDecision: 0 }));
+  return { status: "blocked_by_intervention", excludedExerciseIds: input.candidates.map((candidate) => candidate.id).sort(), interventionKeys: active.filter(isHardExclusion).map(keyFor).sort() };
+}
 
 export function resolveInterventionCandidates(input: {
   candidates: Exercise[];

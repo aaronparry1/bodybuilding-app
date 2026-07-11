@@ -7,7 +7,7 @@ import { exactTargets } from "@/domain/training/prescribed-performance-progressi
 import { planningSummary } from "@/domain/training/planning-summary";
 import { resolveCanonicalLoadEvidence } from "@/domain/training/load-evidence-resolver";
 import { selectSetMethod, setMethodExplanation } from "@/domain/training/set-method-governance";
-import { resolveInterventionCandidates } from "@/domain/training/exercise-intervention-selection";
+import { resolveInterventionCandidateResolution } from "@/domain/training/exercise-intervention-selection";
 
 /** The one production session-construction path. Equipment is intentionally not an eligibility input. */
 export type RecoverySessionRole = "push" | "pull" | "legs" | "upper" | "lower" | "full_body" | "arms";
@@ -110,8 +110,9 @@ function selectSessionExercises(contract: SessionContract, catalogue: Exercise[]
 
 function selectForSlot(slot: Slot, catalogue: Exercise[], plan: ActiveTrainingPlan, selected: Array<{ exercise: Exercise }>): { exercise: Exercise; slot: Slot; interventionKey?: string } | null {
   const candidates = catalogue.filter((exercise) => exercise.movementPattern === slot.pattern && exercise.suitability.includes(plan.experienceLevel) && !selected.some((item) => item.exercise.id === exercise.id));
-  const resolved = resolveInterventionCandidates({ candidates, interventions: plan.recommendationState?.exerciseInterventions ?? [], currentMesocycleId: plan.currentMesocycleId ?? "" });
-  const candidate = resolved.sort((a, b) => exerciseScore(b.exercise, slot) + b.score - exerciseScore(a.exercise, slot) - a.score || a.exercise.id.localeCompare(b.exercise.id))[0];
+  const resolved = resolveInterventionCandidateResolution({ candidates, interventions: plan.recommendationState?.exerciseInterventions ?? [], currentMesocycleId: plan.currentMesocycleId ?? "" });
+  if (resolved.status !== "candidates") return null;
+  const candidate = resolved.candidates.sort((a, b) => exerciseScore(b.exercise, slot) + b.score - exerciseScore(a.exercise, slot) - a.score || a.exercise.id.localeCompare(b.exercise.id))[0];
   return candidate ? { exercise: candidate.exercise, slot, interventionKey: candidate.interventionKey } : null;
 }
 
