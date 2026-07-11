@@ -82,6 +82,14 @@ Current planning authority now resolves before active construction. Original sna
 
 ## Created-file checksums at last verification
 
+## Unexpected untracked file investigation
+
+| Path | SHA-256 | Size | Classification | Resolution |
+| --- | --- | --- | --- | --- |
+| `tests/plan-page-view-model.test 2.ts` | `ef49f66d5b6549de7d7dfebea947baf21bb2e3b0baa33a7a97c8dfecda37dad6` | 13,169 bytes | Older Phase 4A pre-edit copy; legacy block/roadmap/annual assertions only | Preserve in ignored quarantine, then remove from `tests/`. |
+
+The file's checksum matches the pre-edit checksum recorded for `tests/plan-page-view-model.test.ts` in the Phase 4A ledger. It was not referenced by package scripts or imports, and its `test 2.ts` suffix is outside Vitest's normal `*.test.ts` discovery pattern. Provenance cannot be established from local metadata; Finder/editor duplication is plausible but unproven.
+
 ## Phase 4A execution record
 
 | File | Pre-edit SHA-256 | Change reason | Post-edit SHA-256 | Focused tests |

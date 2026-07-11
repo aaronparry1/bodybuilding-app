@@ -57,6 +57,7 @@ yarn-error.*
 !/qa-reports/legacy-migration-change-control/baseline-failures.md
 !/qa-reports/legacy-migration-change-control/baseline-commit-inventory.md
 /qa-reports/legacy-migration-change-control/originals/
+/qa-reports/legacy-migration-change-control/quarantine/
 /docs/screenshots/
 /reports/**/screenshots/
 
