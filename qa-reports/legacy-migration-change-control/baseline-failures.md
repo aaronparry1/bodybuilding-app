@@ -25,3 +25,5 @@ Baseline: **16 failing files / 50 failing tests; 117 passing files / 1,473 passi
 Acceptance rule for every phase: no new failing file, no new failure in a previously passing relevant suite, no worsened frozen failure, and all newly added focused tests pass.
 
 Phase 9A removed seven obsolete Home view-model assertions from the frozen baseline. They asserted annual/block labels and next-block previews that no longer belong to the current Home contract; replacement current-authority coverage lives in `tests/home-dashboard-view-model.test.ts`. Final Phase 9A comparison: **15 failing files / 43 failing tests / 1,501 passing tests**; no other frozen failure changed.
+
+Phase 9B changes only the planned-session constructor result representation and its direct callers. It introduces focused result-contract coverage and does not alter a frozen failing suite.

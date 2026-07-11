@@ -442,7 +442,9 @@ describe("workout navigation and logging UI contracts", () => {
   it("uses the recovery constructor as the only active-plan workout path", () => {
     expect(workoutLoggerSource).toContain("buildRecoveryWorkoutSession");
     expect(workoutLoggerSource).toContain("Production recovery has one entry point");
-    expect(workoutLoggerSource).toContain("return buildRecoveryWorkoutSession({");
+    expect(workoutLoggerSource).toContain('case "blocked_by_intervention":');
+    expect(workoutLoggerSource).toContain('case "no_eligible_candidate":');
+    expect(workoutLoggerSource).toContain('case "invalid_input":');
   });
 
   it("starts the active-plan Train flow when the legacy preview is unavailable instead of restarting onboarding", () => {

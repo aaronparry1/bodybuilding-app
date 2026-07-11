@@ -18,4 +18,4 @@ Migration-focused tests, typecheck, Expo public config, and web export pass. Aft
 
 ## Residual risks
 
-Legacy annual utilities still require a dedicated compatibility-test/deletion phase. Phase 9A removed Home's deprecated compatibility fields and obsolete assertions. The constructor’s public `null` result remains ambiguous to external callers, although the intervention-aware resolver is explicit. No expiry, medical, or scope semantics were invented for interventions.
+Legacy annual utilities still require a dedicated compatibility-test/deletion phase. Phase 9A removed Home's deprecated compatibility fields and Phase 9B replaced the public planned-session constructor's ambiguous nullable result with explicit outcomes. No expiry, medical, or scope semantics were invented for interventions.

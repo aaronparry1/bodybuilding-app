@@ -182,7 +182,7 @@ function createSessionFromActivePlan(userId?: string | null, appSettings?: AppSe
   const history = summarizeWorkoutHistory(workoutSessionRepository.list());
   const planSessionIndex = resolveRecommendedSessionIndex({ activePlan, history });
   const timestamp = now();
-  return buildRecoveryWorkoutSession({
+  const result = buildRecoveryWorkoutSession({
     id: makeId("session"),
     userId,
     startedAt: timestamp,
@@ -192,6 +192,14 @@ function createSessionFromActivePlan(userId?: string | null, appSettings?: AppSe
     history,
     sessionIndex: planSessionIndex,
   });
+  switch (result.status) {
+    case "constructed":
+      return result.session;
+    case "blocked_by_intervention":
+    case "no_eligible_candidate":
+    case "invalid_input":
+      return null;
+  }
 }
 
 /* Retired V2/V3 workout-generation implementation. Removed from production compilation while the remaining legacy helpers are deleted in the recovery cleanup. 

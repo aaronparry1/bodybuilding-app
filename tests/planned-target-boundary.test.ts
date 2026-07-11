@@ -78,7 +78,10 @@ describe("planned exact-target boundary", () => {
     const first = buildRecoveryWorkoutSession({ id: "first", ...input });
     const second = buildRecoveryWorkoutSession({ id: "second", ...input });
 
-    expect(first?.exercises.every((exercise) => exercise.prescribedSetTargets?.length === exercise.settings.requiredWorkSets)).toBe(true);
-    expect(first?.exercises.map((exercise) => exercise.prescribedSetTargets)).toEqual(second?.exercises.map((exercise) => exercise.prescribedSetTargets));
+    expect(first.status).toBe("constructed");
+    expect(second.status).toBe("constructed");
+    if (first.status !== "constructed" || second.status !== "constructed") throw new Error("Expected constructed sessions.");
+    expect(first.session.exercises.every((exercise) => exercise.prescribedSetTargets?.length === exercise.settings.requiredWorkSets)).toBe(true);
+    expect(first.session.exercises.map((exercise) => exercise.prescribedSetTargets)).toEqual(second.session.exercises.map((exercise) => exercise.prescribedSetTargets));
   });
 });

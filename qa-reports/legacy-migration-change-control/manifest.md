@@ -224,3 +224,13 @@ Removed `currentBlock` and `nextBlockPreview` from the default Home contract. Th
 | `tests/home-dashboard-view-model.test.ts` | `64fd827fb014a308a97e0a1da0e706dd5973561c548a0cfd89e8be9bd4b2b30d` | `2237ec763ce2ee81a181dd000499059bc99a19a3dbf9c215ddab7f6edee4a010` | Replace seven obsolete block assertions with current-authority coverage. | Home view-model |
 | `tests/product-flow-architecture.test.ts` | `b822ebbb595e623d687f025baf89b99889854f5470e28e7a1fe640948c21e627` | `aba17cfec67e2a26262d6b07ab1508386b8359eacff140872e95d384f7bed79c` | Remove now-invalid Home-contract references. | Typecheck; suite remains frozen-baseline failing elsewhere |
 | `tests/end-to-end-simulator-qa.test.ts` | `14742b522c4c72c0c29133cc6a620196898ab67bd6215ce86b6214d5e8e5080c` | `5d75ff226818ab13df170b19cc155039767a288122369ac19c713dd8052ae6ff` | Replace Home block fixture assertion with microcycle assertion. | Typecheck; suite remains frozen-baseline failing elsewhere |
+
+## Phase 9B explicit planned-construction outcomes
+
+The Phase 9A Git commit is the pre-edit baseline for the constructor, logger, and direct tests. `buildRecoveryWorkoutSession` now returns a discriminated result rather than `WorkoutSession | null`; the logger narrows success at its existing no-session UI boundary. Focused proof covers constructed, intervention-blocked, no-eligible-candidate, and incomplete-planning outcomes.
+
+| File | Pre-edit SHA-256 (Phase 9A) | Post-edit SHA-256 | Reason | Focused tests |
+| --- | --- | --- | --- | --- |
+| `src/domain/training/recovery-workout-constructor.ts` | `2dcb17a6573c2b00cee509eda39564f4bc4ff0115f0549cabd7da53f8108bd46` | `28b7bf66fe2bdf20c979d805235fad94dfc09f6b204fdac3bb13a2d6fbe35be5` | Replace ambiguous nullable outcome with a discriminated construction result. | Constructor, exact-target, intervention tests |
+| `src/features/workout-logging/use-workout-logger.ts` | `20dcf7946b5928b73d17d9d2ba1bc9ac5a2915e3c09941920b334d7d1f00747b` | `8ff3d5c339344ee70265103ec7d4185439efc59326eed49200624a8d1c284670` | Exhaustively handle construction outcomes at the existing no-session UI boundary. | Navigation architecture |
+| `tests/session-construction.test.ts` | `bb81d9c4a256306a90c9add44a6c62ede64205461ec1542ccea0c0bc9972dfd7` | `9c9ef583805407244dd9a30e54c61cabd0ecbd9a22d32d0074e38391bf7297d1` | Cover explicit constructed, blocked, and no-candidate results. | Self |

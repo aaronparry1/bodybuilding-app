@@ -25,23 +25,28 @@ describe("current planning constructor authority", () => {
   it("constructs a current plan without a TrainingBlock input", () => {
     const session = construct(activePlan());
 
-    expect(session?.sessionKind).toBe("planned");
-    expect(session?.planMesocycleId).toBe("strength_general");
-    expect(session?.planMicrocycleNumber).toBe(1);
+    expect(session.status).toBe("constructed");
+    if (session.status !== "constructed") throw new Error("Expected constructed session.");
+    expect(session.session.sessionKind).toBe("planned");
+    expect(session.session.planMesocycleId).toBe("strength_general");
+    expect(session.session.planMicrocycleNumber).toBe(1);
   });
 
   it("does not let conflicting legacy blocks override current mesocycle construction", () => {
     const plan = activePlan();
     const conflicting = { ...plan, blocks: plan.blocks.map((block) => ({ ...block, type: "deload" as const })) };
 
-    expect(construct(conflicting)?.exercises[0]?.settings.requiredWorkSets).toBe(4);
+    const result = construct(conflicting);
+    expect(result.status).toBe("constructed");
+    if (result.status !== "constructed") throw new Error("Expected constructed session.");
+    expect(result.session.exercises[0]?.settings.requiredWorkSets).toBe(4);
   });
 
   it("returns no planned workout when current authority is incomplete and compatibility cannot apply", () => {
     const plan = { ...activePlan(), currentMesocycleId: undefined };
 
     expect(resolveCurrentPlanningInput(plan, 0).status).toBe("incomplete");
-    expect(construct(plan)).toBeNull();
+    expect(construct(plan)).toEqual({ status: "invalid_input", reason: { code: "incomplete_planning_context" } });
   });
 
   it("uses an explicitly labelled compatibility input only for plans without current planning fields", () => {

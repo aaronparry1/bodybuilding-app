@@ -30,19 +30,32 @@ type SessionContract = {
   stopConditions: string[];
 };
 
-const labels: Record<RecoverySessionRole, string> = { push: "Push", pull: "Pull", legs: "Legs", upper: "Upper", lower: "Lower", full_body: "Full Body", arms: "Arms" };
-
-export function buildRecoveryWorkoutSession(input: {
+export type PlannedSessionConstructionInput = {
   id: string; userId?: string | null; startedAt: string; activePlan: ActiveTrainingPlan;
   appSettings: AppSettings; exercises: Exercise[]; history: WorkoutHistorySummary[]; sessionIndex: number;
-}): WorkoutSession | null {
+};
+
+export type PlannedSessionConstructionResult =
+  | { status: "constructed"; session: WorkoutSession }
+  | { status: "blocked_by_intervention"; reason: { slot: string; excludedExerciseIds: string[]; interventionKeys: string[] } }
+  | { status: "no_eligible_candidate"; reason: { slot: string; candidatesConsidered: number } }
+  | { status: "invalid_input"; reason: { code: "incomplete_planning_context" | "invalid_constructed_session" } };
+
+type SlotSelectionResult =
+  | { status: "selected"; selection: { exercise: Exercise; slot: Slot; interventionKey?: string } }
+  | { status: "blocked_by_intervention"; reason: { slot: string; excludedExerciseIds: string[]; interventionKeys: string[] } }
+  | { status: "no_eligible_candidate"; reason: { slot: string; candidatesConsidered: number } };
+
+const labels: Record<RecoverySessionRole, string> = { push: "Push", pull: "Pull", legs: "Legs", upper: "Upper", lower: "Lower", full_body: "Full Body", arms: "Arms" };
+
+export function buildRecoveryWorkoutSession(input: PlannedSessionConstructionInput): PlannedSessionConstructionResult {
   const resolved = resolveCurrentPlanningInput(input.activePlan, input.sessionIndex);
-  if (resolved.status !== "ready") return null;
+  if (resolved.status !== "ready") return { status: "invalid_input", reason: { code: "incomplete_planning_context" } };
   const contract = constructSessionContract(resolved.planning);
   const selected = selectSessionExercises(contract, input.exercises, input.activePlan);
-  if (!selected) return null;
+  if (selected.status !== "selected") return selected;
 
-  const exerciseLogs = selected.map((selection, index) => createExerciseLog(selection.exercise, selection.slot, index, resolved.planning, input, selection.interventionKey));
+  const exerciseLogs = selected.selections.map((selection, index) => createExerciseLog(selection.exercise, selection.slot, index, resolved.planning, input, selection.interventionKey));
   const session: WorkoutSession = {
     id: input.id, userId: input.userId ?? "guest-local", programmeId: input.activePlan.id,
     templateId: `session-construction-${contract.role}`, planSessionIndex: input.sessionIndex,
@@ -50,7 +63,9 @@ export function buildRecoveryWorkoutSession(input: {
     name: contract.name, startedAt: input.startedAt, updatedAt: input.startedAt, syncState: "local", exercises: exerciseLogs,
     notes: sessionNotes(contract, input.activePlan),
   };
-  return isValidRecoveryWorkout(session, contract.role, input.exercises) && isWithinContract(session, contract) ? session : null;
+  return isValidRecoveryWorkout(session, contract.role, input.exercises) && isWithinContract(session, contract)
+    ? { status: "constructed", session }
+    : { status: "invalid_input", reason: { code: "invalid_constructed_session" } };
 }
 
 export function constructSessionContract(planning: CurrentPlanningInput): SessionContract {
@@ -93,27 +108,32 @@ function slotsFor(role: RecoverySessionRole, strengthFocused: boolean): Slot[] {
   return [required("squat", primary, "lower body"), required("horizontal_push", "secondary_developmental", "pressing"), required("horizontal_pull", "secondary_developmental", "pulling")];
 }
 
-function selectSessionExercises(contract: SessionContract, catalogue: Exercise[], plan: ActiveTrainingPlan): { exercise: Exercise; slot: Slot; interventionKey?: string }[] | null {
+function selectSessionExercises(contract: SessionContract, catalogue: Exercise[], plan: ActiveTrainingPlan): { status: "selected"; selections: Array<{ exercise: Exercise; slot: Slot; interventionKey?: string }> } | Exclude<SlotSelectionResult, { status: "selected" }> {
   const selected: { exercise: Exercise; slot: Slot; interventionKey?: string }[] = [];
   for (const slot of contract.requiredSlots) {
     const candidate = selectForSlot(slot, catalogue, plan, selected);
-    if (!candidate) return null;
-    selected.push(candidate);
+    if (candidate.status !== "selected") return candidate;
+    selected.push(candidate.selection);
   }
   for (const slot of contract.optionalSlots) {
     if (selected.length >= contract.targetExercises) break;
     const candidate = selectForSlot(slot, catalogue, plan, selected);
-    if (candidate) selected.push(candidate);
+    if (candidate.status === "selected") selected.push(candidate.selection);
   }
-  return selected.length >= contract.minimumExercises && selected.length <= contract.maximumExercises ? selected : null;
+  return selected.length >= contract.minimumExercises && selected.length <= contract.maximumExercises
+    ? { status: "selected", selections: selected }
+    : { status: "no_eligible_candidate", reason: { slot: contract.primaryTarget, candidatesConsidered: selected.length } };
 }
 
-function selectForSlot(slot: Slot, catalogue: Exercise[], plan: ActiveTrainingPlan, selected: Array<{ exercise: Exercise }>): { exercise: Exercise; slot: Slot; interventionKey?: string } | null {
+function selectForSlot(slot: Slot, catalogue: Exercise[], plan: ActiveTrainingPlan, selected: Array<{ exercise: Exercise }>): SlotSelectionResult {
   const candidates = catalogue.filter((exercise) => exercise.movementPattern === slot.pattern && exercise.suitability.includes(plan.experienceLevel) && !selected.some((item) => item.exercise.id === exercise.id));
   const resolved = resolveInterventionCandidateResolution({ candidates, interventions: plan.recommendationState?.exerciseInterventions ?? [], currentMesocycleId: plan.currentMesocycleId ?? "" });
-  if (resolved.status !== "candidates") return null;
+  if (resolved.status === "blocked_by_intervention") return { status: resolved.status, reason: { slot: slot.target, excludedExerciseIds: resolved.excludedExerciseIds, interventionKeys: resolved.interventionKeys } };
+  if (resolved.status === "no_eligible_candidate") return { status: resolved.status, reason: { slot: slot.target, candidatesConsidered: candidates.length } };
   const candidate = resolved.candidates.sort((a, b) => exerciseScore(b.exercise, slot) + b.score - exerciseScore(a.exercise, slot) - a.score || a.exercise.id.localeCompare(b.exercise.id))[0];
-  return candidate ? { exercise: candidate.exercise, slot, interventionKey: candidate.interventionKey } : null;
+  return candidate
+    ? { status: "selected", selection: { exercise: candidate.exercise, slot, interventionKey: candidate.interventionKey } }
+    : { status: "no_eligible_candidate", reason: { slot: slot.target, candidatesConsidered: candidates.length } };
 }
 
 function exerciseScore(exercise: Exercise, slot: Slot): number {
@@ -121,7 +141,7 @@ function exerciseScore(exercise: Exercise, slot: Slot): number {
   return (exercise.fatigueCost === "low" ? 8 : exercise.fatigueCost === "moderate" ? 5 : 2) + (exercise.tier === "A" ? 6 : exercise.tier === "B" ? 3 : 1) + (slot.role === "isolation" && exercise.role === "isolation" ? 12 : 0) + (slot.role === "primary_strength" && exercise.role === "primary_compound" ? 12 : 0);
 }
 
-function createExerciseLog(exercise: Exercise, slot: Slot, index: number, planning: CurrentPlanningInput, input: Parameters<typeof buildRecoveryWorkoutSession>[0], interventionKey?: string): WorkoutExerciseLog {
+function createExerciseLog(exercise: Exercise, slot: Slot, index: number, planning: CurrentPlanningInput, input: PlannedSessionConstructionInput, interventionKey?: string): WorkoutExerciseLog {
   const base = resolveWorkoutExerciseSettings(exercise, input.appSettings);
   const settings = settingsForSlot(base, slot);
   const previous = resolveCanonicalLoadEvidence(input.history, exercise.id);
