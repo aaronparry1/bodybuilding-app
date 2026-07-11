@@ -194,3 +194,12 @@ Phase 6 consolidates completed-workout evidence provenance and lookup. It does n
 | `docs/evidence-repository-runtime-authority.md`, `docs/archive/retired-v2-v3-living-athlete-evidence-reference.md`, `qa-reports/legacy-migration-change-control/phase-6-evidence-repository-authority-map.md` | New files | Record authority, archive review, and deletion gates. | See current checksums in Phase 6 verification output | Documentation review |
 
 The Phase 6 originals are preserved below `originals/phase-6/`. The V2/V3/living-athlete logger comment was classified as deletion-gated: it contains no evidence IDs or repository writes, but it also contains unrelated retired policy/generation material that must be handled in a separate scoped cleanup.
+
+## Phase 7 execution record
+
+| File | Pre-edit SHA-256 | Change reason | Focused tests |
+| --- | --- | --- | --- |
+| `src/domain/training/recovery-workout-constructor.ts` | `291a125626e3a82e616058f2525e1a10c33c3b1335ab87951954f7ac52090b1f` | Apply active exercise interventions after normal eligibility and before deterministic scoring. | intervention selection, session construction |
+| `src/domain/training/exercise-intervention-selection.ts` | New file | Centralize active intervention filtering/modifiers and derived provenance key. | intervention selection |
+| `tests/exercise-intervention-selection.test.ts` | New file | Cover hard exclusion, substitute preference, invalid replacement, no-op, determinism, and empty safe outcome. | self |
+| `docs/exercise-intervention-session-construction.md`, `qa-reports/legacy-migration-change-control/phase-7-exercise-intervention-integration-map.md` | New files | Record supported schema, precedence, timing boundary, and deferred work. | Documentation review |

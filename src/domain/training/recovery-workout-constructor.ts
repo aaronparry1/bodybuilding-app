@@ -7,6 +7,7 @@ import { exactTargets } from "@/domain/training/prescribed-performance-progressi
 import { planningSummary } from "@/domain/training/planning-summary";
 import { resolveCanonicalLoadEvidence } from "@/domain/training/load-evidence-resolver";
 import { selectSetMethod, setMethodExplanation } from "@/domain/training/set-method-governance";
+import { resolveInterventionCandidates } from "@/domain/training/exercise-intervention-selection";
 
 /** The one production session-construction path. Equipment is intentionally not an eligibility input. */
 export type RecoverySessionRole = "push" | "pull" | "legs" | "upper" | "lower" | "full_body" | "arms";
@@ -41,7 +42,7 @@ export function buildRecoveryWorkoutSession(input: {
   const selected = selectSessionExercises(contract, input.exercises, input.activePlan);
   if (!selected) return null;
 
-  const exerciseLogs = selected.map((selection, index) => createExerciseLog(selection.exercise, selection.slot, index, resolved.planning, input));
+  const exerciseLogs = selected.map((selection, index) => createExerciseLog(selection.exercise, selection.slot, index, resolved.planning, input, selection.interventionKey));
   const session: WorkoutSession = {
     id: input.id, userId: input.userId ?? "guest-local", programmeId: input.activePlan.id,
     templateId: `session-construction-${contract.role}`, planSessionIndex: input.sessionIndex,
@@ -92,23 +93,26 @@ function slotsFor(role: RecoverySessionRole, strengthFocused: boolean): Slot[] {
   return [required("squat", primary, "lower body"), required("horizontal_push", "secondary_developmental", "pressing"), required("horizontal_pull", "secondary_developmental", "pulling")];
 }
 
-function selectSessionExercises(contract: SessionContract, catalogue: Exercise[], plan: ActiveTrainingPlan): { exercise: Exercise; slot: Slot }[] | null {
-  const selected: { exercise: Exercise; slot: Slot }[] = [];
+function selectSessionExercises(contract: SessionContract, catalogue: Exercise[], plan: ActiveTrainingPlan): { exercise: Exercise; slot: Slot; interventionKey?: string }[] | null {
+  const selected: { exercise: Exercise; slot: Slot; interventionKey?: string }[] = [];
   for (const slot of contract.requiredSlots) {
-    const candidate = catalogue
-      .filter((exercise) => exercise.movementPattern === slot.pattern && exercise.suitability.includes(plan.experienceLevel) && !selected.some((item) => item.exercise.id === exercise.id))
-      .sort((a, b) => exerciseScore(b, slot) - exerciseScore(a, slot))[0];
+    const candidate = selectForSlot(slot, catalogue, plan, selected);
     if (!candidate) return null;
-    selected.push({ exercise: candidate, slot });
+    selected.push(candidate);
   }
   for (const slot of contract.optionalSlots) {
     if (selected.length >= contract.targetExercises) break;
-    const candidate = catalogue
-      .filter((exercise) => exercise.movementPattern === slot.pattern && exercise.suitability.includes(plan.experienceLevel) && !selected.some((item) => item.exercise.id === exercise.id))
-      .sort((a, b) => exerciseScore(b, slot) - exerciseScore(a, slot))[0];
-    if (candidate) selected.push({ exercise: candidate, slot });
+    const candidate = selectForSlot(slot, catalogue, plan, selected);
+    if (candidate) selected.push(candidate);
   }
   return selected.length >= contract.minimumExercises && selected.length <= contract.maximumExercises ? selected : null;
+}
+
+function selectForSlot(slot: Slot, catalogue: Exercise[], plan: ActiveTrainingPlan, selected: Array<{ exercise: Exercise }>): { exercise: Exercise; slot: Slot; interventionKey?: string } | null {
+  const candidates = catalogue.filter((exercise) => exercise.movementPattern === slot.pattern && exercise.suitability.includes(plan.experienceLevel) && !selected.some((item) => item.exercise.id === exercise.id));
+  const resolved = resolveInterventionCandidates({ candidates, interventions: plan.recommendationState?.exerciseInterventions ?? [], currentMesocycleId: plan.currentMesocycleId ?? "" });
+  const candidate = resolved.sort((a, b) => exerciseScore(b.exercise, slot) + b.score - exerciseScore(a.exercise, slot) - a.score || a.exercise.id.localeCompare(b.exercise.id))[0];
+  return candidate ? { exercise: candidate.exercise, slot, interventionKey: candidate.interventionKey } : null;
 }
 
 function exerciseScore(exercise: Exercise, slot: Slot): number {
@@ -116,14 +120,14 @@ function exerciseScore(exercise: Exercise, slot: Slot): number {
   return (exercise.fatigueCost === "low" ? 8 : exercise.fatigueCost === "moderate" ? 5 : 2) + (exercise.tier === "A" ? 6 : exercise.tier === "B" ? 3 : 1) + (slot.role === "isolation" && exercise.role === "isolation" ? 12 : 0) + (slot.role === "primary_strength" && exercise.role === "primary_compound" ? 12 : 0);
 }
 
-function createExerciseLog(exercise: Exercise, slot: Slot, index: number, planning: CurrentPlanningInput, input: Parameters<typeof buildRecoveryWorkoutSession>[0]): WorkoutExerciseLog {
+function createExerciseLog(exercise: Exercise, slot: Slot, index: number, planning: CurrentPlanningInput, input: Parameters<typeof buildRecoveryWorkoutSession>[0], interventionKey?: string): WorkoutExerciseLog {
   const base = resolveWorkoutExerciseSettings(exercise, input.appSettings);
   const settings = settingsForSlot(base, slot);
   const previous = resolveCanonicalLoadEvidence(input.history, exercise.id);
   const load = exercise.kind === "bodyweight" ? 0 : previous?.load ?? 0;
   const prescribedSetTargets = exactTargets({ sets: settings.requiredWorkSets, repMin: settings.repRange.min, repMax: settings.repRange.max, mesocycleId: planning.mesocycleId });
   const method = selectSetMethod({ mesocycleId: planning.mesocycleId, experience: input.activePlan.experienceLevel, exerciseRole: exercise.role, sessionRole: slot.target });
-  return { id: `${input.id}-exercise-${index + 1}`, exerciseId: exercise.id, exerciseName: exercise.name, settings, load, loadKnown: exercise.kind === "bodyweight" || previous != null, prescribedSetTargets, sets: [], status: "active", origin: "planned", notes: `${slot.role}${slot.protected ? " · protected work" : " · optional/removable work"}. Method: ${method}. ${setMethodExplanation(method)} Exact targets: ${prescribedSetTargets.join("/")}. Stop for pain, unsafe technique, or excessive performance drop-off.` };
+  return { id: `${input.id}-exercise-${index + 1}`, exerciseId: exercise.id, exerciseName: exercise.name, settings, load, loadKnown: exercise.kind === "bodyweight" || previous != null, prescribedSetTargets, sets: [], status: "active", origin: "planned", notes: `${slot.role}${slot.protected ? " · protected work" : " · optional/removable work"}. Method: ${method}. ${setMethodExplanation(method)} Exact targets: ${prescribedSetTargets.join("/")}.${interventionKey ? ` Intervention:${interventionKey}.` : ""} Stop for pain, unsafe technique, or excessive performance drop-off.` };
 }
 
 function settingsForSlot(base: ProgressionSettings, slot: Slot): ProgressionSettings {
