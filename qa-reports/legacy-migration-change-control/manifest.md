@@ -247,3 +247,7 @@ Removed `useTrainingYear` from the active workout logger fallback and from Train
 | --- | --- | --- | --- | --- |
 | `src/features/workout-logging/use-workout-logger.ts` | `8ff3d5c339344ee70265103ec7d4185439efc59326eed49200624a8d1c284670` | `23c03f018f05e8aa001266cadc2954cf794d5230ca11df0cc35d09c64e1a4ea9` | Prevent training-year state from becoming fallback workout authority. | Train/navigation/constructor/non-planned |
 | `app/(protected)/(tabs)/train.tsx` | `c5722a8d58d28f99ea7aae0552da21402afb42ee6dabbc8041aeaa9096c59a0d` | `d69e028da76811a8a0be530be2012c31e562a46f7bb111fe2cb17d046a488567` | Remove unused training-year import. | Typecheck |
+
+## Phase 10B boundary audit
+
+No production file was changed. `ActiveTrainingPlan` still persists `blocks` and `activeBlockId`, and `plan-setup` writes them through `annual-planner`. Reclassifying that executable legacy shape as a preference would be unsafe; the required plan-model/block-utility migration is deferred by scope. Sync retains training-year data as a separate compatibility record and restores an active plan independently.
