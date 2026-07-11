@@ -1,5 +1,15 @@
 # Legacy migration change-control manifest
 
+## Phase 11A.2C3 execution record
+
+| File | Reason | Focused tests |
+| --- | --- | --- |
+| `current-readiness-producer.ts` | Canonical composition of existing evidence boundaries into a persisted snapshot. | readiness production, evidence regressions |
+| `current-progression-transition-decision-writer.ts` | Snapshot-first authoritative writer and idempotency. | readiness production |
+| `current-readiness-snapshot.ts`, decision record | Persist narrow decision context/reference with defensive copying. | snapshot and decision persistence |
+
+No C3 module applies a transition, creates a microcycle, or invokes legacy block progression. Stage 2 consumer migration remains deferred.
+
 ## Phase 11A.2C2 execution record
 
 | File | Pre-edit SHA-256 | Change reason | Post-edit checksum / focused tests |

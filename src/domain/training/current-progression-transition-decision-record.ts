@@ -20,6 +20,7 @@ export type CurrentMesocycleDecisionRecord = {
   planId: string;
   mesocycleId: MesocycleId;
   microcycleNumber: number;
+  readinessSnapshotId?: string;
   lifecycle: DecisionLifecycle;
   createdAt: string;
   appliedAt?: string;
@@ -34,6 +35,7 @@ export function createCurrentMesocycleDecisionRecord(input: {
   createdAt: string;
   decision: MesocycleDecision;
   evidence: DecisionEvidenceSummary;
+  readinessSnapshotId?: string;
 }): CurrentMesocycleDecisionRecord {
   return {
     schemaVersion: CURRENT_MESOCYCLE_DECISION_SCHEMA,
@@ -41,6 +43,7 @@ export function createCurrentMesocycleDecisionRecord(input: {
     planId: input.planId,
     mesocycleId: input.mesocycleId,
     microcycleNumber: input.microcycleNumber,
+    ...(input.readinessSnapshotId ? { readinessSnapshotId: input.readinessSnapshotId } : {}),
     createdAt: input.createdAt,
     lifecycle:
       input.decision.outcome === "delay" || input.decision.outcome === "review_required"
