@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaptivestrengthcoach.com/research/adaptive-stress-lab/coaching-recommendation.schema.json",
+  "title": "Adaptive Stress Lab Coaching Recommendation",
+  "description": "Draft research-only coaching recommendation schema for Decision Engine v0.2.",
+  "type": "object",
+  "required": [
+    "scenario_id",
+    "athlete_profile_id",
+    "status",
+    "recommendation_type",
+    "aggressiveness",
+    "primary_intervention",
+    "secondary_interventions",
+    "blocked_interventions",
+    "rationale",
+    "user_message",
+    "confidence",
+    "charter_alignment",
+    "safety_gate_status",
+    "evidence_sources",
+    "open_questions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scenario_id": { "type": "string" },
+    "athlete_profile_id": { "type": "string" },
+    "status": { "const": "draft_research_output" },
+    "recommendation_type": {
+      "type": "string",
+      "enum": ["push", "hold", "consolidate", "reduce", "recover", "substitute", "stop_movement", "stop_session"]
+    },
+    "aggressiveness": { "type": "string", "enum": ["very_low", "low", "moderate", "high"] },
+    "primary_intervention": { "type": "string" },
+    "secondary_interventions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "blocked_interventions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "rationale": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "user_message": { "type": "string" },
+    "confidence": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "charter_alignment": {
+      "type": "object",
+      "required": ["long_term_progress", "adaptation", "recovery", "confidence", "enjoyment", "momentum", "notes"],
+      "additionalProperties": false,
+      "properties": {
+        "long_term_progress": { "type": "string" },
+        "adaptation": { "type": "string" },
+        "recovery": { "type": "string" },
+        "confidence": { "type": "string" },
+        "enjoyment": { "type": "string" },
+        "momentum": { "type": "string" },
+        "notes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "safety_gate_status": { "type": "string", "enum": ["clear", "caution", "restrict", "stop"] },
+    "evidence_sources": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

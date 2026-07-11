@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaptivestrengthcoach.com/research/adaptive-stress-lab/coaching-decision.schema.json",
+  "title": "Adaptive Stress Lab Coaching Decision",
+  "description": "Draft research-only coaching decision output schema. Intervention hierarchy requires Aaron approval before production use.",
+  "type": "object",
+  "required": [
+    "scenarioId",
+    "athleteProfileId",
+    "status",
+    "primaryRecommendation",
+    "interventions",
+    "rationale",
+    "validationScore",
+    "productionEligible",
+    "openQuestions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scenarioId": { "type": "string" },
+    "athleteProfileId": { "type": "string" },
+    "status": { "const": "draft_research_output" },
+    "primaryRecommendation": {
+      "type": "string",
+      "enum": [
+        "push_cautiously",
+        "hold_and_confirm",
+        "reduce_local_stress",
+        "reduce_session_stress",
+        "recovery_bias",
+        "resume_gently",
+        "redistribute_stimulus",
+        "needs_human_review"
+      ]
+    },
+    "interventions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "scope", "intent", "approvalStatus"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "add_rep",
+              "hold_load",
+              "reduce_load",
+              "reduce_sets",
+              "maintain_sets",
+              "redistribute_volume",
+              "consolidation_week",
+              "recovery_guidance",
+              "capacity_support",
+              "no_change"
+            ]
+          },
+          "scope": { "type": "string", "enum": ["exercise", "session", "week", "block"] },
+          "intent": { "type": "string" },
+          "approvalStatus": { "const": "draft_requires_aaron_approval" }
+        }
+      }
+    },
+    "rationale": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "validationScore": {
+      "type": "object",
+      "required": ["scientificConfidence", "adaptationPotential", "fatigueCost", "safety", "behaviouralSimplicity", "overallConfidence"],
+      "additionalProperties": false,
+      "properties": {
+        "scientificConfidence": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "adaptationPotential": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "fatigueCost": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "safety": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "behaviouralSimplicity": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "overallConfidence": { "type": "integer", "minimum": 1, "maximum": 5 }
+      }
+    },
+    "productionEligible": { "const": false },
+    "openQuestions": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

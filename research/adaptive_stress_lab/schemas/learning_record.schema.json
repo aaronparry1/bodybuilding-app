@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaptivestrengthcoach.com/research/adaptive_stress_lab/learning_record.schema.json",
+  "title": "LearningRecord",
+  "type": "object",
+  "required": [
+    "decision_context_signature",
+    "recommendation_type",
+    "outcome_distribution",
+    "sample_size",
+    "confidence",
+    "suggested_adjustment",
+    "charter_guardrail_notes"
+  ],
+  "properties": {
+    "decision_context_signature": { "type": "string" },
+    "recommendation_type": { "type": "string" },
+    "push_type": { "type": ["string", "null"] },
+    "outcome_distribution": {
+      "type": "object",
+      "required": ["positive", "neutral", "negative", "unsafe", "inconclusive"],
+      "properties": {
+        "positive": { "type": "integer", "minimum": 0 },
+        "neutral": { "type": "integer", "minimum": 0 },
+        "negative": { "type": "integer", "minimum": 0 },
+        "unsafe": { "type": "integer", "minimum": 0 },
+        "inconclusive": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "sample_size": { "type": "integer", "minimum": 0 },
+    "confidence": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "suggested_adjustment": { "type": "string" },
+    "charter_guardrail_notes": { "type": "array", "items": { "type": "string" } }
+  }
+}

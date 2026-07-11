@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaptivestrengthcoach.com/research/adaptive-stress-lab/athlete-state.schema.json",
+  "title": "Adaptive Stress Lab Athlete State",
+  "description": "Draft research-only athlete state schema. Describes the athlete; does not recommend interventions.",
+  "type": "object",
+  "required": [
+    "scenario_id",
+    "athlete_profile_id",
+    "status",
+    "adaptation",
+    "fatigue",
+    "recovery",
+    "momentum",
+    "confidence",
+    "evidence_quality",
+    "confidence_reason",
+    "last_updated",
+    "evidence_count",
+    "evidence_summary",
+    "score_explanations",
+    "open_questions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scenario_id": { "type": "string" },
+    "athlete_profile_id": { "type": "string" },
+    "status": { "const": "draft_research_output" },
+    "adaptation": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "fatigue": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "recovery": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "momentum": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "confidence": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "evidence_quality": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "confidence_reason": { "type": "string" },
+    "last_updated": { "type": "string", "format": "date-time" },
+    "evidence_count": { "type": "integer", "minimum": 0 },
+    "evidence_summary": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "score_explanations": {
+      "type": "object",
+      "required": ["adaptation", "fatigue", "recovery", "momentum", "confidence", "evidence_quality"],
+      "additionalProperties": false,
+      "properties": {
+        "adaptation": { "$ref": "#/$defs/explanationList" },
+        "fatigue": { "$ref": "#/$defs/explanationList" },
+        "recovery": { "$ref": "#/$defs/explanationList" },
+        "momentum": { "$ref": "#/$defs/explanationList" },
+        "confidence": { "$ref": "#/$defs/explanationList" },
+        "evidence_quality": { "$ref": "#/$defs/explanationList" }
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "explanationList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence", "movement", "contribution", "confidence_level"],
+        "additionalProperties": false,
+        "properties": {
+          "evidence": { "type": "string" },
+          "movement": { "type": "integer" },
+          "contribution": { "type": "string" },
+          "confidence_level": { "type": "string", "enum": ["low", "moderate", "high"] }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,127 @@
+[
+  {
+    "id": "beginner_hypertrophy",
+    "label": "Beginner Hypertrophy",
+    "status": "research_fixture",
+    "goal": "hypertrophy",
+    "trainingAge": "beginner",
+    "experienceLevel": "beginner",
+    "daysPerWeek": 3,
+    "sessionTimeMinutes": 50,
+    "primaryConstraints": ["needs simple decisions", "technique still developing"],
+    "constraints": {
+      "time": "moderate",
+      "equipment": "commercial_gym",
+      "adherence": "moderate",
+      "stress": "moderate"
+    },
+    "recoveryContext": {
+      "sleepQuality": "mixed",
+      "soreness": "moderate",
+      "readiness": "moderate",
+      "fatigueTrend": "stable"
+    },
+    "notes": ["Prioritise repeatable execution, confidence, and consistency before aggressive load progression."],
+    "approvalStatus": "draft_requires_aaron_approval"
+  },
+  {
+    "id": "intermediate_strength_hypertrophy",
+    "label": "Intermediate Strength/Hypertrophy",
+    "status": "research_fixture",
+    "goal": "strength_hypertrophy",
+    "trainingAge": "intermediate",
+    "experienceLevel": "intermediate",
+    "daysPerWeek": 4,
+    "sessionTimeMinutes": 60,
+    "primaryConstraints": ["wants strength and size", "can tolerate moderate variation"],
+    "constraints": {
+      "time": "moderate",
+      "equipment": "commercial_gym",
+      "adherence": "strong",
+      "stress": "moderate"
+    },
+    "recoveryContext": {
+      "sleepQuality": "good",
+      "soreness": "low",
+      "readiness": "high",
+      "fatigueTrend": "stable"
+    },
+    "notes": ["Good candidate for careful overload only when session-level evidence is strong."],
+    "approvalStatus": "draft_requires_aaron_approval"
+  },
+  {
+    "id": "advanced_powerlifting",
+    "label": "Advanced Powerlifting",
+    "status": "research_fixture",
+    "goal": "powerlifting",
+    "trainingAge": "advanced",
+    "experienceLevel": "advanced",
+    "daysPerWeek": 5,
+    "sessionTimeMinutes": 85,
+    "primaryConstraints": ["high specificity need", "higher joint and systemic cost"],
+    "constraints": {
+      "time": "high",
+      "equipment": "commercial_gym",
+      "adherence": "strong",
+      "stress": "moderate"
+    },
+    "recoveryContext": {
+      "sleepQuality": "good",
+      "soreness": "moderate",
+      "readiness": "moderate",
+      "fatigueTrend": "stable"
+    },
+    "notes": ["Protect skill practice while controlling axial loading and proximity to failure."],
+    "approvalStatus": "draft_requires_aaron_approval"
+  },
+  {
+    "id": "busy_parent_time_constrained",
+    "label": "Busy Parent / Time-Constrained Lifter",
+    "status": "research_fixture",
+    "goal": "strength_hypertrophy",
+    "trainingAge": "intermediate",
+    "experienceLevel": "intermediate",
+    "daysPerWeek": 3,
+    "sessionTimeMinutes": 40,
+    "primaryConstraints": ["short sessions", "variable schedule", "adherence risk"],
+    "constraints": {
+      "time": "low",
+      "equipment": "commercial_gym",
+      "adherence": "fragile",
+      "stress": "high"
+    },
+    "recoveryContext": {
+      "sleepQuality": "mixed",
+      "soreness": "moderate",
+      "readiness": "moderate",
+      "fatigueTrend": "rising"
+    },
+    "notes": ["Prefer high-value work, shorter sessions, and fewer decision points."],
+    "approvalStatus": "draft_requires_aaron_approval"
+  },
+  {
+    "id": "recovery_limited_lifter",
+    "label": "Recovery-Limited Lifter",
+    "status": "research_fixture",
+    "goal": "hypertrophy",
+    "trainingAge": "intermediate",
+    "experienceLevel": "intermediate",
+    "daysPerWeek": 4,
+    "sessionTimeMinutes": 55,
+    "primaryConstraints": ["poor sleep", "fatigue accumulates quickly", "needs conservative stress allocation"],
+    "constraints": {
+      "time": "moderate",
+      "equipment": "commercial_gym",
+      "adherence": "moderate",
+      "stress": "high"
+    },
+    "recoveryContext": {
+      "sleepQuality": "poor",
+      "soreness": "high",
+      "readiness": "low",
+      "fatigueTrend": "rising"
+    },
+    "notes": ["Prefer lower-fatigue interventions and stronger guardrails against runaway volume or intensity."],
+    "approvalStatus": "draft_requires_aaron_approval"
+  }
+]

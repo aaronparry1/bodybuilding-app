@@ -1,0 +1,79 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# local credentials and environment
+/credentials/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# test, QA, and migration output
+/coverage/
+/test-results/
+/output/
+/qa-screenshots/
+/screenshots/
+/qa-reports/*
+!/qa-reports/legacy-migration-change-control/
+!/qa-reports/legacy-migration-change-control/manifest.md
+!/qa-reports/legacy-migration-change-control/baseline-failures.md
+!/qa-reports/legacy-migration-change-control/baseline-commit-inventory.md
+/qa-reports/legacy-migration-change-control/originals/
+/docs/screenshots/
+/reports/**/screenshots/
+
+# generated marketing archives
+/docs/app-store-conversion-pack/*.zip
+
+# editor and temporary files
+.idea/
+.vscode/
+.claude/
+*.swp
+*.swo
+*~
+
+# generated native build artefacts; retain reproducible native source and config
+/ios/Pods/
+/ios/build/
+/android/.gradle/
+/android/app/build/
+*.xcarchive

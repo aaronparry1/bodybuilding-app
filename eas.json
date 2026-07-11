@@ -1,0 +1,92 @@
+{
+  "cli": {
+    "version": ">= 16.0.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development",
+      "autoIncrement": true,
+      "env": {
+        "APP_ENV": "development",
+        "APP_NAME": "Adaptive Strength Coach Dev",
+        "APP_SCHEME": "ironlogic-dev",
+        "APP_IOS_BUNDLE_IDENTIFIER": "com.aaronparry.adaptivestrengthcoach.dev",
+        "APP_ANDROID_PACKAGE": "com.aaronparry.adaptivestrengthcoach.dev",
+        "ASC_COACHING_ENGINE_V3": "true",
+        "ASC_V3_ACTIVE_WORKOUT": "true",
+        "ASC_V3_QUALITY_GATE_STRICT": "true",
+        "EXPO_PUBLIC_ASC_COACHING_ENGINE_V3": "true",
+        "EXPO_PUBLIC_ASC_V3_ACTIVE_WORKOUT": "true",
+        "EXPO_PUBLIC_ASC_V3_QUALITY_GATE_STRICT": "true"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "channel": "staging",
+      "autoIncrement": true,
+      "env": {
+        "APP_ENV": "staging",
+        "APP_NAME": "Adaptive Strength Coach Staging",
+        "APP_SCHEME": "ironlogic-staging",
+        "APP_IOS_BUNDLE_IDENTIFIER": "com.aaronparry.adaptivestrengthcoach.staging",
+        "APP_ANDROID_PACKAGE": "com.aaronparry.adaptivestrengthcoach.staging",
+        "ASC_COACHING_ENGINE_V3": "true",
+        "ASC_V3_ACTIVE_WORKOUT": "true",
+        "ASC_V3_QUALITY_GATE_STRICT": "true",
+        "EXPO_PUBLIC_ASC_COACHING_ENGINE_V3": "true",
+        "EXPO_PUBLIC_ASC_V3_ACTIVE_WORKOUT": "true",
+        "EXPO_PUBLIC_ASC_V3_QUALITY_GATE_STRICT": "true"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "channel": "production",
+      "autoIncrement": true,
+      "env": {
+        "APP_ENV": "production",
+        "APP_NAME": "Adaptive Strength Coach",
+        "APP_SCHEME": "ironlogic",
+        "APP_IOS_BUNDLE_IDENTIFIER": "com.aaronparry.adaptivestrengthcoach",
+        "APP_ANDROID_PACKAGE": "com.aaronparry.adaptivestrengthcoach",
+        "ASC_COACHING_ENGINE_V3": "true",
+        "ASC_V3_ACTIVE_WORKOUT": "true",
+        "ASC_V3_QUALITY_GATE_STRICT": "true",
+        "ASC_V3_SHADOW_MODE": "false",
+        "EXPO_PUBLIC_ASC_COACHING_ENGINE_V3": "true",
+        "EXPO_PUBLIC_ASC_V3_ACTIVE_WORKOUT": "true",
+        "EXPO_PUBLIC_ASC_V3_QUALITY_GATE_STRICT": "true",
+        "EXPO_PUBLIC_ASC_V3_SHADOW_MODE": "false"
+      },
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  },
+  "submit": {
+    "preview": {
+      "ios": {},
+      "android": {
+        "track": "internal"
+      }
+    },
+    "production": {
+      "ios": {
+        "ascAppId": "6762462649"
+      },
+      "android": {
+        "track": "internal"
+      }
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaptivestrengthcoach.com/research/adaptive-stress-lab/athlete-profile.schema.json",
+  "title": "Adaptive Stress Lab Athlete Profile",
+  "description": "Draft research-only athlete profile schema. Field set requires Aaron approval before production use.",
+  "type": "object",
+  "required": [
+    "id",
+    "label",
+    "status",
+    "goal",
+    "trainingAge",
+    "experienceLevel",
+    "daysPerWeek",
+    "sessionTimeMinutes",
+    "constraints",
+    "recoveryContext",
+    "approvalStatus"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "label": { "type": "string" },
+    "status": { "const": "research_fixture" },
+    "goal": {
+      "type": "string",
+      "enum": ["hypertrophy", "strength_hypertrophy", "powerlifting", "body_recomposition", "maintenance"]
+    },
+    "trainingAge": {
+      "type": "string",
+      "enum": ["beginner", "intermediate", "advanced"]
+    },
+    "experienceLevel": {
+      "type": "string",
+      "enum": ["beginner", "intermediate", "advanced"]
+    },
+    "daysPerWeek": { "type": "integer", "minimum": 1, "maximum": 7 },
+    "sessionTimeMinutes": { "type": "integer", "minimum": 20, "maximum": 150 },
+    "primaryConstraints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "constraints": {
+      "type": "object",
+      "required": ["time", "equipment", "adherence", "stress"],
+      "additionalProperties": false,
+      "properties": {
+        "time": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "equipment": { "const": "commercial_gym" },
+        "adherence": { "type": "string", "enum": ["fragile", "moderate", "strong"] },
+        "stress": { "type": "string", "enum": ["low", "moderate", "high"] }
+      }
+    },
+    "recoveryContext": {
+      "type": "object",
+      "required": ["sleepQuality", "soreness", "readiness", "fatigueTrend"],
+      "additionalProperties": false,
+      "properties": {
+        "sleepQuality": { "type": "string", "enum": ["poor", "mixed", "good"] },
+        "soreness": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "readiness": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "fatigueTrend": { "type": "string", "enum": ["falling", "stable", "rising"] }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "approvalStatus": { "const": "draft_requires_aaron_approval" }
+  }
+}

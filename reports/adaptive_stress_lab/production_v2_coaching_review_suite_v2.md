@@ -1,0 +1,505 @@
+# Production V2 Coaching Review Suite v2
+
+Status: isolated production-pipeline review. No global workout-generation wiring.
+
+## Summary
+
+- Total scenarios: 78
+- Expected behaviour checks passed: 22/22
+- Flagged for Aaron review: 4
+- Ready for simulator-only wiring: yes
+
+## Top Questionable Decisions
+
+- core_deadlift_calibration: Deadlift calibration stays capped (low_evidence_confidence, low_confidence_load_mapping)
+- sit_unsupported_fallback: Unsupported mystery lift (low_evidence_confidence, low_confidence_load_mapping, unsupported_fallback)
+- sit_unknown_farmer: Unknown farmer carry (low_evidence_confidence, low_confidence_load_mapping)
+- sit_squat_new_low_confidence: New squat low confidence (low_evidence_confidence, low_confidence_load_mapping)
+
+## Top Questionable Load Decisions
+
+- core_deadlift_calibration: Deadlift calibration stays capped (low_evidence_confidence, low_confidence_load_mapping)
+- sit_unsupported_fallback: Unsupported mystery lift (low_evidence_confidence, low_confidence_load_mapping, unsupported_fallback)
+- sit_unknown_farmer: Unknown farmer carry (low_evidence_confidence, low_confidence_load_mapping)
+- sit_squat_new_low_confidence: New squat low confidence (low_evidence_confidence, low_confidence_load_mapping)
+
+## Missing Context
+
+- Adaptive Load Prescription is isolated and not wired to generated workouts.
+- Cycle context uses compact scalar recovery/performance inputs, not full Coaching State.
+- Set allocation preview uses synthetic completed sets, not full workout state.
+- Exercise metadata is archetype-level; production exercise database mapping still needs review before global wiring.
+
+## Scenario Groups
+
+### strength
+
+- core_deload_deadlift: Deload deadlift always recovery
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> move_on (Recovery week dose complete.)
+  - Flags: none
+- core_safety_peak_bench: Safety blocks peak bench performance
+  - Cycle: express_strength, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: express_strength -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> move_on (Safety first. Move on.)
+  - Flags: none
+- core_deadlift_calibration: Deadlift calibration stays capped
+  - Cycle: build_strength_capacity, maintain
+  - Session: calibration/skill
+  - Rep: capped_amrap, AMRAP, cap 4.
+  - Load: conservative_start/calibration_load, Use a conservative calibration load.
+  - Review: build_strength_capacity -> calibration/skill -> capped_amrap -> conservative_start/calibration_load -> one_more_set (Possible underload. Verify with one more.)
+  - Flags: low_evidence_confidence, low_confidence_load_mapping
+- core_strength_peak_owned: Owned peak squat expression
+  - Cycle: express_strength, conserve
+  - Session: performance/peak
+  - Rep: fixed_reps, 1 reps.
+  - Load: increase_load/small_progression, Small load increase.
+  - Review: express_strength -> performance/peak -> fixed_reps -> increase_load/small_progression -> move_on (Below target. Move on.)
+  - Flags: none
+- core_unstable_squat: Unstable squat load should not progress
+  - Cycle: increase_specificity, maintain
+  - Session: verification/tension
+  - Rep: top_range_check, Top-range check.
+  - Load: reduce_load/conservative_progression, Stabilise with a small reduction.
+  - Review: increase_specificity -> verification/tension -> top_range_check -> reduce_load/conservative_progression -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+- matrix_01: strength accumulation Competition Squat
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: low_evidence_confidence
+- matrix_02: strength intensification Competition Bench Press
+  - Cycle: increase_specificity, maintain
+  - Session: productive/tension
+  - Rep: fixed_reps, 3 reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: increase_specificity -> productive/tension -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_03: strength peak Competition Deadlift
+  - Cycle: express_strength, conserve
+  - Session: performance/peak
+  - Rep: fixed_reps, 1 reps.
+  - Load: keep_load/peak_specific_load, Keep the load.
+  - Review: express_strength -> performance/peak -> fixed_reps -> keep_load/peak_specific_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+- matrix_04: strength maintenance Standing Overhead Press
+  - Cycle: build_strength_capacity, spend
+  - Session: productive/tension
+  - Rep: fixed_reps, 6 reps.
+  - Load: increase_load/small_progression, Small load increase.
+  - Review: build_strength_capacity -> productive/tension -> fixed_reps -> increase_load/small_progression -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_owned_bench: Owned bench load
+  - Cycle: increase_specificity, spend
+  - Session: productive/tension
+  - Rep: fixed_reps, 3 reps.
+  - Load: increase_load/small_progression, Small load increase.
+  - Review: increase_specificity -> productive/tension -> fixed_reps -> increase_load/small_progression -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_introduced_squat: Introduced squat load
+  - Cycle: increase_specificity, maintain
+  - Session: verification/tension
+  - Rep: top_range_check, Top-range check.
+  - Load: keep_load/owned_load, Stabilise the new load.
+  - Review: increase_specificity -> verification/tension -> top_range_check -> keep_load/owned_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+- sit_overreached_squat: Overreached squat
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+
+### athletic_performance
+
+- core_athletic_power: Athletic power movement
+  - Cycle: build_strength_capacity, maintain
+  - Session: verification/speed_power
+  - Rep: fixed_reps, 3 fast reps.
+  - Load: keep_load/power_quality_load, Preserve speed and quality.
+  - Review: build_strength_capacity -> verification/speed_power -> fixed_reps -> keep_load/power_quality_load -> one_more_set (Possible underload. Verify with one more.)
+  - Flags: none
+- core_athletic_accessory: Athletic accessory support
+  - Cycle: build_strength_capacity, maintain
+  - Session: productive/balanced
+  - Rep: fixed_reps, 12 support reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: build_strength_capacity -> productive/balanced -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_13: athletic_performance accumulation Standing Overhead Press
+  - Cycle: build_strength_capacity, spend
+  - Session: calibration/skill
+  - Rep: top_range_check, Load-finding check.
+  - Load: estimate_from_amrap/calibration_load, Estimate from the calibration set.
+  - Review: build_strength_capacity -> calibration/skill -> top_range_check -> estimate_from_amrap/calibration_load -> one_more_set (Possible underload. Verify with one more.)
+  - Flags: low_evidence_confidence
+- matrix_14: athletic_performance intensification Barbell Row
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_15: athletic_performance peak Chest Press
+  - Cycle: express_power, conserve
+  - Session: verification/peak
+  - Rep: fixed_reps, 3 reps.
+  - Load: reduce_load/conservative_progression, Reduce slightly and rebuild.
+  - Review: express_power -> verification/peak -> fixed_reps -> reduce_load/conservative_progression -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_16: athletic_performance maintenance Leg Extension
+  - Cycle: build_strength_capacity, maintain
+  - Session: productive/recovery
+  - Rep: fixed_reps, 12 support reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: build_strength_capacity -> productive/recovery -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_power_speed_bench: Speed bench athletic
+  - Cycle: increase_specificity, spend
+  - Session: productive/speed_power
+  - Rep: fixed_reps, 2 fast reps.
+  - Load: keep_load/power_quality_load, Preserve speed and quality.
+  - Review: increase_specificity -> productive/speed_power -> fixed_reps -> keep_load/power_quality_load -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_power_accessory_row: Athletic row support
+  - Cycle: increase_specificity, maintain
+  - Session: productive/balanced
+  - Rep: fixed_reps, 8 support reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: increase_specificity -> productive/balanced -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_dead_hang_new: New dead hang
+  - Cycle: build_strength_capacity, maintain
+  - Session: calibration/balanced
+  - Rep: duration_carry, Carry for time.
+  - Load: no_external_load/bodyweight_or_duration, Use bodyweight or duration.
+  - Review: build_strength_capacity -> calibration/balanced -> duration_carry -> no_external_load/bodyweight_or_duration -> one_more_set (One more productive set.)
+  - Flags: low_evidence_confidence
+- sit_athletic_peak_throw: Athletic peak medicine ball throw
+  - Cycle: express_power, conserve
+  - Session: performance/peak
+  - Rep: fixed_reps, 3 fast reps.
+  - Load: keep_load/power_quality_load, Preserve speed and quality.
+  - Review: express_power -> performance/peak -> fixed_reps -> keep_load/power_quality_load -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_unknown_farmer: Unknown farmer carry
+  - Cycle: build_strength_capacity, maintain
+  - Session: calibration/balanced
+  - Rep: duration_carry, Carry for time.
+  - Load: conservative_start/calibration_load, Start conservatively.
+  - Review: build_strength_capacity -> calibration/balanced -> duration_carry -> conservative_start/calibration_load -> one_more_set (One more productive set.)
+  - Flags: low_evidence_confidence, low_confidence_load_mapping
+- sit_power_poor_recovery: Power movement poor recovery
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> one_more_set (One more productive set.)
+  - Flags: none
+
+### hypertrophy
+
+- core_hypertrophy_isolation_good: Hypertrophy isolation high recovery
+  - Cycle: build_quality_volume, spend
+  - Session: productive/metabolic
+  - Rep: fixed_reps, 12 reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: build_quality_volume -> productive/metabolic -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- core_hypertrophy_compound_limited: Hypertrophy compound limited recovery
+  - Cycle: build_quality_volume, maintain
+  - Session: productive/tension
+  - Rep: fixed_reps, 8 reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: build_quality_volume -> productive/tension -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- core_underloaded_chest_press: Underloaded chest press verification
+  - Cycle: build_quality_volume, maintain
+  - Session: verification/balanced
+  - Rep: top_range_check, Top-range check.
+  - Load: increase_load/small_progression, Small load increase.
+  - Review: build_quality_volume -> verification/balanced -> top_range_check -> increase_load/small_progression -> one_more_set (Possible underload. Verify with one more.)
+  - Flags: none
+- core_large_jump_lateral_raise: Large jump blocks lateral raise increase
+  - Cycle: build_quality_volume, spend
+  - Session: verification/metabolic
+  - Rep: top_range_check, Top-range check.
+  - Load: keep_load/conservative_progression, Jump is too large. Keep load.
+  - Review: build_quality_volume -> verification/metabolic -> top_range_check -> keep_load/conservative_progression -> one_more_set (Possible underload. Verify with one more.)
+  - Flags: none
+- matrix_05: hypertrophy accumulation Barbell Row
+  - Cycle: build_quality_volume, maintain
+  - Session: calibration/balanced
+  - Rep: top_range_check, Load-finding check.
+  - Load: estimate_from_amrap/calibration_load, Estimate from the calibration set.
+  - Review: build_quality_volume -> calibration/balanced -> top_range_check -> estimate_from_amrap/calibration_load -> one_more_set (Possible underload. Verify with one more.)
+  - Flags: low_evidence_confidence
+- matrix_06: hypertrophy intensification Chest Press
+  - Cycle: progress_quality_work, maintain
+  - Session: productive/tension
+  - Rep: fixed_reps, 8 reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: progress_quality_work -> productive/tension -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_07: hypertrophy peak Leg Extension
+  - Cycle: progress_quality_work, conserve
+  - Session: verification/tension
+  - Rep: top_range_check, Top-range check.
+  - Load: keep_load/owned_load, Stabilise the new load.
+  - Review: progress_quality_work -> verification/tension -> top_range_check -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_08: hypertrophy maintenance Box Jump
+  - Cycle: build_quality_volume, maintain
+  - Session: verification/balanced
+  - Rep: fixed_reps, 3 fast reps.
+  - Load: keep_load/power_quality_load, Preserve speed and quality.
+  - Review: build_quality_volume -> verification/balanced -> fixed_reps -> keep_load/power_quality_load -> one_more_set (Possible underload. Verify with one more.)
+  - Flags: none
+- sit_new_machine_press: New machine press
+  - Cycle: build_quality_volume, maintain
+  - Session: calibration/balanced
+  - Rep: top_range_check, Load-finding check.
+  - Load: estimate_from_amrap/calibration_load, Estimate from the calibration set.
+  - Review: build_quality_volume -> calibration/balanced -> top_range_check -> estimate_from_amrap/calibration_load -> one_more_set (One more productive set.)
+  - Flags: low_evidence_confidence
+- sit_underloaded_leg_ext: Underloaded leg extension
+  - Cycle: build_quality_volume, spend
+  - Session: verification/metabolic
+  - Rep: top_range_check, Top-range check.
+  - Load: increase_load/small_progression, Small load increase.
+  - Review: build_quality_volume -> verification/metabolic -> top_range_check -> increase_load/small_progression -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_improving_lat: Lat pulldown improving
+  - Cycle: build_quality_volume, spend
+  - Session: productive/balanced
+  - Rep: fixed_reps, 10 reps.
+  - Load: increase_load/small_progression, Small load increase.
+  - Review: build_quality_volume -> productive/balanced -> fixed_reps -> increase_load/small_progression -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_poor_recovery_isolation: Poor recovery cable curl
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> one_more_set (One more productive set.)
+  - Flags: none
+
+### get_lean
+
+- core_get_lean_poor: Get lean poor recovery
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+- matrix_17: get_lean accumulation Box Jump
+  - Cycle: preserve_performance, conserve
+  - Session: calibration/balanced
+  - Rep: fixed_reps, 3 fast reps.
+  - Load: keep_load/power_quality_load, Preserve speed and quality.
+  - Review: preserve_performance -> calibration/balanced -> fixed_reps -> keep_load/power_quality_load -> one_more_set (One more productive set.)
+  - Flags: low_evidence_confidence
+- matrix_18: get_lean intensification Plank
+  - Cycle: preserve_performance, conserve
+  - Session: productive/balanced
+  - Rep: duration_hold, Hold the target time.
+  - Load: no_external_load/bodyweight_or_duration, Use bodyweight or duration.
+  - Review: preserve_performance -> productive/balanced -> duration_hold -> no_external_load/bodyweight_or_duration -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_19: get_lean peak Competition Squat
+  - Cycle: preserve_performance, maintain
+  - Session: verification/balanced
+  - Rep: top_range_check, Top-range check.
+  - Load: keep_load/owned_load, Stabilise the new load.
+  - Review: preserve_performance -> verification/balanced -> top_range_check -> keep_load/owned_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+- matrix_20: get_lean maintenance Competition Bench Press
+  - Cycle: preserve_performance, conserve
+  - Session: productive/tension
+  - Rep: fixed_reps, 6 controlled reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: preserve_performance -> productive/tension -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_get_lean_good_bench: Get lean good recovery bench
+  - Cycle: preserve_performance, maintain
+  - Session: productive/tension
+  - Rep: fixed_reps, 6 controlled reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: preserve_performance -> productive/tension -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_get_lean_limited_leg_press: Get lean limited leg press
+  - Cycle: preserve_performance, conserve
+  - Session: productive/recovery
+  - Rep: fixed_reps, 6 controlled reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: preserve_performance -> productive/recovery -> fixed_reps -> keep_load/owned_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+- sit_overreached_get_lean: Overreached get lean row
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> move_on (Below target. Move on.)
+  - Flags: none
+- sit_get_lean_maintenance_plank: Get lean maintenance plank
+  - Cycle: preserve_performance, conserve
+  - Session: productive/balanced
+  - Rep: duration_hold, Hold the target time.
+  - Load: no_external_load/bodyweight_or_duration, Use bodyweight or duration.
+  - Review: preserve_performance -> productive/balanced -> duration_hold -> no_external_load/bodyweight_or_duration -> one_more_set (One more productive set.)
+  - Flags: none
+
+### maintenance
+
+- core_maintenance_normal: Maintenance normal row
+  - Cycle: maintain_training, maintain
+  - Session: productive/balanced
+  - Rep: fixed_reps, Controlled work.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: maintain_training -> productive/balanced -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_21: maintenance accumulation Competition Deadlift
+  - Cycle: maintain_training, maintain
+  - Session: productive/recovery
+  - Rep: fixed_reps, Controlled work.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: maintain_training -> productive/recovery -> fixed_reps -> keep_load/owned_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: low_evidence_confidence
+- matrix_22: maintenance intensification Standing Overhead Press
+  - Cycle: maintain_training, spend
+  - Session: verification/balanced
+  - Rep: top_range_check, Top-range check.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: maintain_training -> verification/balanced -> top_range_check -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_23: maintenance peak Barbell Row
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_24: maintenance maintenance Chest Press
+  - Cycle: maintain_training, maintain
+  - Session: productive/balanced
+  - Rep: fixed_reps, Controlled work.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: maintain_training -> productive/balanced -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_duration_plank: Plank duration support
+  - Cycle: maintain_training, maintain
+  - Session: productive/balanced
+  - Rep: duration_hold, Hold the target time.
+  - Load: no_external_load/bodyweight_or_duration, Use bodyweight or duration.
+  - Review: maintain_training -> productive/balanced -> duration_hold -> no_external_load/bodyweight_or_duration -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_unsupported_fallback: Unsupported mystery lift
+  - Cycle: maintain_training, maintain
+  - Session: productive/balanced
+  - Rep: fixed_reps, Controlled work.
+  - Load: keep_load/calibration_load, Keep load while evidence builds.
+  - Review: maintain_training -> productive/balanced -> fixed_reps -> keep_load/calibration_load -> one_more_set (One more productive set.)
+  - Flags: low_evidence_confidence, low_confidence_load_mapping, unsupported_fallback
+- sit_maintenance_peak_request: Maintenance accidental peak phase
+  - Cycle: maintain_training, conserve
+  - Session: productive/balanced
+  - Rep: fixed_reps, Controlled work.
+  - Load: increase_load/small_progression, Small load increase.
+  - Review: maintain_training -> productive/balanced -> fixed_reps -> increase_load/small_progression -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_maintenance_overreached: Maintenance overreached
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> move_on (Below target. Move on.)
+  - Flags: none
+
+### build_muscle_strength
+
+- core_low_exposure_press: Low exposure overhead press calibration
+  - Cycle: build_muscle_and_strength, maintain
+  - Session: calibration/tension
+  - Rep: top_range_check, Load-finding check.
+  - Load: estimate_from_amrap/calibration_load, Estimate from the calibration set.
+  - Review: build_muscle_and_strength -> calibration/tension -> top_range_check -> estimate_from_amrap/calibration_load -> one_more_set (One more productive set.)
+  - Flags: low_evidence_confidence
+- matrix_09: build_muscle_strength accumulation Plank
+  - Cycle: build_muscle_and_strength, maintain
+  - Session: calibration/balanced
+  - Rep: duration_hold, Hold the target time.
+  - Load: no_external_load/bodyweight_or_duration, Use bodyweight or duration.
+  - Review: build_muscle_and_strength -> calibration/balanced -> duration_hold -> no_external_load/bodyweight_or_duration -> one_more_set (One more productive set.)
+  - Flags: low_evidence_confidence
+- matrix_10: build_muscle_strength intensification Competition Squat
+  - Cycle: build_muscle_and_strength, spend
+  - Session: productive/tension
+  - Rep: fixed_reps, 5 reps.
+  - Load: increase_load/small_progression, Small load increase.
+  - Review: build_muscle_and_strength -> productive/tension -> fixed_reps -> increase_load/small_progression -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+- matrix_11: build_muscle_strength peak Competition Bench Press
+  - Cycle: express_strength, maintain
+  - Session: verification/peak
+  - Rep: fixed_reps, 2 reps.
+  - Load: keep_load/peak_specific_load, Keep the load.
+  - Review: express_strength -> verification/peak -> fixed_reps -> keep_load/peak_specific_load -> one_more_set (One more productive set.)
+  - Flags: none
+- matrix_12: build_muscle_strength maintenance Competition Deadlift
+  - Cycle: recover, conserve
+  - Session: recovery/recovery
+  - Rep: recovery_reps, Recovery set.
+  - Load: reduce_load/recovery_load, Safety or recovery load.
+  - Review: recover -> recovery/recovery -> recovery_reps -> reduce_load/recovery_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+- sit_stabilising_rdl: Stabilising RDL
+  - Cycle: build_muscle_and_strength, maintain
+  - Session: verification/tension
+  - Rep: top_range_check, Top-range check.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: build_muscle_and_strength -> verification/tension -> top_range_check -> keep_load/owned_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+- sit_plateau_row: Barbell row plateau
+  - Cycle: build_muscle_and_strength, maintain
+  - Session: verification/tension
+  - Rep: top_range_check, Top-range check.
+  - Load: reduce_load/conservative_progression, Reduce slightly and rebuild.
+  - Review: build_muscle_and_strength -> verification/tension -> top_range_check -> reduce_load/conservative_progression -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_bms_peak_bench: Build muscle strength peak bench
+  - Cycle: express_strength, conserve
+  - Session: performance/peak
+  - Rep: fixed_reps, 1 reps.
+  - Load: increase_load/small_progression, Small load increase.
+  - Review: express_strength -> performance/peak -> fixed_reps -> increase_load/small_progression -> move_on (Below target. Move on.)
+  - Flags: none
+- sit_bms_accessory_good: Build muscle strength accessory
+  - Cycle: build_muscle_and_strength, spend
+  - Session: productive/metabolic
+  - Rep: fixed_reps, 12 reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: build_muscle_and_strength -> productive/metabolic -> fixed_reps -> keep_load/owned_load -> one_more_set (One more productive set.)
+  - Flags: none
+- sit_bms_deadlift_accumulation: Build muscle strength deadlift
+  - Cycle: build_muscle_and_strength, maintain
+  - Session: productive/tension
+  - Rep: fixed_reps, 5 reps.
+  - Load: keep_load/owned_load, Keep the load.
+  - Review: build_muscle_and_strength -> productive/tension -> fixed_reps -> keep_load/owned_load -> move_on (Stimulus achieved. Save energy for the next lift.)
+  - Flags: none
+
+
+## Recommendation
+
+The isolated pipeline is coherent enough for simulator-only wiring, with the flagged review items kept visible.
+

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaptivestrengthcoach.com/research/adaptive_stress_lab/outcome_event.schema.json",
+  "title": "OutcomeEvent",
+  "type": "object",
+  "required": [
+    "id",
+    "athlete_profile_id",
+    "coaching_state_summary",
+    "safety_gate_status",
+    "recommendation_type",
+    "intervention_type",
+    "goal",
+    "week",
+    "follow_up_window",
+    "follow_up_evidence",
+    "outcome_classification",
+    "confidence"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "athlete_profile_id": { "type": "string" },
+    "coaching_state_summary": { "type": "object" },
+    "safety_gate_status": { "type": "string" },
+    "recommendation_type": { "type": "string" },
+    "push_type": { "type": ["string", "null"] },
+    "intervention_type": { "type": "string" },
+    "goal": { "type": "string" },
+    "exercise": { "type": ["string", "null"] },
+    "movement_pattern": { "type": ["string", "null"] },
+    "week": { "type": "integer", "minimum": 1 },
+    "timestamp": { "type": "string" },
+    "follow_up_window": {
+      "type": "string",
+      "enum": ["immediate_session", "next_session", "two_week", "four_week", "eight_week"]
+    },
+    "follow_up_evidence": { "type": "object" },
+    "outcome_classification": {
+      "type": "string",
+      "enum": ["positive", "neutral", "negative", "unsafe", "inconclusive"]
+    },
+    "confidence": { "type": "integer", "minimum": 0, "maximum": 100 }
+  }
+}

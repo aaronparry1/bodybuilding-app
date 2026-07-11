@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaptivestrengthcoach.com/research/adaptive-stress-lab/safety-gate.schema.json",
+  "title": "Adaptive Stress Lab Safety Gate",
+  "description": "Draft research-only Safety Gate schema. Safety Gate sits after Coaching State and before future coaching decisions.",
+  "type": "object",
+  "required": [
+    "scenario_id",
+    "athlete_profile_id",
+    "status",
+    "severity",
+    "veto",
+    "affected_areas",
+    "reasons",
+    "allowed_actions",
+    "blocked_actions",
+    "recommended_user_message",
+    "confidence",
+    "evidence_sources"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scenario_id": { "type": "string" },
+    "athlete_profile_id": { "type": "string" },
+    "status": { "type": "string", "enum": ["clear", "caution", "restrict", "stop"] },
+    "severity": { "type": "string", "enum": ["none", "low", "moderate", "high", "severe"] },
+    "veto": { "type": "boolean" },
+    "affected_areas": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "reasons": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "allowed_actions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "blocked_actions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "recommended_user_message": { "type": "string" },
+    "confidence": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "evidence_sources": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

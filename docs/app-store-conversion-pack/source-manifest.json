@@ -1,0 +1,92 @@
+{
+  "canvas": {
+    "width": 1320,
+    "height": 2868,
+    "device": "6.9-inch iPhone portrait"
+  },
+  "brand": {
+    "name": "Adaptive Strength Coach",
+    "shortName": "A.S.C.",
+    "tagline": "Auto-Regulated Strength Training",
+    "palette": {
+      "background": "#05080D",
+      "panel": "#0E1724",
+      "gold": "#E2BD6B",
+      "goldDeep": "#8E6A2E",
+      "cream": "#F5F0E8",
+      "muted": "#9BA7B9"
+    }
+  },
+  "screenshots": [
+    {
+      "file": "01-stop-guessing-start-progressing.png",
+      "headline": "STOP GUESSING. START PROGRESSING.",
+      "subheading": "Adaptive workouts that adjust to your performance.",
+      "proofTitle": "Your next session, ready",
+      "proofBody": "The app sets the plan. Your performance sets the dose.",
+      "proofLabel": "Today",
+      "source": "website/public/assets/screenshots/home.png",
+      "purpose": "Lead with the core promise: coached training that adapts instead of leaving the user to guess."
+    },
+    {
+      "file": "02-build-muscle-build-strength.png",
+      "headline": "BUILD MUSCLE. BUILD STRENGTH.",
+      "subheading": "Evidence-based training that evolves with you.",
+      "proofTitle": "Targets that adapt",
+      "proofBody": "Rep ranges, target zones, and load guidance in one place.",
+      "proofLabel": "Workout targets",
+      "source": "website/public/assets/screenshots/train-target-zone.png",
+      "purpose": "Position the app around the main outcome rather than the mechanics of the workout screen."
+    },
+    {
+      "file": "03-your-roadmap-already-planned.png",
+      "headline": "YOUR ROADMAP. ALREADY PLANNED.",
+      "subheading": "From Hypertrophy to Peak.",
+      "proofTitle": "A full training journey",
+      "proofBody": "Build, strengthen, recover, and peak with structure.",
+      "proofLabel": "Training roadmap",
+      "source": "qa-screenshots/plan-roadmap-redesign/roadmap-top-cleaner.png",
+      "purpose": "Show that users get a long-term plan, not a random workout list."
+    },
+    {
+      "file": "04-know-when-youre-improving.png",
+      "headline": "KNOW WHEN YOU'RE IMPROVING.",
+      "subheading": "PR tracking, e1RM, and Strength Dashboard.",
+      "proofTitle": "Progress you can see",
+      "proofBody": "Track estimated strength without testing maxes.",
+      "proofLabel": "Progress",
+      "source": "website/public/assets/screenshots/progress-dashboard.png",
+      "purpose": "Make progress measurement obvious and valuable."
+    },
+    {
+      "file": "05-train-hard-recover-smart.png",
+      "headline": "TRAIN HARD. RECOVER SMART.",
+      "subheading": "Recovery Windows and fatigue management built in.",
+      "proofTitle": "Hard training, smarter timing",
+      "proofBody": "Recovery guidance supports the plan instead of replacing it.",
+      "proofLabel": "Recovery",
+      "source": "website/public/assets/screenshots/recovery-capacity.png",
+      "purpose": "Signal coaching sophistication and reduce fear of overtraining."
+    },
+    {
+      "file": "06-powerlifting-covered.png",
+      "headline": "POWERLIFTING? COVERED.",
+      "subheading": "Meet prep, peaking, and competition planning.",
+      "proofTitle": "Specificity when it matters",
+      "proofBody": "Plan toward the platform with peaking and recovery built in.",
+      "proofLabel": "Meet prep",
+      "source": "website/public/assets/screenshots/powerlifting-meet.png",
+      "purpose": "Capture strength athletes with a direct event-prep message."
+    },
+    {
+      "file": "07-built-for-real-lifters.png",
+      "headline": "BUILT FOR REAL LIFTERS.",
+      "subheading": "No guesswork. No generic programs.",
+      "proofTitle": "Review, adjust, repeat",
+      "proofBody": "Workout feedback turns logged training into the next decision.",
+      "proofLabel": "Workout review",
+      "source": "website/public/assets/screenshots/workout-review-pr.jpg",
+      "purpose": "Close the sequence with the app's feedback loop and real training identity."
+    }
+  ]
+}

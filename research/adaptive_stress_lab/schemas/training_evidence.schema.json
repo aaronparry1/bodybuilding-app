@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaptivestrengthcoach.com/research/adaptive-stress-lab/training-evidence.schema.json",
+  "title": "Adaptive Stress Lab Training Evidence",
+  "description": "Draft research-only training evidence schema. Scoring model requires Aaron approval before production use.",
+  "type": "object",
+  "required": [
+    "id",
+    "scenario",
+    "athleteProfileId",
+    "status",
+    "evidenceQuality",
+    "trainingContinuity",
+    "systemicSignals",
+    "approvalStatus"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "scenario": { "type": "string" },
+    "athleteProfileId": { "type": "string" },
+    "status": { "const": "research_fixture" },
+    "evidenceModelVersion": { "type": "string", "enum": ["v0.4", "v0.5"] },
+    "performanceTrend": { "type": "string", "enum": ["improving", "stable", "stagnant", "declining", "mixed"] },
+    "fatigueState": { "type": "string", "enum": ["low", "moderate", "high"] },
+    "recoveryState": { "type": "string", "enum": ["good", "mixed", "poor"] },
+    "evidenceQuality": { "type": "string", "enum": ["low", "moderate", "high"] },
+    "trainingContinuity": { "type": "string", "enum": ["consistent", "interrupted", "missed_week"] },
+    "localLiftSignals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["lift", "signal", "severity"],
+        "additionalProperties": false,
+        "properties": {
+          "lift": { "type": "string" },
+          "signal": {
+            "type": "string",
+            "enum": [
+              "none",
+              "above_range",
+              "inside_range",
+              "below_range",
+              "dropoff",
+              "productive_fatigue",
+              "technique_limit",
+              "same_load_collapse",
+              "repeated_shutdown"
+            ]
+          },
+          "severity": { "type": "string", "enum": ["none", "low", "moderate", "high"] }
+        }
+      }
+    },
+    "systemicSignals": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "none",
+          "multiple_lifts_down",
+          "sleep_disrupted",
+          "high_soreness",
+          "missed_sessions",
+          "time_constraint",
+          "low_frequency",
+          "high_stress",
+          "good_readiness"
+        ]
+      }
+    },
+    "sessionHistory": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plannedSessionsCompleted": { "type": "integer", "minimum": 0 },
+        "plannedSessionsMissed": { "type": "integer", "minimum": 0 },
+        "extraSessionsCompleted": { "type": "integer", "minimum": 0 },
+        "sessionSpacing": { "type": "string", "enum": ["normal", "compressed", "extended", "irregular"] },
+        "completedSets": { "type": "integer", "minimum": 0 },
+        "skippedExercises": { "type": "integer", "minimum": 0 },
+        "sessionDurationMinutes": { "type": ["integer", "null"], "minimum": 0 },
+        "sessionCompletionQuality": { "type": "string", "enum": ["good", "mixed", "poor"] }
+      }
+    },
+    "exerciseHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "exerciseName": { "type": "string" },
+          "movementPattern": { "type": "string" },
+          "targetRange": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "unit": { "type": "string", "enum": ["reps", "seconds"] }
+            }
+          },
+          "loads": { "type": "array", "items": { "type": "number" } },
+          "repsOrSeconds": { "type": "array", "items": { "type": "number" } },
+          "withinRange": { "type": "boolean" },
+          "comparableLoadTrend": { "type": "string", "enum": ["improving", "stable", "stagnant", "declining", "mixed", "sharp_drop"] },
+          "loadEvents": { "type": "array", "items": { "type": "string", "enum": ["increase", "decrease", "hold"] } },
+          "shutdowns": { "type": "integer", "minimum": 0 },
+          "belowMinimumEvents": { "type": "integer", "minimum": 0 },
+          "aboveRangeEvents": { "type": "integer", "minimum": 0 },
+          "productiveFatigue": { "type": "boolean" },
+          "newExercise": { "type": "boolean" },
+          "techniqueBreakdown": { "type": "string", "enum": ["none", "low", "moderate", "high"] },
+          "repeatedSuccessfulExposuresAtLoad": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "swapHistory": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "swappedFrom": { "type": "string" },
+        "swappedTo": { "type": "string" },
+        "reason": { "type": "string" },
+        "postSwapPerformance": { "type": "string", "enum": ["improved", "stable", "declined", "unknown"] },
+        "exposuresSinceSwap": { "type": "integer", "minimum": 0 },
+        "improvementConfirmed": { "type": "boolean" }
+      }
+    },
+    "consolidationHistory": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "recentPushOccurred": { "type": "boolean" },
+        "plannedConsolidationDue": { "type": "boolean" },
+        "consolidationCompleted": { "type": "boolean" },
+        "ownsNewLoad": { "type": "boolean" },
+        "repeatedSuccessfulExposuresAtNewLoad": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "frequencyStimulus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "trainingDaysAvailable": { "type": "integer", "minimum": 1, "maximum": 7 },
+        "currentFrequency": { "type": "integer", "minimum": 1, "maximum": 7 },
+        "sessionDensity": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "compoundDensity": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "weeklyHardSetEstimate": { "type": "integer", "minimum": 0 },
+        "axialLoadingDensity": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "highFatigueMovementClustering": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "lowFrequencyHighDensityWarning": { "type": "boolean" },
+        "highFrequencyFatigue": { "type": "boolean" },
+        "hiddenOverreachRisk": { "type": "boolean" }
+      }
+    },
+    "safetyContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "affectedArea": { "type": "string" },
+        "affectedMovementPattern": { "type": "string" },
+        "painTrend": { "type": "string", "enum": ["none", "stable", "worsening", "improving"] },
+        "painSeverity": { "type": "string", "enum": ["none", "mild", "moderate", "sharp", "severe"] },
+        "techniqueBreakdown": { "type": "boolean" },
+        "systemicRedFlags": { "type": "array", "items": { "type": "string" } },
+        "safetyIssueScope": { "type": "string", "enum": ["none", "movement_specific", "session_wide"] }
+      }
+    },
+    "evidenceConfidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plannedEvidenceCount": { "type": "integer", "minimum": 0 },
+        "comparableExposureCount": { "type": "integer", "minimum": 0 },
+        "recency": { "type": "string", "enum": ["recent", "stale", "mixed"] },
+        "dataCompleteness": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "evidenceSourceQuality": { "type": "string", "enum": ["low", "moderate", "high"] }
+      }
+    },
+    "subjectiveContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "readiness": { "type": "string", "enum": ["poor", "mixed", "good", "great"] },
+        "stress": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "sleep": { "type": "string", "enum": ["poor", "mixed", "good"] },
+        "motivation": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "soreness": { "type": "string", "enum": ["low", "moderate", "high"] },
+        "safetyFlag": {
+          "type": "string",
+          "enum": ["none", "pain", "sharp_pain", "worsening_pain", "severe_pain", "injury_concern", "dizziness", "unusual_symptoms", "unsafe", "medical_red_flag"]
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "approvalStatus": { "const": "draft_requires_aaron_approval" }
+  }
+}

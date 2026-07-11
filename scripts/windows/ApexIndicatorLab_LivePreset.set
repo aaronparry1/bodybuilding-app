@@ -1,0 +1,9 @@
+EnableScalpExecutionPolicyHook=true
+ScalpExecutionRequireMatch=true
+ScalpTradeOnlyPolicySymbols=true
+ScalpExecutionAllowWatchEntries=false
+ScalpExecutionRequireStatEdge=false
+ScalpExecutionBypassEdgeAndConvictionGates=true
+ScalpExecutionFireEverySignal=true
+EnableStrategyDiscovery=false
+EnableMRShadowPromotionGate=false

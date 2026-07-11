@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adaptive Strength Coach - V2 Coach Review Dashboard</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070707;
+      --panel: #111111;
+      --panel-soft: #171717;
+      --line: #2b2618;
+      --text: #f6f0df;
+      --muted: #b8ad96;
+      --gold: #d7b35a;
+      --gold-soft: #3a2d12;
+      --danger: #f28b82;
+      --warning: #ffd166;
+      --ok: #9be7a3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 40px 20px 64px;
+    }
+    header {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+    p { margin: 0; color: var(--muted); }
+    .instructions {
+      margin-top: 18px;
+      display: grid;
+      gap: 6px;
+      color: var(--text);
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+      margin: 22px 0 28px;
+    }
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .metric strong {
+      display: block;
+      font-size: 1.8rem;
+      line-height: 1;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .metric span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      min-width: 0;
+    }
+    .card.flagged {
+      border-color: var(--gold);
+      box-shadow: inset 0 0 0 1px rgba(215, 179, 90, 0.2);
+    }
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 1.08rem;
+      letter-spacing: 0;
+    }
+    .meta, .outputs {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 8px;
+      align-items: baseline;
+      font-size: 0.93rem;
+    }
+    .row span:first-child {
+      color: var(--muted);
+    }
+    .row span:last-child {
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+    .flag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 12px 0 14px;
+    }
+    .flag {
+      border: 1px solid var(--gold);
+      background: var(--gold-soft);
+      color: var(--warning);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+    }
+    .flag.none {
+      border-color: #263526;
+      background: #101d10;
+      color: var(--ok);
+    }
+    .verdict {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      display: grid;
+      gap: 8px;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+    .verdict-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .notes {
+      color: var(--muted);
+      min-height: 28px;
+      border-bottom: 1px solid #3b3527;
+      padding-bottom: 6px;
+    }
+    footer {
+      margin-top: 30px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Coach Review Dashboard</h1>
+      <p>Static V2 QA preview for Adaptive Strength Coach. No server, network, Expo, app build, or production UI required.</p>
+      <div class="instructions">
+        <strong>Open this file in your browser.</strong>
+        <span>Review each card and mark your verdict manually.</span>
+      </div>
+    </header>
+    <section class="summary" aria-label="Dashboard summary">
+      <div class="metric"><strong>12</strong><span>Total scenarios</span></div>
+      <div class="metric"><strong>2</strong><span>Flagged scenarios</span></div>
+      <div class="metric"><strong>1</strong><span>Unsupported fallback</span></div>
+      <div class="metric"><strong>2</strong><span>Low confidence</span></div>
+      <div class="metric"><strong>2026-06-29 22:34:56 UTC</strong><span>Generated</span></div>
+    </section>
+    <section class="grid" aria-label="Scenario review cards">
+      <article class="card">
+    <h2>Hypertrophy isolation</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Build Muscle</span></div>
+      <div class="row"><span>Phase</span><span>Hypertrophy</span></div>
+      <div class="row"><span>Exercise</span><span>Dumbbell Lateral Raise</span></div>
+      <div class="row"><span>Context</span><span>normal recovery context · sets 12 x 15, 14</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Hypertrophy Accumulation</span></div>
+      <div class="row"><span>Intent</span><span>Verification / Balanced</span></div>
+      <div class="row"><span>Reps</span><span>Top-range check</span></div>
+      <div class="row"><span>Load</span><span>Keep Load</span></div>
+      <div class="row"><span>Sets</span><span>One More Set</span></div>
+      <div class="row"><span>Confidence</span><span>80%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag none">none</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card">
+    <h2>Hypertrophy compound</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Build Muscle</span></div>
+      <div class="row"><span>Phase</span><span>Hypertrophy</span></div>
+      <div class="row"><span>Exercise</span><span>Leg Press</span></div>
+      <div class="row"><span>Context</span><span>normal recovery context · sets 140 x 12, 11</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Hypertrophy Accumulation</span></div>
+      <div class="row"><span>Intent</span><span>Verification / Balanced</span></div>
+      <div class="row"><span>Reps</span><span>Top-range check</span></div>
+      <div class="row"><span>Load</span><span>Keep Load</span></div>
+      <div class="row"><span>Sets</span><span>One More Set</span></div>
+      <div class="row"><span>Confidence</span><span>80%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag none">none</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card">
+    <h2>Strength squat</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Build Strength</span></div>
+      <div class="row"><span>Phase</span><span>Strength</span></div>
+      <div class="row"><span>Exercise</span><span>Competition Squat</span></div>
+      <div class="row"><span>Context</span><span>normal recovery context · sets 150 x 5, 5</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Strength Intensification</span></div>
+      <div class="row"><span>Intent</span><span>Verification / Tension</span></div>
+      <div class="row"><span>Reps</span><span>Top-range check</span></div>
+      <div class="row"><span>Load</span><span>Increase Load</span></div>
+      <div class="row"><span>Sets</span><span>One More Set</span></div>
+      <div class="row"><span>Confidence</span><span>82%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag none">none</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card">
+    <h2>Strength bench</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Build Strength</span></div>
+      <div class="row"><span>Phase</span><span>Strength</span></div>
+      <div class="row"><span>Exercise</span><span>Competition Bench Press</span></div>
+      <div class="row"><span>Context</span><span>normal recovery context · sets 100 x 5, 5, 5</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Strength Intensification</span></div>
+      <div class="row"><span>Intent</span><span>Verification / Tension</span></div>
+      <div class="row"><span>Reps</span><span>Top-range check</span></div>
+      <div class="row"><span>Load</span><span>Increase Load</span></div>
+      <div class="row"><span>Sets</span><span>One More Set</span></div>
+      <div class="row"><span>Confidence</span><span>81%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag none">none</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card flagged">
+    <h2>Deadlift calibration</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Build Strength</span></div>
+      <div class="row"><span>Phase</span><span>Strength</span></div>
+      <div class="row"><span>Exercise</span><span>Competition Deadlift</span></div>
+      <div class="row"><span>Context</span><span>normal recovery context · low load confidence · no completed sets · conservative load expected</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Strength Intensification</span></div>
+      <div class="row"><span>Intent</span><span>Calibration / Tension</span></div>
+      <div class="row"><span>Reps</span><span>AMRAP cap 4</span></div>
+      <div class="row"><span>Load</span><span>Conservative Start</span></div>
+      <div class="row"><span>Sets</span><span>Waiting for set</span></div>
+      <div class="row"><span>Confidence</span><span>63%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag">low_confidence</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card">
+    <h2>Athletic power movement</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Athletic Performance</span></div>
+      <div class="row"><span>Phase</span><span>Power</span></div>
+      <div class="row"><span>Exercise</span><span>Box Jump</span></div>
+      <div class="row"><span>Context</span><span>normal recovery context · sets 0 x 3, 3</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Athletic Performance Accumulation</span></div>
+      <div class="row"><span>Intent</span><span>Productive / Speed Power</span></div>
+      <div class="row"><span>Reps</span><span>2-4 reps</span></div>
+      <div class="row"><span>Load</span><span>Keep Load</span></div>
+      <div class="row"><span>Sets</span><span>One More Set</span></div>
+      <div class="row"><span>Confidence</span><span>77%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag none">none</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card">
+    <h2>Athletic accessory</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Athletic Performance</span></div>
+      <div class="row"><span>Phase</span><span>Power</span></div>
+      <div class="row"><span>Exercise</span><span>Triceps Pushdown</span></div>
+      <div class="row"><span>Context</span><span>normal recovery context · sets 35 x 12, 11</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Athletic Performance Accumulation</span></div>
+      <div class="row"><span>Intent</span><span>Verification / Balanced</span></div>
+      <div class="row"><span>Reps</span><span>Top-range check</span></div>
+      <div class="row"><span>Load</span><span>Keep Load</span></div>
+      <div class="row"><span>Sets</span><span>One More Set</span></div>
+      <div class="row"><span>Confidence</span><span>79%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag none">none</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card">
+    <h2>Get lean poor recovery</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Get Leaner</span></div>
+      <div class="row"><span>Phase</span><span>Deload</span></div>
+      <div class="row"><span>Exercise</span><span>Leg Press</span></div>
+      <div class="row"><span>Context</span><span>deload/recovery context · sets 120 x 10, 9 · conservative load expected</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Get Lean Deload</span></div>
+      <div class="row"><span>Intent</span><span>Recovery / Recovery</span></div>
+      <div class="row"><span>Reps</span><span>8-12 reps</span></div>
+      <div class="row"><span>Load</span><span>Reduce Load</span></div>
+      <div class="row"><span>Sets</span><span>One More Set</span></div>
+      <div class="row"><span>Confidence</span><span>84%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag none">none</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card">
+    <h2>Deload</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Build Muscle And Strength</span></div>
+      <div class="row"><span>Phase</span><span>Deload</span></div>
+      <div class="row"><span>Exercise</span><span>Machine Chest Press</span></div>
+      <div class="row"><span>Context</span><span>deload/recovery context · sets 80 x 10, 10 · conservative load expected</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Build Muscle Strength Deload</span></div>
+      <div class="row"><span>Intent</span><span>Recovery / Recovery</span></div>
+      <div class="row"><span>Reps</span><span>8-12 reps</span></div>
+      <div class="row"><span>Load</span><span>Reduce Load</span></div>
+      <div class="row"><span>Sets</span><span>One More Set</span></div>
+      <div class="row"><span>Confidence</span><span>84%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag none">none</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card">
+    <h2>Duration plank</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Build Muscle And Strength</span></div>
+      <div class="row"><span>Phase</span><span>Hypertrophy</span></div>
+      <div class="row"><span>Exercise</span><span>Plank</span></div>
+      <div class="row"><span>Context</span><span>normal recovery context · sets 0 x 45, 40 · conservative load expected</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Build Muscle Strength Accumulation</span></div>
+      <div class="row"><span>Intent</span><span>Productive / Balanced</span></div>
+      <div class="row"><span>Reps</span><span>38 sec</span></div>
+      <div class="row"><span>Load</span><span>No External Load</span></div>
+      <div class="row"><span>Sets</span><span>One More Set</span></div>
+      <div class="row"><span>Confidence</span><span>80%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag none">none</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card">
+    <h2>Underloaded / top-range</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Build Muscle</span></div>
+      <div class="row"><span>Phase</span><span>Hypertrophy</span></div>
+      <div class="row"><span>Exercise</span><span>Machine Chest Press</span></div>
+      <div class="row"><span>Context</span><span>normal recovery context · sets 80 x 12, 12</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Hypertrophy Accumulation</span></div>
+      <div class="row"><span>Intent</span><span>Verification / Balanced</span></div>
+      <div class="row"><span>Reps</span><span>Top-range check</span></div>
+      <div class="row"><span>Load</span><span>Increase Load</span></div>
+      <div class="row"><span>Sets</span><span>One More Set</span></div>
+      <div class="row"><span>Confidence</span><span>81%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag none">none</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+<article class="card flagged">
+    <h2>Unsupported fallback</h2>
+    <div class="meta">
+      <div class="row"><span>Goal</span><span>Build Muscle And Strength</span></div>
+      <div class="row"><span>Phase</span><span>Hypertrophy</span></div>
+      <div class="row"><span>Exercise</span><span>Mystery Lift</span></div>
+      <div class="row"><span>Context</span><span>normal recovery context · low load confidence · no completed sets · conservative load expected</span></div>
+    </div>
+    <div class="outputs">
+      <div class="row"><span>Cycle</span><span>Build Muscle Strength Accumulation</span></div>
+      <div class="row"><span>Intent</span><span>Calibration / Balanced</span></div>
+      <div class="row"><span>Reps</span><span>Top-range check</span></div>
+      <div class="row"><span>Load</span><span>Conservative Start</span></div>
+      <div class="row"><span>Sets</span><span>Waiting for set</span></div>
+      <div class="row"><span>Confidence</span><span>57%</span></div>
+    </div>
+    <div class="flag-list" aria-label="Flags"><span class="flag">unsupported_fallback</span><span class="flag">low_confidence</span></div>
+    <div class="verdict">
+      <strong>Aaron verdict</strong>
+      <div class="verdict-options">
+        <span>✅ Looks right</span>
+        <span>⚠️ Needs tweak</span>
+        <span>❌ Wrong</span>
+      </div>
+      <div class="notes">Notes: ________________________________</div>
+    </div>
+  </article>
+    </section>
+    <footer>Generated at 2026-06-29T22:34:56.229Z from the local V2 QA preview harness.</footer>
+  </main>
+</body>
+</html>

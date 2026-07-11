@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaptivestrengthcoach.com/research/adaptive-stress-lab/coaching-state.schema.json",
+  "title": "Adaptive Stress Lab Coaching State",
+  "description": "Draft research-only objective-first coaching state schema. Describes the athlete; does not prescribe interventions.",
+  "type": "object",
+  "required": [
+    "scenario_id",
+    "athlete_profile_id",
+    "status",
+    "adaptation",
+    "recovery_capacity",
+    "momentum",
+    "confidence",
+    "evidence_quality",
+    "coaching_opportunity",
+    "confidence_reason",
+    "last_updated",
+    "evidence_count",
+    "evidence_summary",
+    "authority_summary",
+    "subjective_context_handling",
+    "safety_flags",
+    "score_explanations",
+    "open_questions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scenario_id": { "type": "string" },
+    "athlete_profile_id": { "type": "string" },
+    "status": { "const": "draft_research_output" },
+    "adaptation": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "recovery_capacity": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "momentum": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "confidence": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "evidence_quality": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "coaching_opportunity": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "confidence_reason": { "type": "string" },
+    "last_updated": { "type": "string", "format": "date-time" },
+    "evidence_count": { "type": "integer", "minimum": 0 },
+    "evidence_summary": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "authority_summary": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "subjective_context_handling": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "safety_flags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "score_explanations": {
+      "type": "object",
+      "required": ["adaptation", "recovery_capacity", "momentum", "confidence", "evidence_quality", "coaching_opportunity"],
+      "additionalProperties": false,
+      "properties": {
+        "adaptation": { "$ref": "#/$defs/explanationList" },
+        "recovery_capacity": { "$ref": "#/$defs/explanationList" },
+        "momentum": { "$ref": "#/$defs/explanationList" },
+        "confidence": { "$ref": "#/$defs/explanationList" },
+        "evidence_quality": { "$ref": "#/$defs/explanationList" },
+        "coaching_opportunity": { "$ref": "#/$defs/explanationList" }
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "explanationList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["authority", "evidence", "movement", "contribution", "confidence_level"],
+        "additionalProperties": false,
+        "properties": {
+          "authority": {
+            "type": "string",
+            "enum": ["objective_performance", "training_behaviour", "recovery_behaviour", "subjective_context", "safety_flag", "fixture_quality"]
+          },
+          "evidence": { "type": "string" },
+          "movement": { "type": "integer" },
+          "contribution": { "type": "string" },
+          "confidence_level": { "type": "string", "enum": ["low", "moderate", "high"] }
+        }
+      }
+    }
+  }
+}
