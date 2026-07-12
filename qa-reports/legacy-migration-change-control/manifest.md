@@ -16,6 +16,10 @@ Audit-only: range routing remains blocked. `applyAdjustmentToSlots` is programme
 
 Read-only repository composition reuses active-plan and workout-session reads, with deterministic persisted planning-identity ordering. The missing persisted programme-guidance target identity remains explicit through a narrow target-read adapter; no first match, block fallback, or write is permitted.
 
+## Stage 2C3A1E2E2.5 identity and timing design
+
+Audit-only: future guidance target is proposed as a versioned, persistently addressable programme guidance slot with parent/version validation. Recommended timing is next microcycle only; both target granularity and timing are product-owner decisions before E2E3 writes can begin.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
