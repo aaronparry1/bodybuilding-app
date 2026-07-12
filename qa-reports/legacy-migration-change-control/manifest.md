@@ -28,6 +28,10 @@ Pure current record validation/factory defines target identity, next-normal timi
 
 Pure timing resolver accepts supplied current decision, plan/microcycle, version and created-workout facts. It can resolve only an applied continue to an existing next normal same-mesocycle microcycle; it remains non-persistent and has no repository/application authority.
 
+## Stage 2C3A1E2E3D guidance slot identity
+
+Pure persisted-slot contract, exact lookup and expected-version update helper establish the destination shape. Existing plans without slots are compatibility-only; no lazy hydration upgrade, active-plan write, session construction change, or service binding occurs here.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
