@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildLegacyProgressJourneyActionsInput } from "@/domain/training/legacy-progress-journey-actions";
+import { buildCurrentProgressRecoveryPresentationInput } from "@/domain/training/current-progress-recovery-presentation";
 import type { StrategicCoachingViewModel } from "@/domain/training/strategic-coaching-presenter";
 
 describe("legacy Progress journey-actions input", () => {
@@ -15,9 +16,10 @@ describe("legacy Progress journey-actions input", () => {
       },
     };
 
-    expect(buildLegacyProgressJourneyActionsInput(source, true, false)).toEqual({
+    const recovery = buildCurrentProgressRecoveryPresentationInput({ status: "recovery_recommended", reason: "persisted_deload_decision", historicalWarning: "none" });
+    expect(buildLegacyProgressJourneyActionsInput(source, recovery, false)).toEqual({
       strategic: { hasEnoughHistory: true, recommendationTitle: "Advance to the next block" },
-      recovery: { priority: true },
+      recovery: { current: recovery },
       rotation: { hasRecommendation: false },
     });
   });
@@ -29,9 +31,10 @@ describe("legacy Progress journey-actions input", () => {
       currentBlockLabel: "Hypertrophy block",
     };
 
-    expect(buildLegacyProgressJourneyActionsInput(source, false, true)).toEqual({
+    const recovery = buildCurrentProgressRecoveryPresentationInput({ status: "watch", reason: "historical_fatigue_pattern", historicalWarning: "fatigue_pattern_observed" });
+    expect(buildLegacyProgressJourneyActionsInput(source, recovery, true)).toEqual({
       strategic: { hasEnoughHistory: false },
-      recovery: { priority: false },
+      recovery: { current: recovery },
       rotation: { hasRecommendation: true },
     });
   });

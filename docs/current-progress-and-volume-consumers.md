@@ -12,4 +12,6 @@ Stage 2C2A0 exposes the context on the dashboard contract only. Strategic, recov
 
 ## Presentation extraction status
 
-Progress copy helpers, primary evidence, journey actions, and action flow now each consume a narrow legacy compatibility input rather than a complete presenter result. These are structural seams only: their legacy strategic, recovery, rotation, and volume meanings remain unchanged until the separately approved semantic phases. The next seam replacement is recovery.
+Progress copy helpers, primary evidence, journey actions, and action flow now each consume a narrow compatibility input rather than a complete presenter result. Strategic, rotation, and volume meanings remain deferred semantic phases.
+
+Recovery is now the exception: its presentation category is current-derived. Historical fatigue is supporting-only, while only persisted `deload` or active current deload creates a Progress recovery action. Strategic, rotation, and volume remain compatibility-derived.

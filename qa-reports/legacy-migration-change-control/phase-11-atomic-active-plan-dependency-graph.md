@@ -35,3 +35,5 @@ Persisted readiness history now feeds pure exposure context; current mesocycle `
 ## Progress presentation extraction boundary
 
 The legacy strategic presenter is now decomposed before the copy, primary-evidence, journey-action, and action-flow helpers. Recovery, rotation, and volume semantic replacements remain later edges. No typed compatibility input is current decision authority.
+
+Recovery presentation now consumes the current recovery context; legacy fatigue/block recommendation values are warning-only or absent from current recovery action paths. Rotation and volume remain deferred compatibility edges.

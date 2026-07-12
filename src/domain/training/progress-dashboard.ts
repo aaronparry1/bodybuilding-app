@@ -5,7 +5,7 @@ import { classifyFatigue, type FatigueClassifierResult } from "@/domain/training
 import { buildHypertrophyCoachReport, type HypertrophyCoachReport } from "@/domain/training/progression-coach";
 import { displayWorkoutName } from "@/domain/training/planned-workout";
 import { buildStrategicCoachingViewModel, type StrategicCoachingViewModel } from "@/domain/training/strategic-coaching-presenter";
-import { buildLegacyProgressCopyPresentationInput, type LegacyProgressCopyPresentationInput } from "@/domain/training/legacy-progress-copy-presentation";
+import { buildLegacyProgressCopyPresentationInput, withoutLegacyRecoveryCopyAuthority, type LegacyProgressCopyPresentationInput } from "@/domain/training/legacy-progress-copy-presentation";
 import { buildLegacyProgressPrimaryEvidenceInput, type LegacyProgressPrimaryEvidenceInput } from "@/domain/training/legacy-progress-primary-evidence";
 import { buildLegacyProgressJourneyActionsInput, type LegacyProgressJourneyActionsInput } from "@/domain/training/legacy-progress-journey-actions";
 import { buildLegacyProgressActionFlowInput, type LegacyProgressActionFlowInput } from "@/domain/training/legacy-progress-action-flow";
@@ -21,6 +21,8 @@ import { createPlanningContext } from "@/domain/training/planning-context";
 import { getBlockTransitionPreview, shouldSuppressRotationRecommendation } from "@/domain/training/recommendation-actions";
 import { resolveCurrentProgressContext, type CurrentProgressContext } from "@/domain/training/current-progress-context";
 import { buildCurrentProgressStrategicSummary, type CurrentProgressStrategicSummary } from "@/domain/training/current-progress-strategic-summary";
+import { buildCurrentProgressRecoveryContext, type CurrentProgressRecoveryContext } from "@/domain/training/current-progress-recovery-context";
+import { buildCurrentProgressRecoveryPresentationInput, isCurrentRecoveryAction, type CurrentProgressRecoveryPresentationInput } from "@/domain/training/current-progress-recovery-presentation";
 import { evidence, fixtureSource, insufficientEvidence, type RecommendationEvidence } from "@/domain/training/recommendation-evidence";
 import { previousVolumeLadderActions } from "@/domain/training/volume-adjustments";
 import type { PrimaryLiftVariationSelection } from "@/domain/training/primary-lift-variations";
@@ -39,6 +41,7 @@ export interface ProgressWorkoutCard {
 export interface ProgressDashboardViewModel {
   currentProgressContext: CurrentProgressContext;
   currentStrategicSummary: CurrentProgressStrategicSummary;
+  currentRecoveryContext: CurrentProgressRecoveryContext;
   completedWorkouts: WorkoutHistorySummary[];
   hiddenZeroSetWorkouts: WorkoutHistorySummary[];
   hasEnoughHistory: boolean;
@@ -127,7 +130,6 @@ export function buildProgressDashboardViewModel(
     goal: planningContext?.goal ?? activePlan?.goal,
     currentBlockType: activeBlock?.type,
   });
-  const legacyCopyPresentation = buildLegacyProgressCopyPresentationInput(strategic);
   const eventTaper = activePlan?.targetDate
     ? resolveEventTaper({
         eventType: activePlan.eventType,
@@ -160,6 +162,23 @@ export function buildProgressDashboardViewModel(
     goal: activePlan?.goal,
     deloadActive: activeBlock?.type === "deload" || activePlan?.recommendationState?.deload?.status === "accepted",
   });
+  const currentMicrocycleProgressionState =
+    "planId" in currentProgressContext &&
+    activePlan?.id === currentProgressContext.planId &&
+    activePlan.currentMesocycleId === currentProgressContext.mesocycleId &&
+    activePlan.currentMicrocycle?.sequenceNumber === currentProgressContext.microcycleNumber
+      ? activePlan.currentMicrocycle.progressionState
+      : undefined;
+  const currentRecoveryContext = buildCurrentProgressRecoveryContext(
+    currentProgressContext,
+    currentMicrocycleProgressionState,
+    isHistoricalFatigueWarning(fatigueClassification),
+  );
+  const currentRecoveryPresentation = buildCurrentProgressRecoveryPresentationInput(currentRecoveryContext);
+  const legacyCopyPresentation = withoutLegacyRecoveryCopyAuthority(
+    buildLegacyProgressCopyPresentationInput(strategic),
+    currentRecoveryPresentation,
+  );
   const personalisedVolumeResults = strategic.hasEnoughHistory
     ? analyzePersonalisedVolume({
         completedWorkouts: plannedCompletedWorkouts,
@@ -199,18 +218,13 @@ export function buildProgressDashboardViewModel(
     : null;
   const rotationAction = strategic.hasEnoughHistory ? firstRotationRecommendation(plannedCompletedWorkouts, exercises, activePlan, fatigueClassification) : undefined;
   const rotationRecommendation = rotationAction ? formatRotationRecommendation(rotationAction) : undefined;
-  const hasRecoveryPriority = isRecoveryPriority(strategic, fatigueClassification);
+  const hasRecoveryPriority = currentRecoveryPresentation.priority;
   const primaryExerciseAction = firstExerciseAction(coachReport);
   const legacyTransitionPreview = activePlan ? getBlockTransitionPreview(activePlan) : null;
   const legacyActionFlowInput = buildLegacyProgressActionFlowInput({
     history: { hasEnoughHistory: strategic.hasEnoughHistory },
     recovery: {
-      accepted: activePlan?.recommendationState?.deload?.status === "accepted",
-      ...(activePlan?.recommendationState?.deload?.status === "accepted" ? { acceptedAt: activePlan.recommendationState.deload.decidedAt } : {}),
-      priority: hasRecoveryPriority,
-      fatigue: fatigueClassification,
-      ...(strategic.recommendation?.deloadProfile ? { deloadProfile: strategic.recommendation.deloadProfile } : {}),
-      recommendationReasons: [...(strategic.recommendation?.reasons ?? [])],
+      current: currentRecoveryPresentation,
     },
     rotation: { action: rotationAction },
     volume: { recommendation: personalisedVolumeRecommendation },
@@ -222,12 +236,12 @@ export function buildProgressDashboardViewModel(
     ordering: { source },
   });
   const actionFlow = buildActionFlow(legacyActionFlowInput);
-  const legacyJourneyActionsInput = buildLegacyProgressJourneyActionsInput(strategic, hasRecoveryPriority, Boolean(rotationRecommendation));
+  const legacyJourneyActionsInput = buildLegacyProgressJourneyActionsInput(strategic, currentRecoveryPresentation, Boolean(rotationRecommendation));
   const journeyActions = buildJourneyActions(legacyJourneyActionsInput);
   const legacyPrimaryEvidenceInput = buildLegacyProgressPrimaryEvidenceInput({
     historical: { completedWorkouts: plannedCompletedWorkouts, source },
     strategic: { hasEnoughHistory: strategic.hasEnoughHistory, ...(strategic.recommendation?.title ? { recommendationTitle: strategic.recommendation.title } : {}), ...(strategic.recommendation?.message ? { recommendationMessage: strategic.recommendation.message } : {}), recommendationReasons: [...(strategic.recommendation?.reasons ?? [])] },
-    recovery: { priority: hasRecoveryPriority, fatigue: fatigueClassification },
+    recovery: { current: currentRecoveryPresentation },
     volume: { primary: volumeRecommendation, personalised: personalisedVolumeRecommendation },
     rotation: { action: rotationAction },
   });
@@ -235,13 +249,14 @@ export function buildProgressDashboardViewModel(
   return {
     currentProgressContext,
     currentStrategicSummary,
+    currentRecoveryContext,
     completedWorkouts,
     hiddenZeroSetWorkouts,
     hasEnoughHistory: strategic.hasEnoughHistory,
-    verdictTitle: verdictTitle(legacyCopyPresentation, hasRecoveryPriority),
-    verdictMessage: verdictMessage(legacyCopyPresentation, hasRecoveryPriority),
-    actionTitle: actionTitle(legacyCopyPresentation, primaryExerciseAction, hasRecoveryPriority),
-    actionMessage: actionMessage(legacyCopyPresentation, primaryExerciseAction, hasRecoveryPriority),
+    verdictTitle: verdictTitle(legacyCopyPresentation, currentRecoveryPresentation),
+    verdictMessage: verdictMessage(legacyCopyPresentation, currentRecoveryPresentation),
+    actionTitle: actionTitle(legacyCopyPresentation, primaryExerciseAction, currentRecoveryPresentation),
+    actionMessage: actionMessage(legacyCopyPresentation, primaryExerciseAction, currentRecoveryPresentation),
     progressionNote: hasRecoveryPriority && primaryExerciseAction ? progressionNote(primaryExerciseAction) : undefined,
     volumeRecommendation: personalisedVolumeRecommendation?.userCopy ?? volumeRecommendation?.reason,
     recoveryCapacityRecommendation:
@@ -261,14 +276,14 @@ export function buildProgressDashboardViewModel(
 
 function buildActionFlow(input: LegacyProgressActionFlowInput): ProgressActionFlow | undefined {
   const { source } = input.ordering;
-  const { fatigue } = input.recovery;
-  const hasRecoveryPriority = input.recovery.priority;
+  const recovery = input.recovery.current;
+  const hasRecoveryPriority = recovery.priority;
   const rotationAction = input.rotation.action;
   const personalisedVolumeRecommendation = input.volume.recommendation;
 
   if (!input.history.hasEnoughHistory) return undefined;
 
-  if (input.recovery.accepted) {
+  if (recovery.context.status === "recovery_active") {
     return {
       type: "accepted",
       title: "Recovery session planned",
@@ -279,8 +294,8 @@ function buildActionFlow(input: LegacyProgressActionFlowInput): ProgressActionFl
         confidence: "high",
         source: "history",
         summary: "Recovery was automatically planned from high-confidence fatigue evidence.",
-        dataPoints: [`Accepted at ${input.recovery.acceptedAt}`],
-        reason: "Deload is active on the plan.",
+        dataPoints: ["Current microcycle is marked as a deload."],
+        reason: "Recovery microcycle is active.",
         actionAllowed: true,
       }),
     };
@@ -290,19 +305,16 @@ function buildActionFlow(input: LegacyProgressActionFlowInput): ProgressActionFl
     return {
       type: "deload",
       title: "Recovery session planned",
-      reason:
-        fatigue.classification === "systemic" || fatigue.classification === "mixed"
-          ? "Performance is dropping before useful work is complete, so the next plan needs less stress."
-          : "Fatigue is affecting key training decisions, so the next plan needs less stress.",
+      reason: "A persisted current decision has approved a recovery microcycle.",
       primaryLabel: "View recovery plan",
-      deloadProfile: input.recovery.deloadProfile ?? "clear",
+      deloadProfile: "clear",
       evidence: evidence({
         type: "deload",
         confidence: "high",
         source,
-        summary: "Recovery is the priority signal and should be planned automatically.",
-        dataPoints: [...(input.recovery.recommendationReasons.length > 0 ? input.recovery.recommendationReasons : ["Readiness and fatigue signals point toward recovery."]), ...fatigue.evidence].slice(0, 7),
-        reason: fatigue.classification === "systemic" || fatigue.classification === "mixed" ? fatigue.recommendedResponse : "Performance is dropping and fatigue is rising.",
+        summary: "A persisted current decision has made recovery the active priority.",
+        dataPoints: ["Persisted deload decision is ready."],
+        reason: "Recovery microcycle is ready.",
         actionAllowed: true,
       }),
     };
@@ -385,20 +397,20 @@ function buildActionFlow(input: LegacyProgressActionFlowInput): ProgressActionFl
 function buildPrimaryEvidence(input: LegacyProgressPrimaryEvidenceInput): RecommendationEvidence {
   const { completedWorkouts, source } = input.historical;
   const { recommendationReasons, recommendationMessage, recommendationTitle, hasEnoughHistory } = input.strategic;
-  const { fatigue: fatigueClassification, priority: recoveryPriority } = input.recovery;
+  const recovery = input.recovery.current;
   const { primary: volumeRecommendation, personalised: personalisedVolumeRecommendation } = input.volume;
   const rotationAction = input.rotation.action;
   if (!hasEnoughHistory) {
     return insufficientEvidence("progress_dashboard", "Log 3-5 completed workouts first.");
   }
-  if (recoveryPriority) {
+  if (isCurrentRecoveryAction(recovery)) {
     return evidence({
       type: "progress_dashboard",
       confidence: "high",
       source,
-      summary: "Recovery signals outrank load or volume actions.",
-      dataPoints: [`${completedWorkouts.length} completed workouts`, ...fatigueClassification.evidence, ...recommendationReasons].slice(0, 7),
-      reason: fatigueClassification.classification !== "insufficient_data" ? fatigueClassification.recommendedResponse : "Fatigue is limiting progress.",
+      summary: recovery.context.status === "recovery_active" ? "Recovery microcycle is active." : "Recovery microcycle is ready.",
+      dataPoints: [`${completedWorkouts.length} completed workouts`, recovery.context.reason],
+      reason: recovery.context.status === "recovery_active" ? "Recovery microcycle is active." : "Recovery microcycle is ready.",
       actionAllowed: true,
     });
   }
@@ -444,14 +456,16 @@ function buildPrimaryEvidence(input: LegacyProgressPrimaryEvidenceInput): Recomm
       actionAllowed: Boolean(rotationAction.suggestedReplacement),
     });
   }
+  const historicalWarning = recovery.context.status === "watch" && recovery.context.historicalWarning === "fatigue_pattern_observed";
+  const assessmentUnavailable = recovery.context.status === "assessment_unavailable";
   return evidence({
     type: "progress_dashboard",
     confidence: "medium",
     source,
     summary: "Enough completed workouts for a general coach verdict.",
-    dataPoints: [`${completedWorkouts.length} completed workouts`, ...recommendationReasons].slice(0, 5),
-    reason: recommendationMessage ?? "Continue collecting training history.",
-    actionAllowed: true,
+    dataPoints: [`${completedWorkouts.length} completed workouts`, ...recommendationReasons, ...(historicalWarning ? ["Historical fatigue pattern observed; monitor recovery."] : [])].slice(0, 5),
+    reason: assessmentUnavailable ? "Current recovery status cannot be assessed reliably." : historicalWarning ? "A historical fatigue pattern is worth monitoring." : recommendationMessage ?? "Continue collecting training history.",
+    actionAllowed: !assessmentUnavailable,
   });
 }
 
@@ -470,7 +484,7 @@ function buildJourneyActions(input: LegacyProgressJourneyActionsInput): Progress
     };
   }
 
-  if (input.recovery.priority) {
+  if (isCurrentRecoveryAction(input.recovery.current)) {
     return {
       primary: { label: "View recovery plan", href: "/(protected)/(tabs)/programmes" },
     };
@@ -585,22 +599,23 @@ function isNormalCompletedWorkout(summary: WorkoutHistorySummary): boolean {
   return Boolean(summary.completedAt) && summary.setsCompleted > 0 && summary.exerciseSummaries.some((exercise) => exercise.setsCompleted > 0);
 }
 
-function isRecoveryPriority(strategic: StrategicCoachingViewModel, fatigueClassification?: FatigueClassifierResult): boolean {
-  const recommendation = strategic.recommendation?.title.toLowerCase() ?? "";
-  const separatedFatiguePriority =
+function isHistoricalFatigueWarning(fatigueClassification?: FatigueClassifierResult): boolean {
+  return (
     (fatigueClassification?.classification === "systemic" || fatigueClassification?.classification === "mixed") &&
     fatigueClassification.severity === "high" &&
-    fatigueClassification.confidence !== "low";
-  return separatedFatiguePriority || recommendation.includes("deload") || recommendation.includes("recovery window");
+    fatigueClassification.confidence !== "low"
+  );
 }
 
 function firstExerciseAction(report: HypertrophyCoachReport): string | null {
   return report.coachingSummary.find((item) => item.trim().length > 0) ?? null;
 }
 
-function verdictTitle(input: LegacyProgressCopyPresentationInput, recoveryPriority: boolean): string {
+function verdictTitle(input: LegacyProgressCopyPresentationInput, recovery: CurrentProgressRecoveryPresentationInput): string {
   if (!input.hasEnoughHistory) return "Not enough data yet.";
-  if (recoveryPriority) return "Fatigue is the limiter.";
+  if (recovery.context.status === "recovery_recommended") return "Recovery microcycle is ready.";
+  if (recovery.context.status === "recovery_active") return "Recovery microcycle is active.";
+  if (recovery.context.status === "assessment_unavailable") return "Recovery status is unavailable.";
   const recommendation = input.recommendationTitle?.toLowerCase() ?? "";
   const momentum = input.momentumBand?.toLowerCase() ?? "";
   if (recommendation.includes("advance")) return "You are ready to shift emphasis.";
@@ -609,25 +624,29 @@ function verdictTitle(input: LegacyProgressCopyPresentationInput, recoveryPriori
   return "Training is on track.";
 }
 
-function verdictMessage(input: LegacyProgressCopyPresentationInput, recoveryPriority: boolean): string {
+function verdictMessage(input: LegacyProgressCopyPresentationInput, recovery: CurrentProgressRecoveryPresentationInput): string {
   if (!input.hasEnoughHistory) return "Log 3-5 completed workouts first. Then Progress can give useful coaching.";
-  if (recoveryPriority) return "The next plan should reduce stress until output normalises.";
+  if (recovery.context.status === "recovery_recommended") return "A persisted decision has approved a recovery microcycle.";
+  if (recovery.context.status === "recovery_active") return "Keep the current recovery microcycle easy until performance normalises.";
+  if (recovery.context.status === "assessment_unavailable") return "Current recovery status cannot be assessed reliably.";
   const reasons = input.recommendationReasons;
   if (reasons.length > 0) return reasons.slice(0, 2).join(" ");
   return input.recommendationMessage ?? "Keep collecting productive work from completed sessions.";
 }
 
-function actionTitle(input: LegacyProgressCopyPresentationInput, exerciseAction: string | null, recoveryPriority: boolean): string {
+function actionTitle(input: LegacyProgressCopyPresentationInput, exerciseAction: string | null, recovery: CurrentProgressRecoveryPresentationInput): string {
   if (!input.hasEnoughHistory) return "Build more history first.";
-  if (recoveryPriority) return "Recovery session planned.";
+  if (recovery.context.status === "recovery_recommended") return "Recovery microcycle is ready.";
+  if (recovery.context.status === "recovery_active") return "Recovery microcycle is active.";
   const recommendation = input.recommendationTitle;
   if (recommendation) return sentenceCase(recommendation);
   return exerciseAction ? sentenceCase(stripExercisePrefix(exerciseAction)) : "Stay the course.";
 }
 
-function actionMessage(input: LegacyProgressCopyPresentationInput, exerciseAction: string | null, recoveryPriority: boolean): string {
+function actionMessage(input: LegacyProgressCopyPresentationInput, exerciseAction: string | null, recovery: CurrentProgressRecoveryPresentationInput): string {
   if (!input.hasEnoughHistory) return "Complete a few real sessions and Progress will start giving objective recommendations.";
-  if (recoveryPriority) return "ASC will keep the next session calmer. Let output recover before chasing load.";
+  if (recovery.context.status === "recovery_recommended") return "A persisted decision has made recovery the current priority.";
+  if (recovery.context.status === "recovery_active") return "Keep the current recovery microcycle easy until performance normalises.";
   if (input.recommendationMessage) return input.recommendationMessage;
   return exerciseAction ?? "Maintain the current plan until the logbook says otherwise.";
 }

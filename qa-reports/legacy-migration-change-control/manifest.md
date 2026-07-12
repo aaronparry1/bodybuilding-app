@@ -1,5 +1,18 @@
 # Legacy migration change-control manifest
 
+## Current Progress recovery semantic replacement
+
+| File | Checksum before | Legacy source → current replacement | Checksum after | Tests / deletion gate |
+| --- | --- | --- | --- | --- |
+| `progress-dashboard.ts` | `cf5dc0…f9c0dd` | `isRecoveryPriority` and accepted legacy-block state → one current recovery context/presentation input. | `7900ab…596c55` | Progress recovery regressions; retain strategic/rotation/volume adapters until their semantic phases. |
+| `legacy-progress-action-flow.ts` | `807087…d2b487` | Legacy recovery candidate → current recovery presentation candidate. | `959552…df5869` | current recovery presentation. |
+| `legacy-progress-primary-evidence.ts` | `e8baf7…38b4f3` | Legacy fatigue priority → current recovery presentation. | `d3f175…f11a3d` | Current evidence remains immutable; strategic/rotation/volume compatibility retained. |
+| `legacy-progress-journey-actions.ts` | `a09874…2d7308` | Legacy recovery boolean → current recovery presentation. | `0411e7…4db814` | Journey recovery regression. |
+| `legacy-progress-copy-presentation.ts` | `5c1521…9faf51` | Legacy deload/recovery copy fallback → current recovery copy authority. | `c82796…f49e82` | `current-progress-recovery-presentation`. |
+| `current-progress-recovery-presentation.ts` | New file | Narrow read-only presentation projection of current recovery context. | `339616…a40f0` | self. |
+
+Intentional difference: historical fatigue, legacy recommendation text, and legacy deload block state no longer create recovery priority or action. Rotation, volume, strategic transition, current decision production, B3 fatigue, and formulas remain unchanged.
+
 ## Fourth Progress presentation extraction
 
 | File | Checksum before | Reason / authority | Checksum after | Focused tests / deletion gate |

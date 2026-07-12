@@ -2,14 +2,14 @@ import type { RecommendationEvidence } from "@/domain/training/recommendation-ev
 import type { ExerciseRotationRecommendation } from "@/domain/training/exercise-rotation";
 import type { PersonalisedVolumeResult } from "@/domain/training/personalised-volume";
 import type { StrategicCoachingViewModel } from "@/domain/training/strategic-coaching-presenter";
-import type { FatigueClassifierResult } from "@/domain/training/fatigue-classifier";
+import type { CurrentProgressRecoveryPresentationInput } from "@/domain/training/current-progress-recovery-presentation";
 import type { WorkoutHistorySummary } from "@/domain/training/models";
 import type { getPrimaryVolumeRecommendation } from "@/domain/training/volume-landmarks";
 
 export type LegacyProgressPrimaryEvidenceInput = Readonly<{
   historical: { completedWorkouts: readonly WorkoutHistorySummary[]; source: RecommendationEvidence["source"] };
   strategic: { hasEnoughHistory: boolean; recommendationTitle?: string; recommendationMessage?: string; recommendationReasons: readonly string[] };
-  recovery: { priority: boolean; fatigue: FatigueClassifierResult };
+  recovery: { current: CurrentProgressRecoveryPresentationInput };
   volume: { primary: ReturnType<typeof getPrimaryVolumeRecommendation>; personalised?: PersonalisedVolumeResult | null };
   rotation: { action?: ExerciseRotationRecommendation };
 }>;

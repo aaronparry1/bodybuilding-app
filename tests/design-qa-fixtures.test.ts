@@ -306,26 +306,15 @@ describe("Design QA fixtures", () => {
     expect(progress.rotationRecommendation).toContain("Suggested replacement");
   });
 
-  it("creates Phase 1 recovery fixtures without over-promoting mild fatigue", () => {
-    const expected: Array<[DesignQaFixtureId, string | null]> = [
-      ["phase1_deload_mild", null],
-      ["phase1_deload_clear", "clear deload profile"],
-      ["phase1_deload_severe", "severe deload profile"],
-    ];
+  it("keeps Phase 1 fatigue fixtures non-actionable without a persisted current deload", () => {
+    const expected: DesignQaFixtureId[] = ["phase1_deload_mild", "phase1_deload_clear", "phase1_deload_severe"];
 
-    for (const [fixtureId, profileText] of expected) {
+    for (const fixtureId of expected) {
       applyDesignQaFixture(fixtureId, "development");
       const history = summarizeWorkoutHistory(workoutSessionRepository.list());
       const progress = buildProgressDashboardViewModel(history, exerciseLibrary, activeTrainingPlanRepository.getOptional());
-      const evidenceText = progress.actionFlow?.evidence.dataPoints.join(" ").toLowerCase() ?? "";
-
-      if (profileText) {
-        expect(progress.actionFlow?.type).toBe("deload");
-        expect(evidenceText).toContain(profileText);
-        expect(progress.actionFlow?.evidence.actionAllowed).toBe(true);
-      } else {
-        expect(progress.actionFlow?.type).not.toBe("deload");
-      }
+      expect(progress.actionFlow?.type).not.toBe("deload");
+      expect(progress.journeyActions.primary.label).not.toBe("View recovery plan");
     }
   });
 

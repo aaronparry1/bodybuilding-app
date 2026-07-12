@@ -37,3 +37,5 @@ Phase 11A.2C1B verification: **15 failing files / 43 failing tests / 1,529 passi
 Journey-action input extraction verification: **15 failing files / 43 failing tests / 1,553 passing tests**. The two additional passing tests characterize only the narrow legacy journey compatibility adapter; the known `tests/progress-dashboard.test.ts` recovery-prescription fixture failure remains unchanged. Typecheck, Expo public config, and web export passed.
 
 Action-flow input extraction verification: **15 failing files / 43 failing tests / 1,554 passing tests**. The additional passing test characterizes only typed legacy action-flow candidate decomposition; the known `tests/progress-dashboard.test.ts` recovery-prescription fixture failure remains unchanged. Typecheck, Expo public config, and web export passed.
+
+Current Progress recovery semantic replacement verification: **15 failing files / 43 failing tests / 1,557 passing tests**. Obsolete historical-fatigue and legacy-deload recovery-action assertions were replaced with non-actionable warning coverage; the known recovery-prescription fixture failure remains unchanged. Typecheck, Expo public config, and web export passed.

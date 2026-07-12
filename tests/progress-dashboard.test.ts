@@ -102,7 +102,7 @@ describe("progress dashboard view model", () => {
     expect(progress.recentWorkouts[0]?.name).toBe("Arms");
   });
 
-  it("lets fatigue verdict override aggressive load-increase coach action", () => {
+  it("keeps historical fatigue as a warning instead of creating a recovery action", () => {
     const history = [0, 1, 2, 3].map((index) =>
       workout(index, [
         exerciseEntry(index, {
@@ -126,18 +126,11 @@ describe("progress dashboard view model", () => {
     );
     const progress = buildProgressDashboardViewModel(history, exerciseLibrary);
 
-    expect(progress.verdictTitle).toBe("Fatigue is the limiter.");
-    expect(progress.actionTitle).toBe("Recovery session planned.");
-    expect(progress.actionMessage).not.toContain("increase load");
-    expect(progress.progressionNote).toContain("Cable Fly: increase load");
-    expect(progress.journeyActions.primary).toEqual({ label: "View recovery plan", href: "/(protected)/(tabs)/programmes" });
-    expect(progress.journeyActions.secondary).toBeUndefined();
-    expect(progress.actionFlow?.type).toBe("deload");
-    if (progress.actionFlow?.type !== "deload") throw new Error("Expected automatic deload flow");
-    expect(progress.actionFlow.title).toBe("Recovery session planned");
-    expect(progress.actionFlow.primaryLabel).toBe("View recovery plan");
-    expect("secondaryLabel" in progress.actionFlow).toBe(false);
-    expect(progress.actionFlow.evidence.summary).toContain("automatically");
+    expect(progress.currentRecoveryContext).toMatchObject({ status: "compatibility" });
+    expect(progress.actionTitle).not.toBe("Recovery session planned.");
+    expect(progress.progressionNote).toBeUndefined();
+    expect(progress.journeyActions.primary.label).not.toBe("View recovery plan");
+    expect(progress.actionFlow?.type).not.toBe("deload");
   });
 
   it("does not recommend a Recovery Window from repeated productive hypertrophy accessory shutdowns alone", () => {
@@ -210,7 +203,7 @@ describe("progress dashboard view model", () => {
     expect(progress.actionTitle).not.toBe("Reduce workload first.");
   });
 
-  it("recognises an accepted deload instead of repeating the stale fatigue action", () => {
+  it("does not treat a legacy accepted deload block as a current recovery action", () => {
     const history = [0, 1, 2, 3].map((index) =>
       workout(index, [
         exerciseEntry(index, {
@@ -224,8 +217,9 @@ describe("progress dashboard view model", () => {
     const plan = startDeloadPlan(activePlan());
     const progress = buildProgressDashboardViewModel(history, exerciseLibrary, plan);
 
-    expect(progress.actionFlow?.type).toBe("accepted");
-    expect(progress.actionFlow?.title).toBe("Recovery session planned");
+    expect(progress.currentRecoveryContext).toMatchObject({ status: "compatibility" });
+    expect(progress.actionFlow?.type).not.toBe("accepted");
+    expect(progress.actionFlow?.type).not.toBe("deload");
   });
 
   it("keeps mild fatigue evidence below the full Recovery Window action threshold", () => {
@@ -235,19 +229,12 @@ describe("progress dashboard view model", () => {
     expect(progress.actionTitle).not.toBe("Reduce workload first.");
   });
 
-  it("carries repeated systemic deload evidence into the automatic recovery plan", () => {
+  it("does not turn repeated systemic historical evidence into an automatic recovery plan", () => {
     const plan = activePlan("build_muscle_and_strength");
     const progress = buildProgressDashboardViewModel(severeDeloadHistory(), exerciseLibrary, plan);
 
-    expect(progress.actionFlow?.type).toBe("deload");
-    if (progress.actionFlow?.type !== "deload") throw new Error("Expected deload action flow");
-    expect(progress.actionFlow.deloadProfile).toBe("severe");
-
-    const accepted = startDeloadPlan(plan, "2026-06-06T10:00:00.000Z", progress.actionFlow.deloadProfile);
-    const activeBlock = accepted.blocks.find((block) => block.id === accepted.activeBlockId);
-
-    expect(activeBlock?.type).toBe("deload");
-    expect(activeBlock?.notes.join(" ")).toContain("reduce productive sets 50-70%");
+    expect(progress.actionFlow?.type).not.toBe("deload");
+    expect(progress.journeyActions.primary.label).not.toBe("View recovery plan");
   });
 
   it("accepting a Recovery Window changes the active generated prescription, not just the roadmap", () => {
