@@ -45,3 +45,5 @@ Current Progress rotation semantic replacement adds focused read-only interventi
 Stage 2C3A is documentation-only; it leaves the verified 15 failing files / 43 failing tests / 1,560 passing tests baseline unchanged.
 
 Stage 2C3A1E2E0 is audit-only and makes no runtime change. It retains the most recently fully verified baseline pending the next repository-wide verification run.
+
+Stage 2C3A1E2E1 verification: **15 failing files / 43 failing tests / 1,575 passing tests**. The five additional passing tests cover the read-only guidance resolver; typecheck, Expo public config, and web export passed. No frozen failure changed.

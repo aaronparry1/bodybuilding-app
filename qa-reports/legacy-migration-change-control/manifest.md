@@ -8,6 +8,10 @@ Audit-only: `volume-adjustments.ts` remains unchanged. The record separates form
 
 Audit-only: range routing remains blocked. `applyAdjustmentToSlots` is programme-construction mechanics and lacks authoritative target/lifecycle facts; E2B/E2C/E2D remain pure. A future dedicated guidance-application service must resolve plan/programme/workout-reference identity, timing, idempotency, and persistence ordering before either range branch can route.
 
+## Stage 2C3A1E2E1 guidance target resolver
+
+`recommended-set-guidance-target-resolver.ts` is a read-only application seam. It accepts a versioned command and narrow read interfaces, produces E2C/E2D facts from resolved identities/references, and leaves timing/application unresolved. It performs no normalization, write, lifecycle change, or legacy caller routing. Delete or replace only after the idempotent E2E3 application service owns the same command contract.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
