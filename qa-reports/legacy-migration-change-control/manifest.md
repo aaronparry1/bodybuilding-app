@@ -4,6 +4,10 @@
 
 Audit-only: `volume-adjustments.ts` remains unchanged. The record separates formula mechanics, eligibility, event/taper policy, block-scoped record identity, programme mutation, and future Progress presentation. C3A1 is the next implementation gate.
 
+## Stage 2C3A1E2E0 range application orchestration audit
+
+Audit-only: range routing remains blocked. `applyAdjustmentToSlots` is programme-construction mechanics and lacks authoritative target/lifecycle facts; E2B/E2C/E2D remain pure. A future dedicated guidance-application service must resolve plan/programme/workout-reference identity, timing, idempotency, and persistence ordering before either range branch can route.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
