@@ -8,6 +8,7 @@ import { buildStrategicCoachingViewModel, type StrategicCoachingViewModel } from
 import { buildLegacyProgressCopyPresentationInput, type LegacyProgressCopyPresentationInput } from "@/domain/training/legacy-progress-copy-presentation";
 import { buildLegacyProgressPrimaryEvidenceInput, type LegacyProgressPrimaryEvidenceInput } from "@/domain/training/legacy-progress-primary-evidence";
 import { buildLegacyProgressJourneyActionsInput, type LegacyProgressJourneyActionsInput } from "@/domain/training/legacy-progress-journey-actions";
+import { buildLegacyProgressActionFlowInput, type LegacyProgressActionFlowInput } from "@/domain/training/legacy-progress-action-flow";
 import { recommendExerciseRotation, type ExerciseRotationRecommendation } from "@/domain/training/exercise-rotation";
 import { analyzeMuscleVolumeLandmarks, getPrimaryVolumeRecommendation } from "@/domain/training/volume-landmarks";
 import {
@@ -200,15 +201,27 @@ export function buildProgressDashboardViewModel(
   const rotationRecommendation = rotationAction ? formatRotationRecommendation(rotationAction) : undefined;
   const hasRecoveryPriority = isRecoveryPriority(strategic, fatigueClassification);
   const primaryExerciseAction = firstExerciseAction(coachReport);
-  const actionFlow = buildActionFlow({
-    strategic,
-    hasRecoveryPriority,
-    rotationAction,
-    personalisedVolumeRecommendation,
-    activePlan,
-    source,
-    fatigueClassification,
+  const legacyTransitionPreview = activePlan ? getBlockTransitionPreview(activePlan) : null;
+  const legacyActionFlowInput = buildLegacyProgressActionFlowInput({
+    history: { hasEnoughHistory: strategic.hasEnoughHistory },
+    recovery: {
+      accepted: activePlan?.recommendationState?.deload?.status === "accepted",
+      ...(activePlan?.recommendationState?.deload?.status === "accepted" ? { acceptedAt: activePlan.recommendationState.deload.decidedAt } : {}),
+      priority: hasRecoveryPriority,
+      fatigue: fatigueClassification,
+      ...(strategic.recommendation?.deloadProfile ? { deloadProfile: strategic.recommendation.deloadProfile } : {}),
+      recommendationReasons: [...(strategic.recommendation?.reasons ?? [])],
+    },
+    rotation: { action: rotationAction },
+    volume: { recommendation: personalisedVolumeRecommendation },
+    strategic: {
+      ...(legacyTransitionPreview?.available
+        ? { transitionAvailable: true, transitionReason: legacyTransitionPreview.reason }
+        : { transitionAvailable: false }),
+    },
+    ordering: { source },
   });
+  const actionFlow = buildActionFlow(legacyActionFlowInput);
   const legacyJourneyActionsInput = buildLegacyProgressJourneyActionsInput(strategic, hasRecoveryPriority, Boolean(rotationRecommendation));
   const journeyActions = buildJourneyActions(legacyJourneyActionsInput);
   const legacyPrimaryEvidenceInput = buildLegacyProgressPrimaryEvidenceInput({
@@ -246,26 +259,16 @@ export function buildProgressDashboardViewModel(
   };
 }
 
-function buildActionFlow({
-  strategic,
-  hasRecoveryPriority,
-  rotationAction,
-  personalisedVolumeRecommendation,
-  activePlan,
-  source,
-  fatigueClassification,
-}: {
-  strategic: StrategicCoachingViewModel;
-  hasRecoveryPriority: boolean;
-  rotationAction?: ExerciseRotationRecommendation;
-  personalisedVolumeRecommendation?: PersonalisedVolumeResult | null;
-  activePlan?: ActiveTrainingPlan | null;
-  source: RecommendationEvidence["source"];
-  fatigueClassification: FatigueClassifierResult;
-}): ProgressActionFlow | undefined {
-  if (!strategic.hasEnoughHistory) return undefined;
+function buildActionFlow(input: LegacyProgressActionFlowInput): ProgressActionFlow | undefined {
+  const { source } = input.ordering;
+  const { fatigue } = input.recovery;
+  const hasRecoveryPriority = input.recovery.priority;
+  const rotationAction = input.rotation.action;
+  const personalisedVolumeRecommendation = input.volume.recommendation;
 
-  if (activePlan?.recommendationState?.deload?.status === "accepted") {
+  if (!input.history.hasEnoughHistory) return undefined;
+
+  if (input.recovery.accepted) {
     return {
       type: "accepted",
       title: "Recovery session planned",
@@ -276,7 +279,7 @@ function buildActionFlow({
         confidence: "high",
         source: "history",
         summary: "Recovery was automatically planned from high-confidence fatigue evidence.",
-        dataPoints: [`Accepted at ${activePlan.recommendationState.deload.decidedAt}`],
+        dataPoints: [`Accepted at ${input.recovery.acceptedAt}`],
         reason: "Deload is active on the plan.",
         actionAllowed: true,
       }),
@@ -288,18 +291,18 @@ function buildActionFlow({
       type: "deload",
       title: "Recovery session planned",
       reason:
-        fatigueClassification.classification === "systemic" || fatigueClassification.classification === "mixed"
+        fatigue.classification === "systemic" || fatigue.classification === "mixed"
           ? "Performance is dropping before useful work is complete, so the next plan needs less stress."
           : "Fatigue is affecting key training decisions, so the next plan needs less stress.",
       primaryLabel: "View recovery plan",
-      deloadProfile: strategic.recommendation?.deloadProfile ?? "clear",
+      deloadProfile: input.recovery.deloadProfile ?? "clear",
       evidence: evidence({
         type: "deload",
         confidence: "high",
         source,
         summary: "Recovery is the priority signal and should be planned automatically.",
-        dataPoints: [...(strategic.recommendation?.reasons ?? ["Readiness and fatigue signals point toward recovery."]), ...fatigueClassification.evidence].slice(0, 7),
-        reason: fatigueClassification.classification === "systemic" || fatigueClassification.classification === "mixed" ? fatigueClassification.recommendedResponse : "Performance is dropping and fatigue is rising.",
+        dataPoints: [...(input.recovery.recommendationReasons.length > 0 ? input.recovery.recommendationReasons : ["Readiness and fatigue signals point toward recovery."]), ...fatigue.evidence].slice(0, 7),
+        reason: fatigue.classification === "systemic" || fatigue.classification === "mixed" ? fatigue.recommendedResponse : "Performance is dropping and fatigue is rising.",
         actionAllowed: true,
       }),
     };
@@ -358,7 +361,7 @@ function buildActionFlow({
     };
   }
 
-  if (activePlan && getBlockTransitionPreview(activePlan).available) {
+  if (input.strategic.transitionAvailable) {
     return {
       type: "accepted",
       title: "Block decision available",
@@ -369,7 +372,7 @@ function buildActionFlow({
         confidence: "medium",
         source: "history",
         summary: "The active block has reached its planned endpoint.",
-        dataPoints: [getBlockTransitionPreview(activePlan).reason],
+        dataPoints: [input.strategic.transitionReason ?? ""],
         reason: "Review the block decision in Plan.",
         actionAllowed: true,
       }),

@@ -12,4 +12,4 @@ Stage 2C2A0 exposes the context on the dashboard contract only. Strategic, recov
 
 ## Presentation extraction status
 
-Progress copy helpers, primary evidence, and journey actions now each consume a narrow legacy compatibility input rather than a complete presenter result. These are structural seams only: their legacy strategic, recovery, rotation, and volume meanings remain unchanged until the separately approved semantic phases. `buildActionFlow` remains the next raw presenter consumer.
+Progress copy helpers, primary evidence, journey actions, and action flow now each consume a narrow legacy compatibility input rather than a complete presenter result. These are structural seams only: their legacy strategic, recovery, rotation, and volume meanings remain unchanged until the separately approved semantic phases. The next seam replacement is recovery.

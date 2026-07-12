@@ -42,6 +42,10 @@
 4. Extract action-flow ordering last.
 5. Replace recovery input with `CurrentProgressRecoveryContext`; then rotation, then volume; remove presenter only after every Progress helper is free of raw legacy input.
 
+## Extraction status
+
+Copy, primary-evidence, journey-action, and action-flow helpers now each consume a narrow typed legacy input. The action-flow boundary preserves the frozen order—history gate, accepted deload, recovery, rotation, volume, strategic transition, default—and makes no semantic replacement.
+
 ## Target boundary
 
 `ProgressPresentationInputs` must eventually separate `strategic`, `recovery`, `rotation`, `volume`, `historical`, and ordering inputs. No generic recommendation object, block identity, or fake current strategic type is permitted.

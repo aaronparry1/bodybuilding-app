@@ -34,4 +34,4 @@ Persisted readiness history now feeds pure exposure context; current mesocycle `
 
 ## Progress presentation extraction boundary
 
-The legacy strategic presenter is now decomposed before the copy, primary-evidence, and journey-action helpers. `buildActionFlow` still receives the raw legacy presenter result; recovery, rotation, and volume semantic replacements remain later edges. No typed compatibility input is current decision authority.
+The legacy strategic presenter is now decomposed before the copy, primary-evidence, journey-action, and action-flow helpers. Recovery, rotation, and volume semantic replacements remain later edges. No typed compatibility input is current decision authority.

@@ -1,5 +1,16 @@
 # Legacy migration change-control manifest
 
+## Fourth Progress presentation extraction
+
+| File | Checksum before | Reason / authority | Checksum after | Focused tests / deletion gate |
+| --- | --- | --- | --- | --- |
+| `src/domain/training/progress-dashboard.ts` | `b09f4c…f14368` | `buildActionFlow` now receives separated legacy candidates rather than raw presenter/plan inputs. | `cf5dc0…f9c0dd` | `legacy-progress-action-flow`, Progress dashboard regression. Remove adapter after current strategic/recovery/rotation/volume inputs migrate. |
+| `src/domain/training/legacy-progress-action-flow.ts` | New file | Pure compatibility candidate decomposition; selection and ordering remain in `buildActionFlow`. | `807087…d2b487` | `legacy-progress-action-flow`; remove with final presenter deletion. |
+| `tests/legacy-progress-action-flow.test.ts` | New file | Characterizes candidate separation without selecting an action. | `6fe487…86dee0` | self. |
+| `docs/progress-action-flow-input-boundary.md` | New file | Documents current branch precedence and semantic replacement gates. | `329695…8cfee` | Documentation review. |
+
+No action-flow, recovery, rotation, volume, strategic, historical, decision, or plan semantics change in this extraction.
+
 ## Third Progress presentation extraction
 
 | File | Checksum before | Reason / authority | Checksum after | Focused tests / deletion gate |

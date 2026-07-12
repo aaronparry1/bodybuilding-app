@@ -11,3 +11,5 @@ First extraction complete: copy helpers now consume `LegacyProgressCopyPresentat
 Second extraction complete: primary evidence now consumes `LegacyProgressPrimaryEvidenceInput`; journey and action-flow remain deferred.
 
 Third extraction complete: journey actions now consume `LegacyProgressJourneyActionsInput`, built at the legacy presenter compatibility boundary. Action-flow ordering remains the next raw legacy extraction family.
+
+Fourth extraction complete: action flow now consumes `LegacyProgressActionFlowInput`, with separate legacy history, recovery, rotation, volume, strategic-transition, and ordering candidates. The next phase is the approved recovery semantic replacement.

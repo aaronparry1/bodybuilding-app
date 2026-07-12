@@ -6,4 +6,4 @@ Historical warning is supporting-only (`fatigue_pattern_observed`). It may produ
 
 Blocked, disrupted, insufficient, and compatibility states are assessment-unavailable rather than fatigue action. The boundary is pure and does not access repositories, strategic coaching, decision production, writer, application, formulas, or UI.
 
-Dashboard integration is deliberately blocked: `verdictTitle`, `verdictMessage`, `actionTitle`, `actionMessage`, `buildActionFlow`, `buildPrimaryEvidence`, and `buildJourneyActions` still consume legacy strategic recommendation. Stage 2C2A2B must decompose those shared presentation inputs before the pure recovery state can be used by Progress.
+All shared presentation helpers now have typed legacy input boundaries. `buildActionFlow` still preserves the legacy recovery candidate unchanged; the next phase can replace that candidate with the pure recovery context without changing rotation or volume inputs.
