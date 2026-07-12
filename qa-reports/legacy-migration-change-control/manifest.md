@@ -1,5 +1,9 @@
 # Legacy migration change-control manifest
 
+## Stage 2C2A2B0-A presentation equivalence audit
+
+Documentation-only inventory of shared Progress helper branches, scenario coverage, typed target boundary, and rollback-safe extraction order. No production presentation behavior changed.
+
 ## Stage 2C2A2A pure recovery boundary
 
 | File | Authority | Scope | Tests |
