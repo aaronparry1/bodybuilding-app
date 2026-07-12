@@ -44,6 +44,10 @@ Pure persisted-domain contracts model programme/session/prescription lineage and
 
 Pure supplied-ID constructor creates an initial D1 specification and optional first-microcycle reference from approved pre-exercise inputs. It is uncalled in production and does not alter active plans, repositories, or construction consumers.
 
+## Stage D2.5 pre-exercise prescription slot policy audit
+
+Audit-only: generated settings are decomposed into policy, selection and exact-target concerns. A future policy must define ordered training jobs before exercise selection; no slot source, identifiers, plan container, or construction behaviour changed.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
