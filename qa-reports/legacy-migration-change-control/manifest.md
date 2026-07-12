@@ -1,5 +1,11 @@
 # Legacy migration change-control manifest
 
+## Stage 2C2A2A pure recovery boundary
+
+| File | Authority | Scope | Tests |
+| --- | --- | --- | --- |
+| `current-progress-recovery-context.ts` | Resolved current context plus optional immutable warning | Pure only; dashboard/action-flow integration deferred to A2B. | `current-progress-recovery-context` |
+
 ## Stage 2C2A1.2 caller record
 
 | File | Old caller | Current caller | Compatibility retained |
