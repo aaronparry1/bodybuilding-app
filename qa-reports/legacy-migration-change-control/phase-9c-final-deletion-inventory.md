@@ -10,3 +10,5 @@
 | `v2-coaching-qa.ts`, `run-v2-qa-preview.ts`, V2 QA screens/reports | QA routes, fixtures, tests | Active QA/historical | Retain | Current QA surfaces and test imports remain. |
 
 No annual/block/range module satisfies every deletion gate. The current planned constructor remains isolated from raw `TrainingBlock`, but the broader runtime still has active legacy imports outside the completed migration boundaries. Phase 9C therefore cannot safely certify the repository complete.
+
+Progress no longer passes the complete strategic presenter result to its copy, primary-evidence, or journey-action helpers; `buildActionFlow` and other deferred Progress adapters still prevent strategic-coaching deletion.

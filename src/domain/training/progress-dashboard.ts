@@ -7,6 +7,7 @@ import { displayWorkoutName } from "@/domain/training/planned-workout";
 import { buildStrategicCoachingViewModel, type StrategicCoachingViewModel } from "@/domain/training/strategic-coaching-presenter";
 import { buildLegacyProgressCopyPresentationInput, type LegacyProgressCopyPresentationInput } from "@/domain/training/legacy-progress-copy-presentation";
 import { buildLegacyProgressPrimaryEvidenceInput, type LegacyProgressPrimaryEvidenceInput } from "@/domain/training/legacy-progress-primary-evidence";
+import { buildLegacyProgressJourneyActionsInput, type LegacyProgressJourneyActionsInput } from "@/domain/training/legacy-progress-journey-actions";
 import { recommendExerciseRotation, type ExerciseRotationRecommendation } from "@/domain/training/exercise-rotation";
 import { analyzeMuscleVolumeLandmarks, getPrimaryVolumeRecommendation } from "@/domain/training/volume-landmarks";
 import {
@@ -208,11 +209,8 @@ export function buildProgressDashboardViewModel(
     source,
     fatigueClassification,
   });
-  const journeyActions = buildJourneyActions({
-    strategic,
-    hasRecoveryPriority,
-    hasRotationRecommendation: Boolean(rotationRecommendation),
-  });
+  const legacyJourneyActionsInput = buildLegacyProgressJourneyActionsInput(strategic, hasRecoveryPriority, Boolean(rotationRecommendation));
+  const journeyActions = buildJourneyActions(legacyJourneyActionsInput);
   const legacyPrimaryEvidenceInput = buildLegacyProgressPrimaryEvidenceInput({
     historical: { completedWorkouts: plannedCompletedWorkouts, source },
     strategic: { hasEnoughHistory: strategic.hasEnoughHistory, ...(strategic.recommendation?.title ? { recommendationTitle: strategic.recommendation.title } : {}), ...(strategic.recommendation?.message ? { recommendationMessage: strategic.recommendation.message } : {}), recommendationReasons: [...(strategic.recommendation?.reasons ?? [])] },
@@ -458,16 +456,8 @@ function isFixtureHistory(history: WorkoutHistorySummary[]): boolean {
   return history.some((summary) => summary.userId === "design-qa-local" || summary.notes?.includes("[Design QA Fixture]"));
 }
 
-function buildJourneyActions({
-  strategic,
-  hasRecoveryPriority,
-  hasRotationRecommendation,
-}: {
-  strategic: StrategicCoachingViewModel;
-  hasRecoveryPriority: boolean;
-  hasRotationRecommendation: boolean;
-}): ProgressDashboardViewModel["journeyActions"] {
-  if (!strategic.hasEnoughHistory) {
+function buildJourneyActions(input: LegacyProgressJourneyActionsInput): ProgressDashboardViewModel["journeyActions"] {
+  if (!input.strategic.hasEnoughHistory) {
     return {
       primary: { label: "Log a workout", href: "/(protected)/(tabs)/train" },
       secondary: {
@@ -477,13 +467,13 @@ function buildJourneyActions({
     };
   }
 
-  if (hasRecoveryPriority) {
+  if (input.recovery.priority) {
     return {
       primary: { label: "View recovery plan", href: "/(protected)/(tabs)/programmes" },
     };
   }
 
-  if (hasRotationRecommendation) {
+  if (input.rotation.hasRecommendation) {
     return {
       primary: { label: "Review rotation in Train", href: "/(protected)/(tabs)/train" },
       secondary: {
@@ -493,7 +483,7 @@ function buildJourneyActions({
     };
   }
 
-  const recommendation = strategic.recommendation?.title.toLowerCase() ?? "";
+  const recommendation = input.strategic.recommendationTitle?.toLowerCase() ?? "";
   if (recommendation.includes("advance") || recommendation.includes("repeat") || recommendation.includes("extend")) {
     return {
       primary: { label: "Review block in Plan", href: "/(protected)/(tabs)/programmes" },

@@ -1,5 +1,16 @@
 # Legacy migration change-control manifest
 
+## Third Progress presentation extraction
+
+| File | Checksum before | Reason / authority | Checksum after | Focused tests / deletion gate |
+| --- | --- | --- | --- | --- |
+| `src/domain/training/progress-dashboard.ts` | `c83ad6…110fa` | `buildJourneyActions` no longer receives the full legacy presenter; it receives only an explicit journey compatibility input. | `b09f4c…f14368` | `legacy-progress-journey-actions`, Progress dashboard characterization. Delete adapter after strategic, recovery, and rotation presentation inputs migrate. |
+| `src/domain/training/legacy-progress-journey-actions.ts` | New file | Pure legacy-source decomposition for journey actions; no current authority or decision semantics. | `a09874…2d7308` | `legacy-progress-journey-actions`; remove with final Progress legacy-presenter deletion. |
+| `tests/legacy-progress-journey-actions.test.ts` | New file | Characterizes exact extraction and absent-title behaviour. | `db5809…38d93a` | self. |
+| `docs/progress-journey-actions-input-boundary.md` | New file | Documents typed boundary, equivalence, and next action-flow gate. | `b3ce88…eef537` | Documentation review. |
+
+No recovery, rotation, volume, action-flow, historical, decision, or plan semantics change in this extraction.
+
 ## Second Progress presentation extraction
 
 `buildPrimaryEvidence` now receives typed legacy category inputs. Its branch ordering and output are unchanged; journey/action-flow remain raw legacy dependencies.

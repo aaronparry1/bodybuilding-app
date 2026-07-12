@@ -9,3 +9,7 @@ Historical Progress authority remains stored exact planned targets and immutable
 ## Deferred adapters
 
 Stage 2C2A0 exposes the context on the dashboard contract only. Strategic, recovery, rotation, and volume adapters remain separate migration gates. Stage 2C3 will replace only the legacy planning authority passed into volume adapters, without changing formulas.
+
+## Presentation extraction status
+
+Progress copy helpers, primary evidence, and journey actions now each consume a narrow legacy compatibility input rather than a complete presenter result. These are structural seams only: their legacy strategic, recovery, rotation, and volume meanings remain unchanged until the separately approved semantic phases. `buildActionFlow` remains the next raw presenter consumer.

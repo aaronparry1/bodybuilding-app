@@ -9,3 +9,5 @@ The later recovery correction is explicitly semantic: historical fatigue becomes
 First extraction complete: copy helpers now consume `LegacyProgressCopyPresentationInput`, built once at the legacy presenter compatibility boundary. Evidence, journey, and action-flow families remain raw-legacy consumers until their separately scoped extraction phases.
 
 Second extraction complete: primary evidence now consumes `LegacyProgressPrimaryEvidenceInput`; journey and action-flow remain deferred.
+
+Third extraction complete: journey actions now consume `LegacyProgressJourneyActionsInput`, built at the legacy presenter compatibility boundary. Action-flow ordering remains the next raw legacy extraction family.

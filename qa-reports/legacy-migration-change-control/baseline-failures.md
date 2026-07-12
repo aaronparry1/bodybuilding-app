@@ -33,3 +33,5 @@ Phase 9C deletion audit found active annual/training-year and block-policy impor
 Stage 1 current decision persistence adds passing focused decision-record coverage only. It does not change any frozen baseline assertion or migrate a legacy consumer.
 
 Phase 11A.2C1B verification: **15 failing files / 43 failing tests / 1,529 passing tests**. Typecheck, Expo public config, and web export passed. Phase 11A.2C2 must retain this comparison baseline.
+
+Journey-action input extraction verification: **15 failing files / 43 failing tests / 1,553 passing tests**. The two additional passing tests characterize only the narrow legacy journey compatibility adapter; the known `tests/progress-dashboard.test.ts` recovery-prescription fixture failure remains unchanged. Typecheck, Expo public config, and web export passed.

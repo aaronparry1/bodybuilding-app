@@ -31,3 +31,7 @@ The current decision evaluator now writes a versioned, block-free decision recor
 ## Phase 11A.2C2
 
 Persisted readiness history now feeds pure exposure context; current mesocycle `nextStates` feed candidate validation; machine-evaluable objective policy remains an explicit gap. Neither edge writes a decision or touches legacy active-plan progression.
+
+## Progress presentation extraction boundary
+
+The legacy strategic presenter is now decomposed before the copy, primary-evidence, and journey-action helpers. `buildActionFlow` still receives the raw legacy presenter result; recovery, rotation, and volume semantic replacements remain later edges. No typed compatibility input is current decision authority.
