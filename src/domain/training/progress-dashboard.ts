@@ -5,6 +5,7 @@ import { classifyFatigue, type FatigueClassifierResult } from "@/domain/training
 import { buildHypertrophyCoachReport, type HypertrophyCoachReport } from "@/domain/training/progression-coach";
 import { displayWorkoutName } from "@/domain/training/planned-workout";
 import { buildStrategicCoachingViewModel, type StrategicCoachingViewModel } from "@/domain/training/strategic-coaching-presenter";
+import { buildLegacyProgressCopyPresentationInput, type LegacyProgressCopyPresentationInput } from "@/domain/training/legacy-progress-copy-presentation";
 import { recommendExerciseRotation, type ExerciseRotationRecommendation } from "@/domain/training/exercise-rotation";
 import { analyzeMuscleVolumeLandmarks, getPrimaryVolumeRecommendation } from "@/domain/training/volume-landmarks";
 import {
@@ -123,6 +124,7 @@ export function buildProgressDashboardViewModel(
     goal: planningContext?.goal ?? activePlan?.goal,
     currentBlockType: activeBlock?.type,
   });
+  const legacyCopyPresentation = buildLegacyProgressCopyPresentationInput(strategic);
   const eventTaper = activePlan?.targetDate
     ? resolveEventTaper({
         eventType: activePlan.eventType,
@@ -217,10 +219,10 @@ export function buildProgressDashboardViewModel(
     completedWorkouts,
     hiddenZeroSetWorkouts,
     hasEnoughHistory: strategic.hasEnoughHistory,
-    verdictTitle: verdictTitle(strategic),
-    verdictMessage: verdictMessage(strategic),
-    actionTitle: actionTitle(strategic, primaryExerciseAction, hasRecoveryPriority),
-    actionMessage: actionMessage(strategic, primaryExerciseAction, hasRecoveryPriority),
+    verdictTitle: verdictTitle(legacyCopyPresentation, hasRecoveryPriority),
+    verdictMessage: verdictMessage(legacyCopyPresentation, hasRecoveryPriority),
+    actionTitle: actionTitle(legacyCopyPresentation, primaryExerciseAction, hasRecoveryPriority),
+    actionMessage: actionMessage(legacyCopyPresentation, primaryExerciseAction, hasRecoveryPriority),
     progressionNote: hasRecoveryPriority && primaryExerciseAction ? progressionNote(primaryExerciseAction) : undefined,
     volumeRecommendation: personalisedVolumeRecommendation?.userCopy ?? volumeRecommendation?.reason,
     recoveryCapacityRecommendation:
@@ -606,37 +608,37 @@ function firstExerciseAction(report: HypertrophyCoachReport): string | null {
   return report.coachingSummary.find((item) => item.trim().length > 0) ?? null;
 }
 
-function verdictTitle(strategic: StrategicCoachingViewModel): string {
-  if (!strategic.hasEnoughHistory) return "Not enough data yet.";
-  if (isRecoveryPriority(strategic)) return "Fatigue is the limiter.";
-  const recommendation = strategic.recommendation?.title.toLowerCase() ?? "";
-  const momentum = strategic.momentum?.band.toLowerCase() ?? "";
+function verdictTitle(input: LegacyProgressCopyPresentationInput, recoveryPriority: boolean): string {
+  if (!input.hasEnoughHistory) return "Not enough data yet.";
+  if (recoveryPriority) return "Fatigue is the limiter.";
+  const recommendation = input.recommendationTitle?.toLowerCase() ?? "";
+  const momentum = input.momentumBand?.toLowerCase() ?? "";
   if (recommendation.includes("advance")) return "You are ready to shift emphasis.";
   if (momentum.includes("strong")) return "Training is moving well.";
   if (momentum.includes("slowing")) return "Progress is slowing.";
   return "Training is on track.";
 }
 
-function verdictMessage(strategic: StrategicCoachingViewModel): string {
-  if (!strategic.hasEnoughHistory) return "Log 3-5 completed workouts first. Then Progress can give useful coaching.";
-  if (isRecoveryPriority(strategic)) return "The next plan should reduce stress until output normalises.";
-  const reasons = strategic.recommendation?.reasons ?? [];
+function verdictMessage(input: LegacyProgressCopyPresentationInput, recoveryPriority: boolean): string {
+  if (!input.hasEnoughHistory) return "Log 3-5 completed workouts first. Then Progress can give useful coaching.";
+  if (recoveryPriority) return "The next plan should reduce stress until output normalises.";
+  const reasons = input.recommendationReasons;
   if (reasons.length > 0) return reasons.slice(0, 2).join(" ");
-  return strategic.recommendation?.message ?? "Keep collecting productive work from completed sessions.";
+  return input.recommendationMessage ?? "Keep collecting productive work from completed sessions.";
 }
 
-function actionTitle(strategic: StrategicCoachingViewModel, exerciseAction: string | null, recoveryPriority: boolean): string {
-  if (!strategic.hasEnoughHistory) return "Build more history first.";
+function actionTitle(input: LegacyProgressCopyPresentationInput, exerciseAction: string | null, recoveryPriority: boolean): string {
+  if (!input.hasEnoughHistory) return "Build more history first.";
   if (recoveryPriority) return "Recovery session planned.";
-  const recommendation = strategic.recommendation?.title;
+  const recommendation = input.recommendationTitle;
   if (recommendation) return sentenceCase(recommendation);
   return exerciseAction ? sentenceCase(stripExercisePrefix(exerciseAction)) : "Stay the course.";
 }
 
-function actionMessage(strategic: StrategicCoachingViewModel, exerciseAction: string | null, recoveryPriority: boolean): string {
-  if (!strategic.hasEnoughHistory) return "Complete a few real sessions and Progress will start giving objective recommendations.";
+function actionMessage(input: LegacyProgressCopyPresentationInput, exerciseAction: string | null, recoveryPriority: boolean): string {
+  if (!input.hasEnoughHistory) return "Complete a few real sessions and Progress will start giving objective recommendations.";
   if (recoveryPriority) return "ASC will keep the next session calmer. Let output recover before chasing load.";
-  if (strategic.recommendation?.message) return strategic.recommendation.message;
+  if (input.recommendationMessage) return input.recommendationMessage;
   return exerciseAction ?? "Maintain the current plan until the logbook says otherwise.";
 }
 

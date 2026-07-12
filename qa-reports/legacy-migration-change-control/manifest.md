@@ -1,5 +1,9 @@
 # Legacy migration change-control manifest
 
+## First Progress presentation extraction
+
+`verdictTitle`, `verdictMessage`, `actionTitle`, and `actionMessage` now receive a narrow legacy copy compatibility input. Output equivalence is covered by the existing Progress dashboard characterization suite; evidence, journey, and action-flow remain deferred.
+
 ## Stage 2C2A2B0-A presentation equivalence audit
 
 Documentation-only inventory of shared Progress helper branches, scenario coverage, typed target boundary, and rollback-safe extraction order. No production presentation behavior changed.

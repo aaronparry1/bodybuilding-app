@@ -5,3 +5,5 @@ The shared Progress helpers currently consume one legacy strategic presenter res
 The safe sequence is: freeze helper outputs; extract leaf copy inputs; extract evidence; extract journey inputs; extract action-flow ordering; then replace recovery, rotation, and volume categories independently. The presenter can be removed from Progress only after no helper receives its raw result.
 
 The later recovery correction is explicitly semantic: historical fatigue becomes a warning, not an authorised recovery action. It is not part of the structural extraction seam.
+
+First extraction complete: copy helpers now consume `LegacyProgressCopyPresentationInput`, built once at the legacy presenter compatibility boundary. Evidence, journey, and action-flow families remain raw-legacy consumers until their separately scoped extraction phases.
