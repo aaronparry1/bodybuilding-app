@@ -1,5 +1,11 @@
 # Legacy migration change-control manifest
 
+## Stage 2C2A1.2 caller record
+
+| File | Old caller | Current caller | Compatibility retained |
+| --- | --- | --- | --- |
+| `progress-dashboard.ts` | Legacy presenter only | One resolved current context → pure strategic summary | Legacy presenter remains for adapter fields pending A1.3. |
+
 ## Stage 2C2A1.1 strategic-summary record
 
 | File | Authority | Reason | Tests |

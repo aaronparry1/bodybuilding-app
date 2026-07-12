@@ -55,6 +55,7 @@ describe("progress dashboard view model", () => {
     const progress = buildProgressDashboardViewModel([workout(1)], exerciseLibrary);
 
     expect(progress.currentProgressContext).toMatchObject({ status: "compatibility" });
+    expect(progress.currentStrategicSummary).toMatchObject({ status: "compatibility" });
     expect(progress.recentWorkouts[0]?.sessionId).toBe("session-1");
   });
 
