@@ -15,3 +15,5 @@ Third extraction complete: journey actions now consume `LegacyProgressJourneyAct
 Fourth extraction complete: action flow now consumes `LegacyProgressActionFlowInput`, with separate legacy history, recovery, rotation, volume, strategic-transition, and ordering candidates. The next phase is the approved recovery semantic replacement.
 
 Recovery semantic replacement complete: the recovery candidate is now current-derived across action flow, evidence, journey, and copy. Rotation, volume, and strategic compatibility replacement remain separate phases.
+
+Rotation semantic replacement complete: Progress presents only persisted intervention/applied replacement facts; historical rotation observations are non-actionable.

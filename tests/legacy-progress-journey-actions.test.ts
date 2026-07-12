@@ -17,10 +17,10 @@ describe("legacy Progress journey-actions input", () => {
     };
 
     const recovery = buildCurrentProgressRecoveryPresentationInput({ status: "recovery_recommended", reason: "persisted_deload_decision", historicalWarning: "none" });
-    expect(buildLegacyProgressJourneyActionsInput(source, recovery, false)).toEqual({
+    expect(buildLegacyProgressJourneyActionsInput(source, recovery, { status: "no_rotation", reason: "no_current_rotation" })).toEqual({
       strategic: { hasEnoughHistory: true, recommendationTitle: "Advance to the next block" },
       recovery: { current: recovery },
-      rotation: { hasRecommendation: false },
+      rotation: { current: { status: "no_rotation", reason: "no_current_rotation" } },
     });
   });
 
@@ -32,10 +32,10 @@ describe("legacy Progress journey-actions input", () => {
     };
 
     const recovery = buildCurrentProgressRecoveryPresentationInput({ status: "watch", reason: "historical_fatigue_pattern", historicalWarning: "fatigue_pattern_observed" });
-    expect(buildLegacyProgressJourneyActionsInput(source, recovery, true)).toEqual({
+    expect(buildLegacyProgressJourneyActionsInput(source, recovery, { status: "rotation_authorised", reason: "persistent_stall", exerciseId: "ex", interventionDecision: "substitute" })).toEqual({
       strategic: { hasEnoughHistory: false },
       recovery: { current: recovery },
-      rotation: { hasRecommendation: true },
+      rotation: { current: { status: "rotation_authorised", reason: "persistent_stall", exerciseId: "ex", interventionDecision: "substitute" } },
     });
   });
 });

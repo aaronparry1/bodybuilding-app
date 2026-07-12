@@ -39,3 +39,5 @@ Journey-action input extraction verification: **15 failing files / 43 failing te
 Action-flow input extraction verification: **15 failing files / 43 failing tests / 1,554 passing tests**. The additional passing test characterizes only typed legacy action-flow candidate decomposition; the known `tests/progress-dashboard.test.ts` recovery-prescription fixture failure remains unchanged. Typecheck, Expo public config, and web export passed.
 
 Current Progress recovery semantic replacement verification: **15 failing files / 43 failing tests / 1,557 passing tests**. Obsolete historical-fatigue and legacy-deload recovery-action assertions were replaced with non-actionable warning coverage; the known recovery-prescription fixture failure remains unchanged. Typecheck, Expo public config, and web export passed.
+
+Current Progress rotation semantic replacement adds focused read-only intervention-context coverage; rotation stall assertions now verify no action without a persisted intervention.

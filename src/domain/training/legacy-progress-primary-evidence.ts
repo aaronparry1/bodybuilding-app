@@ -1,5 +1,5 @@
 import type { RecommendationEvidence } from "@/domain/training/recommendation-evidence";
-import type { ExerciseRotationRecommendation } from "@/domain/training/exercise-rotation";
+import type { CurrentProgressRotationContext } from "@/domain/training/current-progress-rotation-context";
 import type { PersonalisedVolumeResult } from "@/domain/training/personalised-volume";
 import type { StrategicCoachingViewModel } from "@/domain/training/strategic-coaching-presenter";
 import type { CurrentProgressRecoveryPresentationInput } from "@/domain/training/current-progress-recovery-presentation";
@@ -11,7 +11,7 @@ export type LegacyProgressPrimaryEvidenceInput = Readonly<{
   strategic: { hasEnoughHistory: boolean; recommendationTitle?: string; recommendationMessage?: string; recommendationReasons: readonly string[] };
   recovery: { current: CurrentProgressRecoveryPresentationInput };
   volume: { primary: ReturnType<typeof getPrimaryVolumeRecommendation>; personalised?: PersonalisedVolumeResult | null };
-  rotation: { action?: ExerciseRotationRecommendation };
+  rotation: { current: CurrentProgressRotationContext };
 }>;
 
 export function buildLegacyProgressPrimaryEvidenceInput(input: LegacyProgressPrimaryEvidenceInput): LegacyProgressPrimaryEvidenceInput { return input; }

@@ -386,7 +386,7 @@ describe("progress dashboard view model", () => {
     expect(progress.volumeRecommendation).toBeUndefined();
   });
 
-  it("surfaces stalled Tier A rotation recommendations with a clear reason", () => {
+  it("keeps a stalled Tier A history observation non-actionable without an intervention", () => {
     const history = [1, 2, 3, 4].map((index) =>
       workout(index, [
         exerciseEntry(index, {
@@ -400,14 +400,9 @@ describe("progress dashboard view model", () => {
     );
     const progress = buildProgressDashboardViewModel(history, exerciseLibrary);
 
-    expect(progress.rotationRecommendation).toContain("Rotate Bench Press");
-    expect(progress.rotationRecommendation).toContain("stalled across 4 exposures");
-    expect(progress.rotationRecommendation).toContain("Suggested replacement");
-    expect(progress.journeyActions.primary).toEqual({ label: "Review rotation in Train", href: "/(protected)/(tabs)/train" });
-    expect(progress.journeyActions.secondary?.label).toBe("Keep exercise");
-    expect(progress.actionFlow?.type).toBe("rotation");
-    expect(progress.actionFlow?.evidence.confidence).toBe("high");
-    expect(progress.actionFlow?.evidence.dataPoints.join(" ")).toContain("stalled across 4 exposures");
+    expect(progress.currentRotationContext).toMatchObject({ status: "compatibility" });
+    expect(progress.journeyActions.primary.label).not.toBe("Review rotation in Train");
+    expect(progress.actionFlow?.type).not.toBe("rotation");
   });
 
   it("suppresses a kept stalled exercise recommendation", () => {

@@ -22,6 +22,7 @@ import { getBlockTransitionPreview, shouldSuppressRotationRecommendation } from 
 import { resolveCurrentProgressContext, type CurrentProgressContext } from "@/domain/training/current-progress-context";
 import { buildCurrentProgressStrategicSummary, type CurrentProgressStrategicSummary } from "@/domain/training/current-progress-strategic-summary";
 import { buildCurrentProgressRecoveryContext, type CurrentProgressRecoveryContext } from "@/domain/training/current-progress-recovery-context";
+import { buildCurrentProgressRotationContext, type CurrentProgressRotationContext } from "@/domain/training/current-progress-rotation-context";
 import { buildCurrentProgressRecoveryPresentationInput, isCurrentRecoveryAction, type CurrentProgressRecoveryPresentationInput } from "@/domain/training/current-progress-recovery-presentation";
 import { evidence, fixtureSource, insufficientEvidence, type RecommendationEvidence } from "@/domain/training/recommendation-evidence";
 import { previousVolumeLadderActions } from "@/domain/training/volume-adjustments";
@@ -42,6 +43,7 @@ export interface ProgressDashboardViewModel {
   currentProgressContext: CurrentProgressContext;
   currentStrategicSummary: CurrentProgressStrategicSummary;
   currentRecoveryContext: CurrentProgressRecoveryContext;
+  currentRotationContext: CurrentProgressRotationContext;
   completedWorkouts: WorkoutHistorySummary[];
   hiddenZeroSetWorkouts: WorkoutHistorySummary[];
   hasEnoughHistory: boolean;
@@ -218,6 +220,12 @@ export function buildProgressDashboardViewModel(
     : null;
   const rotationAction = strategic.hasEnoughHistory ? firstRotationRecommendation(plannedCompletedWorkouts, exercises, activePlan, fatigueClassification) : undefined;
   const rotationRecommendation = rotationAction ? formatRotationRecommendation(rotationAction) : undefined;
+  const currentRotationContext = buildCurrentProgressRotationContext(
+    currentProgressContext,
+    activePlan?.recommendationState?.exerciseInterventions ?? [],
+    activePlan?.recommendationState?.exerciseReplacements ?? {},
+    Boolean(rotationAction),
+  );
   const hasRecoveryPriority = currentRecoveryPresentation.priority;
   const primaryExerciseAction = firstExerciseAction(coachReport);
   const legacyTransitionPreview = activePlan ? getBlockTransitionPreview(activePlan) : null;
@@ -226,7 +234,7 @@ export function buildProgressDashboardViewModel(
     recovery: {
       current: currentRecoveryPresentation,
     },
-    rotation: { action: rotationAction },
+    rotation: { current: currentRotationContext },
     volume: { recommendation: personalisedVolumeRecommendation },
     strategic: {
       ...(legacyTransitionPreview?.available
@@ -236,20 +244,21 @@ export function buildProgressDashboardViewModel(
     ordering: { source },
   });
   const actionFlow = buildActionFlow(legacyActionFlowInput);
-  const legacyJourneyActionsInput = buildLegacyProgressJourneyActionsInput(strategic, currentRecoveryPresentation, Boolean(rotationRecommendation));
+  const legacyJourneyActionsInput = buildLegacyProgressJourneyActionsInput(strategic, currentRecoveryPresentation, currentRotationContext);
   const journeyActions = buildJourneyActions(legacyJourneyActionsInput);
   const legacyPrimaryEvidenceInput = buildLegacyProgressPrimaryEvidenceInput({
     historical: { completedWorkouts: plannedCompletedWorkouts, source },
     strategic: { hasEnoughHistory: strategic.hasEnoughHistory, ...(strategic.recommendation?.title ? { recommendationTitle: strategic.recommendation.title } : {}), ...(strategic.recommendation?.message ? { recommendationMessage: strategic.recommendation.message } : {}), recommendationReasons: [...(strategic.recommendation?.reasons ?? [])] },
     recovery: { current: currentRecoveryPresentation },
     volume: { primary: volumeRecommendation, personalised: personalisedVolumeRecommendation },
-    rotation: { action: rotationAction },
+    rotation: { current: currentRotationContext },
   });
 
   return {
     currentProgressContext,
     currentStrategicSummary,
     currentRecoveryContext,
+    currentRotationContext,
     completedWorkouts,
     hiddenZeroSetWorkouts,
     hasEnoughHistory: strategic.hasEnoughHistory,
@@ -278,7 +287,8 @@ function buildActionFlow(input: LegacyProgressActionFlowInput): ProgressActionFl
   const { source } = input.ordering;
   const recovery = input.recovery.current;
   const hasRecoveryPriority = recovery.priority;
-  const rotationAction = input.rotation.action;
+  const rotation = input.rotation.current;
+  const rotationAction = rotation.status === "rotation_authorised" || rotation.status === "rotation_applied";
   const personalisedVolumeRecommendation = input.volume.recommendation;
 
   if (!input.history.hasEnoughHistory) return undefined;
@@ -323,30 +333,21 @@ function buildActionFlow(input: LegacyProgressActionFlowInput): ProgressActionFl
   if (rotationAction) {
     return {
       type: "rotation",
-      title: `Rotate ${rotationAction.currentExerciseName}`,
-      reason: rotationAction.reason,
-      primaryLabel: "Replace exercise",
+      title: rotation.status === "rotation_applied" ? "Exercise variation updated" : "Approved exercise change is ready",
+      reason: rotation.reason,
+      primaryLabel: rotation.status === "rotation_applied" ? "View plan" : "Review in Plan",
       secondaryLabel: "Keep exercise",
-      currentExerciseId: rotationAction.currentExerciseId,
-      currentExerciseName: rotationAction.currentExerciseName,
-      replacementExerciseId: rotationAction.suggestedReplacement?.id,
-      replacementExerciseName: rotationAction.suggestedReplacement?.name,
-      structuredPrimaryLiftVariation: rotationAction.structuredPrimaryLiftVariation,
+      currentExerciseId: rotation.exerciseId ?? "",
+      currentExerciseName: rotation.exerciseId ?? "Exercise",
+      replacementExerciseId: rotation.replacementExerciseId,
       evidence: evidence({
         type: "exercise_rotation",
         confidence: "high",
         source,
-        summary: rotationAction.structuredPrimaryLiftVariation ? "Primary-lift stall criteria were met." : "Exercise-level stall criteria were met.",
-        dataPoints: [
-          rotationAction.reason,
-          rotationAction.structuredPrimaryLiftVariation
-            ? `Structured ${rotationAction.structuredPrimaryLiftVariation.family.label} variation: ${rotationAction.structuredPrimaryLiftVariation.selectedExercise.name}`
-            : rotationAction.suggestedReplacement
-              ? `Suggested same-family/role replacement: ${rotationAction.suggestedReplacement.name}`
-              : "No suitable replacement found.",
-        ],
-        reason: rotationAction.reason,
-        actionAllowed: Boolean(rotationAction.suggestedReplacement),
+        summary: rotation.status === "rotation_applied" ? "An approved exercise change is active." : "An approved exercise change is available.",
+        dataPoints: [rotation.reason],
+        reason: rotation.reason,
+        actionAllowed: false,
       }),
     };
   }
@@ -399,7 +400,7 @@ function buildPrimaryEvidence(input: LegacyProgressPrimaryEvidenceInput): Recomm
   const { recommendationReasons, recommendationMessage, recommendationTitle, hasEnoughHistory } = input.strategic;
   const recovery = input.recovery.current;
   const { primary: volumeRecommendation, personalised: personalisedVolumeRecommendation } = input.volume;
-  const rotationAction = input.rotation.action;
+  const rotation = input.rotation.current;
   if (!hasEnoughHistory) {
     return insufficientEvidence("progress_dashboard", "Log 3-5 completed workouts first.");
   }
@@ -445,15 +446,15 @@ function buildPrimaryEvidence(input: LegacyProgressPrimaryEvidenceInput): Recomm
       actionAllowed: true,
     });
   }
-  if (rotationAction) {
+  if (rotation.status === "rotation_authorised" || rotation.status === "rotation_applied" || rotation.status === "rotation_observed") {
     return evidence({
       type: "exercise_rotation",
       confidence: "high",
       source,
-      summary: "Exercise-level stall criteria were met.",
-      dataPoints: [rotationAction.reason, ...recommendationReasons].slice(0, 5),
-      reason: rotationAction.reason,
-      actionAllowed: Boolean(rotationAction.suggestedReplacement),
+      summary: rotation.status === "rotation_observed" ? "An exercise pattern is worth reviewing." : rotation.status === "rotation_applied" ? "An approved exercise change is active." : "An approved exercise change is available.",
+      dataPoints: [rotation.reason, ...recommendationReasons].slice(0, 5),
+      reason: rotation.reason,
+      actionAllowed: false,
     });
   }
   const historicalWarning = recovery.context.status === "watch" && recovery.context.historicalWarning === "fatigue_pattern_observed";
@@ -490,9 +491,9 @@ function buildJourneyActions(input: LegacyProgressJourneyActionsInput): Progress
     };
   }
 
-  if (input.rotation.hasRecommendation) {
+  if (input.rotation.current.status === "rotation_authorised" || input.rotation.current.status === "rotation_applied") {
     return {
-      primary: { label: "Review rotation in Train", href: "/(protected)/(tabs)/train" },
+      primary: { label: input.rotation.current.status === "rotation_applied" ? "View plan" : "Review approved exercise change", href: "/(protected)/(tabs)/programmes" },
       secondary: {
         label: "Keep exercise",
         message: "Noted. Keep the exercise if it still feels good and setup is available.",

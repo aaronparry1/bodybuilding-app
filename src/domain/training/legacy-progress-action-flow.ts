@@ -1,4 +1,4 @@
-import type { ExerciseRotationRecommendation } from "@/domain/training/exercise-rotation";
+import type { CurrentProgressRotationContext } from "@/domain/training/current-progress-rotation-context";
 import type { RecommendationEvidence } from "@/domain/training/recommendation-evidence";
 import type { PersonalisedVolumeResult } from "@/domain/training/personalised-volume";
 import type { CurrentProgressRecoveryPresentationInput } from "@/domain/training/current-progress-recovery-presentation";
@@ -7,7 +7,7 @@ export type LegacyProgressRecoveryActionCandidate = Readonly<{
   current: CurrentProgressRecoveryPresentationInput;
 }>;
 
-export type LegacyProgressRotationActionCandidate = Readonly<{ action?: ExerciseRotationRecommendation }>;
+export type LegacyProgressRotationActionCandidate = Readonly<{ current: CurrentProgressRotationContext }>;
 export type LegacyProgressVolumeActionCandidate = Readonly<{ recommendation?: PersonalisedVolumeResult | null }>;
 export type LegacyProgressStrategicActionCandidate = Readonly<{ transitionAvailable: boolean; transitionReason?: string }>;
 

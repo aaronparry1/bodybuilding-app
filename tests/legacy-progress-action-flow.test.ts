@@ -8,7 +8,7 @@ describe("legacy Progress action-flow input", () => {
     const input = buildLegacyProgressActionFlowInput({
       history: { hasEnoughHistory: true },
       recovery: { current: recovery },
-      rotation: {},
+      rotation: { current: { status: "no_rotation", reason: "no_current_rotation" } },
       volume: { recommendation: null },
       strategic: { transitionAvailable: true, transitionReason: "Planned endpoint reached." },
       ordering: { source: "history" },
@@ -17,7 +17,7 @@ describe("legacy Progress action-flow input", () => {
     expect(input).toEqual({
       history: { hasEnoughHistory: true },
       recovery: { current: recovery },
-      rotation: {},
+      rotation: { current: { status: "no_rotation", reason: "no_current_rotation" } },
       volume: { recommendation: null },
       strategic: { transitionAvailable: true, transitionReason: "Planned endpoint reached." },
       ordering: { source: "history" },
