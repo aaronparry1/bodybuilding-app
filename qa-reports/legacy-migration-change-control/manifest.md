@@ -52,6 +52,10 @@ Audit-only: generated settings are decomposed into policy, selection and exact-t
 
 Pure policy vocabulary defines pre-exercise input, semantic targets, purposes, constraints, requirement/omission/substitution semantics and D2 mapping. It has no policy table, selected exercise, ID generation, runtime caller or persistence authority.
 
+## Stage D2.5B representative hypertrophy Upper policy
+
+Purely resolves one explicit intermediate four-day Upper/Lower hypertrophy Upper-A/full-gym input into ordered jobs. It is not a runtime caller and every other goal, role, experience, purpose or equipment combination remains explicit unsupported policy.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
