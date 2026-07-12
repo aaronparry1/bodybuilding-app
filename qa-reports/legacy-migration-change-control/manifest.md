@@ -12,6 +12,10 @@ Audit-only: range routing remains blocked. `applyAdjustmentToSlots` is programme
 
 `recommended-set-guidance-target-resolver.ts` is a read-only application seam. It accepts a versioned command and narrow read interfaces, produces E2C/E2D facts from resolved identities/references, and leaves timing/application unresolved. It performs no normalization, write, lifecycle change, or legacy caller routing. Delete or replace only after the idempotent E2E3 application service owns the same command contract.
 
+## Stage 2C3A1E2E2 repository binding
+
+Read-only repository composition reuses active-plan and workout-session reads, with deterministic persisted planning-identity ordering. The missing persisted programme-guidance target identity remains explicit through a narrow target-read adapter; no first match, block fallback, or write is permitted.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
