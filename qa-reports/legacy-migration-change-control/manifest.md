@@ -40,6 +40,10 @@ Audit-only: current guidance ranges are generated setting output, not active-pla
 
 Pure persisted-domain contracts model programme/session/prescription lineage and microcycle programme references. They are intentionally unintegrated: no active-plan container, constructor, persistence, construction, workout trace, or application authority was introduced.
 
+## Stage D2 programme specification construction
+
+Pure supplied-ID constructor creates an initial D1 specification and optional first-microcycle reference from approved pre-exercise inputs. It is uncalled in production and does not alter active plans, repositories, or construction consumers.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
