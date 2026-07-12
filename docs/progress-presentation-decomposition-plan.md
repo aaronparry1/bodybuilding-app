@@ -17,3 +17,5 @@ Fourth extraction complete: action flow now consumes `LegacyProgressActionFlowIn
 Recovery semantic replacement complete: the recovery candidate is now current-derived across action flow, evidence, journey, and copy. Rotation, volume, and strategic compatibility replacement remain separate phases.
 
 Rotation semantic replacement complete: Progress presents only persisted intervention/applied replacement facts; historical rotation observations are non-actionable.
+
+Volume replacement is deferred behind the separate volume authority/mutation audit. Progress must not consume a fabricated current volume context while formula, event policy, record identity, and mutation authority remain block-scoped.

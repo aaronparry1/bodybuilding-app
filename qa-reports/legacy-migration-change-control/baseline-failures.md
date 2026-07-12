@@ -41,3 +41,5 @@ Action-flow input extraction verification: **15 failing files / 43 failing tests
 Current Progress recovery semantic replacement verification: **15 failing files / 43 failing tests / 1,557 passing tests**. Obsolete historical-fatigue and legacy-deload recovery-action assertions were replaced with non-actionable warning coverage; the known recovery-prescription fixture failure remains unchanged. Typecheck, Expo public config, and web export passed.
 
 Current Progress rotation semantic replacement adds focused read-only intervention-context coverage; rotation stall assertions now verify no action without a persisted intervention.
+
+Stage 2C3A is documentation-only; it leaves the verified 15 failing files / 43 failing tests / 1,560 passing tests baseline unchanged.
