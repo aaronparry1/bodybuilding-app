@@ -32,6 +32,10 @@ Pure timing resolver accepts supplied current decision, plan/microcycle, version
 
 Pure persisted-slot contract, exact lookup and expected-version update helper establish the destination shape. Existing plans without slots are compatibility-only; no lazy hydration upgrade, active-plan write, session construction change, or service binding occurs here.
 
+## Stage 2C3A1E2E3D0 programme-guidance ownership audit
+
+Audit-only: current guidance ranges are generated setting output, not active-plan programme state. Recommended next architecture is a mesocycle programme specification with explicit microcycle programme-version references. No container, ID, construction, target, or application behaviour changed.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
