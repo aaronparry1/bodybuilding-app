@@ -30,3 +30,7 @@ Using that legacy auto-advance as a substitute would either fabricate `continue`
 ## C2 dependency note
 
 Consumers still cannot produce decisions. C2 adds only pure context for C3: snapshot-derived exposure, non-selected approved successor candidates, and explicit objective-policy absence.
+
+## Strategic replacement audit
+
+`strategic-coaching-presenter` is not a safe current adapter: it constructs block plans and emits duplicate transition authority. Progress must replace it with a direct current summary; Home and QA remain separately classified compatibility callers.

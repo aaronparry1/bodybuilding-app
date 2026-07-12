@@ -1,5 +1,9 @@
 # Legacy migration change-control manifest
 
+## Stage 2C2A1-R audit record
+
+Strategic coaching is confirmed as legacy decision authority, not a formula-preserving Progress adapter. No production code changed. The audit defines a direct current summary replacement and caller-by-caller deletion gates.
+
 ## Stage 2C2A0 dashboard projection record
 
 | File | Old authority | New authority | Historical authority | Tests |
