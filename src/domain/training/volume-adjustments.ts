@@ -4,6 +4,7 @@ import type { Exercise, MuscleGroup, ProgramExercise, Programme } from "@/domain
 import { normalizeTrainingSetupGoal, type ActiveTrainingPlan, type VolumeAdjustmentRecord } from "@/domain/training/plan-setup";
 import type { PersonalisedVolumeResult, VolumeLadderAction } from "@/domain/training/personalised-volume";
 import { shiftRecommendedSetRange, withSetPrescription } from "@/domain/training/set-prescription";
+import { transformVolumeBiasAnnotation } from "@/domain/training/current-volume-bias-annotation";
 
 const increaseActions = new Set<VolumeLadderAction>(["bias_high", "raise_range", "add_exercise"]);
 const structuralActions = new Set<VolumeLadderAction>(["add_exercise", "remove_or_swap_exercise"]);
@@ -108,9 +109,9 @@ function applyAdjustmentToSlots(
 ): ProgramExercise[] {
   switch (adjustment.action) {
     case "bias_high":
-      return slots.map((slot) => (slotTouchesMuscle(slot, exerciseById, adjustment.muscle) ? { ...slot, notes: appendNote(slot.notes, "Aim for the top of the range if performance holds.") } : slot));
+      return slots.map((slot) => (slotTouchesMuscle(slot, exerciseById, adjustment.muscle) ? { ...slot, notes: transformVolumeBiasAnnotation({ annotation: slot.notes, direction: "bias_high" }).resultingAnnotation } : slot));
     case "bias_low":
-      return slots.map((slot) => (slotTouchesMuscle(slot, exerciseById, adjustment.muscle) ? { ...slot, notes: appendNote(slot.notes, "Stay near the low end this week.") } : slot));
+      return slots.map((slot) => (slotTouchesMuscle(slot, exerciseById, adjustment.muscle) ? { ...slot, notes: transformVolumeBiasAnnotation({ annotation: slot.notes, direction: "bias_low" }).resultingAnnotation } : slot));
     case "raise_range":
       return adjustBestAccessorySlot(slots, exerciseById, adjustment.muscle, 1, "Personalised volume: start one set higher next week.");
     case "lower_range":
