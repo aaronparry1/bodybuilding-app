@@ -64,6 +64,10 @@ Purely resolves the matching Lower-A input into knee/hip/knee-flexion/calf/trunk
 
 Pure B policies complete structural four-template coverage for the one representative intermediate four-day Upper/Lower family. They remain unpersisted and uncalled at runtime; all other programme families remain unsupported.
 
+## Stage D2.5C3 Upper/Lower certification
+
+Test-only D2/D1 certification proves the four representative policies construct and hydrate one valid specification using supplied identities. It introduces no runtime policy, plan, persistence, construction or adjustment authority.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
