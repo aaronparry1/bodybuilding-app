@@ -56,6 +56,10 @@ Pure policy vocabulary defines pre-exercise input, semantic targets, purposes, c
 
 Purely resolves one explicit intermediate four-day Upper/Lower hypertrophy Upper-A/full-gym input into ordered jobs. It is not a runtime caller and every other goal, role, experience, purpose or equipment combination remains explicit unsupported policy.
 
+## Stage D2.5C1 representative hypertrophy Lower policy
+
+Purely resolves the matching Lower-A input into knee/hip/knee-flexion/calf/trunk jobs. It does not broaden lower variants or runtime policy coverage and does not change Upper output.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
