@@ -6,6 +6,7 @@ import { buildHypertrophyCoachReport, type HypertrophyCoachReport } from "@/doma
 import { displayWorkoutName } from "@/domain/training/planned-workout";
 import { buildStrategicCoachingViewModel, type StrategicCoachingViewModel } from "@/domain/training/strategic-coaching-presenter";
 import { buildLegacyProgressCopyPresentationInput, type LegacyProgressCopyPresentationInput } from "@/domain/training/legacy-progress-copy-presentation";
+import { buildLegacyProgressPrimaryEvidenceInput, type LegacyProgressPrimaryEvidenceInput } from "@/domain/training/legacy-progress-primary-evidence";
 import { recommendExerciseRotation, type ExerciseRotationRecommendation } from "@/domain/training/exercise-rotation";
 import { analyzeMuscleVolumeLandmarks, getPrimaryVolumeRecommendation } from "@/domain/training/volume-landmarks";
 import {
@@ -212,6 +213,13 @@ export function buildProgressDashboardViewModel(
     hasRecoveryPriority,
     hasRotationRecommendation: Boolean(rotationRecommendation),
   });
+  const legacyPrimaryEvidenceInput = buildLegacyProgressPrimaryEvidenceInput({
+    historical: { completedWorkouts: plannedCompletedWorkouts, source },
+    strategic: { hasEnoughHistory: strategic.hasEnoughHistory, ...(strategic.recommendation?.title ? { recommendationTitle: strategic.recommendation.title } : {}), ...(strategic.recommendation?.message ? { recommendationMessage: strategic.recommendation.message } : {}), recommendationReasons: [...(strategic.recommendation?.reasons ?? [])] },
+    recovery: { priority: hasRecoveryPriority, fatigue: fatigueClassification },
+    volume: { primary: volumeRecommendation, personalised: personalisedVolumeRecommendation },
+    rotation: { action: rotationAction },
+  });
 
   return {
     currentProgressContext,
@@ -231,7 +239,7 @@ export function buildProgressDashboardViewModel(
         : undefined,
     recoveryCapacityTarget,
     rotationRecommendation,
-    recommendationEvidence: buildPrimaryEvidence({ strategic, completedWorkouts: plannedCompletedWorkouts, volumeRecommendation, personalisedVolumeRecommendation, rotationAction, source, fatigueClassification }),
+    recommendationEvidence: buildPrimaryEvidence(legacyPrimaryEvidenceInput),
     actionFlow,
     journeyActions,
     recentProgress: recentProgressItems(completedWorkouts),
@@ -373,33 +381,22 @@ function buildActionFlow({
   return undefined;
 }
 
-function buildPrimaryEvidence({
-  strategic,
-  completedWorkouts,
-  volumeRecommendation,
-  personalisedVolumeRecommendation,
-  rotationAction,
-  source,
-  fatigueClassification,
-}: {
-  strategic: StrategicCoachingViewModel;
-  completedWorkouts: WorkoutHistorySummary[];
-  volumeRecommendation: ReturnType<typeof getPrimaryVolumeRecommendation>;
-  personalisedVolumeRecommendation?: PersonalisedVolumeResult | null;
-  rotationAction?: ExerciseRotationRecommendation;
-  source: RecommendationEvidence["source"];
-  fatigueClassification: FatigueClassifierResult;
-}): RecommendationEvidence {
-  if (!strategic.hasEnoughHistory) {
+function buildPrimaryEvidence(input: LegacyProgressPrimaryEvidenceInput): RecommendationEvidence {
+  const { completedWorkouts, source } = input.historical;
+  const { recommendationReasons, recommendationMessage, recommendationTitle, hasEnoughHistory } = input.strategic;
+  const { fatigue: fatigueClassification, priority: recoveryPriority } = input.recovery;
+  const { primary: volumeRecommendation, personalised: personalisedVolumeRecommendation } = input.volume;
+  const rotationAction = input.rotation.action;
+  if (!hasEnoughHistory) {
     return insufficientEvidence("progress_dashboard", "Log 3-5 completed workouts first.");
   }
-  if (isRecoveryPriority(strategic)) {
+  if (recoveryPriority) {
     return evidence({
       type: "progress_dashboard",
       confidence: "high",
       source,
       summary: "Recovery signals outrank load or volume actions.",
-      dataPoints: [`${completedWorkouts.length} completed workouts`, ...fatigueClassification.evidence, ...(strategic.recommendation?.reasons ?? [])].slice(0, 7),
+      dataPoints: [`${completedWorkouts.length} completed workouts`, ...fatigueClassification.evidence, ...recommendationReasons].slice(0, 7),
       reason: fatigueClassification.classification !== "insufficient_data" ? fatigueClassification.recommendedResponse : "Fatigue is limiting progress.",
       actionAllowed: true,
     });
@@ -418,7 +415,7 @@ function buildPrimaryEvidence({
       actionAllowed: personalisedVolumeRecommendation.confidence !== "low",
     });
   }
-  if (volumeRecommendation && volumeRecommendation.recommendation !== "maintain" && strategic.recommendation?.title.toLowerCase().includes("volume")) {
+  if (volumeRecommendation && volumeRecommendation.recommendation !== "maintain" && recommendationTitle?.toLowerCase().includes("volume")) {
     return evidence({
       type: "volume_change",
       confidence: "medium",
@@ -426,7 +423,7 @@ function buildPrimaryEvidence({
       summary: "Muscle-volume trend crossed a recommendation threshold.",
       dataPoints: [
         `${completedWorkouts.length} completed workouts`,
-        ...(strategic.recommendation?.reasons ?? []).slice(0, 2),
+        ...recommendationReasons.slice(0, 2),
         `${volumeRecommendation.muscleGroup.replaceAll("_", " ")}: ${volumeRecommendation.weeklyProductiveSets} productive sets this week`,
         `Progression rate ${Math.round(volumeRecommendation.progressionRate * 100)}%`,
         `Regressive shutdown pressure ${Math.round(volumeRecommendation.shutdownRate * 100)}%`,
@@ -441,7 +438,7 @@ function buildPrimaryEvidence({
       confidence: "high",
       source,
       summary: "Exercise-level stall criteria were met.",
-      dataPoints: [rotationAction.reason, ...(strategic.recommendation?.reasons ?? [])].slice(0, 5),
+      dataPoints: [rotationAction.reason, ...recommendationReasons].slice(0, 5),
       reason: rotationAction.reason,
       actionAllowed: Boolean(rotationAction.suggestedReplacement),
     });
@@ -451,8 +448,8 @@ function buildPrimaryEvidence({
     confidence: "medium",
     source,
     summary: "Enough completed workouts for a general coach verdict.",
-    dataPoints: [`${completedWorkouts.length} completed workouts`, ...(strategic.recommendation?.reasons ?? [])].slice(0, 5),
-    reason: strategic.recommendation?.message ?? "Continue collecting training history.",
+    dataPoints: [`${completedWorkouts.length} completed workouts`, ...recommendationReasons].slice(0, 5),
+    reason: recommendationMessage ?? "Continue collecting training history.",
     actionAllowed: true,
   });
 }

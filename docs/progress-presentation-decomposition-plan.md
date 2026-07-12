@@ -7,3 +7,5 @@ The safe sequence is: freeze helper outputs; extract leaf copy inputs; extract e
 The later recovery correction is explicitly semantic: historical fatigue becomes a warning, not an authorised recovery action. It is not part of the structural extraction seam.
 
 First extraction complete: copy helpers now consume `LegacyProgressCopyPresentationInput`, built once at the legacy presenter compatibility boundary. Evidence, journey, and action-flow families remain raw-legacy consumers until their separately scoped extraction phases.
+
+Second extraction complete: primary evidence now consumes `LegacyProgressPrimaryEvidenceInput`; journey and action-flow remain deferred.

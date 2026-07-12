@@ -1,5 +1,9 @@
 # Legacy migration change-control manifest
 
+## Second Progress presentation extraction
+
+`buildPrimaryEvidence` now receives typed legacy category inputs. Its branch ordering and output are unchanged; journey/action-flow remain raw legacy dependencies.
+
 ## First Progress presentation extraction
 
 `verdictTitle`, `verdictMessage`, `actionTitle`, and `actionMessage` now receive a narrow legacy copy compatibility input. Output equivalence is covered by the existing Progress dashboard characterization suite; evidence, journey, and action-flow remain deferred.
