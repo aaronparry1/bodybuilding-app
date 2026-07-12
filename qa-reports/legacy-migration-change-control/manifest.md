@@ -20,6 +20,10 @@ Read-only repository composition reuses active-plan and workout-session reads, w
 
 Audit-only: future guidance target is proposed as a versioned, persistently addressable programme guidance slot with parent/version validation. Recommended timing is next microcycle only; both target granularity and timing are product-owner decisions before E2E3 writes can begin.
 
+## Stage 2C3A1E2E3A current guidance record contract
+
+Pure current record validation/factory defines target identity, next-normal timing lifecycle, and timestamp-independent semantic idempotency. It does not alter active-plan storage or legacy records; block/week records remain compatibility-only.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.

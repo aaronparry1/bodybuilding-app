@@ -1,0 +1,8 @@
+import { describe, expect, it } from "vitest";
+import { createCurrentRecommendedSetGuidanceAdjustmentRecord, hydrateRecommendedSetGuidanceAdjustmentRecord, semanticIdempotencyKey } from "@/domain/training/current-recommended-set-guidance-adjustment-record";
+const input: any = { id: "r1", schemaVersion: "v1", kind: "raise_range", direction: "raise", magnitude: 1, target: { schemaVersion: "v1", planId: "p", mesocycleId: "m", parentProgrammeId: "pg", parentProgrammeVersion: "2", guidanceSlotId: "slot", targetDomain: "programme_guidance_slot", guidancePolicyVersion: "v1" }, expectedTargetVersion: "2", normalizationPolicyVersion: "legacy_programme_guidance_v1", timing: { state: "unresolved_pending_decision" }, lifecycle: "proposed", createdAt: "2026-07-12", evidenceIds: ["e1"] };
+describe("current recommended set guidance adjustment record", () => {
+ it("keeps unresolved timing explicit and fingerprints semantic identity without timestamp", () => { const record = createCurrentRecommendedSetGuidanceAdjustmentRecord(input); expect(record.status).toBe("hydrated_current"); expect(semanticIdempotencyKey(input)).toBe(semanticIdempotencyKey({ ...input, createdAt: "later" })); });
+ it("requires resolved next-normal timing before applied", () => expect(createCurrentRecommendedSetGuidanceAdjustmentRecord({ ...input, lifecycle: "applied" }).status).toBe("invalid_record"));
+ it("keeps block-scoped records legacy-compatible without fabricating identity", () => expect(hydrateRecommendedSetGuidanceAdjustmentRecord({ id: "old", blockId: "b", week: 1 }).status).toBe("hydrated_legacy_compatibility"));
+});
