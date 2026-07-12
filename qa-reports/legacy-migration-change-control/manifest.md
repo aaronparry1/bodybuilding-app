@@ -1,5 +1,13 @@
 # Legacy migration change-control manifest
 
+## Stage 2C2A1.1 strategic-summary record
+
+| File | Authority | Reason | Tests |
+| --- | --- | --- | --- |
+| `current-progress-strategic-summary.ts` | Current Progress context + immutable supplied observations | Direct strategic presentation projection without legacy block authority. | `current-progress-strategic-summary` |
+
+Stage 2C2A1.2 must migrate the Progress caller; this summary remains unused until then.
+
 ## Stage 2C2A1-R audit record
 
 Strategic coaching is confirmed as legacy decision authority, not a formula-preserving Progress adapter. No production code changed. The audit defines a direct current summary replacement and caller-by-caller deletion gates.
