@@ -60,6 +60,10 @@ Purely resolves one explicit intermediate four-day Upper/Lower hypertrophy Upper
 
 Purely resolves the matching Lower-A input into knee/hip/knee-flexion/calf/trunk jobs. It does not broaden lower variants or runtime policy coverage and does not change Upper output.
 
+## Stage D2.5C2 hypertrophy Upper/Lower A/B policy
+
+Pure B policies complete structural four-template coverage for the one representative intermediate four-day Upper/Lower family. They remain unpersisted and uncalled at runtime; all other programme families remain unsupported.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
