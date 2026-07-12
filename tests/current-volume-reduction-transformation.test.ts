@@ -1,0 +1,3 @@
+import { describe, expect, it } from "vitest"; import { transformCurrentVolumeReduction } from "@/domain/training/current-volume-reduction-transformation";
+const slots = [{ slotId: "a", originalIndex: 0, exerciseId: "a", structuralCategory: "accessory" as const, currentSetCount: 3, protected: false, approvedEligible: true, removable: false, minimumSetCount: 1 }];
+describe("current volume reduction transformation", () => { it("reduces immutable caller-approved slots", () => { const result = transformCurrentVolumeReduction({ slots, magnitude: 2, maximumSetCount: 10 }); expect(result).toMatchObject({ status: "transformed", appliedMagnitude: 2 }); expect(result.slots[0]?.currentSetCount).toBe(1); expect(slots[0]?.currentSetCount).toBe(3); }); });
