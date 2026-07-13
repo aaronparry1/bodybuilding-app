@@ -1,0 +1,25 @@
+{
+  "phase": "D4E3C4D5",
+  "status": "authority_still_unknown",
+  "fixtureCount": 10,
+  "exactEquivalentCount": 3,
+  "identifierEquivalentCount": 0,
+  "unknownAuthorityCount": 6,
+  "semanticMismatchCount": 0,
+  "ownershipStage": "helper_resolution",
+  "finalDecisionBoundary": "resolveCompatibilityFinalRepLaneDecision",
+  "generatedSettingsProjection": "decision_object",
+  "postBoundaryRepLaneAuthority": "not_detected_in_projection_path",
+  "productionV2RuntimeUse": false,
+  "internalCallerReadiness": "blocked",
+  "publicFacadeReadiness": "compatibility_only",
+  "remainingGaps": [
+    "override_authority",
+    "advanced_methods",
+    "family_collisions",
+    "special_families",
+    "planned_order_final_authority",
+    "partial_facades"
+  ],
+  "nextPhase": "complete production authority fixtures before D4E3C4E"
+}
