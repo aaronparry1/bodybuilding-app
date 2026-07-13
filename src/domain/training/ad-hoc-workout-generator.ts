@@ -847,35 +847,23 @@ function structuredVariabilityScore(exercise: Exercise, slot: TemplateSlot, opti
   return score;
 }
 
-function createGeneratedSlot(exercise: Exercise, slot: TemplateSlot, plannedOrder: number, options: GenerateWorkoutOptions): ProgramExercise {
+type CompatibilityGeneratedSlotPrescriptionRequest = Readonly<{ exercise: Exercise; slot: TemplateSlot; options: GenerateWorkoutOptions }>;
+type CompatibilityGeneratedSlotPrescription = Readonly<{ settings: ProgressionSettings; loadRecommendation: ReturnType<typeof resolveStartingLoadRecommendation> }>;
+
+function buildCompatibilityGeneratedSlotPrescription(request: CompatibilityGeneratedSlotPrescriptionRequest): CompatibilityGeneratedSlotPrescription {
+  const { exercise, slot, options } = request;
   const settings = resolveGeneratedSettings(exercise, slot, options.currentBlock, options.experienceLevel);
+  const loadIncrement = resolveLoadIncrement({ exercise, equipmentProfile: options.loadIncrementProfile, unit: options.unit ?? settings.unit, context: "estimate" });
+  const resolvedSettings = { ...settings, loadIncrease: loadIncrement.increment, unit: options.unit ?? settings.unit };
+  const loadRecommendation = resolveStartingLoadRecommendation({ targetExercise: exercise, exercises: options.exercises, history: options.history, repRange: resolvedSettings.repRange, loadIncrement: resolvedSettings.loadIncrease, referenceDate: options.referenceDate, goal: options.goal, experienceLevel: options.experienceLevel, blockType: options.currentBlock?.type, exerciseRole: strategyRoleForSlot(exercise, slot), exerciseFamily: exercise.family, trainingLane: resolvedSettings.trainingLane, unit: resolvedSettings.unit });
+  return { settings: resolvedSettings, loadRecommendation };
+}
+
+function createGeneratedSlot(exercise: Exercise, slot: TemplateSlot, plannedOrder: number, options: GenerateWorkoutOptions): ProgramExercise {
+  const prescription = buildCompatibilityGeneratedSlotPrescription({ exercise, slot, options });
+  const settings = prescription.settings;
   const laneCopy = settings.trainingLane ? getLanePrescriptionConstraints(settings.trainingLane).copy : "Build useful work.";
-  const loadIncrement = resolveLoadIncrement({
-    exercise,
-    equipmentProfile: options.loadIncrementProfile,
-    unit: options.unit ?? settings.unit,
-    context: "estimate",
-  });
-  const resolvedSettings = {
-    ...settings,
-    loadIncrease: loadIncrement.increment,
-    unit: options.unit ?? settings.unit,
-  };
-  const loadRecommendation = resolveStartingLoadRecommendation({
-    targetExercise: exercise,
-    exercises: options.exercises,
-    history: options.history,
-    repRange: resolvedSettings.repRange,
-    loadIncrement: resolvedSettings.loadIncrease,
-    referenceDate: options.referenceDate,
-    goal: options.goal,
-    experienceLevel: options.experienceLevel,
-    blockType: options.currentBlock?.type,
-    exerciseRole: strategyRoleForSlot(exercise, slot),
-    exerciseFamily: exercise.family,
-    trainingLane: resolvedSettings.trainingLane,
-    unit: resolvedSettings.unit,
-  });
+  const loadRecommendation = prescription.loadRecommendation;
   const hasGapNote = loadRecommendation.recommendationEvidence?.type === "training_gap_starting_load";
   const estimateNote = loadRecommendation.source === "same_family_estimate" && !hasGapNote ? ` ${loadRecommendation.message}` : "";
   const gapNote = hasGapNote ? ` ${loadRecommendation.message}` : "";
@@ -885,7 +873,7 @@ function createGeneratedSlot(exercise: Exercise, slot: TemplateSlot, plannedOrde
     exerciseId: exercise.id,
     plannedOrder,
     suggestedLoad: loadRecommendation.load,
-    settings: resolvedSettings,
+    settings,
     notes: `${slot.label}: ${slot.reason}. ${laneCopy} Autoregulation will cap quality sets from logged performance.${estimateNote}${gapNote}`,
   };
 }
