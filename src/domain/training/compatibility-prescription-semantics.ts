@@ -118,7 +118,7 @@ export function validateCompatibilityPrescriptionSemantics(value: CompatibilityP
 export function fingerprintCompatibilityPrescriptionSemantics(value: CompatibilityPrescriptionSemantics): string { const { fingerprint: _ignored, ...rest } = value; return fingerprint(rest); }
 export function lookupCompatibilityPrescriptionSemantics(branchKey: CompatibilityBranchKey): Readonly<{ status: "found"; semantics: CompatibilityPrescriptionSemantics } | { status: "missing" | "ambiguous" | "invalid_key"; reasonCode: string }> {
   if (!branchKey || branchKey.sessionContext !== "generated_slot") return { status: "invalid_key", reasonCode: "branch_key_invalid" };
-  const matches = COMPATIBILITY_PRESCRIPTION_REGISTRY.filter((entry) => stable(entry.branchKey) === stable(branchKey));
+  const matches = COMPATIBILITY_PRESCRIPTION_REGISTRY.filter((entry) => Object.keys(entry.branchKey).every((field) => entry.branchKey[field as keyof CompatibilityBranchKey] === branchKey[field as keyof CompatibilityBranchKey]));
   if (matches.length === 0) return { status: "missing", reasonCode: "branch_not_registered" };
   if (matches.length > 1) return { status: "ambiguous", reasonCode: "duplicate_branch_key" };
   return { status: "found", semantics: copyCompatibilityPrescriptionSemantics(matches[0]) };
