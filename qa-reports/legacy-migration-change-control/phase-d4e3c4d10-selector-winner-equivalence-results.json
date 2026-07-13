@@ -1,0 +1,12 @@
+{
+  "phase": "D4E3C4D10",
+  "status": "selector_identity_not_locally_available",
+  "familiesAttempted": [],
+  "familiesBlocked": ["explicit_override", "advanced_method", "planned_order_lane", "family_role_collision"],
+  "primitiveOutputDrift": false,
+  "generatedOutputDrift": false,
+  "branchOrderChanged": false,
+  "v2RuntimeUse": false,
+  "internalCallerReadiness": "blocked",
+  "nextPhase": "decompose resolveRepRange at its existing return branches"
+}
