@@ -81,6 +81,50 @@ type CoachingTemplate = {
   slots: TemplateSlot[];
 };
 
+/** Selection-only semantic request used by current programme jobs. */
+export type SemanticExerciseSelectionRequest = Readonly<{
+  allowedMuscles: readonly MuscleGroup[];
+  movementPattern?: MovementPattern;
+  exerciseFamily?: ExerciseFamily;
+  purpose: "primary_compound" | "secondary_compound" | "isolation" | "supporting_accessory";
+  exerciseClass: "compound" | "isolation" | "either";
+}>;
+
+/**
+ * Reuses the generator's candidate filtering, scoring and tie-breaking mechanics
+ * for one semantic job. It intentionally accepts no block or workout type.
+ */
+export function selectExerciseCandidateForSemanticJob(
+  request: SemanticExerciseSelectionRequest,
+  options: Omit<GenerateWorkoutOptions, "currentBlock" | "targetExerciseCount" | "focusMuscles">,
+): Exercise | null {
+  const role: ExerciseRole = request.purpose === "primary_compound"
+    ? "primary_compound"
+    : request.purpose === "secondary_compound"
+      ? "secondary_compound"
+      : request.purpose === "isolation"
+        ? "isolation"
+        : "accessory";
+  const slot: TemplateSlot = {
+    role,
+    muscles: [...request.allowedMuscles],
+    patterns: request.movementPattern ? [request.movementPattern] : undefined,
+    families: request.exerciseFamily ? [request.exerciseFamily] : undefined,
+    label: "semantic selection job",
+    sets: 1,
+    reason: "current programme semantic job",
+  };
+  const candidates = options.exercises
+    .filter((exercise) => matchesEquipment(exercise, options.availableEquipment))
+    .filter((exercise) => matchesExperience(exercise, options.experienceLevel));
+  const classFiltered = request.exerciseClass === "either"
+    ? candidates
+    : candidates.filter((exercise) => request.exerciseClass === "compound"
+      ? exercise.role !== "isolation" && exercise.roles.includes("primary_compound") || exercise.roles.includes("secondary_compound")
+      : exercise.role === "isolation" || exercise.roles.includes("isolation"));
+  return pickExerciseForSlot(slot, classFiltered, [], options);
+}
+
 const templateMap: Record<BlockFamily, Record<Exclude<GeneratedWorkoutType, "custom">, CoachingTemplate>> = {
   hypertrophy: {
     push: template("Push", ["chest", "shoulders", "triceps"], [
