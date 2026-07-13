@@ -4,11 +4,11 @@ D4E2 is an explicit policy-design gate. The certified calibration programme supp
 
 Those values cannot be inferred from `hypertrophy_calibration`, slot purpose, movement pattern or programme order. A future calibration exact-target bundle must define each policy independently, validate all four session roles and retained slot classifications, and certify that no unresolved default remains.
 
-## Proposed bundle (not yet certified)
+## Approved bundle (D4E2B metadata; not arithmetic)
 
 Identity: `hypertrophy_calibration_exact_target_policy_v1`, for the certified intermediate four-day full-gym Upper/Lower calibration family and normal calibration priority.
 
-The proposed lanes are:
+The approved lanes are:
 
 - `primary_compound_calibration` for knee/hinge and primary upper compounds;
 - `secondary_compound_calibration` for retained complementary compounds;
@@ -16,19 +16,19 @@ The proposed lanes are:
 
 The proposed precedence is: certified D4B recommended min/max guidance is the hard envelope; calibration chooses an initial count inside that envelope; history may move within it; drop-off/shutdown may terminate early. Legacy block defaults never override the envelope.
 
-Starting-load policy proposal: exercise-specific history first, sparse-history evidence second, conservative exercise-specific discovery third, and explicit review when safe estimation is unavailable. Generic body-part or block percentages are not valid current authority.
+Starting-load policy: exercise-specific history first, sparse-history evidence second, conservative exercise-specific discovery third, and explicit review when safe estimation is unavailable. Generic body-part or block percentages are not valid current authority.
 
-Drop-off proposal: retain the approved 15% rule, compare valid working performance with the best/reference set after the minimum observation count, and exclude warm-up/load-finding attempts. Shutdown is exercise-level, retains valid completed work, does not add replacement sets, and permits later unrelated jobs when live safety permits.
+Drop-off: greater than 15% from the best valid completed working set, after two valid working sets, excluding warm-up/load-finding attempts. Shutdown is exercise-level, retains valid completed work, cancels remaining sets, adds no replacements, and permits later unrelated jobs when live safety permits.
 
-Effort policy proposal: no routine AMRAP or intentional failure; missed or failed reps are evidence. Suitability is explicit purpose/lane/exercise-class/loading validation, not a renamed block check.
+Effort policy: no routine AMRAP, intentional failure, RIR or RPE; missed or failed reps are evidence. Suitability is explicit purpose/lane/exercise-class/loading validation, not a renamed block check.
 
 ### Slot/session matrix
 
 All retained Upper-A, Upper-B, Lower-A and Lower-B slots resolve to one of the three lanes above. Primary presses, pulls, knee-dominant and hip-hinge jobs use the compound lanes; knee-flexion, calves and lateral deltoid use isolation calibration. Every row must additionally specify rep domain, set construction, load method, drop-off and shutdown before certification; no wildcard row is allowed.
 
-### Owner decisions still required
+### Approved numerical and precedence decisions
 
-Aaron must approve exact numerical rep domains, initial count within each D4B range, no-history minimum behavior, starting-load hierarchy and rounding, 15% comparison basis/minimum observations, exercise-level continuation, final-set failure/AMRAP behavior, and how established history changes calibration prescriptions. These are intentionally unresolved rather than inferred.
+Primary compounds use internal domain 6–10; secondary compounds 8–12; isolation, lateral deltoid, knee-flexion and calves 10–15. Exact reps are produced later by the arithmetic core. D4B min/max guidance is the hard envelope; no-history and sparse history start at minimum; established history may move within the envelope only. Loads round to available increments. Established history may refine reps, load and count without changing semantics or exceeding maximum. Progression remains owned by readiness/decision architecture.
 
 ### Certification and implementation sequence
 
