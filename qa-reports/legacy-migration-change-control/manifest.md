@@ -500,3 +500,7 @@ The exact supported D3 calibration family now has a pure current-session source 
 ## Stage D4B slot exercise-selection adapter
 
 The calibration-only semantic adapter maps each D3 slot one-to-one into an explicit exercise-selection job with movement, purpose, guidance, constraints and immutable source trace. It preserves calibration omissions and reports unmappable semantics; runtime construction remains unchanged pending authority-switch integration.
+
+## Stage D4C runtime construction routing
+
+The exact restricted calibration family now has a read-only runtime source router that resolves D3 reference → D4 projection → certified D4B adapter. Compatibility plans retain the generated path; malformed current plans fail without fallback. No exercise-selection algorithm, exact-target algorithm, D3 metadata, programme version, adjustment or workout write changed.
