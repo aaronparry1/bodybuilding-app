@@ -9,6 +9,7 @@ import { mesocycleById, selectMesocycles, type MesocycleId } from "@/domain/trai
 import { createMicrocycle, type MicrocyclePlan } from "@/domain/training/microcycle-scheduler";
 import type { PersonalisedVolumeConfidence, VolumeLadderAction } from "@/domain/training/personalised-volume";
 import type { PrimaryLiftVariationDecisionRecord } from "@/domain/training/primary-lift-variations";
+import { buildRestrictedCalibrationProgrammeMetadata, type RestrictedCalibrationMetadata } from "@/domain/training/restricted-calibration-programme-persistence";
 
 export type TrainingSetupGoal =
   | "build_muscle"
@@ -64,6 +65,10 @@ export interface ActiveTrainingPlan {
   createdAt: string;
   targetDate?: string;
   eventType?: EventType;
+  /** Immutable D3 planning metadata; absent means legacy/compatibility plan until D4. */
+  programmeSpecifications?: RestrictedCalibrationMetadata["programmeSpecifications"];
+  microcycleProgrammeReferences?: RestrictedCalibrationMetadata["microcycleProgrammeReferences"];
+  programmePolicyMetadata?: RestrictedCalibrationMetadata;
 }
 
 export interface PlanRecommendationState {
@@ -158,7 +163,7 @@ export function createActiveTrainingPlan(input: TrainingSetupInput, createdAt = 
   const currentMicrocycle = currentMesocycleId
     ? createMicrocycle({ parentMesocycleId: currentMesocycleId, trainingDays: clampDays(normalizedInput.daysPerWeek) as 3 | 4 | 5 | 6, split: normalizedInput.preferredSplit })
     : undefined;
-  return {
+  const plan: ActiveTrainingPlan = {
     id: `active-plan-${createdAt}`,
     name: nameForSetup(normalizedInput),
     mode: normalizedInput.planningChoice,
@@ -178,6 +183,13 @@ export function createActiveTrainingPlan(input: TrainingSetupInput, createdAt = 
     targetDate: normalizedInput.targetDate,
     eventType: normalizedInput.eventType,
   };
+  const metadata = currentMesocycleId ? buildRestrictedCalibrationProgrammeMetadata({ setup: normalizedInput, planId: plan.id, mesocycleId: currentMesocycleId, microcycleNumber: currentMicrocycle?.sequenceNumber ?? 1, createdAt }) : null;
+  if (metadata?.status === "supported_calibration_programme_persistence") {
+    plan.programmeSpecifications = metadata.metadata.programmeSpecifications;
+    plan.microcycleProgrammeReferences = metadata.metadata.microcycleProgrammeReferences;
+    plan.programmePolicyMetadata = metadata.metadata;
+  }
+  return plan;
 }
 
 function macrocycleEngineForSetupGoal(goal: TrainingSetupGoal): import("@/domain/training/macrocycle-engine").MacrocycleEngineId {
