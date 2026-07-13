@@ -927,6 +927,10 @@ type CompatibilityFinalRepLaneDecision = Readonly<{
   prescriptionFamily: "ordinary" | "corrective" | "recovery" | "power";
   plannedOrderClass: "unknown";
   ownershipStage: "helper_resolution";
+  repAuthoritySource: "block_compatibility" | "corrective_family" | "recovery_family" | "power_family" | "unavailable_in_legacy_contract";
+  laneAuthoritySource: "block_compatibility" | "corrective_family" | "recovery_family" | "power_family" | "unavailable_in_legacy_contract";
+  appliedRepAuthorityIdentity: string;
+  appliedLaneAuthorityIdentity: string;
   reasonCodes: readonly string[];
   fingerprint: string;
 }>;
@@ -942,7 +946,8 @@ function resolveCompatibilityFinalRepLaneDecision(exercise: Exercise, slot: Temp
   if (!Number.isInteger(repRange.min) || !Number.isInteger(repRange.max) || repRange.min < 1 || repRange.max < repRange.min || !lane) return { status: "invalid_input", reasonCode: "final_rep_lane_decision_invalid" };
   const prescriptionFamily = exercise.roles.includes("recovery") ? "recovery" : exercise.roles.includes("corrective") ? "corrective" : exercise.roles.includes("power") || slot.role === "power" ? "power" : "ordinary";
   const roleSource: CompatibilityFinalRepLaneDecision["roleSource"] = slot.role === exerciseRole ? "explicit" : "inferred";
-  const semantic = { schemaVersion: "v1" as const, repRange, lane, exerciseRole, roleSource, prescriptionFamily: prescriptionFamily as CompatibilityFinalRepLaneDecision["prescriptionFamily"], plannedOrderClass: "unknown" as const, ownershipStage: "helper_resolution" as const, reasonCodes: ["production_helpers_selected_rep_and_lane"] };
+  const familyAuthority = prescriptionFamily === "corrective" ? "corrective_family" : prescriptionFamily === "recovery" ? "recovery_family" : prescriptionFamily === "power" ? "power_family" : "block_compatibility";
+  const semantic = { schemaVersion: "v1" as const, repRange, lane, exerciseRole, roleSource, prescriptionFamily: prescriptionFamily as CompatibilityFinalRepLaneDecision["prescriptionFamily"], plannedOrderClass: "unknown" as const, ownershipStage: "helper_resolution" as const, repAuthoritySource: familyAuthority as CompatibilityFinalRepLaneDecision["repAuthoritySource"], laneAuthoritySource: familyAuthority as CompatibilityFinalRepLaneDecision["laneAuthoritySource"], appliedRepAuthorityIdentity: `production.${familyAuthority}.rep`, appliedLaneAuthorityIdentity: `production.${familyAuthority}.lane`, reasonCodes: ["production_helpers_selected_rep_and_lane"] };
   return { status: "resolved", decision: { ...semantic, fingerprint: `v1|${JSON.stringify(semantic)}` } };
 }
 

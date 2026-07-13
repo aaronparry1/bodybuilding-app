@@ -1,0 +1,20 @@
+{
+  "phase": "D4E3C4D6",
+  "status": "authority_mapping_ambiguous",
+  "knownAuthorityCategoryCount": 4,
+  "unknownAuthorityCategoryCount": 2,
+  "categories": [
+    "block_compatibility",
+    "corrective_family",
+    "recovery_family",
+    "power_family",
+    "override_method_role_collisions",
+    "planned_order_authority"
+  ],
+  "productionOutputsChanged": false,
+  "precedenceChanged": false,
+  "v2RuntimeUse": false,
+  "internalCallerReadiness": "blocked",
+  "publicFacadeReadiness": "compatibility_only",
+  "nextPhase": "capture override and planned-order provenance at production selection points"
+}
