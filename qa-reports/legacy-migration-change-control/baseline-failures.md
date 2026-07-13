@@ -53,3 +53,5 @@ Stage D2.5D0 pre-edit focused verification: **10 focused files / 42 focused test
 Stage D2.5D1 verified pre-edit baseline: **15 failing files / 43 failing tests / 1,604 passing tests**. Ten requested focused files/42 tests passed; typecheck, Expo public config and web export passed. The frozen failure set did not worsen. This is the first full-suite comparison after the D2.5 policy/certification additions.
 
 Stage D2.5D1 post-edit verification: **15 failing files / 43 failing tests / 1,610 passing tests**. Eleven focused files/48 tests passed; typecheck, Expo public config and web export passed. The six added mapping tests account for the passing-test increase; no frozen failure changed.
+
+Stage D2.5D2 pre-edit verification retained **15 failing files / 43 failing tests / 1,610 passing tests**; focused 48 tests, typecheck, Expo config and web export passed.
