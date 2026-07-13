@@ -1,0 +1,14 @@
+{
+  "phase": "D4E3C4D3",
+  "status": "final_authority_not_observable",
+  "nonObservableActiveBranchCount": 6,
+  "exactEquivalentCount": 3,
+  "identifierEquivalentCount": 0,
+  "unknownAuthorityCount": 6,
+  "semanticMismatchCount": 0,
+  "generatedSettingsFinalAuthority": "unresolved",
+  "publicFacadeGapCount": 2,
+  "callerReadiness": "blocked",
+  "productionFilesChanged": 0,
+  "nextPhase": "decompose final compatibility prescription decision boundary before observation"
+}
