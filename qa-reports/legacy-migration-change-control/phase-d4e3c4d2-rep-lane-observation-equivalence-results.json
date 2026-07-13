@@ -1,0 +1,15 @@
+{
+  "phase": "D4E3C4D2",
+  "status": "observation_seam_missing",
+  "productionCategoryCount": 12,
+  "exactEquivalentCount": 3,
+  "identifierEquivalentCount": 0,
+  "remainingCharacterizationGaps": 9,
+  "remainingSemanticMismatches": 0,
+  "nonObservableActiveBranches": 6,
+  "facadeGapCount": 2,
+  "laneIdentityCoverage": 8,
+  "generatedSettingsFinalAuthority": "not_certified",
+  "callerReadiness": "blocked",
+  "nextPhase": "D4E3C4D3: narrow production decision seam only where existing outputs cannot observe the winner"
+}
