@@ -1,0 +1,14 @@
+{
+  "phase": "D4E3C4D10B",
+  "status": "partial_method_equivalence",
+  "repOwnedMethodsCovered": 1,
+  "laneOwnedMethodsCovered": 0,
+  "knownMethodWinnerCount": 1,
+  "unknownMethodWinnerCount": 0,
+  "primitiveOutputDrift": false,
+  "branchOrderChanged": false,
+  "generatedOutputDrift": false,
+  "plannedOrderUntouched": true,
+  "familyRoleUntouched": true,
+  "nextPhase": "D4E3C4D10C planned-order lane selection"
+}

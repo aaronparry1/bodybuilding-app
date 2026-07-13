@@ -18,6 +18,7 @@ export interface ResolveRepRangeInput {
 
 export type RepRangeAuthoritySource = "explicit_slot_override" | "block_compatibility" | "exercise_family_override" | "exercise_default" | "advanced_method" | "programme_default";
 export type ResolvedRepRangeDecision = Readonly<{ status: "resolved"; value: RepRange; authoritySource: RepRangeAuthoritySource; appliedIdentity: string }>; 
+export type ResolvedCompatibilityAdvancedMethodDecision = Readonly<{ status: "applied" | "not_applicable"; value?: RepRange; methodIdentity?: string; ownership: "rep" | "lane" | "both"; reasonCode: string }>;
 
 const safeFallback: RepRange = { min: 8, max: 12 };
 
@@ -64,10 +65,17 @@ export function resolveRepRangeDecision(input: ResolveRepRangeInput): ResolvedRe
   const exerciseDefault = normalizeRepRange(input.exerciseDefault);
   if (exerciseDefault) return { status: "resolved", value: exerciseDefault, authoritySource: "exercise_default", appliedIdentity: "exercise_default_rep_range" };
 
-  const advanced = input.userAdvancedOverride?.enabled ? normalizeRepRange(input.userAdvancedOverride.repRange) : null;
-  if (advanced) return { status: "resolved", value: advanced, authoritySource: "advanced_method", appliedIdentity: "user_advanced_override" };
+  const advanced = resolveAdvancedMethodDecision(input);
+  if (advanced.status === "applied" && advanced.value) return { status: "resolved", value: advanced.value, authoritySource: "advanced_method", appliedIdentity: advanced.methodIdentity ?? "user_advanced_override" };
 
   return { status: "resolved", value: safeFallback, authoritySource: "programme_default", appliedIdentity: "safe_fallback" };
+}
+
+function resolveAdvancedMethodDecision(input: ResolveRepRangeInput): ResolvedCompatibilityAdvancedMethodDecision {
+  if (!input.userAdvancedOverride?.enabled) return { status: "not_applicable", ownership: "rep", reasonCode: "advanced_method_not_applicable" };
+  const value = normalizeRepRange(input.userAdvancedOverride.repRange);
+  if (!value) return { status: "not_applicable", ownership: "rep", reasonCode: "advanced_method_invalid" };
+  return { status: "applied", value, methodIdentity: "user_advanced_override", ownership: "rep", reasonCode: "advanced_method_selected" };
 }
 
 export function normalizeRepRange(range?: RepRange | null): RepRange | null {
