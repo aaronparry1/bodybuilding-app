@@ -47,3 +47,5 @@ Stage 2C3A is documentation-only; it leaves the verified 15 failing files / 43 f
 Stage 2C3A1E2E0 is audit-only and makes no runtime change. It retains the most recently fully verified baseline pending the next repository-wide verification run.
 
 Stage 2C3A1E2E1 verification: **15 failing files / 43 failing tests / 1,575 passing tests**. The five additional passing tests cover the read-only guidance resolver; typecheck, Expo public config, and web export passed. No frozen failure changed.
+
+Stage D2.5D0 pre-edit focused verification: **10 focused files / 42 focused tests passing**; `npm run typecheck` passed. This documentation-only phase did not rerun the full suite, Expo public config or web export, so the most recent repository-wide comparison remains **15 failing files / 43 failing tests / 1,575 passing tests** from E2E1 and is not re-certified here.

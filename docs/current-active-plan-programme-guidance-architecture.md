@@ -25,6 +25,10 @@ Each microcycle references one exact programme ID/version. Continue first establ
 
 Existing plans remain compatibility-only. No generated settings may be promoted to current identities. The migration is: contracts → new-plan specification constructor → repository/hydration → construction projection accessor → microcycle version reference → workout trace → concrete service adapter → service binding → routing. Legacy writable fields are compatibility projections until all readers/writers migrate.
 
+## Mesocycle-policy gate
+
+The specification is attached only after an exact mesocycle-purpose mapping selects a versioned policy. Generic hypertrophy is not a valid parent-purpose. The certified intermediate four-day Upper/Lower policy is a candidate `hypertrophy_base` policy; current new plans start in `hypertrophy_calibration`, which needs a separately certified conservative policy before production persistence can begin.
+
 ## Owner decisions
 
 Aaron must approve the hybrid mesocycle/version model, slot/muscle-pattern granularity, template exercise-selection representation, deload programme treatment, historical version retention, and the continue/guidance orchestration order. No E2E3E implementation is safe before these are approved.

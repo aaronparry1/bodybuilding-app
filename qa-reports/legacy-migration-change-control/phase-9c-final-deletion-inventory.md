@@ -14,3 +14,7 @@ No annual/block/range module satisfies every deletion gate. The current planned 
 Progress no longer passes the complete strategic presenter result to its copy, primary-evidence, journey-action, or action-flow helpers; category compatibility adapters and semantic replacements still prevent strategic-coaching deletion.
 
 The Progress recovery category no longer needs legacy strategic coaching authority. Strategic, rotation, volume, Home, QA, and compatibility callers still block shared-module deletion.
+
+## D2.5D0 deletion gate
+
+No mesocycle catalogue field, generic hypertrophy policy input, generated exercise-setting field, or legacy block field may be deleted or repurposed for programme-guidance mapping. Deletion/replacement requires an explicit exact-purpose mapping registry, certified policy for each production entry purpose, and active-plan/construction migration; calibration remains the immediate blocker.
