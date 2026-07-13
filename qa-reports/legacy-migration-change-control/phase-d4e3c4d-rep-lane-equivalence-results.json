@@ -1,0 +1,21 @@
+{
+  "phase": "D4E3C4D",
+  "status": "characterization_gap",
+  "productionFixtureCount": 12,
+  "ordinaryBranchesObserved": 3,
+  "laneIdentitiesObserved": 8,
+  "exactEquivalenceFixtures": 3,
+  "unresolvedCategories": [
+    "explicit_slot_override",
+    "advanced_method",
+    "exercise_family_override_collision",
+    "inferred_role_collision",
+    "corrective_family",
+    "recovery_family",
+    "power_family",
+    "planned_order_lane",
+    "partial_public_facade"
+  ],
+  "callerMigrationReady": false,
+  "notes": "No production routing is permitted until the expanded v2 resolver represents and matches these branches."
+}
