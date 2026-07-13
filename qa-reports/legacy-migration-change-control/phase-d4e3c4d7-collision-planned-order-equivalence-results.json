@@ -1,0 +1,13 @@
+{
+  "phase": "D4E3C4D7",
+  "status": "collision_authority_unavailable",
+  "knownCollisionProvenanceCount": 1,
+  "unknownAuthorityCount": 3,
+  "known": ["inferred_role_fallthrough"],
+  "blocked": ["override_method_collisions", "method_family_role_collisions", "planned_order_lane_authority"],
+  "productionOutputsChanged": false,
+  "precedenceChanged": false,
+  "v2RuntimeUse": false,
+  "internalCallerReadiness": "blocked",
+  "nextPhase": "expose collision winners at existing production authority selectors"
+}
