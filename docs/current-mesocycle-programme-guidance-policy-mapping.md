@@ -8,7 +8,7 @@ A current mesocycle maps to a programme-guidance policy only through an explicit
 
 | Purpose | Training job and evidence state | Programme-policy status |
 | --- | --- | --- |
-| `hypertrophy_calibration` | Establish reproducible exercise, load and recovery baselines. Load data, stable exercise fit and set tolerance are not yet trusted. | Dedicated policy required. It must state conservative ranges, accessory rules, stable-selection constraints and the evidence needed before base. The certified productive policy must not be attached here. |
+| `hypertrophy_calibration` | Establish reproducible exercise, load and recovery baselines. Load data, stable exercise fit and set tolerance are not yet trusted. | Supported only for the exact certified family by `intermediate_upper_lower_hypertrophy_calibration_v1`. It is a separate conservative 26–44-set policy; persistence and guidance application remain disabled. |
 | `hypertrophy_base` | Build a recoverable, stable progressive muscle-specific stimulus. Success is priority-muscle rep/load progression. | Candidate for `certified_upper_lower_hypertrophy_v1`, pending exact field-level equivalence certification. |
 | `hypertrophy_volume` | Find productive additional *local* volume after a base dose is known. | Dedicated volume policy required. It may reuse structural templates but not the certified ranges by default. |
 | `hypertrophy_specialisation` | Prioritise one to three muscles while maintaining the rest. | Dedicated policy required: priority slot/placement and non-priority maintenance are materially different. |
@@ -45,7 +45,7 @@ It returns no slots, IDs, exercises, programme versions or successor choice. The
 | Inputs | Mapping now | D3 consequence |
 | --- | --- | --- |
 | Intermediate, four-day, Upper/Lower, full gym, `hypertrophy_base`, normal productive | Candidate only; D2.5D2 certification required. | May support a base-only fixture path after certification, not normal production entry. |
-| Same family, `hypertrophy_calibration` | Dedicated calibration policy required. | Compatibility-only; do not attach the certified specification. |
+| Same family, `hypertrophy_calibration` | Dedicated calibration policy is certified for slot resolution and D2 construction. | Restricted D3 persistence still requires a separate integration phase. |
 | Same family, `hypertrophy_volume` | Dedicated volume policy required. | Compatibility-only. |
 | Specialisation, consolidation, transition; beginner; other split/frequency/equipment; strength/power | Unsupported. | Compatibility-only while existing workout flow remains available. |
 
@@ -59,7 +59,7 @@ The mapping applies only to the mesocycle currently named in the input. It canno
 
 ## Plan-creation consequence and gates
 
-`createActiveTrainingPlan` currently starts a new intermediate build-muscle plan in `hypertrophy_calibration`. Until calibration policy is implemented and certified, normal new plans must continue through explicit compatibility construction: no programme specification, no invented identity and no current guidance-adjustment eligibility. Base-only restricted D3 can be tested only through an explicitly base-starting fixture after D2.5D2; it cannot be presented as production new-plan readiness.
+`createActiveTrainingPlan` currently starts a new intermediate build-muscle plan in `hypertrophy_calibration`. The calibration policy is now certified for exact slot resolution and D2 construction, but plan creation remains unchanged until restricted D3 persists a complete specification and reference. Current plans therefore continue through compatibility construction: no programme specification, no invented identity and no current guidance-adjustment eligibility.
 
 D2.5D1 now enforces this decision through a pure registry result: calibration returns `dedicated_policy_required`; base returns candidate only; every current capability flag is false. The registry is not imported by plan setup yet.
 

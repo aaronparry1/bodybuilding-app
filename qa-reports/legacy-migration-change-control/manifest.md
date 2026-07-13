@@ -80,6 +80,10 @@ Audit-only: the certified intermediate four-day Upper/Lower policy is a candidat
 
 Pure field-level certification passed for the exact intermediate four-day full-gym Upper/Lower base family. Registry support enables only slot resolution and D2 construction; persistence and application remain false. Calibration/volume remain dedicated-policy-required and no runtime caller changed.
 
+## Stage D2.5D3 calibration policy change control
+
+High-risk policy and mapping originals were snapshotted before implementation. The separate `intermediate_upper_lower_hypertrophy_calibration_v1` policy and its `hypertrophy_calibration_upper_lower_certification_v1` proof now lock 26–44 direct-set QA guidance, retained movement evidence, omitted accessory density and stable substitution semantics. The exact registry row enables slot resolution and D2 construction only; persistence and adjustment remain false, and no runtime caller changed.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.
