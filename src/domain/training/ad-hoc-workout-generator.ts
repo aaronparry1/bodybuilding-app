@@ -879,13 +879,10 @@ function createGeneratedSlot(exercise: Exercise, slot: TemplateSlot, plannedOrde
 }
 
 function resolveGeneratedSettings(exercise: Exercise, slot: TemplateSlot, currentBlock?: TrainingBlock | null, experienceLevel?: ExperienceLevel): ProgressionSettings {
-  const role = strategyRoleForSlot(exercise, slot);
-  const lane = resolveTrainingLane({
-    blockType: currentBlock?.type,
-    exerciseRole: role,
-    exerciseFamily: exercise.family,
-    slotRole: slot.role,
-  });
+  const decisionResult = resolveCompatibilityFinalRepLaneDecision(exercise, slot, currentBlock);
+  const decision = decisionResult.status === "resolved" ? decisionResult.decision : null;
+  const role = decision?.exerciseRole ?? strategyRoleForSlot(exercise, slot);
+  const lane = decision?.lane ?? resolveTrainingLane({ blockType: currentBlock?.type, exerciseRole: role, exerciseFamily: exercise.family, slotRole: slot.role });
   const slotSets = setsForExperience(slot, experienceLevel);
   const prescription = resolveEvidenceBasedSlotPrescription({
     blockType: currentBlock?.type,
@@ -901,7 +898,7 @@ function resolveGeneratedSettings(exercise: Exercise, slot: TemplateSlot, curren
   });
   const generated = withSetPrescription({
     ...exercise.defaultSettings,
-    repRange: getGeneratedRepRange(exercise, slot, currentBlock),
+    repRange: decision?.repRange ?? getGeneratedRepRange(exercise, slot, currentBlock),
     dropOffPercent: getSafeDropOffPercent(currentBlock, exercise.defaultSettings.dropOffPercent),
     loadIncrease: exercise.defaultLoadJump,
     requiredWorkSets: slotSets,
@@ -919,6 +916,34 @@ function resolveGeneratedSettings(exercise: Exercise, slot: TemplateSlot, curren
     source: "generated",
   });
   return applyLaneSetConstraints({ ...generated, trainingLane: lane }, lane);
+}
+
+type CompatibilityFinalRepLaneDecision = Readonly<{
+  schemaVersion: "v1";
+  repRange: RepRange;
+  lane: NonNullable<ProgressionSettings["trainingLane"]>;
+  exerciseRole: ExerciseRole;
+  roleSource: "explicit" | "inferred" | "default";
+  prescriptionFamily: "ordinary" | "corrective" | "recovery" | "power";
+  plannedOrderClass: "unknown";
+  ownershipStage: "helper_resolution";
+  reasonCodes: readonly string[];
+  fingerprint: string;
+}>;
+
+type CompatibilityFinalRepLaneDecisionResult = Readonly<{ status: "resolved"; decision: CompatibilityFinalRepLaneDecision }> | Readonly<{ status: "invalid_input"; reasonCode: string }>;
+
+function resolveCompatibilityFinalRepLaneDecision(exercise: Exercise, slot: TemplateSlot, currentBlock?: TrainingBlock | null): CompatibilityFinalRepLaneDecisionResult {
+  const exerciseRole = strategyRoleForSlot(exercise, slot);
+  const lane = resolveTrainingLane({ blockType: currentBlock?.type, exerciseRole, exerciseFamily: exercise.family, slotRole: slot.role });
+  const repRange = (exercise.defaultSettings.measurementType ?? exercise.measurementType) === "duration"
+    ? exercise.defaultRepRange
+    : resolveRepRange({ blockType: currentBlock?.type, exerciseRole, exerciseFamily: exercise.family, movementPattern: exercise.movementPattern, exerciseDefault: exercise.defaultRepRange });
+  if (!Number.isInteger(repRange.min) || !Number.isInteger(repRange.max) || repRange.min < 1 || repRange.max < repRange.min || !lane) return { status: "invalid_input", reasonCode: "final_rep_lane_decision_invalid" };
+  const prescriptionFamily = exercise.roles.includes("recovery") ? "recovery" : exercise.roles.includes("corrective") ? "corrective" : exercise.roles.includes("power") || slot.role === "power" ? "power" : "ordinary";
+  const roleSource: CompatibilityFinalRepLaneDecision["roleSource"] = slot.role === exerciseRole ? "explicit" : "inferred";
+  const semantic = { schemaVersion: "v1" as const, repRange, lane, exerciseRole, roleSource, prescriptionFamily: prescriptionFamily as CompatibilityFinalRepLaneDecision["prescriptionFamily"], plannedOrderClass: "unknown" as const, ownershipStage: "helper_resolution" as const, reasonCodes: ["production_helpers_selected_rep_and_lane"] };
+  return { status: "resolved", decision: { ...semantic, fingerprint: `v1|${JSON.stringify(semantic)}` } };
 }
 
 function getGeneratedRepRange(exercise: Exercise, slot: TemplateSlot, currentBlock?: TrainingBlock | null): RepRange {
