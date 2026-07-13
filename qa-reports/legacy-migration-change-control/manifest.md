@@ -492,3 +492,11 @@ The original evaluator contract remains pure. This bridge adds a separately vers
 High-risk originals were captured before the restricted persistence seam. Exact supported new calibration plans now receive optional immutable D1 programme metadata and a bound initial microcycle reference through caller-supplied IDs and the existing D2 constructor. Compatibility plans remain metadata-free; malformed current metadata is rejected. Session construction, generated settings, adjustment writers and legacy fields remain unchanged pending D4.
 
 Original checksums: `plan-setup.ts` `52dee681860392dcd2e229fc1465faca278f3efd3e01bf34db1bd05ac50a56a0`; `current-programme-specification.ts` `0190c2271c509bf1d2b08f590db2e32a6615be8d872b3f2096b1cbd9dd779817`; `current-programme-specification-construction.ts` `9855bdc5c18762ae327e71f1a97dcd3f8fc0a2beabed5234a17e305288c1a1d7`; `active-training-plan-repository.ts` `d0ee04d109fafe91363de0f0d03f6c1b3d5544e414c02808e179a7ee9c8e69d1`. Full originals are under `qa-reports/legacy-migration-change-control/originals/`.
+
+## Stage D4 construction projection
+
+The exact supported D3 calibration family now has a pure current-session source resolver that projects persisted programme/template/slot guidance and source trace. Compatibility plans remain on the legacy path; malformed current metadata fails explicitly. No generated-setting writer, exercise selector, exact-target logic, programme mutation or adjustment binding was changed. D4B remains the adapter/read-path connection gate.
+
+## Stage D4B slot exercise-selection adapter
+
+The calibration-only semantic adapter maps each D3 slot one-to-one into an explicit exercise-selection job with movement, purpose, guidance, constraints and immutable source trace. It preserves calibration omissions and reports unmappable semantics; runtime construction remains unchanged pending authority-switch integration.
