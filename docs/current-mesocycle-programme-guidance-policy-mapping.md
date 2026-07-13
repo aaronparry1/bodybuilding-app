@@ -21,7 +21,7 @@ All powerbuilding, strength and athletic purposes remain unsupported by this pol
 
 The certified four-template policy is proposed as `certified_upper_lower_hypertrophy_v1`: intermediate, four-day, full-gym Upper/Lower, productive normal microcycle, with Upper A/B and Lower A/B. It contains 58–84 direct pre-exercise prescribed sets across the four sessions. Its slot count, optional accessory treatment, stable selection assumptions and recoverability profile are consistent with **base productive hypertrophy**, not calibration, volume expansion, specialisation, consolidation or transition.
 
-This is a semantic recommendation, not an implementation mapping. `hypertrophy_base` remains unmapped until D2.5D2 proves every required policy field is identical: family, roles/order, target/purpose, ranges, optionality, constraints, equipment, experience, normal-productivity priority and certification fingerprint.
+This is a semantic recommendation, not executable support. D2.5D1 now records it as `candidate_pending_certification` with all execution capabilities false. `hypertrophy_base` remains unapproved until D2.5D2 proves every required policy field is identical: family, roles/order, target/purpose, ranges, optionality, constraints, equipment, experience, normal-productivity priority and certification fingerprint.
 
 ## Structure versus purpose parameters
 
@@ -60,6 +60,8 @@ The mapping applies only to the mesocycle currently named in the input. It canno
 ## Plan-creation consequence and gates
 
 `createActiveTrainingPlan` currently starts a new intermediate build-muscle plan in `hypertrophy_calibration`. Until calibration policy is implemented and certified, normal new plans must continue through explicit compatibility construction: no programme specification, no invented identity and no current guidance-adjustment eligibility. Base-only restricted D3 can be tested only through an explicitly base-starting fixture after D2.5D2; it cannot be presented as production new-plan readiness.
+
+D2.5D1 now enforces this decision through a pure registry result: calibration returns `dedicated_policy_required`; base returns candidate only; every current capability flag is false. The registry is not imported by plan setup yet.
 
 Production restricted D3 requires either a certified calibration policy or a separately approved product/training decision to change initial mesocycle selection. Engineering must not change that selection merely to unblock persistence.
 

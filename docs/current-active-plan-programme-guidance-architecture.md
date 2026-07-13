@@ -27,7 +27,7 @@ Existing plans remain compatibility-only. No generated settings may be promoted 
 
 ## Mesocycle-policy gate
 
-The specification is attached only after an exact mesocycle-purpose mapping selects a versioned policy. Generic hypertrophy is not a valid parent-purpose. The certified intermediate four-day Upper/Lower policy is a candidate `hypertrophy_base` policy; current new plans start in `hypertrophy_calibration`, which needs a separately certified conservative policy before production persistence can begin.
+The specification is attached only after an exact mesocycle-purpose mapping selects a versioned policy. Generic hypertrophy is not a valid parent-purpose. D2.5D1 intentionally grants no mapping execution permission: the certified intermediate four-day Upper/Lower policy remains a candidate `hypertrophy_base` policy until D2.5D2 equivalence certification. Current new plans start in `hypertrophy_calibration`, which needs a separately certified conservative policy before production persistence can begin.
 
 ## Owner decisions
 

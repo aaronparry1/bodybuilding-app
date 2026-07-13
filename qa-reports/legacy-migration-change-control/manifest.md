@@ -72,6 +72,10 @@ Test-only D2/D1 certification proves the four representative policies construct 
 
 Audit-only: the certified intermediate four-day Upper/Lower policy is a candidate for `hypertrophy_base`, not generic hypertrophy authority. `createActiveTrainingPlan` begins build-muscle plans in `hypertrophy_calibration`; calibration, volume, specialisation, consolidation and transition require their own explicit versioned policies. No mapping, catalogue, plan, construction, specification or adjustment behaviour changed. D3 is gated on a policy certified for the exact initial mesocycle.
 
+## Stage D2.5D1 exact purpose-policy mapping contract
+
+`current-mesocycle-programme-policy-mapping.ts` is a pure, versioned exact-purpose registry. It projects candidate policy/certification identity, explicit reason/capability/consequence states, deterministic fingerprints and catalogue completeness without resolving slots or calling any runtime consumer. The base candidate remains non-executable; all current permissions are false. D2.5D2 is the sole gate that may approve base equivalence.
+
 ## Current Progress rotation semantic replacement
 
 `progress-dashboard.ts` now projects current rotation intervention facts through `current-progress-rotation-context.ts`. Legacy rotation scoring is no longer action, evidence, or journey authority. Historical stall is supporting-only; strategic and volume compatibility remain unchanged. Delete the rotation compatibility bridge only after all remaining legacy rotation display fields are removed with the shared presenter.

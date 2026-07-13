@@ -49,3 +49,7 @@ Stage 2C3A1E2E0 is audit-only and makes no runtime change. It retains the most r
 Stage 2C3A1E2E1 verification: **15 failing files / 43 failing tests / 1,575 passing tests**. The five additional passing tests cover the read-only guidance resolver; typecheck, Expo public config, and web export passed. No frozen failure changed.
 
 Stage D2.5D0 pre-edit focused verification: **10 focused files / 42 focused tests passing**; `npm run typecheck` passed. This documentation-only phase did not rerun the full suite, Expo public config or web export, so the most recent repository-wide comparison remains **15 failing files / 43 failing tests / 1,575 passing tests** from E2E1 and is not re-certified here.
+
+Stage D2.5D1 verified pre-edit baseline: **15 failing files / 43 failing tests / 1,604 passing tests**. Ten requested focused files/42 tests passed; typecheck, Expo public config and web export passed. The frozen failure set did not worsen. This is the first full-suite comparison after the D2.5 policy/certification additions.
+
+Stage D2.5D1 post-edit verification: **15 failing files / 43 failing tests / 1,610 passing tests**. Eleven focused files/48 tests passed; typecheck, Expo public config and web export passed. The six added mapping tests account for the passing-test increase; no frozen failure changed.

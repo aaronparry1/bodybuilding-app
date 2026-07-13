@@ -17,4 +17,4 @@ The Progress recovery category no longer needs legacy strategic coaching authori
 
 ## D2.5D0 deletion gate
 
-No mesocycle catalogue field, generic hypertrophy policy input, generated exercise-setting field, or legacy block field may be deleted or repurposed for programme-guidance mapping. Deletion/replacement requires an explicit exact-purpose mapping registry, certified policy for each production entry purpose, and active-plan/construction migration; calibration remains the immediate blocker.
+No mesocycle catalogue field, generic hypertrophy policy input, generated exercise-setting field, or legacy block field may be deleted or repurposed for programme-guidance mapping. D2.5D1's explicit exact-purpose registry does not remove this gate: deletion/replacement requires a certified policy for each production entry purpose and active-plan/construction migration; calibration remains the immediate blocker.

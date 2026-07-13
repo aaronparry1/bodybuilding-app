@@ -26,4 +26,4 @@ Exposure, successor validation, and objective-status boundaries are current-only
 
 ## D2.5D0 programme-policy status
 
-The certified intermediate four-day Upper/Lower policy is not generic hypertrophy authority. It is a candidate `hypertrophy_base` policy only after a field-level equivalence certification. New build-muscle plans start in `hypertrophy_calibration`, which remains compatibility-only until a dedicated conservative policy and certification exist; no active-plan programme specification is persisted yet.
+The certified intermediate four-day Upper/Lower policy is not generic hypertrophy authority. D2.5D1 records a non-executable `hypertrophy_base` candidate only; field-level equivalence certification remains required. New build-muscle plans start in `hypertrophy_calibration`, which remains compatibility-only until a dedicated conservative policy and certification exist; no active-plan programme specification is persisted yet.
