@@ -936,6 +936,7 @@ type CompatibilityFinalRepLaneDecision = Readonly<{
     reasonCode: string;
     displacedAuthorities: readonly string[];
   }> | null;
+  winnerRetention: "retained_at_existing_branch" | "unavailable_in_legacy_contract";
   reasonCodes: readonly string[];
   fingerprint: string;
 }>;
@@ -952,7 +953,7 @@ function resolveCompatibilityFinalRepLaneDecision(exercise: Exercise, slot: Temp
   const prescriptionFamily = exercise.roles.includes("recovery") ? "recovery" : exercise.roles.includes("corrective") ? "corrective" : exercise.roles.includes("power") || slot.role === "power" ? "power" : "ordinary";
   const roleSource: CompatibilityFinalRepLaneDecision["roleSource"] = slot.role === exerciseRole ? "explicit" : "inferred";
   const familyAuthority = prescriptionFamily === "corrective" ? "corrective_family" : prescriptionFamily === "recovery" ? "recovery_family" : prescriptionFamily === "power" ? "power_family" : "block_compatibility";
-  const semantic = { schemaVersion: "v1" as const, repRange, lane, exerciseRole, roleSource, prescriptionFamily: prescriptionFamily as CompatibilityFinalRepLaneDecision["prescriptionFamily"], plannedOrderClass: "unknown" as const, ownershipStage: "helper_resolution" as const, repAuthoritySource: familyAuthority as CompatibilityFinalRepLaneDecision["repAuthoritySource"], laneAuthoritySource: familyAuthority as CompatibilityFinalRepLaneDecision["laneAuthoritySource"], appliedRepAuthorityIdentity: `production.${familyAuthority}.rep`, appliedLaneAuthorityIdentity: `production.${familyAuthority}.lane`, collision: roleSource === "inferred" ? { selectedAuthority: "inferred_role", reasonCode: "explicit_role_absent_inference_selected", displacedAuthorities: [] as readonly string[] } : null, reasonCodes: ["production_helpers_selected_rep_and_lane"] };
+  const semantic = { schemaVersion: "v1" as const, repRange, lane, exerciseRole, roleSource, prescriptionFamily: prescriptionFamily as CompatibilityFinalRepLaneDecision["prescriptionFamily"], plannedOrderClass: "unknown" as const, ownershipStage: "helper_resolution" as const, repAuthoritySource: familyAuthority as CompatibilityFinalRepLaneDecision["repAuthoritySource"], laneAuthoritySource: familyAuthority as CompatibilityFinalRepLaneDecision["laneAuthoritySource"], appliedRepAuthorityIdentity: `production.${familyAuthority}.rep`, appliedLaneAuthorityIdentity: `production.${familyAuthority}.lane`, collision: roleSource === "inferred" ? { selectedAuthority: "inferred_role", reasonCode: "explicit_role_absent_inference_selected", displacedAuthorities: [] as readonly string[] } : null, winnerRetention: familyAuthority === "block_compatibility" && roleSource !== "inferred" ? "unavailable_in_legacy_contract" as const : "retained_at_existing_branch" as const, reasonCodes: ["production_helpers_selected_rep_and_lane"] };
   return { status: "resolved", decision: { ...semantic, fingerprint: `v1|${JSON.stringify(semantic)}` } };
 }
 

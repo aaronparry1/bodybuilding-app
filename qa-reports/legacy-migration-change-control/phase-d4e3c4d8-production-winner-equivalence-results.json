@@ -1,0 +1,14 @@
+{
+  "phase": "D4E3C4D8",
+  "status": "winner_identity_not_retained",
+  "knownWinnerIdentityCount": 2,
+  "unknownWinnerCount": 4,
+  "retained": ["family_authority", "inferred_role_fallthrough"],
+  "blocked": ["explicit_override", "advanced_method", "family_role_collision", "planned_order_lane"],
+  "productionOutputsChanged": false,
+  "precedenceChanged": false,
+  "v2RuntimeUse": false,
+  "internalCallerReadiness": "blocked",
+  "publicFacadeStatus": "compatibility_only",
+  "nextPhase": "retain winners at override, method, role and planned-order selection branches"
+}
