@@ -1,12 +1,12 @@
 {
   "phase": "D4E3C4D10",
-  "status": "selector_identity_not_locally_available",
-  "familiesAttempted": [],
-  "familiesBlocked": ["explicit_override", "advanced_method", "planned_order_lane", "family_role_collision"],
+  "status": "fixture_coverage_incomplete",
+  "completed": ["explicit_override_rep_selection"],
+  "blocked": ["advanced_method_selection", "planned_order_lane_selection", "family_role_collision_selection"],
   "primitiveOutputDrift": false,
   "generatedOutputDrift": false,
   "branchOrderChanged": false,
-  "v2RuntimeUse": false,
-  "internalCallerReadiness": "blocked",
-  "nextPhase": "decompose resolveRepRange at its existing return branches"
+  "knownWinnerCount": 3,
+  "structurallyUnavailableCount": 3,
+  "nextPhase": "D4E3C4D10B advanced-method selection"
 }

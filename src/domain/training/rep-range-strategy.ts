@@ -16,6 +16,9 @@ export interface ResolveRepRangeInput {
   userAdvancedOverride?: UserAdvancedRepRangeOverride | null;
 }
 
+export type RepRangeAuthoritySource = "explicit_slot_override" | "block_compatibility" | "exercise_family_override" | "exercise_default" | "advanced_method" | "programme_default";
+export type ResolvedRepRangeDecision = Readonly<{ status: "resolved"; value: RepRange; authoritySource: RepRangeAuthoritySource; appliedIdentity: string }>; 
+
 const safeFallback: RepRange = { min: 8, max: 12 };
 
 const familyOverrides: Partial<Record<ExerciseFamily, RepRange>> = {
@@ -44,22 +47,27 @@ const smallMuscleFamilies = new Set<ExerciseFamily>([
 ]);
 
 export function resolveRepRange(input: ResolveRepRangeInput): RepRange {
+  return resolveRepRangeDecision(input).value;
+}
+
+/** Internal rich result; the public façade above intentionally remains primitive. */
+export function resolveRepRangeDecision(input: ResolveRepRangeInput): ResolvedRepRangeDecision {
   const explicit = normalizeRepRange(input.programmeSlotOverride);
-  if (explicit) return explicit;
+  if (explicit) return { status: "resolved", value: explicit, authoritySource: "explicit_slot_override", appliedIdentity: "programme_slot_override" };
 
   const blockRoleRange = resolveBlockRoleRepRange(input.blockType, input.exerciseRole, input.exerciseFamily, input.movementPattern);
-  if (blockRoleRange) return blockRoleRange;
+  if (blockRoleRange) return { status: "resolved", value: blockRoleRange, authoritySource: "block_compatibility", appliedIdentity: `block:${input.blockType ?? "default"}` };
 
   const familyRange = input.exerciseFamily ? normalizeRepRange(familyOverrides[input.exerciseFamily]) : null;
-  if (familyRange) return familyRange;
+  if (familyRange) return { status: "resolved", value: familyRange, authoritySource: "exercise_family_override", appliedIdentity: `family:${input.exerciseFamily}` };
 
   const exerciseDefault = normalizeRepRange(input.exerciseDefault);
-  if (exerciseDefault) return exerciseDefault;
+  if (exerciseDefault) return { status: "resolved", value: exerciseDefault, authoritySource: "exercise_default", appliedIdentity: "exercise_default_rep_range" };
 
   const advanced = input.userAdvancedOverride?.enabled ? normalizeRepRange(input.userAdvancedOverride.repRange) : null;
-  if (advanced) return advanced;
+  if (advanced) return { status: "resolved", value: advanced, authoritySource: "advanced_method", appliedIdentity: "user_advanced_override" };
 
-  return safeFallback;
+  return { status: "resolved", value: safeFallback, authoritySource: "programme_default", appliedIdentity: "safe_fallback" };
 }
 
 export function normalizeRepRange(range?: RepRange | null): RepRange | null {

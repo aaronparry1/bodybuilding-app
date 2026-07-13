@@ -9,11 +9,11 @@ describe("D4E3C4D10 selector decomposition gate", () => {
   it("confirms current selector contracts are primitive", () => {
     expect(rep).toContain("export function resolveRepRange");
     expect(lane).toContain("export function resolveTrainingLane");
-    expect(rep).toContain("return safeFallback");
+    expect(rep).toContain("value: safeFallback");
   });
 
-  it("keeps this blocked phase free of wrapper precedence", () => {
-    expect(rep).not.toContain("resolveRepRangeDecision");
+  it("keeps remaining selector families free of wrapper precedence", () => {
+    expect(rep).toContain("resolveRepRangeDecision");
     expect(lane).not.toContain("resolveTrainingLaneDecision");
   });
 
