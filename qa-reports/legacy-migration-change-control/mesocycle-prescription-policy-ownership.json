@@ -6,6 +6,11 @@
     {"legacy":"block.dropOffRule","owner":"Mesocycle + Session Construction","replacement":"Mesocycle fatigue boundary; exact stop rule downstream"},
     {"legacy":"block.suitableBlocks","owner":"Session Construction","replacement":"Mesocycle exerciseSuitability envelope"},
     {"legacy":"block.currentWeek","owner":"Microcycle","replacement":"microcycle sequence/position"},
-    {"legacy":"block.active status","owner":"Progress/Mesocycle transition","replacement":"readiness and transition state"}
+    {"legacy":"block.active status","owner":"Progress/Mesocycle transition","replacement":"readiness and transition state"},
+    {"legacy":"resolveTrainingLaneDecision(blockType)","owner":"Mesocycle + Microcycle + Session Construction","replacement":"lane envelope + current session role + exact lane selection"},
+    {"legacy":"resolveEvidenceBasedSlotPrescription(blockType)","owner":"Mesocycle + Progress + Session Construction","replacement":"target/method/volume envelope + evidence + exact prescription"},
+    {"legacy":"suitableBlocks","owner":"Exercise metadata + Mesocycle","replacement":"factual metadata matcher against suitability envelope"},
+    {"legacy":"peak/deload block branches","owner":"Mesocycle","replacement":"specialStateScoring and specialState"},
+    {"legacy":"TrainingBlock.dropOffRule","owner":"Mesocycle + Session Construction","replacement":"dropOff envelope plus exact session stop rule"}
   ]
 }
