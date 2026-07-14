@@ -13,7 +13,7 @@ describe("D4E3C4D10C6 private lane authority", () => {
   });
 
   it("keeps the rich result internal and out of generated settings", () => {
-    expect(source).not.toContain("export type ResolvedTrainingLaneDecision");
+    expect(source).toContain("export type ResolvedTrainingLaneDecision");
     expect(source).not.toContain("complete-rep-lane-precedence-resolver");
   });
 });

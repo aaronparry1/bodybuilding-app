@@ -1,0 +1,12 @@
+{
+  "phase": "D4E3C4D10C7",
+  "fixtures": ["17 primitive lane fixtures unchanged"],
+  "selectorInvocationCount": "one_per_generated_slot",
+  "generatedSettingsProjection": "primitive_lane_only",
+  "finalDecisionProvenance": "copied_from_private_lane_decision",
+  "v2ProductionDependency": false,
+  "fullSuite": {"failingTests": 43, "passingTests": 1744, "baselineFailingTests": 43, "baselinePassingTests": 1742},
+  "focusedTests": {"passed": 30},
+  "outputEquivalence": "unchanged",
+  "status": "verified_pending_commit"
+}

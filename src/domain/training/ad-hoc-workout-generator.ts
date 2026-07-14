@@ -1,6 +1,6 @@
 import type { TrainingBlock } from "@/domain/training/annual-models";
 import { createTrainingBlock, getBlockDropOffPercentage } from "@/domain/training/annual-planner";
-import { getLanePrescriptionConstraints, resolveTrainingLane } from "@/domain/training/block-training-lanes";
+import { getLanePrescriptionConstraints, resolveTrainingLaneDecision, type ResolvedTrainingLaneDecision } from "@/domain/training/block-training-lanes";
 import { scoreExercisePreference, type ExercisePreferenceRecord } from "@/domain/training/exercise-preferences";
 import { resolveStartingLoadRecommendation } from "@/domain/training/load-selection";
 import { resolveLoadIncrement, type LoadIncrementProfile } from "@/domain/training/load-increment-strategy";
@@ -879,10 +879,11 @@ function createGeneratedSlot(exercise: Exercise, slot: TemplateSlot, plannedOrde
 }
 
 function resolveGeneratedSettings(exercise: Exercise, slot: TemplateSlot, currentBlock?: TrainingBlock | null, experienceLevel?: ExperienceLevel): ProgressionSettings {
-  const decisionResult = resolveCompatibilityFinalRepLaneDecision(exercise, slot, currentBlock);
+  const laneDecision = resolveTrainingLaneDecision({ blockType: currentBlock?.type, exerciseRole: strategyRoleForSlot(exercise, slot), exerciseFamily: exercise.family, slotRole: slot.role });
+  const decisionResult = resolveCompatibilityFinalRepLaneDecision(exercise, slot, currentBlock, laneDecision);
   const decision = decisionResult.status === "resolved" ? decisionResult.decision : null;
   const role = decision?.exerciseRole ?? strategyRoleForSlot(exercise, slot);
-  const lane = decision?.lane ?? resolveTrainingLane({ blockType: currentBlock?.type, exerciseRole: role, exerciseFamily: exercise.family, slotRole: slot.role });
+  const lane = decision?.lane ?? laneDecision.lane;
   const slotSets = setsForExperience(slot, experienceLevel);
   const prescription = resolveEvidenceBasedSlotPrescription({
     blockType: currentBlock?.type,
@@ -928,7 +929,7 @@ type CompatibilityFinalRepLaneDecision = Readonly<{
   plannedOrderClass: "unknown";
   ownershipStage: "helper_resolution";
   repAuthoritySource: "block_compatibility" | "corrective_family" | "recovery_family" | "power_family" | "unavailable_in_legacy_contract";
-  laneAuthoritySource: "block_compatibility" | "corrective_family" | "recovery_family" | "power_family" | "unavailable_in_legacy_contract";
+  laneAuthoritySource: "block_compatibility" | "corrective_family" | "recovery_family" | "power_family" | "explicit_exercise_role" | "slot_role" | "planned_order" | "unavailable_in_legacy_contract";
   appliedRepAuthorityIdentity: string;
   appliedLaneAuthorityIdentity: string;
   collision: Readonly<{
@@ -943,9 +944,10 @@ type CompatibilityFinalRepLaneDecision = Readonly<{
 
 type CompatibilityFinalRepLaneDecisionResult = Readonly<{ status: "resolved"; decision: CompatibilityFinalRepLaneDecision }> | Readonly<{ status: "invalid_input"; reasonCode: string }>;
 
-function resolveCompatibilityFinalRepLaneDecision(exercise: Exercise, slot: TemplateSlot, currentBlock?: TrainingBlock | null): CompatibilityFinalRepLaneDecisionResult {
+function resolveCompatibilityFinalRepLaneDecision(exercise: Exercise, slot: TemplateSlot, currentBlock?: TrainingBlock | null, suppliedLaneDecision?: ResolvedTrainingLaneDecision): CompatibilityFinalRepLaneDecisionResult {
   const exerciseRole = strategyRoleForSlot(exercise, slot);
-  const lane = resolveTrainingLane({ blockType: currentBlock?.type, exerciseRole, exerciseFamily: exercise.family, slotRole: slot.role });
+  const laneDecision = suppliedLaneDecision ?? resolveTrainingLaneDecision({ blockType: currentBlock?.type, exerciseRole, exerciseFamily: exercise.family, slotRole: slot.role });
+  const lane = laneDecision.lane;
   const repRange = (exercise.defaultSettings.measurementType ?? exercise.measurementType) === "duration"
     ? exercise.defaultRepRange
     : resolveRepRange({ blockType: currentBlock?.type, exerciseRole, exerciseFamily: exercise.family, movementPattern: exercise.movementPattern, exerciseDefault: exercise.defaultRepRange });
@@ -953,7 +955,7 @@ function resolveCompatibilityFinalRepLaneDecision(exercise: Exercise, slot: Temp
   const prescriptionFamily = exercise.roles.includes("recovery") ? "recovery" : exercise.roles.includes("corrective") ? "corrective" : exercise.roles.includes("power") || slot.role === "power" ? "power" : "ordinary";
   const roleSource: CompatibilityFinalRepLaneDecision["roleSource"] = slot.role === exerciseRole ? "explicit" : "inferred";
   const familyAuthority = prescriptionFamily === "corrective" ? "corrective_family" : prescriptionFamily === "recovery" ? "recovery_family" : prescriptionFamily === "power" ? "power_family" : "block_compatibility";
-  const semantic = { schemaVersion: "v1" as const, repRange, lane, exerciseRole, roleSource, prescriptionFamily: prescriptionFamily as CompatibilityFinalRepLaneDecision["prescriptionFamily"], plannedOrderClass: "unknown" as const, ownershipStage: "helper_resolution" as const, repAuthoritySource: familyAuthority as CompatibilityFinalRepLaneDecision["repAuthoritySource"], laneAuthoritySource: familyAuthority as CompatibilityFinalRepLaneDecision["laneAuthoritySource"], appliedRepAuthorityIdentity: `production.${familyAuthority}.rep`, appliedLaneAuthorityIdentity: `production.${familyAuthority}.lane`, collision: roleSource === "inferred" ? { selectedAuthority: "inferred_role", reasonCode: "explicit_role_absent_inference_selected", displacedAuthorities: [] as readonly string[] } : null, winnerRetention: familyAuthority === "block_compatibility" && roleSource !== "inferred" ? "unavailable_in_legacy_contract" as const : "retained_at_existing_branch" as const, reasonCodes: ["production_helpers_selected_rep_and_lane"] };
+  const semantic = { schemaVersion: "v1" as const, repRange, lane, exerciseRole, roleSource, prescriptionFamily: prescriptionFamily as CompatibilityFinalRepLaneDecision["prescriptionFamily"], plannedOrderClass: "unknown" as const, ownershipStage: "helper_resolution" as const, repAuthoritySource: familyAuthority as CompatibilityFinalRepLaneDecision["repAuthoritySource"], laneAuthoritySource: laneDecision.source as CompatibilityFinalRepLaneDecision["laneAuthoritySource"], appliedRepAuthorityIdentity: `production.${familyAuthority}.rep`, appliedLaneAuthorityIdentity: `production.${laneDecision.appliedIdentity}.lane`, collision: roleSource === "inferred" ? { selectedAuthority: "inferred_role", reasonCode: "explicit_role_absent_inference_selected", displacedAuthorities: [] as readonly string[] } : null, winnerRetention: laneDecision.winnerRetention, reasonCodes: [laneDecision.reasonCode] };
   return { status: "resolved", decision: { ...semantic, fingerprint: `v1|${JSON.stringify(semantic)}` } };
 }
 

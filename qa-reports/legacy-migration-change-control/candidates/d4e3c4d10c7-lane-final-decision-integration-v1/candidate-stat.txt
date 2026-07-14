@@ -1,0 +1,4 @@
+ src/domain/training/ad-hoc-workout-generator.ts | 16 +++++++++-------
+ src/domain/training/block-training-lanes.ts     |  4 ++--
+ tests/d4e3c4d10c6-lane-authority.test.ts        |  2 +-
+ 3 files changed, 12 insertions(+), 10 deletions(-)

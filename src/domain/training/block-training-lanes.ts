@@ -75,7 +75,7 @@ export function resolveTrainingLane(input: {
   return resolveTrainingLaneDecision(input).lane;
 }
 
-type ResolvedTrainingLaneDecision = Readonly<{
+export type ResolvedTrainingLaneDecision = Readonly<{
   lane: TrainingLane;
   source: "block_compatibility" | "explicit_exercise_role" | "slot_role" | "planned_order" | "programme_default";
   branchId: string;
@@ -86,7 +86,7 @@ type ResolvedTrainingLaneDecision = Readonly<{
   winnerRetention: "retained_at_existing_branch";
 }>;
 
-function resolveTrainingLaneDecision(input: {
+export function resolveTrainingLaneDecision(input: {
   blockType?: BlockType | null;
   exerciseRole?: ExerciseRole | null;
   exerciseFamily?: ExerciseFamily | null;

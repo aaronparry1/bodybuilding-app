@@ -1,0 +1,9 @@
+{
+  "phase": "D4E3C4D10C7",
+  "fixtures": [],
+  "selectorInvocationCount": "one_per_generated_slot",
+  "generatedSettingsProjection": "primitive_lane_only",
+  "finalDecisionProvenance": "copied_from_private_lane_decision",
+  "v2ProductionDependency": false,
+  "status": "pending_verification"
+}

@@ -1,0 +1,7 @@
+{
+  "baselineFailureCount": 43,
+  "candidateFailureCount": 43,
+  "newlyFailing": [],
+  "newlyPassing": [],
+  "note": "Compared against authoritative baseline count; baseline artifact contains counts only."
+}

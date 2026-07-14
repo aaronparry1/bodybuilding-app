@@ -1,0 +1,16 @@
+ M src/domain/training/ad-hoc-workout-generator.ts
+ M src/domain/training/block-training-lanes.ts
+ M tests/d4e3c4d10c6-lane-authority.test.ts
+?? .env.example
+?? .env.local.example
+?? .env.production.example
+?? .env.staging.example
+?? docs/final-compatibility-lane-provenance-integration.md
+?? hf_portfolio_backtest/
+?? qa-reports/legacy-migration-change-control/candidates/d4e3c4d10c7-lane-final-decision-integration-v1/
+?? qa-reports/legacy-migration-change-control/phase-d4e3-shared-exact-target-core-map.md
+?? qa-reports/legacy-migration-change-control/phase-d4e3b-block-free-compatibility-prescription-map.md
+?? qa-reports/legacy-migration-change-control/phase-d4e3c1-rep-lane-semantic-extraction-map.md
+?? qa-reports/legacy-migration-change-control/phase-d4e3c4d10c7-lane-final-decision-integration-map.md
+?? qa-reports/legacy-migration-change-control/phase-d4e3c4d10c7-lane-final-decision-results.json
+?? tests/d4e3c4d10c7-lane-final-decision.test.ts
