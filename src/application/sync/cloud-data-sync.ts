@@ -14,7 +14,6 @@ import { LocalSyncQueueStore } from "@/data/sync/local-sync-queue-store";
 import { SyncQueue } from "@/data/sync/sync-queue";
 import { WorkoutSyncService } from "@/data/sync/workout-sync-service";
 import type { AppSupabaseClient } from "@/lib/supabase/client";
-import type { TrainingYear } from "@/domain/training/annual-models";
 import type { Exercise, Programme, WorkoutSession } from "@/domain/training/models";
 import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 
@@ -36,7 +35,7 @@ export interface CloudUserDataBackup {
   updatedAt: string;
   appSettings: AppSettings;
   activeTrainingPlan?: ActiveTrainingPlan | null;
-  trainingYear?: TrainingYear | null;
+  trainingYear?: unknown;
   recoveryCapacityIgnore?: RecoveryCapacityIgnoreRecord | null;
 }
 

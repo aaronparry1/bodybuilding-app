@@ -44,4 +44,9 @@ describe("canonical training application boundary", () => {
     });
     expect(canApplyLegacyBlockMutation(plan)).toBe(false);
   });
+
+  it("keeps the legacy archive transport inert at its boundary", async () => {
+    const archive = await import("@/application/training/legacy-training-year-archive");
+    expect(Object.keys(archive.legacyTrainingYearArchive).sort()).toEqual(["read", "write"]);
+  });
 });
