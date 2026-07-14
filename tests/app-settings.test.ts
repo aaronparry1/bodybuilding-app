@@ -107,7 +107,7 @@ describe("app settings", () => {
 
     expect(settings).toEqual({
       repRange: { min: 10, max: 14 },
-      dropOffPercent: 10,
+      dropOffPercent: 18,
       loadIncrease: 10,
       unit: "lb",
       requiredWorkSets: 4,

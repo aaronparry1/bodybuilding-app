@@ -1,5 +1,4 @@
 import { progressionSettingsFromAppSettings, type AppSettings } from "@/application/settings/settings-model";
-import { getBlockDropOffPercentage } from "@/domain/training/annual-planner";
 import type { TrainingBlock } from "@/domain/training/annual-models";
 import { resolveLoadIncrement } from "@/domain/training/load-increment-strategy";
 import type { Exercise, ProgramExercise, ProgressionSettings } from "@/domain/training/models";
@@ -44,7 +43,7 @@ export function resolveWorkoutExerciseSettings(
           durationIncreaseSeconds: plannedSlot?.settings.durationIncreaseSeconds ?? exercise.defaultSettings.durationIncreaseSeconds ?? 5,
         }
       : {}),
-    dropOffPercent: currentBlock ? getBlockDropOffPercentage(currentBlock) : (plannedSlot?.settings.dropOffPercent ?? exercise.defaultSettings.dropOffPercent ?? appDefaults.dropOffPercent),
+    dropOffPercent: plannedSlot?.settings.dropOffPercent ?? exercise.defaultSettings.dropOffPercent ?? appDefaults.dropOffPercent,
     loadIncrease: plannedSlot?.settings.loadIncrease ?? loadIncrement.increment,
     unit: appDefaults.unit,
   }, {
