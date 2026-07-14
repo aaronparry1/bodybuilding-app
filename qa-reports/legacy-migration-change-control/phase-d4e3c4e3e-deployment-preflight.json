@@ -1,0 +1,16 @@
+{
+  "phase":"D4E3C4E3E",
+  "commit":"fa11c5e",
+  "profile":"preview",
+  "distribution":"internal",
+  "channel":"staging",
+  "observation":"enabled_in_preview_only",
+  "authority":"production_only",
+  "secretScan":"passed_no_values_printed",
+  "expoConfig":"passed",
+  "easCli":"unavailable_in_environment",
+  "buildStarted":false,
+  "buildId":null,
+  "status":"blocked_before_build",
+  "remainingExternalStep":"install/authenticate EAS CLI, then run one preview internal build"
+}

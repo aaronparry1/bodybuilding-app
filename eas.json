@@ -41,7 +41,8 @@
         "ASC_V3_QUALITY_GATE_STRICT": "true",
         "EXPO_PUBLIC_ASC_COACHING_ENGINE_V3": "true",
         "EXPO_PUBLIC_ASC_V3_ACTIVE_WORKOUT": "true",
-        "EXPO_PUBLIC_ASC_V3_QUALITY_GATE_STRICT": "true"
+        "EXPO_PUBLIC_ASC_V3_QUALITY_GATE_STRICT": "true",
+        "EXPO_PUBLIC_ORDINARY_V2_SHADOW_OBSERVATION": "enabled"
       },
       "android": {
         "buildType": "apk"
