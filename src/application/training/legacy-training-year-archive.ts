@@ -1,7 +1,7 @@
-import { trainingYearRepository } from "@/data/local/training-year-repository";
+import { legacyTrainingYearSourceRepository } from "@/data/local/legacy-training-year-source-repository";
 
 /** Inert compatibility transport for archived legacy payloads. It cannot make planning decisions. */
 export const legacyTrainingYearArchive = {
-  read(): unknown { return trainingYearRepository.getActiveYear(); },
-  write(source: unknown): void { trainingYearRepository.save(source as Parameters<typeof trainingYearRepository.save>[0]); },
+  read(): unknown { return legacyTrainingYearSourceRepository.read(); },
+  write(source: unknown): void { legacyTrainingYearSourceRepository.write(source); },
 };

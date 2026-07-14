@@ -11,10 +11,9 @@ import { activeTrainingPlanRepository } from "@/data/local/active-training-plan-
 import { customExerciseRepository } from "@/data/local/custom-exercise-repository";
 import { jsonStore } from "@/data/local/json-store";
 import { programmeRepository } from "@/data/local/programme-repository";
-import { trainingYearRepository } from "@/data/local/training-year-repository";
+import { legacyTrainingYearArchive } from "@/application/training/legacy-training-year-archive";
 import { workoutSessionRepository } from "@/data/local/workout-session-repository";
 import { SyncQueue, type SyncQueueItem, type SyncQueueStore } from "@/data/sync/sync-queue";
-import { createAnnualPlan, naturalLifterAnnualPlan } from "@/domain/training/annual-planner";
 import { buildStrengthDashboard } from "@/domain/training/strength-dashboard";
 import type { WorkoutSession } from "@/domain/training/models";
 import { createActiveTrainingPlan } from "@/domain/training/plan-setup";
@@ -91,7 +90,7 @@ describe("cloud data sync and restore", () => {
       },
       "2026-06-10T10:00:00.000Z",
     );
-    const cloudYear = createAnnualPlan(naturalLifterAnnualPlan, "2026-06-10T10:00:00.000Z");
+    const cloudYear = { id: "cloud-year", source: "legacy-test-payload" };
     const backup = {
       ...buildCloudUserDataBackup(),
       appSettings: { ...appSettingsStore.get(), onboardingCompleted: true, unit: "lb" as const },
@@ -108,7 +107,7 @@ describe("cloud data sync and restore", () => {
     });
 
     expect(activeTrainingPlanRepository.getOptional()?.goal).toBe("build_strength");
-    expect(trainingYearRepository.getActiveYear().id).toBe(cloudYear.id);
+    expect((legacyTrainingYearArchive.read() as { id: string }).id).toBe(cloudYear.id);
     expect(appSettingsStore.get().unit).toBe("lb");
     expect(appSettingsStore.get().onboardingCompleted).toBe(true);
   });
