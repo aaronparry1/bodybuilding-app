@@ -1,13 +1,13 @@
-import { mesocycleById } from "@/domain/training/mesocycle-library";
-import { sessionRolesForPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
+import { readCanonicalPlanningProjection } from "@/application/training/canonical-training-architecture";
+import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 
 export function planningSummary(plan: ActiveTrainingPlan, sessionIndex = 0) {
-  const mesocycle = plan.currentMesocycleId ? mesocycleById(plan.currentMesocycleId) : undefined;
-  const role = sessionRolesForPlan(plan)[sessionIndex] ?? "Planned session";
+  const projection = readCanonicalPlanningProjection(plan);
+  const role = readCanonicalPlanningProjection(plan, null, sessionIndex).sessionRole;
   return {
     macrocycle: title(plan.goal),
-    mesocycle: mesocycle?.adaptation ?? "Current training phase",
-    microcycle: plan.currentMicrocycle ? `Microcycle ${plan.currentMicrocycle.sequenceNumber} · ${plan.currentMicrocycle.priority}` : "Current training week",
+    mesocycle: projection.currentMesocycle?.adaptation ?? "Current training phase",
+    microcycle: projection.microcycle ? `Microcycle ${projection.microcycle.number} · ${projection.microcycle.priority}` : "Current training week",
     sessionRole: role,
   };
 }

@@ -1,4 +1,4 @@
-import { resolveCurrentPlanningInput } from "@/domain/training/current-planning-input";
+import { readCurrentPlanningInput } from "@/application/training/canonical-training-architecture";
 import { mesocycleById } from "@/domain/training/mesocycle-library";
 import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 
@@ -24,7 +24,7 @@ export function buildAnalyticsPlanningContext({
 }): AnalyticsPlanningContext {
   if (!activePlan) return { status: "no_plan" };
 
-  const resolved = resolveCurrentPlanningInput(activePlan, sessionIndex);
+  const resolved = readCurrentPlanningInput(activePlan, sessionIndex);
   if (resolved.status === "incomplete") return { status: "incomplete", missing: resolved.missing };
   const mesocycle = mesocycleById(resolved.planning.mesocycleId);
   if (!mesocycle) return { status: "incomplete", missing: ["mesocycle"] };

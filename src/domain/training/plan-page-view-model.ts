@@ -1,7 +1,7 @@
-import { resolveCurrentPlanningInput } from "@/domain/training/current-planning-input";
+import { readApprovedNextMesocycleStates, readCurrentPlanningInput } from "@/application/training/canonical-training-architecture";
 import { mesocycleById, type MesocycleId, type MesocycleSpec } from "@/domain/training/mesocycle-library";
 import type { WorkoutSession } from "@/domain/training/models";
-import { getApprovedNextMesocycleStates, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
+import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { displayNameForTrainingSetupGoal } from "@/domain/training/training-goals";
 
 export type PlanPlanningStatus = "no_plan" | "ready" | "compatibility" | "incomplete";
@@ -80,7 +80,7 @@ export function buildPlanPageViewModel({
 
   const openPlannedWorkout = selectOpenPlannedWorkout(workouts);
   const sessionIndex = openPlannedWorkout?.planSessionIndex ?? 0;
-  const resolved = resolveCurrentPlanningInput(activePlan, sessionIndex);
+  const resolved = readCurrentPlanningInput(activePlan, sessionIndex);
   const planning = resolved.status === "ready" ? resolved.planning : null;
   const mesocycle = planning ? mesocycleById(planning.mesocycleId) : undefined;
   const status: PlanPlanningStatus = !planning ? "incomplete" : planning.source === "legacy_compatibility" ? "compatibility" : "ready";
@@ -116,7 +116,7 @@ export function buildPlanPageViewModel({
 }
 
 function approvedMesocycles(activePlan: ActiveTrainingPlan): ApprovedNextMesocycle[] {
-  return getApprovedNextMesocycleStates(activePlan).flatMap((id): ApprovedNextMesocycle[] => {
+  return readApprovedNextMesocycleStates(activePlan).flatMap((id): ApprovedNextMesocycle[] => {
     const mesocycle = mesocycleById(id);
     return mesocycle ? [{ id, purpose: mesocycle.adaptation }] : [];
   });

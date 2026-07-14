@@ -1,7 +1,8 @@
 import { macrocycleEngineForGoal, type MacrocycleEngineId } from "@/domain/training/macrocycle-engine";
 import { mesocycleById, type MesocycleSpec } from "@/domain/training/mesocycle-library";
 import type { WorkoutSession } from "@/domain/training/models";
-import { sessionRolesForPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
+import { getApprovedNextMesocycleStates, sessionRolesForPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
+import { resolveCurrentPlanningInput, type CurrentPlanningResolution } from "@/domain/training/current-planning-input";
 
 /**
  * Application-facing read boundary for the canonical training architecture.
@@ -18,9 +19,9 @@ export interface CanonicalTrainingPlanningProjection {
   exactPrescribedTargets: Record<string, number[]>;
 }
 
-export function readCanonicalPlanningProjection(plan: ActiveTrainingPlan, session?: WorkoutSession | null): CanonicalTrainingPlanningProjection {
+export function readCanonicalPlanningProjection(plan: ActiveTrainingPlan, session?: WorkoutSession | null, sessionIndexOverride?: number): CanonicalTrainingPlanningProjection {
   const currentMesocycle = plan.currentMesocycleId ? mesocycleById(plan.currentMesocycleId) ?? null : null;
-  const sessionIndex = session?.planSessionIndex ?? 0;
+  const sessionIndex = sessionIndexOverride ?? session?.planSessionIndex ?? 0;
   return {
     goal: plan.goal,
     macrocycleEngine: macrocycleEngineForGoal(plan.goal),
@@ -29,4 +30,13 @@ export function readCanonicalPlanningProjection(plan: ActiveTrainingPlan, sessio
     sessionRole: sessionRolesForPlan(plan)[sessionIndex] ?? "Planned session",
     exactPrescribedTargets: Object.fromEntries((session?.exercises ?? []).map((exercise) => [exercise.exerciseId, exercise.prescribedSetTargets ?? []])),
   };
+}
+
+/** Read-only planning query; compatibility results remain explicitly labelled by the owner. */
+export function readCurrentPlanningInput(plan: ActiveTrainingPlan, sessionIndex: number): CurrentPlanningResolution {
+  return resolveCurrentPlanningInput(plan, sessionIndex);
+}
+
+export function readApprovedNextMesocycleStates(plan: ActiveTrainingPlan) {
+  return getApprovedNextMesocycleStates(plan);
 }
