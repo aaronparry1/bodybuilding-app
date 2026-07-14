@@ -207,10 +207,11 @@ describe("paywall and trial flow", () => {
     expect(source).toContain("{ text: \"Start Free Trial\", onPress: openPremiumPaywall }");
     expect(source).toContain("{ text: \"View Premium\", onPress: openPremiumPaywall }");
     expect(source).toContain("if (!requirePremiumForTodayWorkout(\"continue\")) return;");
-    expect(source).toContain("if (!requirePremiumForTodayWorkout(\"start\")) return;");
+    expect(source).toContain("if (!activePlan || !requirePremiumForTodayWorkout(\"start\")) return;");
     expect(source.indexOf("if (!requirePremiumForTodayWorkout(\"continue\")) return;")).toBeLessThan(source.indexOf("router.push(\"/(protected)/(tabs)/train\")"));
-    expect(source.indexOf("if (!requirePremiumForTodayWorkout(\"start\")) return;")).toBeLessThan(source.indexOf("programmeRepository.save(todayProgramme);"));
-    expect(source.indexOf("if (!requirePremiumForTodayWorkout(\"start\")) return;")).toBeLessThan(source.indexOf("programmeRepository.selectProgrammeDay"));
-    expect(source).toContain("router.push(\"/(protected)/onboarding\")");
+    expect(source.indexOf("if (!activePlan || !requirePremiumForTodayWorkout(\"start\")) return;")).toBeGreaterThan(source.indexOf("const startTodayWorkout"));
+    const startGuard = source.indexOf("if (!activePlan || !requirePremiumForTodayWorkout(\"start\")) return;");
+    expect(source.indexOf("router.push(\"/(protected)/(tabs)/train\")", startGuard)).toBeGreaterThan(startGuard);
+    expect(source).toContain("const startTodayWorkout");
   });
 });

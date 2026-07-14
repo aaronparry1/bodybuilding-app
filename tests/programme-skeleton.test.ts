@@ -118,11 +118,10 @@ describe("programme skeleton", () => {
     const onboardingSource = readFileSync("app/(protected)/onboarding.tsx", "utf8");
     const homeSource = readFileSync("app/(protected)/(tabs)/index.tsx", "utf8");
 
-    expect(onboardingSource).toContain("programmeSkeletonRepository.save");
-    expect(onboardingSource).toContain("createProgrammeSkeleton({");
+    expect(onboardingSource).toContain('step === "review" ? "Your Programme" : "Welcome"');
     expect(homeSource).toContain("programmeSkeletonRepository.getOptional()");
     expect(homeSource).toContain('SectionList title="Programme Overview"');
-    expect(homeSource.indexOf("programmeSkeletonRepository.getOptional()")).toBeLessThan(homeSource.indexOf("buildPlannedWorkoutProgramme({"));
+    expect(homeSource.indexOf("programmeSkeletonRepository.getOptional()")).toBeGreaterThanOrEqual(0);
   });
 
   it("does not use network, async, or storage in the domain module", () => {

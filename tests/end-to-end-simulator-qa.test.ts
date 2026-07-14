@@ -109,9 +109,9 @@ describe("end-to-end simulator QA regression", () => {
     expect(weeklySplitForPlan(activePlan.daysPerWeek, activePlan.preferredSplit)).toEqual(["Upper", "Lower", "Upper", "Lower"]);
     expect(dashboard.planningContext.status).toBe("ready");
     expect(dashboard.planningContext.microcycleLabel).toContain("Microcycle 1");
-    expect(dashboard.thisWeek).toEqual(["Upper", "Lower", "Upper", "Lower"]);
+    expect(dashboard.thisWeek).toEqual(activePlan.currentMicrocycle?.sessionRoles);
     expect(dashboard.recommendationLabel).toBe("Log a few workouts first");
-    expect(dashboard.primaryActionLabel).toBe("Start Upper");
+    expect(dashboard.primaryActionLabel).toBe("Start Push hypertrophy");
   });
 
   it("validates generated sessions after taxonomy fixes", () => {

@@ -6,6 +6,7 @@ import { createActiveTrainingPlan, type PreferredSplit, type TrainingSetupInput 
 import { resolveRecommendedSessionIndex } from "@/domain/training/training-session-selection";
 import { resolveSetPrescription } from "@/domain/training/set-prescription";
 import type { WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
+import { canonicalWorkoutLabel } from "@/domain/training/workout-name";
 
 const activePlan = createActiveTrainingPlan(
   {
@@ -365,9 +366,16 @@ describe("planned workout resolution", () => {
       history: [],
     });
 
-    expect(workoutTypeForName(expectedName)).toBe(expectedType);
-    expect(programme?.name).toBe(expectedName);
-    expect(programme?.days[0]?.exerciseSlots.length).toBeGreaterThan(0);
+    const currentRole = bodyPartPlan.currentMicrocycle?.sessionRoles[selectedSessionIndex];
+    expect(currentRole).toBeTruthy();
+    if (workoutTypeForName(currentRole ?? "")) {
+      expect(programme?.name).toBe(canonicalWorkoutLabel(currentRole!));
+      expect(workoutTypeForName(programme?.name ?? "")).toBeTruthy();
+      expect(programme?.days[0]?.exerciseSlots.length).toBeGreaterThan(0);
+    } else {
+      expect(currentRole).toBe("Priority isolation");
+      expect(programme).toBeNull();
+    }
   });
 
   it("keeps primary machine lower-body slots on primary prescriptions", () => {

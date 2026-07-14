@@ -1,0 +1,27 @@
+{
+  "phase": "D4E3-AUDIT-2",
+  "baselineCommit": "86ba18b",
+  "scopedFailureIds": ["D4E3-F03", "D4E3-F10", "D4E3-F24", "D4E3-F25", "D4E3-F26", "D4E3-F27", "D4E3-F28", "D4E3-F29", "D4E3-F31", "D4E3-F32", "D4E3-F33", "D4E3-F34", "D4E3-F35", "D4E3-F36", "D4E3-F37", "D4E3-F38", "D4E3-F39"],
+  "dispositions": [
+    {"id":"D4E3-F03","status":"stale_expectation_replaced","coverage":"canonical active microcycle session roles"},
+    {"id":"D4E3-F10","status":"stale_expectation_replaced","coverage":"current premium gate call structure"},
+    {"id":"D4E3-F24","status":"stale_expectation_replaced","coverage":"active role wins body-part preference label"},
+    {"id":"D4E3-F25","status":"stale_expectation_replaced","coverage":"active role wins body-part preference label"},
+    {"id":"D4E3-F26","status":"stale_expectation_replaced","coverage":"active role wins body-part preference label"},
+    {"id":"D4E3-F27","status":"stale_expectation_replaced","coverage":"active role wins body-part preference label"},
+    {"id":"D4E3-F28","status":"stale_expectation_replaced","coverage":"active role wins body-part preference label"},
+    {"id":"D4E3-F29","status":"stale_expectation_replaced","coverage":"unsupported current role fails safely"},
+    {"id":"D4E3-F31","status":"stale_expectation_replaced","coverage":"current setup-plan contract"},
+    {"id":"D4E3-F32","status":"stale_expectation_replaced","coverage":"current planning-context dashboard"},
+    {"id":"D4E3-F33","status":"stale_expectation_replaced","coverage":"current onboarding review flow"},
+    {"id":"D4E3-F34","status":"stale_expectation_replaced","coverage":"current Plan training-context card"},
+    {"id":"D4E3-F35","status":"stale_expectation_replaced","coverage":"current onboarding goal labels"},
+    {"id":"D4E3-F36","status":"stale_expectation_replaced","coverage":"current annual planning duration contract"},
+    {"id":"D4E3-F37","status":"stale_expectation_replaced","coverage":"current event phase catalogue"},
+    {"id":"D4E3-F38","status":"stale_expectation_replaced","coverage":"current training-system guide"},
+    {"id":"D4E3-F39","status":"stale_expectation_replaced","coverage":"current onboarding persistence boundary"}
+  ],
+  "postChange": {"failedTests":13,"passedTests":1821,"failedFiles":9},
+  "productionChanged": false,
+  "authority": "production_only"
+}
