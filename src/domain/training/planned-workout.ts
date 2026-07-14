@@ -8,6 +8,7 @@ import { sessionRolesForPlan, type ActiveTrainingPlan } from "@/domain/training/
 import { resolveSelectedSessionIndex } from "@/domain/training/training-session-selection";
 import { applyVolumeAdjustmentsToProgramme } from "@/domain/training/volume-adjustments";
 export { displayWorkoutName } from "@/domain/training/workout-name";
+import { canonicalWorkoutLabel } from "@/domain/training/workout-name";
 
 export interface PlannedWorkoutOptions {
   activePlan: ActiveTrainingPlan;
@@ -93,10 +94,10 @@ export function resolveNextTrainableWorkoutName(
   const startIndex = resolveSelectedSessionIndex({ activePlan, history, selectedSessionIndex, date });
   for (let offset = 0; offset < split.length; offset += 1) {
     const workout = split[(startIndex + offset) % split.length];
-    if (workout && !isRestWorkout(workout)) return workout;
+    if (workout && !isRestWorkout(workout)) return canonicalWorkoutLabel(workout);
   }
 
-  return split[0] ?? "Full Body";
+  return canonicalWorkoutLabel(split[0] ?? "Full Body");
 }
 
 export function currentPlanDayIndex(activePlan: ActiveTrainingPlan, date = new Date()): number {

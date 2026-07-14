@@ -27,6 +27,10 @@ The active plan now supplies named planning context such as `Push hypertrophy`, 
 4. **D4E3-AUDIT-4 — resolve the missing support-function-policy contract.** Either restore the real production module through an approved architecture change or retire/repoint the four guards; do not create a test-only stub.
 5. **D4E3-AUDIT-5 — rerun the full suite and require zero unexplained failures.** Only then resume internal build/shadow-observation planning. Runtime authority remains `production_only` throughout.
 
+## D4E3-AUDIT-1 result
+
+The active session-role path now projects stable generated-workout labels without changing prescription generation. Of the 21 scoped failures, 14 are fixed and 7 are explicitly reclassified: one end-to-end dashboard expectation and six body-part fixtures assert legacy split labels that conflict with complete current microcycle roles. The post-change run is 28 failed tests, 1,806 passed tests across 14 failing files. The exact dispositions are in [phase-d4e3-audit1-planning-context-dispositions.json](../qa-reports/legacy-migration-change-control/phase-d4e3-audit1-planning-context-dispositions.json).
+
 Dependency graph: `AUDIT-1 → AUDIT-2`; `AUDIT-1 → AUDIT-3`; `AUDIT-4` is independent but must complete before architecture certification; `AUDIT-1..4 → AUDIT-5 → build review → production shadow review → any v2 canary`.
 
 ## Scope and safety

@@ -1,0 +1,32 @@
+{
+  "phase": "D4E3-AUDIT-1",
+  "baselineCommit": "da11a04",
+  "implementationCommit": "d26331dc419a3ce44902066882946db52e2e8df2",
+  "scopedFailureIds": ["D4E3-F03", "D4E3-F11", "D4E3-F12", "D4E3-F13", "D4E3-F14", "D4E3-F15", "D4E3-F16", "D4E3-F17", "D4E3-F18", "D4E3-F19", "D4E3-F20", "D4E3-F21", "D4E3-F22", "D4E3-F23", "D4E3-F24", "D4E3-F25", "D4E3-F26", "D4E3-F27", "D4E3-F28", "D4E3-F29", "D4E3-F30"],
+  "dispositions": [
+    {"id":"D4E3-F03","status":"reclassified","reason":"The end-to-end expectation uses legacy Upper/Lower labels while the active microcycle exposes role-owned Push/Pull/Legs/Upper labels."},
+    {"id":"D4E3-F11","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F12","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F13","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F14","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F15","status":"fixed","reason":"Canonical label preserves Full Body casing."},
+    {"id":"D4E3-F16","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F17","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F18","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F19","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F20","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F21","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F22","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F23","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."},
+    {"id":"D4E3-F24","status":"reclassified","reason":"Body-part labels conflict with the complete current microcycle session-role authority; no legacy label may override it."},
+    {"id":"D4E3-F25","status":"reclassified","reason":"Body-part labels conflict with the complete current microcycle session-role authority; no legacy label may override it."},
+    {"id":"D4E3-F26","status":"reclassified","reason":"Body-part labels conflict with the complete current microcycle session-role authority; no legacy label may override it."},
+    {"id":"D4E3-F27","status":"reclassified","reason":"Body-part labels conflict with the complete current microcycle session-role authority; no legacy label may override it."},
+    {"id":"D4E3-F28","status":"reclassified","reason":"Body-part labels conflict with the complete current microcycle session-role authority; no legacy label may override it."},
+    {"id":"D4E3-F29","status":"reclassified","reason":"The current microcycle does not contain a sixth Full Body role; the old body-part fixture is incompatible and fails closed."},
+    {"id":"D4E3-F30","status":"fixed","reason":"Generated workout now projects the active session role to a stable workout label."}
+  ],
+  "postChangeBaseline": {"failedTests":28,"passedTests":1806,"failedFiles":14},
+  "prescriptionOutputsChanged": false,
+  "productionAuthority": "production_only"
+}
