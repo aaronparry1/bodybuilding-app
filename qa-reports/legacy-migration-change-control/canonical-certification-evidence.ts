@@ -31,10 +31,12 @@ export function runCanonicalPipelineCertification() {
   const restored = restoreCanonicalRecordedSession({ snapshot: session, status: "paused", expectedMicrocycleId: construction.carrier.microcycle.id, currentRevision: session.revision });
   evidence.historical_snapshots_preserved = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "recorded_restoration", caseIds: ["restoration:paused"], passed: restored.status === "restored" };
   evidence.malformed_sessions_rejected = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "session_validator", caseIds: ["malformed:wrong_linkage"], passed: restoreCanonicalRecordedSession({ snapshot: session, status: "started", expectedMicrocycleId: "wrong", currentRevision: session.revision }).status === "rejected" };
-  evidence.legacy_history_non_authoritative = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "recorded_restoration", caseIds: ["restoration:legacy_nested_authority"], passed: true };
+  const legacyRejected = restoreCanonicalRecordedSession({ snapshot: { ...session, prescriptionSnapshot: { blocks: [], performedSets: [] } }, status: "legacy_historical", expectedMicrocycleId: construction.carrier.microcycle.id, currentRevision: session.revision });
+  evidence.legacy_history_non_authoritative = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "recorded_restoration", caseIds: ["restoration:legacy_nested_authority"], passed: legacyRejected.status === "rejected" };
   evidence.exact_prescriptions_preserved = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "real_repository", caseIds: ["prescription:roundtrip"], passed: roundTrip };
   evidence.no_legacy_fields_persisted = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "real_repository", caseIds: ["persistence:recursive_legacy_scan"], passed: !JSON.stringify(read).includes("blocks") };
-  evidence.deterministic_outputs_verified = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "real_orchestration", caseIds: ["determinism:repeat_identity"], passed: true };
+  const repeated = constructCanonicalActivePlanFromCanonicalInputs(input);
+  evidence.deterministic_outputs_verified = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "real_orchestration", caseIds: ["determinism:repeat_identity"], passed: repeated.status === "constructed" && compareCanonicalActivePlans(construction.carrier, repeated.carrier).status === "equivalent" };
   for (const name of REQUIRED_CANONICAL_EVIDENCE) if (!evidence[name]) evidence[name] = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "missing", caseIds: [], passed: false, firstFailure: { caseId: name, reason: "missing_producer" } };
   return certifyCanonicalPipelineEvidence(evidence);
 }
