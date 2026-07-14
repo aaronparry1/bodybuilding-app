@@ -1,0 +1,12 @@
+{
+  "phase": "D4E3C4D10C4",
+  "candidateId": "d4e3c4d10c4-branch-observer-v1",
+  "classification": "branch_local_observation_not_viable",
+  "selectedFixture": null,
+  "primitiveReturnChanged": false,
+  "productionPatchApplied": false,
+  "invocationCount": 0,
+  "fixtureDelta": "not_run",
+  "failureDelta": "not_applicable",
+  "nextBoundary": "private branch-local value-plus-source helper behind primitive façade"
+}
