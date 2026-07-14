@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "d4e3c4e1a.v1",
+  "fixtures": [
+    {"id":"ordinary_primary","category":"ordinary","caller":"direct_helper_result","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"production_authority_unavailable","rollback":"incomplete"},
+    {"id":"ordinary_secondary","category":"ordinary","caller":"direct_helper_result","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"production_authority_unavailable","rollback":"incomplete"},
+    {"id":"ordinary_accessory","category":"ordinary","caller":"direct_helper_result","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"production_authority_unavailable","rollback":"incomplete"},
+    {"id":"explicit_slot_override","category":"override","caller":"not_observable_with_current_contract","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"public_facade_gap","rollback":"incomplete"},
+    {"id":"advanced_method","category":"advanced_method","caller":"not_observable_with_current_contract","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"incomplete_method_coverage","rollback":"incomplete"},
+    {"id":"family_override_collision","category":"family_role_collision","caller":"deterministic_source_characterization","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"characterization_gap","rollback":"incomplete"},
+    {"id":"explicit_inferred_role","category":"role_collision","caller":"deterministic_source_characterization","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"incomplete_role_coverage","rollback":"incomplete"},
+    {"id":"corrective_family","category":"special_family","caller":"not_observable_with_current_contract","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"incomplete_special_family_coverage","rollback":"incomplete"},
+    {"id":"recovery_family","category":"special_family","caller":"not_observable_with_current_contract","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"incomplete_special_family_coverage","rollback":"incomplete"},
+    {"id":"power_family","category":"special_family","caller":"not_observable_with_current_contract","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"incomplete_special_family_coverage","rollback":"incomplete"},
+    {"id":"planned_order_lanes","category":"planned_order","caller":"direct_generated_settings_result","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"incomplete_lane_coverage","rollback":"incomplete"},
+    {"id":"partial_public_facade","category":"public_facade","caller":"not_observable_with_current_contract","productionRepAuthority":"unavailable","productionLaneAuthority":"unavailable","v2Outcome":"not_evaluated","comparison":"public_facade_gap","rollback":"incomplete"}
+  ],
+  "fixtureCount": 12,
+  "eligibleFamilyCount": 0,
+  "selectedFirstCandidate": null
+}

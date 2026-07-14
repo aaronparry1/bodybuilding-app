@@ -1,6 +1,7 @@
 {
   "phase": "D4E3C4E2A",
-  "evaluatedBranchFamilies": [],
+  "evaluatedBranchFamilies": ["ordinary", "override", "advanced_method", "family_role_collision", "role_collision", "special_family", "planned_order", "public_facade"],
+  "fixtureEvidenceCount": 12,
   "eligibleFamilyCount": 0,
   "ineligibleFamilyCount": 0,
   "selectedFirstCandidate": null,
