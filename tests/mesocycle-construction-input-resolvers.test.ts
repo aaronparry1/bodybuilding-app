@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-prescription-policy";
+import { enumerateMesocycleTargetCombinations, resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-prescription-policy";
 import { resolveCanonicalLaneEnvelope, resolveCanonicalTargetEnvelope } from "@/domain/training/mesocycle-construction-input-resolvers";
 
 describe("Mesocycle construction input resolvers", () => {
@@ -16,5 +16,14 @@ describe("Mesocycle construction input resolvers", () => {
     const policy = resolveMesocyclePrescriptionPolicy("strength_taper");
     expect(policy.status).toBe("resolved");
     if (policy.status === "resolved") expect(resolveCanonicalTargetEnvelope(policy.policy, "primary", "peak", false).status).toBe("blocked");
+  });
+  it("enumerates every permitted role/lane/method/evidence combination", () => {
+    const policy = resolveMesocyclePrescriptionPolicy("powerbuilding_hypertrophy");
+    expect(policy.status).toBe("resolved");
+    if (policy.status === "resolved") {
+      const combinations = enumerateMesocycleTargetCombinations(policy.policy);
+      expect(combinations.length).toBeGreaterThan(0);
+      for (const role of ["primary", "secondary", "accessory"] as const) for (const lane of policy.policy.concreteLanes.allowed) expect(combinations.some((item) => item.role === role && item.lane === lane)).toBe(true);
+    }
   });
 });
