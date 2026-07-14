@@ -22,13 +22,7 @@ export class LocalActiveTrainingPlanRepository {
   }
 
   get(): ActiveTrainingPlan {
-    const plan = jsonStore.get<ActiveTrainingPlan>(activeTrainingPlanKey, createRecommendedAnnualPlan());
-    const classification = classifyRestrictedCalibrationPlanMetadata(plan);
-    if (classification.status === "invalid_current_plan" || classification.status === "unsupported_schema") throw new Error(classification.reason);
-    const normalized = normalizeActiveTrainingPlanEquipment(plan);
-    if (!normalized.programmePolicyMetadata) return normalized;
-    const metadata = copyRestrictedCalibrationMetadata(normalized.programmePolicyMetadata);
-    return { ...normalized, programmePolicyMetadata: metadata, programmeSpecifications: metadata.programmeSpecifications, microcycleProgrammeReferences: metadata.microcycleProgrammeReferences };
+    return this.getOptional() ?? createRecommendedAnnualPlan();
   }
 
   save(plan: ActiveTrainingPlan): void {
