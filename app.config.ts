@@ -148,6 +148,7 @@ const config: ExpoConfig = {
       qualityGateStrict: flag("ASC_V3_QUALITY_GATE_STRICT", "EXPO_PUBLIC_ASC_V3_QUALITY_GATE_STRICT"),
       shadowMode: flag("ASC_V3_SHADOW_MODE", "EXPO_PUBLIC_ASC_V3_SHADOW_MODE"),
     },
+    ordinaryV2ShadowObservationEnabled: process.env.EXPO_PUBLIC_ORDINARY_V2_SHADOW_OBSERVATION === "enabled",
     eas: {
       projectId: env("EAS_PROJECT_ID", "74af0233-9986-445e-b138-8210fa059bfc"),
     },

@@ -9,7 +9,8 @@ describe("D4E3C4D5 final compatibility rep/lane decision audit", () => {
   it("projects one immutable decision into generated settings", () => {
     expect(source).toContain("const decisionResult = resolveCompatibilityFinalRepLaneDecision");
     expect(source).toContain("repRange: decision?.repRange");
-    expect(source).toContain("return applyLaneSetConstraints({ ...generated, trainingLane: lane }, lane)");
+    expect(source).toContain("const productionSettings = applyLaneSetConstraints({ ...generated, trainingLane: lane }, lane)");
+    expect(source).toContain("return observeOrdinaryV2Shadow");
     expect(source).toContain('ownershipStage: "helper_resolution"');
   });
 

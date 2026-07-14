@@ -8,6 +8,8 @@ import { resolveRepRange } from "@/domain/training/rep-range-strategy";
 import { withSetPrescription } from "@/domain/training/set-prescription";
 import { resolveEvidenceBasedSlotPrescription } from "@/domain/training/slot-prescription-matrix";
 import { shadowResolveCompatibilityV2, type CompatibilityV2ShadowResult } from "@/domain/training/compatibility-v2-shadow";
+import { observeOrdinaryV2Shadow } from "@/domain/training/ordinary-v2-shadow-observation";
+import { resolveOrdinaryShadowObservationPolicy } from "@/domain/training/ordinary-v2-shadow-config";
 import type { TrainingSetupGoal } from "@/domain/training/plan-setup";
 import type {
   BlockCompatibility,
@@ -917,7 +919,8 @@ function resolveGeneratedSettings(exercise: Exercise, slot: TemplateSlot, curren
     hardCapSets: prescription.hardCapSets,
     source: "generated",
   });
-  return applyLaneSetConstraints({ ...generated, trainingLane: lane }, lane);
+  const productionSettings = applyLaneSetConstraints({ ...generated, trainingLane: lane }, lane);
+  return observeOrdinaryV2Shadow({ family: "ordinary", role, production: productionSettings, shadow: () => ({ classification: decision?.shadow.status === "resolved_agreement" ? "aligned" : "unavailable", reasonCode: decision?.shadow.status ?? "shadow_unavailable" }) }, resolveOrdinaryShadowObservationPolicy());
 }
 
 type CompatibilityFinalRepLaneDecision = Readonly<{
