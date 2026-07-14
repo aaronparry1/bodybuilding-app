@@ -1,10 +1,11 @@
 import type { TrainingYear } from "@/domain/training/annual-models";
+import { readCanonicalSessionRoles } from "@/application/training/canonical-training-architecture";
 import type { Exercise, Programme, WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
 import { displayWorkoutName } from "@/domain/training/planned-workout";
 import { resolveEventTaper } from "@/domain/training/event-taper";
 import { classifyFatigue } from "@/domain/training/fatigue-classifier";
 import { buildStrategicCoachingViewModel } from "@/domain/training/strategic-coaching-presenter";
-import { sessionRolesForPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
+import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { evidence, insufficientEvidence, type RecommendationEvidence } from "@/domain/training/recommendation-evidence";
 import { completedPlanSessionIndexes, hasCompletedAllPlanSessionsThisWeek, resolveRecommendedSessionIndex, resolveSelectedSessionIndex } from "@/domain/training/training-session-selection";
 import { analyzePersonalisedVolume, getPrimaryPersonalisedVolumeRecommendation } from "@/domain/training/personalised-volume";
@@ -103,7 +104,7 @@ export function buildHomeDashboardViewModel({
   void programmes;
   void trainingYear;
   const hasActivePlan = Boolean(activePlan);
-  const split = activePlan ? sessionRolesForPlan(activePlan) : [];
+  const split = activePlan ? readCanonicalSessionRoles(activePlan) : [];
   const recommendedSessionIndex = activePlan ? resolveRecommendedSessionIndex({ activePlan, history, date }) : 0;
   const todayIndex = activePlan ? resolveSelectedSessionIndex({ activePlan, history, selectedSessionIndex, date }) : 0;
   const plannedWorkout = split[todayIndex] ?? split[0] ?? "Set up your training plan";

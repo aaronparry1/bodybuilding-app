@@ -40,3 +40,7 @@ export function readCurrentPlanningInput(plan: ActiveTrainingPlan, sessionIndex:
 export function readApprovedNextMesocycleStates(plan: ActiveTrainingPlan) {
   return getApprovedNextMesocycleStates(plan);
 }
+
+export function readCanonicalSessionRoles(plan: ActiveTrainingPlan): string[] {
+  return [...sessionRolesForPlan(plan)];
+}
