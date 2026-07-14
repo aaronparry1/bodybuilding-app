@@ -1,0 +1,13 @@
+{
+  "schema": "canonical_plan_v2",
+  "fields": [
+    {"field":"planId","owner":"operational persistence metadata"},
+    {"field":"macrocycle","owner":"Macrocycle"},
+    {"field":"mesocycle","owner":"Mesocycle"},
+    {"field":"microcycle","owner":"Microcycle"},
+    {"field":"plannedSessions[].prescriptionSnapshot","owner":"Session Construction"},
+    {"field":"progress","owner":"Progress"},
+    {"field":"constraints","owner":"athlete input"},
+    {"field":"operational","owner":"operational persistence metadata"}
+  ]
+}

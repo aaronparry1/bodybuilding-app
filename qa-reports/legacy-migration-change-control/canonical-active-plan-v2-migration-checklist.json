@@ -1,0 +1,18 @@
+{
+  "schema": "canonical_plan_v2",
+  "status": "target_only_not_production_active",
+  "orderedBoundaries": [
+    "active-plan persistence and restoration",
+    "planned-session hydration and construction snapshots",
+    "canonical v1 and legacy-source migration",
+    "session selection and Progress references",
+    "recovery and volume-adjustment projections",
+    "Home/Plan/Train/Progress view models",
+    "recommendation and strategic coaching projections",
+    "ad-hoc and extra-session construction",
+    "retire legacy active-plan type",
+    "delete executable annual architecture",
+    "enforce canonical-only active consumers"
+  ],
+  "prohibitedUntilMigration": ["production restoration caller", "legacy block fallback", "v2 authority switch", "observation rollout"]
+}
