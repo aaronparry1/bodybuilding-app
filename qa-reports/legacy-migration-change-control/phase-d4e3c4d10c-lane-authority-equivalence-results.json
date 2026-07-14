@@ -1,0 +1,8 @@
+{
+  "phase": "D4E3C4D10C",
+  "status": "generated_output_drift",
+  "attempted": false,
+  "reverted": true,
+  "baselineRestored": "15 failing files / 43 failing tests / 1711 passing tests",
+  "nextPhase": "isolate lane branch drift before decomposition"
+}
