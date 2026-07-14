@@ -2,7 +2,6 @@ import { generateWorkoutByFocus, type GeneratedWorkoutType } from "@/domain/trai
 import { getCapacityRoutine, type CapacityFocusArea } from "@/domain/training/capacity-focus";
 import { resolveLoadIncrement, type LoadIncrementProfile } from "@/domain/training/load-increment-strategy";
 import type { Equipment, Exercise, ExperienceLevel, MuscleGroup, Programme, ProgramExercise, ProgressionSettings, UnitSystem, WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
-import { resolveRepRange } from "@/domain/training/rep-range-strategy";
 import { withSetPrescription } from "@/domain/training/set-prescription";
 
 export type ExtraSessionKind = NonNullable<WorkoutSession["sessionKind"]>;
@@ -278,13 +277,7 @@ function createSlot(
     repRange:
       (exercise.defaultSettings.measurementType ?? exercise.measurementType) === "duration"
         ? exercise.defaultRepRange
-        : resolveRepRange({
-            blockType: "hypertrophy",
-            exerciseRole: exercise.role,
-            exerciseFamily: exercise.family,
-            movementPattern: exercise.movementPattern,
-            exerciseDefault: exercise.defaultRepRange,
-          }),
+        : exercise.defaultRepRange,
     loadIncrease: loadIncrement.increment,
     requiredWorkSets: options.requiredWorkSets,
     unit: options.unit ?? exercise.defaultSettings.unit,
