@@ -1,0 +1,18 @@
+{
+  "phase":"canonical training architecture authority audit",
+  "commit":"d16ddf2",
+  "layers":[
+    {"layer":"macrocycle","canonicalType":"MacrocycleSpec","constructor":"src/domain/training/macrocycle-engine.ts:createMacrocycle","stateOwner":"ActiveTrainingPlan macrocycle projection","consumers":["plan-setup.ts","planning-context.ts","plan-page-view-model.ts"],"legacyCompetitors":["annual-planner.ts annualMacrocycleForGoal","annual-models.ts TrainingYear","strategic-coaching.ts createTrainingBlock/recommendNextBlock"],"projection":"planning-context and plan/home summaries"},
+    {"layer":"mesocycle","canonicalType":"MesocycleSpec/MesocycleDecisionInput","constructor":"mesocycle-library.ts and current-progression-transition-decision.ts:decideMesocycleTransition","stateOwner":"ActiveTrainingPlan.currentMesocycleId plus current readiness decision records","consumers":["current-readiness-producer.ts","current-decision-application.ts","programmes.tsx"],"legacyCompetitors":["annual-planner block transition helpers","recommendation-actions.ts TrainingYear actions"],"projection":"approvedNextMesocycleStates and planning context"},
+    {"layer":"microcycle","canonicalType":"MicrocyclePlan","constructor":"microcycle-scheduler.ts:createMicrocycle","stateOwner":"ActiveTrainingPlan.currentMicrocycle","consumers":["current-planning-input.ts","training-session-selection.ts","home-dashboard.ts","plan-page-view-model.ts"],"legacyCompetitors":["weeklySplitForPlan fallback","legacy block/week matching"],"projection":"session roles and microcycle labels"},
+    {"layer":"session_construction","canonicalType":"Programme/WorkoutSession plus exact set prescription","constructor":"planned-workout.ts:buildPlannedWorkoutProgramme and set-prescription.ts:resolveSetPrescription","stateOwner":"generated planned session and stored exact targets","consumers":["train.tsx","session-builder.ts","recovery-capacity-delivery.ts"],"legacyCompetitors":["ad-hoc-workout-generator.ts block inputs","annual block defaults"],"projection":"Train/Home/Plan view models"},
+    {"layer":"progress","canonicalType":"CurrentReadinessSnapshot and CurrentMesocycleDecisionRecord","constructor":"current-readiness-producer.ts and current-progression-transition-decision.ts","stateOwner":"current-readiness-snapshot-repository/current-mesocycle-decision-repository","consumers":["current-completion-orchestration.ts","current-progression-transition-decision-writer.ts","current-decision-application.ts","progress-dashboard.ts"],"legacyCompetitors":["annual-planner recommendBlockAction","strategic-coaching.ts"],"projection":"progress and analytics presentations"}
+  ],
+  "conflicts":[
+    {"id":"AUTH-CONFLICT-1","severity":"blocking","path":"strategic-coaching.ts and recommendation-actions.ts","issue":"active consumers still import annual-planner/TrainingYear helpers alongside canonical readiness/decision paths","requiredResolution":"route modern-plan continuation through canonical decision boundaries or explicitly isolate these as compatibility-only"},
+    {"id":"AUTH-CONFLICT-2","severity":"blocking","path":"plan-setup.ts and annual-planner.ts","issue":"ActiveTrainingPlan construction uses macrocycle-engine while legacy annual block utilities remain production-reachable","requiredResolution":"classify and isolate legacy annual paths before horizon semantics are implemented"}
+  ],
+  "status":"blocked_single_owner_not_yet_demonstrated",
+  "productionAuthority":"production_only",
+  "parallelHorizonEngineIntroduced":false
+}
