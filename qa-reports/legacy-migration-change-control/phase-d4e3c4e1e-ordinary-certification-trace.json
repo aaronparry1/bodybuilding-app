@@ -1,0 +1,13 @@
+{
+  "schemaVersion":"d4e3c4e1e.v1",
+  "execution":{"entry":"tests/d4e3c4e2a-candidate-certification.test.ts","function":"certifyFirstCandidate","shadowInput":"phase-d4e3c4e1-v2-shadow-results.json","e1dConsumed":false},
+  "ordinaryFixtures":[
+    {"id":"ordinary_primary","predicates":[{"name":"fixture_level_evidence_consumed","supplied":false,"passed":false,"blocker":"disconnected_e1d_artifact"},{"name":"shadow_status_verified","supplied":"verified_shadow_only","passed":true}],"firstFailingPredicate":"fixture_level_evidence_consumed"},
+    {"id":"ordinary_secondary","predicates":[{"name":"fixture_level_evidence_consumed","supplied":false,"passed":false,"blocker":"disconnected_e1d_artifact"},{"name":"shadow_status_verified","supplied":"verified_shadow_only","passed":true}],"firstFailingPredicate":"fixture_level_evidence_consumed"},
+    {"id":"ordinary_accessory","predicates":[{"name":"fixture_level_evidence_consumed","supplied":false,"passed":false,"blocker":"disconnected_e1d_artifact"},{"name":"shadow_status_verified","supplied":"verified_shadow_only","passed":true}],"firstFailingPredicate":"fixture_level_evidence_consumed"}
+  ],
+  "family":{"id":"ordinary","coverage":"not_evaluated","eligibility":false,"blockers":["disconnected_e1d_artifact","incomplete_shadow_coverage"]},
+  "result":{"selectedFirstCandidate":null,"status":"no_eligible_branch_family","reason":"incomplete_shadow_coverage"},
+  "classification":"B",
+  "smallestCorrectiveTask":"connect E1D fixture evidence to the existing certifier without changing predicates"
+}
