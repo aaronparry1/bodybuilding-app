@@ -2,6 +2,8 @@ import type { CanonicalSessionConstructionInput } from "@/domain/training/canoni
 import { constructCanonicalSession } from "@/domain/training/canonical-session-construction-pipeline";
 
 export type CanonicalPipelineReadiness = "ready" | "not_ready" | "incomplete";
+export type CanonicalEvidence = Readonly<{ evidenceVersion: "canonical_pipeline_evidence_v1"; producer: string; caseIds: readonly string[]; passed: boolean; firstFailure?: Readonly<{ caseId: string; reason: string }> }>;
+export const REQUIRED_CANONICAL_EVIDENCE = ["orchestration_matrix_passed", "repository_roundtrip_passed", "atomic_failures_contained", "stale_revision_protected", "malformed_carriers_rejected", "malformed_sessions_rejected", "historical_snapshots_preserved", "legacy_history_non_authoritative", "exact_prescriptions_preserved", "no_legacy_fields_persisted", "deterministic_outputs_verified"] as const;
 export type CanonicalPipelineCertification = Readonly<{
   schemaVersion: "canonical_session_pipeline_certification_v1";
   readiness: CanonicalPipelineReadiness;
@@ -74,4 +76,20 @@ export function certifyCanonicalSessionConstruction(inputs: readonly CanonicalSe
     },
     blockers,
   };
+}
+
+export function certifyCanonicalPipelineEvidence(evidence: Readonly<Record<string, CanonicalEvidence>>): CanonicalPipelineCertification {
+  const predicates = Object.fromEntries(REQUIRED_CANONICAL_EVIDENCE.map((name) => [name, false])) as Record<string, boolean>;
+  const blockers: string[] = [];
+  for (const name of REQUIRED_CANONICAL_EVIDENCE) {
+    const result = evidence[name];
+    if (!result) { blockers.push(`${name}:missing_evidence`); continue; }
+    if (result.evidenceVersion !== "canonical_pipeline_evidence_v1") { blockers.push(`${name}:unexpected_evidence_version`); continue; }
+    if (!result.caseIds.length) { blockers.push(`${name}:no_cases_executed`); continue; }
+    if (new Set(result.caseIds).size !== result.caseIds.length) { blockers.push(`${name}:duplicate_case_id`); continue; }
+    if (!result.passed) blockers.push(`${name}:${result.firstFailure?.caseId ?? "unknown_case"}:${result.firstFailure?.reason ?? "failed"}`);
+    else predicates[name] = true;
+  }
+  const ready = REQUIRED_CANONICAL_EVIDENCE.every((name) => predicates[name]);
+  return { schemaVersion: "canonical_session_pipeline_certification_v1", readiness: ready ? "ready" : "not_ready", totalCases: Object.values(evidence).reduce((sum, item) => sum + item.caseIds.length, 0), validCases: Object.values(evidence).filter((item) => item.passed).length, expectedInvalidCases: 0, invariantViolations: [], qualityViolations: [], determinismFailures: [], carrierFailures: [], productionSwitchAllowed: false, pipelineReadyForSwitch: ready, productionSwitchCompleted: false, predicates, blockers };
 }

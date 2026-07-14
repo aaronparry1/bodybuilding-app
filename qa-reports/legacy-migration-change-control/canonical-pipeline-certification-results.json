@@ -1,0 +1,8 @@
+{
+  "evidenceVersion": "canonical_pipeline_evidence_v1",
+  "pipelineReadyForSwitch": false,
+  "productionSwitchCompleted": false,
+  "firstFalsePredicate": "orchestration_matrix_passed",
+  "reason": "real evidence producers are not yet connected to the certification runner",
+  "productionCallerInventory": "deferred_until_pipeline_ready"
+}
