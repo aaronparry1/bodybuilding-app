@@ -16,7 +16,7 @@ import {
 } from "@/domain/training/recommendation-actions";
 
 function plan() {
-  return createActiveTrainingPlan(
+  const canonical = createActiveTrainingPlan(
     {
       goal: "build_muscle_and_strength",
       planningChoice: "recommended_12_month",
@@ -27,6 +27,9 @@ function plan() {
     },
     "2026-06-01T08:00:00.000Z",
   );
+  // These tests exercise the retained compatibility adapter, not canonical mutation.
+  const { authority: _authority, currentMesocycleId: _mesocycle, currentMicrocycle: _microcycle, ...legacy } = canonical;
+  return legacy;
 }
 
 function endingPlan() {
@@ -137,8 +140,9 @@ describe("recommendation action flows", () => {
       },
       "2026-06-01T08:00:00.000Z",
     );
+    const { authority: _authority, currentMesocycleId: _mesocycle, currentMicrocycle: _microcycle, ...legacyBase } = base;
     const ending = {
-      ...base,
+      ...legacyBase,
       blocks: base.blocks.map((block) => ({ ...block, currentWeek: block.durationWeeks })),
     };
     const chosen = chooseNextSingleBlock(ending, "peak", "2026-07-13T08:00:00.000Z");

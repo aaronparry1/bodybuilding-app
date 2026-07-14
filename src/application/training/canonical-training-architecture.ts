@@ -3,6 +3,7 @@ import { mesocycleById, type MesocycleSpec } from "@/domain/training/mesocycle-l
 import type { WorkoutSession } from "@/domain/training/models";
 import { getApprovedNextMesocycleStates, sessionRolesForPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { resolveCurrentPlanningInput, type CurrentPlanningResolution } from "@/domain/training/current-planning-input";
+import { classifyPlanAuthority, mutationEligibility } from "@/domain/training/plan-authority-provenance";
 
 /**
  * Application-facing read boundary for the canonical training architecture.
@@ -43,4 +44,10 @@ export function readApprovedNextMesocycleStates(plan: ActiveTrainingPlan) {
 
 export function readCanonicalSessionRoles(plan: ActiveTrainingPlan): string[] {
   return [...sessionRolesForPlan(plan)];
+}
+
+/** Legacy block mutations are fail-closed for canonical plans. */
+export function canApplyLegacyBlockMutation(plan: ActiveTrainingPlan): boolean {
+  const authority = classifyPlanAuthority(plan);
+  return mutationEligibility(authority, "legacy_compatibility") === "legacy_compatibility_mutation_permitted";
 }

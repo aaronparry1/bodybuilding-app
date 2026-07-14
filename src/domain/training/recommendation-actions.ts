@@ -5,6 +5,7 @@ import { buildDeloadPrescription, type DeloadProfile } from "@/domain/training/d
 import { recordExerciseReason, type ExerciseReasonInput } from "@/domain/training/exercise-preferences";
 import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 import type { PrimaryLiftVariationSelection } from "@/domain/training/primary-lift-variations";
+import { canApplyLegacyBlockMutation } from "@/application/training/canonical-training-architecture";
 
 export interface BlockTransitionPreview {
   available: boolean;
@@ -50,6 +51,7 @@ export function getBlockTransitionPreview(plan: ActiveTrainingPlan): BlockTransi
 }
 
 export function chooseNextSingleBlock(plan: ActiveTrainingPlan, nextBlockType: BlockType, decidedAt = new Date().toISOString()): ActiveTrainingPlan {
+  if (!canApplyLegacyBlockMutation(plan)) return plan;
   const transition = getBlockTransitionPreview(plan);
   if (!transition.available || plan.mode !== "single_block") return plan;
 
@@ -81,6 +83,7 @@ export function chooseNextSingleBlock(plan: ActiveTrainingPlan, nextBlockType: B
 }
 
 export function advanceActivePlanBlock(plan: ActiveTrainingPlan, decidedAt = new Date().toISOString()): ActiveTrainingPlan {
+  if (!canApplyLegacyBlockMutation(plan)) return plan;
   if (!getBlockTransitionPreview(plan).available) return plan;
   const activeIndex = plan.blocks.findIndex((block) => block.id === plan.activeBlockId);
   if (activeIndex < 0) return plan;
@@ -103,6 +106,7 @@ export function advanceActivePlanBlock(plan: ActiveTrainingPlan, decidedAt = new
 }
 
 export function repeatActivePlanBlock(plan: ActiveTrainingPlan, decidedAt = new Date().toISOString()): ActiveTrainingPlan {
+  if (!canApplyLegacyBlockMutation(plan)) return plan;
   if (!getBlockTransitionPreview(plan).available) return plan;
   const activeBlock = getActivePlanBlock(plan);
   if (!activeBlock) return plan;
@@ -129,6 +133,7 @@ export function repeatActivePlanBlock(plan: ActiveTrainingPlan, decidedAt = new 
 }
 
 export function decideLaterOnBlock(plan: ActiveTrainingPlan, decidedAt = new Date().toISOString()): ActiveTrainingPlan {
+  if (!canApplyLegacyBlockMutation(plan)) return plan;
   if (!getBlockTransitionPreview(plan).available) return plan;
   const activeBlock = getActivePlanBlock(plan);
   if (!activeBlock) return plan;
@@ -142,6 +147,7 @@ export function decideLaterOnBlock(plan: ActiveTrainingPlan, decidedAt = new Dat
 }
 
 export function startDeloadPlan(plan: ActiveTrainingPlan, decidedAt = new Date().toISOString(), profile: DeloadProfile = "clear"): ActiveTrainingPlan {
+  if (!canApplyLegacyBlockMutation(plan)) return plan;
   const activeIndex = plan.blocks.findIndex((block) => block.id === plan.activeBlockId);
   if (activeIndex < 0) return plan;
 
@@ -186,6 +192,7 @@ export function startDeloadPlan(plan: ActiveTrainingPlan, decidedAt = new Date()
 }
 
 export function ignoreDeloadPlan(plan: ActiveTrainingPlan, decidedAt = new Date().toISOString()): ActiveTrainingPlan {
+  if (!canApplyLegacyBlockMutation(plan)) return plan;
   return {
     ...plan,
     recommendationState: {

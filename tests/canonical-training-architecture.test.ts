@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readCanonicalPlanningProjection } from "@/application/training/canonical-training-architecture";
+import { canApplyLegacyBlockMutation, readCanonicalPlanningProjection } from "@/application/training/canonical-training-architecture";
 import { createActiveTrainingPlan } from "@/domain/training/plan-setup";
 
 describe("canonical training application boundary", () => {
@@ -31,5 +31,17 @@ describe("canonical training application boundary", () => {
     const projection = readCanonicalPlanningProjection(plan);
     expect(projection).not.toHaveProperty("blocks");
     expect(projection).not.toHaveProperty("activeBlockId");
+  });
+
+  it("fails closed instead of routing canonical plans through legacy block mutation", () => {
+    const plan = createActiveTrainingPlan({
+      goal: "build_muscle",
+      planningChoice: "recommended_12_month",
+      equipmentPreset: "full_gym",
+      daysPerWeek: 4,
+      preferredSplit: "upper_lower",
+      experienceLevel: "intermediate",
+    });
+    expect(canApplyLegacyBlockMutation(plan)).toBe(false);
   });
 });
