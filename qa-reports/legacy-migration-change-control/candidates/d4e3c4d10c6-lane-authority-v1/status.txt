@@ -1,0 +1,14 @@
+ M src/domain/training/block-training-lanes.ts
+?? .env.example
+?? .env.local.example
+?? .env.production.example
+?? .env.staging.example
+?? docs/private-compatibility-lane-authority.md
+?? hf_portfolio_backtest/
+?? qa-reports/legacy-migration-change-control/candidates/d4e3c4d10c6-lane-authority-v1/
+?? qa-reports/legacy-migration-change-control/phase-d4e3-shared-exact-target-core-map.md
+?? qa-reports/legacy-migration-change-control/phase-d4e3b-block-free-compatibility-prescription-map.md
+?? qa-reports/legacy-migration-change-control/phase-d4e3c1-rep-lane-semantic-extraction-map.md
+?? qa-reports/legacy-migration-change-control/phase-d4e3c4d10c6-lane-authority-results.json
+?? qa-reports/legacy-migration-change-control/phase-d4e3c4d10c6-lane-authority-return-map.md
+?? tests/d4e3c4d10c6-lane-authority.test.ts

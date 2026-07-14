@@ -1,0 +1,12 @@
+{
+  "phase": "D4E3C4D10C6",
+  "candidateId": "d4e3c4d10c6-lane-authority-v1",
+  "branchCount": 17,
+  "laneIdentityCount": 13,
+  "primitiveProjection": "unchanged",
+  "generatedSettingsIntegration": false,
+  "finalDecisionIntegration": false,
+  "authorityUnavailableCount": 0,
+  "v2RuntimeUse": false,
+  "nextPhase": "D4E3C4D10C7 integrate private lane decision into final compatibility decision"
+}

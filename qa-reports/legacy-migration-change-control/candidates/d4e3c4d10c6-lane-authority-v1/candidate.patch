@@ -1,0 +1,26 @@
+diff --git a/src/domain/training/block-training-lanes.ts b/src/domain/training/block-training-lanes.ts
+index b9520f8..5d30052 100644
+--- a/src/domain/training/block-training-lanes.ts
++++ b/src/domain/training/block-training-lanes.ts
+@@ -79,6 +79,11 @@ type ResolvedTrainingLaneDecision = Readonly<{
+   lane: TrainingLane;
+   source: "block_compatibility" | "explicit_exercise_role" | "slot_role" | "planned_order" | "programme_default";
+   branchId: string;
++  appliedIdentity: string;
++  plannedOrderClass: "first" | "later" | "unknown";
++  roleSource: "explicit" | "unavailable";
++  reasonCode: string;
++  winnerRetention: "retained_at_existing_branch";
+ }>;
+ 
+ function resolveTrainingLaneDecision(input: {
+@@ -91,7 +96,8 @@ function resolveTrainingLaneDecision(input: {
+   const block = normalizeBlock(input.blockType);
+   const role = input.exerciseRole;
+   const slotRole = input.slotRole;
+-  const select = (lane: TrainingLane, source: ResolvedTrainingLaneDecision["source"], branchId: string): ResolvedTrainingLaneDecision => ({ lane, source, branchId });
++  const plannedOrderClass: ResolvedTrainingLaneDecision["plannedOrderClass"] = input.plannedOrder === 1 ? "first" : input.plannedOrder === undefined ? "unknown" : "later";
++  const select = (lane: TrainingLane, source: ResolvedTrainingLaneDecision["source"], branchId: string): ResolvedTrainingLaneDecision => ({ lane, source, branchId, appliedIdentity: source === "explicit_exercise_role" ? role ?? branchId : source === "slot_role" ? slotRole ?? branchId : source === "planned_order" ? `planned_order:${plannedOrderClass}` : source === "block_compatibility" ? block ?? "default" : branchId, plannedOrderClass, roleSource: source === "explicit_exercise_role" ? "explicit" : "unavailable", reasonCode: branchId, winnerRetention: "retained_at_existing_branch" });
+ 
+   if (block === "deload") return role === "recovery" ? select("recovery", "explicit_exercise_role", "deload-recovery") : select("maintenance", "block_compatibility", "deload-default");
+   if (block === "peak") {
