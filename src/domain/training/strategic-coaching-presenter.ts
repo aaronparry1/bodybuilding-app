@@ -13,6 +13,7 @@ import {
 import type { SuccessModelGoal } from "@/domain/training/success-model";
 import { readCanonicalPlanningProjection } from "@/application/training/canonical-training-architecture";
 import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
+import { displayNameForTrainingSetupGoal } from "@/domain/training/training-goals";
 
 export interface StrategicCoachingViewModel {
   hasEnoughHistory: boolean;
@@ -74,7 +75,7 @@ export function buildStrategicCoachingViewModel(
       currentBlockLabel: planning.currentMesocycle?.adaptation ?? "Current training phase",
       readiness: { score: readiness.score, band: titleReadinessBand(readiness.band), label: `${readiness.score} - ${titleReadinessBand(readiness.band)}` },
       momentum: { score: momentum.score, band: momentum.band, label: `${momentum.score} - ${momentum.band}` },
-      recommendation: { title: recommendationTitle, message: `${planning.sessionRole}: ${planning.currentMesocycle?.adaptation ?? "continue the current phase"}.`, reasons: buildPlainReasons(signals, readiness.reasons) },
+      recommendation: { title: recommendationTitle, message: `${planning.sessionRole}: ${planning.currentMesocycle?.adaptation ?? "continue the current phase"}.`, reasons: [`Goal: ${goalLabel(options.activePlan.goal)}`, ...buildPlainReasons(signals, readiness.reasons)] },
     };
   }
 
@@ -131,6 +132,11 @@ export function buildStrategicCoachingViewModel(
       deloadProfile: recommendation.deloadProfile,
     },
   };
+}
+
+function goalLabel(goal: ActiveTrainingPlan["goal"]): string {
+  if (goal === "powerlifting_meet") return "Powerlifting Meet";
+  return displayNameForTrainingSetupGoal(goal) ?? goal.replaceAll("_", " ");
 }
 
 export function titleRecommendation(outcome: ReturnType<typeof recommendStrategicAction>["outcome"]): string {

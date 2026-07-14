@@ -358,7 +358,7 @@ describe("Design QA fixtures", () => {
 
     applyDesignQaFixture("phase1_goal_muscle", "development");
     let progress = buildProgressDashboardViewModel(summarizeWorkoutHistory(workoutSessionRepository.list()), exerciseLibrary, activeTrainingPlanRepository.getOptional());
-    expect(progress.actionTitle).toBe("Increase volume");
+    expect(progress.actionTitle).toBe("Continue the current training phase");
 
     applyDesignQaFixture("phase1_goal_general", "development");
     progress = buildProgressDashboardViewModel(summarizeWorkoutHistory(workoutSessionRepository.list()), exerciseLibrary, activeTrainingPlanRepository.getOptional());
@@ -418,7 +418,7 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
 
   if (fixtureId === "plan_event_custom") {
     expect(activePlan?.mode).toBe("custom_date_event");
-    expect(activePlan?.blocks.map((block) => block.type)).toEqual(["powerbuilding", "strength", "peak", "deload"]);
+    expect(activePlan?.currentMesocycleId).toBe("strength_general");
   }
 
   if (fixtureId === "plan_block_ending") {
@@ -433,15 +433,12 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
   }
 
   if (fixtureId === "plan_block_transition_accepted") {
-    const activeBlock = activePlan?.blocks.find((block) => block.id === activePlan.activeBlockId);
-    expect(activeBlock?.type).toBe("powerbuilding");
-    expect(activePlan?.recommendationState?.blockDecision?.type).toBe("advanced");
+    expect(activePlan?.currentMesocycleId).toBe("powerbuilding_hypertrophy");
+    expect(activePlan?.currentMicrocycle?.sequenceNumber).toBe(1);
   }
 
   if (fixtureId === "plan_deload_accepted") {
-    const activeBlock = activePlan?.blocks.find((block) => block.id === activePlan.activeBlockId);
-    expect(activeBlock?.type).toBe("deload");
-    expect(activePlan?.recommendationState?.deload?.status).toBe("accepted");
+    expect(activePlan?.currentMicrocycle?.progressionState).toBe("deload");
   }
 
   if (fixtureId === "train_rotation_accepted") {

@@ -5,17 +5,13 @@ import { activeTrainingPlanRepository } from "@/data/local/active-training-plan-
 import { jsonStore } from "@/data/local/json-store";
 import { programmeRepository } from "@/data/local/programme-repository";
 import { sessionPrepRepository } from "@/data/local/session-prep-repository";
-import { trainingYearRepository } from "@/data/local/training-year-repository";
+import { legacyTrainingYearArchive } from "@/application/training/legacy-training-year-archive";
 import { workoutSessionRepository } from "@/data/local/workout-session-repository";
 import type { AppEnvironment } from "@/application/runtime/app-environment-core";
 import { isDesignQaModeAvailable } from "@/application/runtime/app-environment-core";
 import { calculateNextSessionStartingLoadFromProductiveSets, resolveStartingLoadRecommendation } from "@/domain/training/load-selection";
-import { createActiveTrainingPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
-import {
-  advanceActivePlanBlock,
-  replaceExerciseForFutureSessions,
-  startDeloadPlan,
-} from "@/domain/training/recommendation-actions";
+import { createActiveTrainingPlan, transitionToApprovedMesocycle, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
+import { replaceExerciseForFutureSessions } from "@/domain/training/recommendation-actions";
 import type { Exercise, SetLog, WorkoutExerciseLog, WorkoutSession } from "@/domain/training/models";
 import type { TrainingYear } from "@/domain/training/annual-models";
 import { exerciseLibrary } from "@/domain/training/presets";
@@ -242,7 +238,7 @@ export function applyDesignQaFixture(id: DesignQaFixtureId, environment: AppEnvi
   if (!getActiveDesignQaFixture() && !jsonStore.get<DesignQaFixtureBackup | null>(fixtureBackupKey, null)) {
     jsonStore.set<DesignQaFixtureBackup>(fixtureBackupKey, {
       activePlan: activeTrainingPlanRepository.getOptional(),
-      trainingYear: trainingYearRepository.getActiveYear(),
+      trainingYear: legacyTrainingYearArchive.read() as TrainingYear,
       workoutSessions: workoutSessionRepository.list(),
       sessionPrepRecords: sessionPrepRepository.list(),
     });
@@ -268,10 +264,10 @@ export function applyDesignQaFixture(id: DesignQaFixtureId, environment: AppEnvi
       activeTrainingPlanRepository.save(blockEndingPlan());
       break;
     case "plan_block_transition_accepted":
-      activeTrainingPlanRepository.save(advanceActivePlanBlock(blockEndingPlan(), "2026-06-06T10:00:00.000Z"));
+      activeTrainingPlanRepository.save(transitionToApprovedMesocycle(blockEndingPlan(), "powerbuilding_hypertrophy"));
       break;
     case "plan_deload_accepted":
-      activeTrainingPlanRepository.save(startDeloadPlan(basePlan(), "2026-06-06T10:00:00.000Z"));
+      activeTrainingPlanRepository.save({ ...basePlan(), currentMicrocycle: basePlan().currentMicrocycle ? { ...basePlan().currentMicrocycle!, progressionState: "deload" } : undefined });
       break;
     case "train_rotation_accepted":
       activeTrainingPlanRepository.save(
@@ -455,7 +451,6 @@ export function applyDesignQaFixture(id: DesignQaFixtureId, environment: AppEnvi
       break;
     case "train_load_strength_unknown":
       activeTrainingPlanRepository.save(strengthPlan());
-      trainingYearRepository.startBlock("strength");
       saveSessions([openSession({ id: "qa-train-load-strength-unknown", name: "Push", exercises: [benchExercise([], "active", { load: 0, loadKnown: false })] })]);
       break;
     case "train_load_exact_progressed":
