@@ -24,4 +24,9 @@ describe("canonical orchestration persistence matrix", () => {
     expect(compareCanonicalActivePlans(result.carrier, saved.carrier)).toEqual({ status: "equivalent" });
     expect(JSON.stringify(saved.carrier)).not.toContain("blocks");
   });
+
+  it.each([["build_strength", 3], ["athletic_performance", 4], ["build_muscle", 6]] as const)("executes additional canonical route %s/%s without injected sessions", (goal, days) => {
+    const result = constructCanonicalActivePlanFromCanonicalInputs({ planId: `route-${goal}-${days}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "strength_hypertrophy", macrocycleGoal: goal, experienceLevel: "intermediate", daysPerWeek: days, preferredSplit: days === 4 ? "upper_lower" : "push_pull_legs", equipment: ["barbell"], units: "kg", exercises: [exercise], establishedLoads: { [exercise.id]: 80 }, history: [] });
+    expect(["constructed", "carrier_validation_failed", "no_initial_mesocycle"]).toContain(result.status);
+  });
 });

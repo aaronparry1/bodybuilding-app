@@ -9,6 +9,10 @@ describe("canonical recorded-session restoration", () => {
     expect(result.status).toBe("restored");
     if (result.status === "restored") expect(result.snapshot).toBe(snapshot);
   });
+  it.each(["started", "paused", "completed", "legacy_historical"] as const)("preserves %s records", (status) => {
+    const result = restoreCanonicalRecordedSession({ snapshot, status, expectedMicrocycleId: "m1", currentRevision: 2, performedSets: [{ reps: 8 }] });
+    expect(result.status).toBe("restored");
+  });
   it("rejects stale, mislinked and legacy-authority snapshots", () => {
     expect(restoreCanonicalRecordedSession({ snapshot, status: "started", expectedMicrocycleId: "wrong", currentRevision: 2 })).toEqual({ status: "rejected", reason: "invalid_linkage" });
     expect(restoreCanonicalRecordedSession({ snapshot, status: "started", expectedMicrocycleId: "m1", currentRevision: 3 })).toEqual({ status: "rejected", reason: "stale_revision" });
