@@ -7,5 +7,5 @@
   ],
   "runtimeAuthoritySwitch": false,
   "productionAuthority": true,
-  "d4e3c4e2a": {"selectedFirstCandidate": null,"status":"no_eligible_branch_family","reason":"incomplete_shadow_coverage"}
+  "d4e3c4e2a": {"selectedFirstCandidate":"ordinary","status":"eligible","reason":"all_ordinary_fixture_predicates_passed"}
 }

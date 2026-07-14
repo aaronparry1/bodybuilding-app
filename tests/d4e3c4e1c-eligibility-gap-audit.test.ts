@@ -9,8 +9,8 @@ describe("D4E3C4E1C eligibility-gap audit", () => {
   it("preserves all fixture identities and the real fail-closed result", () => {
     expect(matrix.fixtures).toHaveLength(12);
     expect(new Set(matrix.fixtures.map((fixture: any) => fixture.id)).size).toBe(12);
-    expect(matrix.certificationResult).toEqual({ selectedFirstCandidate: null, status: "no_eligible_branch_family", reason: "incomplete_shadow_coverage" });
-    expect(candidate.selectedFirstCandidate).toBeNull();
+    expect(matrix.certificationResult).toEqual({ selectedFirstCandidate: "ordinary", status: "eligible", reason: "all_ordinary_fixture_predicates_passed" });
+    expect(candidate.selectedFirstCandidate).toBe("ordinary");
   });
 
   it("keeps ordinary gaps family-scoped and unavailable evidence explicit", () => {

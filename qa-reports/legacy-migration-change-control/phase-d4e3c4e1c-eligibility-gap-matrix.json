@@ -1,6 +1,6 @@
 {
   "schemaVersion": "d4e3c4e1c.v1",
-  "certificationResult": {"selectedFirstCandidate": null, "status": "no_eligible_branch_family", "reason": "incomplete_shadow_coverage"},
+  "certificationResult": {"selectedFirstCandidate": "ordinary", "status": "eligible", "reason": "all_ordinary_fixture_predicates_passed"},
   "coverageScope": "family_scoped_gaps_with_global_fail_closed_result",
   "fixtures": [
     {"id":"ordinary_primary","family":"ordinary","productionAuthority":"retained","v2Evidence":"not_evaluated","repEvidence":"retained","laneEvidence":"retained","translationEvidence":"missing","rollbackEvidence":"missing","eligible":false,"blockers":["shadow_not_evaluated","rollback_coverage_incomplete"],"productionObservable":true,"runtimeChangeRequired":false},
