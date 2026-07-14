@@ -1,0 +1,72 @@
+diff --git a/src/domain/training/block-training-lanes.ts b/src/domain/training/block-training-lanes.ts
+index ce95f56..b9520f8 100644
+--- a/src/domain/training/block-training-lanes.ts
++++ b/src/domain/training/block-training-lanes.ts
+@@ -72,34 +72,51 @@ export function resolveTrainingLane(input: {
+   slotRole?: string | null;
+   plannedOrder?: number;
+ }): TrainingLane {
++  return resolveTrainingLaneDecision(input).lane;
++}
++
++type ResolvedTrainingLaneDecision = Readonly<{
++  lane: TrainingLane;
++  source: "block_compatibility" | "explicit_exercise_role" | "slot_role" | "planned_order" | "programme_default";
++  branchId: string;
++}>;
++
++function resolveTrainingLaneDecision(input: {
++  blockType?: BlockType | null;
++  exerciseRole?: ExerciseRole | null;
++  exerciseFamily?: ExerciseFamily | null;
++  slotRole?: string | null;
++  plannedOrder?: number;
++}): ResolvedTrainingLaneDecision {
+   const block = normalizeBlock(input.blockType);
+   const role = input.exerciseRole;
+   const slotRole = input.slotRole;
++  const select = (lane: TrainingLane, source: ResolvedTrainingLaneDecision["source"], branchId: string): ResolvedTrainingLaneDecision => ({ lane, source, branchId });
+ 
+-  if (block === "deload") return role === "recovery" ? "recovery" : "maintenance";
++  if (block === "deload") return role === "recovery" ? select("recovery", "explicit_exercise_role", "deload-recovery") : select("maintenance", "block_compatibility", "deload-default");
+   if (block === "peak") {
+-    if (role === "primary_compound" || slotRole === "heavy_primary" || input.plannedOrder === 1) return "peak";
+-    if (role === "secondary_compound" || slotRole === "heavy_secondary" || slotRole === "strength") return "strength_support";
+-    return "maintenance";
++    if (role === "primary_compound" || slotRole === "heavy_primary" || input.plannedOrder === 1) return select("peak", role === "primary_compound" ? "explicit_exercise_role" : slotRole === "heavy_primary" ? "slot_role" : "planned_order", "peak-first");
++    if (role === "secondary_compound" || slotRole === "heavy_secondary" || slotRole === "strength") return select("strength_support", role === "secondary_compound" ? "explicit_exercise_role" : "slot_role", "peak-secondary");
++    return select("maintenance", "block_compatibility", "peak-default");
+   }
+   if (block === "power") {
+-    if (role === "power" || slotRole === "power") return "power";
+-    if (role === "primary_compound" || slotRole === "heavy_primary" || slotRole === "strength") return "strength_support";
+-    return "maintenance";
++    if (role === "power" || slotRole === "power") return select("power", role === "power" ? "explicit_exercise_role" : "slot_role", "power-power");
++    if (role === "primary_compound" || slotRole === "heavy_primary" || slotRole === "strength") return select("strength_support", role === "primary_compound" ? "explicit_exercise_role" : "slot_role", "power-strength");
++    return select("maintenance", "block_compatibility", "power-default");
+   }
+   if (block === "strength") {
+-    if (role === "primary_compound" || slotRole === "heavy_primary") return "strength";
+-    if (role === "secondary_compound" || slotRole === "heavy_secondary" || slotRole === "strength") return "strength_support";
+-    return "maintenance";
++    if (role === "primary_compound" || slotRole === "heavy_primary") return select("strength", role === "primary_compound" ? "explicit_exercise_role" : "slot_role", "strength-primary");
++    if (role === "secondary_compound" || slotRole === "heavy_secondary" || slotRole === "strength") return select("strength_support", role === "secondary_compound" ? "explicit_exercise_role" : "slot_role", "strength-secondary");
++    return select("maintenance", "block_compatibility", "strength-default");
+   }
+   if (block === "powerbuilding") {
+-    if (role === "primary_compound" || slotRole === "heavy_primary") return "strength";
+-    if (role === "secondary_compound" || slotRole === "heavy_secondary" || slotRole === "strength") return "hypertrophy_strength";
+-    return "hypertrophy";
++    if (role === "primary_compound" || slotRole === "heavy_primary") return select("strength", role === "primary_compound" ? "explicit_exercise_role" : "slot_role", "powerbuilding-primary");
++    if (role === "secondary_compound" || slotRole === "heavy_secondary" || slotRole === "strength") return select("hypertrophy_strength", role === "secondary_compound" ? "explicit_exercise_role" : "slot_role", "powerbuilding-secondary");
++    return select("hypertrophy", "block_compatibility", "powerbuilding-default");
+   }
+-  if (role === "primary_compound" || slotRole === "heavy_primary") return "hypertrophy_strength";
+-  if (role === "power" || slotRole === "power") return "power";
+-  return "hypertrophy";
++  if (role === "primary_compound" || slotRole === "heavy_primary") return select("hypertrophy_strength", role === "primary_compound" ? "explicit_exercise_role" : "slot_role", "hypertrophy-primary");
++  if (role === "power" || slotRole === "power") return select("power", role === "power" ? "explicit_exercise_role" : "slot_role", "hypertrophy-power");
++  return select("hypertrophy", "block_compatibility", "hypertrophy-default");
+ }
+ 
+ export function getLanePrescriptionConstraints(lane?: TrainingLane | null): LanePrescriptionConstraints {

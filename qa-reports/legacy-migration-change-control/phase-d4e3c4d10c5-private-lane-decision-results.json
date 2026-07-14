@@ -1,0 +1,19 @@
+{
+  "candidateId": "d4e3c4d10c5-private-lane-decision-v1",
+  "classification": "private_lane_decision_drift",
+  "movedBranchCount": 17,
+  "primitiveCharacterizationPassed": 19,
+  "candidateFailureFiles": 18,
+  "candidateFailureTests": 46,
+  "baselineFailureFiles": 15,
+  "baselineFailureTests": 43,
+  "newFailures": [
+    "tests/d4e3c4d10-selector-decomposition.test.ts > keeps remaining selector families free of wrapper precedence",
+    "tests/d4e3c4d10c3-lane-sidecar.test.ts > confirms the primitive selector remains unchanged and primitive",
+    "tests/d4e3c4d10c4-branch-observation.test.ts > keeps the experiment free of duplicated lane precedence"
+  ],
+  "firstDivergence": "architecture-test expectations",
+  "laneValueChanged": false,
+  "productionChangesRetained": false,
+  "nextBoundary": "isolated architecture-gate update after primitive/generated equivalence"
+}
