@@ -10,6 +10,7 @@ import { createMicrocycle, type MicrocyclePlan } from "@/domain/training/microcy
 import type { PersonalisedVolumeConfidence, VolumeLadderAction } from "@/domain/training/personalised-volume";
 import type { PrimaryLiftVariationDecisionRecord } from "@/domain/training/primary-lift-variations";
 import { buildRestrictedCalibrationProgrammeMetadata, type RestrictedCalibrationMetadata } from "@/domain/training/restricted-calibration-programme-persistence";
+import { CANONICAL_PLAN_AUTHORITY_VERSION } from "@/domain/training/plan-authority-provenance";
 
 export type TrainingSetupGoal =
   | "build_muscle"
@@ -69,6 +70,7 @@ export interface ActiveTrainingPlan {
   programmeSpecifications?: RestrictedCalibrationMetadata["programmeSpecifications"];
   microcycleProgrammeReferences?: RestrictedCalibrationMetadata["microcycleProgrammeReferences"];
   programmePolicyMetadata?: RestrictedCalibrationMetadata;
+  authority?: { kind: "canonical_modern"; version: typeof CANONICAL_PLAN_AUTHORITY_VERSION };
 }
 
 export interface PlanRecommendationState {
@@ -178,6 +180,7 @@ export function createActiveTrainingPlan(input: TrainingSetupInput, createdAt = 
     preferredSplit: normalizedInput.preferredSplit,
     experienceLevel: normalizedInput.experienceLevel,
     recoveryCardioPreference: normalizedInput.recoveryCardioPreference ?? "recommended",
+    authority: { kind: "canonical_modern", version: CANONICAL_PLAN_AUTHORITY_VERSION },
     rotationFrequency: normalizedInput.rotationFrequency ?? "every_4_weeks",
     createdAt,
     targetDate: normalizedInput.targetDate,
