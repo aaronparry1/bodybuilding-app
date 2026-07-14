@@ -1,11 +1,11 @@
-import { macrocycleEngineForGoal } from "@/domain/training/macrocycle-engine";
-import { mesocycleById } from "@/domain/training/mesocycle-library";
+import { readCanonicalPlanningProjection } from "@/application/training/canonical-training-architecture";
+import type { MacrocycleEngineId } from "@/domain/training/macrocycle-engine";
 import type { WorkoutSession } from "@/domain/training/models";
-import { sessionRolesForPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
+import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 
 export interface PlanningContext {
   goal: ActiveTrainingPlan["goal"];
-  macrocycleEngine: ReturnType<typeof macrocycleEngineForGoal>;
+  macrocycleEngine: MacrocycleEngineId;
   mesocyclePurpose: string;
   microcycle: { number: number; priority: string } | null;
   sessionRole: string;
@@ -13,14 +13,13 @@ export interface PlanningContext {
 }
 
 export function createPlanningContext(plan: ActiveTrainingPlan, session?: WorkoutSession | null): PlanningContext {
-  const mesocycle = plan.currentMesocycleId ? mesocycleById(plan.currentMesocycleId) : undefined;
-  const sessionIndex = session?.planSessionIndex ?? 0;
+  const projection = readCanonicalPlanningProjection(plan, session);
   return {
-    goal: plan.goal,
-    macrocycleEngine: macrocycleEngineForGoal(plan.goal),
-    mesocyclePurpose: mesocycle?.adaptation ?? "Current training phase",
-    microcycle: plan.currentMicrocycle ? { number: plan.currentMicrocycle.sequenceNumber, priority: plan.currentMicrocycle.priority } : null,
-    sessionRole: sessionRolesForPlan(plan)[sessionIndex] ?? "Planned session",
-    exactPrescribedTargets: Object.fromEntries((session?.exercises ?? []).map((exercise) => [exercise.exerciseId, exercise.prescribedSetTargets ?? []])),
+    goal: projection.goal,
+    macrocycleEngine: projection.macrocycleEngine,
+    mesocyclePurpose: projection.currentMesocycle?.adaptation ?? "Current training phase",
+    microcycle: projection.microcycle,
+    sessionRole: projection.sessionRole,
+    exactPrescribedTargets: projection.exactPrescribedTargets,
   };
 }
