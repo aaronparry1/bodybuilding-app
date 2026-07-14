@@ -1,0 +1,3 @@
+# No production candidate patch was applied.
+# Sidecar experiment stopped before implementation because the primitive selector
+# exposes no branch-local hook and a test sidecar would infer provenance.

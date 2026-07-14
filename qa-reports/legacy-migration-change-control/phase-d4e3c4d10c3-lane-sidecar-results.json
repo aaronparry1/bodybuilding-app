@@ -1,0 +1,12 @@
+{
+  "phase": "D4E3C4D10C3",
+  "candidateId": "d4e3c4d10c3-lane-sidecar-v1",
+  "classification": "sidecar_boundary_not_viable",
+  "enrichedBranchIds": [],
+  "primitiveFixtureCount": 17,
+  "evaluationCount": 0,
+  "laneFixtureDelta": "not_run",
+  "failureDelta": "not_applicable",
+  "productionChanges": false,
+  "nextBoundary": "branch-local hook for one ordinary lane return with primitive projection unchanged"
+}
