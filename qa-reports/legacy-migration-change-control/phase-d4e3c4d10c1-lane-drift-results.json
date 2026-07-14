@@ -1,0 +1,15 @@
+{
+  "phase": "D4E3C4D10C1",
+  "status": "non_reproducible",
+  "head": "caba86a6caf2acc247686ece8ff5c1388b2ae75b",
+  "baseline": {"failingFiles": 15, "failingTests": 43, "passingTests": 1711},
+  "candidate": {"failingFiles": 16, "failingTests": 44, "passingTests": 0, "captured": false},
+  "newFailingFile": null,
+  "newFailingTest": null,
+  "fixtureId": null,
+  "firstDivergentSymbol": null,
+  "driftCategory": "unknown",
+  "minimalFailingPatchIncrement": null,
+  "productionLaneChangesRetained": false,
+  "recommendedNextBoundary": "isolated lane-selector characterization harness"
+}
