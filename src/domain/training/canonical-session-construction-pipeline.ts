@@ -5,6 +5,7 @@ import { type ConstructionRole, type MesocyclePrescriptionPolicy, type Prescript
 import { resolveCanonicalLaneEnvelope, resolveCanonicalTargetEnvelope } from "@/domain/training/mesocycle-construction-input-resolvers";
 import type { MicrocyclePlan } from "@/domain/training/microcycle-scheduler";
 import { withSetPrescription } from "@/domain/training/set-prescription";
+import { resolveCanonicalProgression, resolveCanonicalRest, resolveCanonicalStopRule, type CanonicalProgressionRule, type CanonicalRestInstruction, type CanonicalStopRule } from "@/domain/training/canonical-prescription-components";
 
 export type CanonicalSessionConstructionInput = Readonly<{
   schemaVersion: "canonical_session_construction_input_v1";
@@ -18,7 +19,7 @@ export type CanonicalSessionConstructionInput = Readonly<{
 
 export type SessionBlueprint = Readonly<{ sessionId: string; role: string; purpose: string; slots: readonly Readonly<{ role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; index: number; reason: string }>[]; strengthAnchorRequired: boolean; specialState: string }>;
 export type PlannedSessionSlot = Readonly<{ id: string; index: number; role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; laneCandidates: readonly TrainingLane[]; preferredLane: TrainingLane; methods: readonly PrescriptionMethodFamily[]; reason: string }>;
-export type CanonicalSessionSnapshot = Readonly<{ schemaVersion: "canonical_session_snapshot_v1"; sessionId: string; operationalIdentity: string; role: string; planSessionIndex: number; slots: readonly Readonly<{ id: string; index: number; exerciseId: string; lane: TrainingLane; method: PrescriptionMethodFamily; settings: ProgressionSettings; reason: string }>[]; provenance: Readonly<{ inputVersion: string; policyVersion: string; constructionVersion: string }> }>;
+export type CanonicalSessionSnapshot = Readonly<{ schemaVersion: "canonical_session_snapshot_v2"; sessionId: string; operationalIdentity: string; role: string; planSessionIndex: number; slots: readonly Readonly<{ id: string; index: number; exerciseId: string; lane: TrainingLane; method: PrescriptionMethodFamily; settings: ProgressionSettings; rest: CanonicalRestInstruction; progression: CanonicalProgressionRule; stopRule: CanonicalStopRule; loadingMode: string; prescribedLoad?: number; substitutionConstraints: readonly string[]; reason: string }>[]; provenance: Readonly<{ inputVersion: string; policyVersion: string; constructionVersion: string; evidenceVersion: string }> }>;
 
 export type CanonicalConstructionResult = Readonly<{ status: "constructed"; blueprint: SessionBlueprint; slotPlan: readonly PlannedSessionSlot[]; snapshot: CanonicalSessionSnapshot } | { status: "blocked"; reason: "invalid_input" | "duplicate_session_identity" | "no_valid_blueprint" | "no_suitable_exercise" | "no_valid_lane" | "no_valid_method" | "established_load_required" | "incomplete_prescription" | "invalid_linkage" }>;
 
@@ -71,8 +72,12 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
     if (target.status === "blocked") return { status: "blocked", reason: target.reason === "established_load_required" ? target.reason : "no_valid_method" };
     const settings = withSetPrescription({ ...exercise.defaultSettings, repRange: { min: target.envelope.minReps, max: target.envelope.maxReps }, trainingLane: lane, unit: input.athlete.units, requiredWorkSets: exercise.defaultSettings.requiredWorkSets }, { exerciseRole: slot.role, exerciseFamily: exercise.family, primaryMuscles: exercise.primaryMuscles }, { source: "generated" });
     if (!settings.requiredSets || settings.repRange.min < 1 || settings.repRange.max < settings.repRange.min) return { status: "blocked", reason: "incomplete_prescription" };
-    slots.push({ id: slot.id, index: slot.index, exerciseId: exercise.id, lane, method: slot.methods[0], settings, reason: slot.reason });
+    const method = slot.methods[0]!;
+    const rest = resolveCanonicalRest(input.mesocycle.policy, lane, method, slot.role);
+    const progression = resolveCanonicalProgression(input.mesocycle.policy, lane, method, input.operational.revision);
+    const stopRule = resolveCanonicalStopRule(input.mesocycle.policy, lane, slot.role, target.envelope.minReps);
+    slots.push({ id: slot.id, index: slot.index, exerciseId: exercise.id, lane, method, settings, rest, progression, stopRule, loadingMode: target.envelope.loadingMode, prescribedLoad: input.progress.establishedLoads?.[exercise.id], substitutionConstraints: [...input.athlete.limitations], reason: slot.reason });
   }
-  const snapshot: CanonicalSessionSnapshot = { schemaVersion: "canonical_session_snapshot_v1", sessionId: blueprint.sessionId, operationalIdentity: input.operational.identity, role: blueprint.role, planSessionIndex: input.microcycle.planSessionIndex, slots, provenance: { inputVersion: input.schemaVersion, policyVersion: input.mesocycle.policy.schemaVersion, constructionVersion: input.operational.constructionVersion } };
+  const snapshot: CanonicalSessionSnapshot = { schemaVersion: "canonical_session_snapshot_v2", sessionId: blueprint.sessionId, operationalIdentity: input.operational.identity, role: blueprint.role, planSessionIndex: input.microcycle.planSessionIndex, slots, provenance: { inputVersion: input.schemaVersion, policyVersion: input.mesocycle.policy.schemaVersion, constructionVersion: input.operational.constructionVersion, evidenceVersion: input.progress.evidenceVersion } };
   return { status: "constructed", blueprint, slotPlan, snapshot };
 }

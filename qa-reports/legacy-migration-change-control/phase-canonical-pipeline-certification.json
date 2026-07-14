@@ -13,8 +13,6 @@
   ],
   "productionSwitchAllowed": false,
   "blockers": [
-    "exact prescription snapshot lacks explicit rest/progression/stop-rule ownership",
-    "drop-off is represented only indirectly through policy provenance, not a resolved construction output",
     "canonical v2 construction still accepts caller-supplied planned-session snapshots",
     "production planned and extra/custom callers remain on the legacy construction engine"
   ]

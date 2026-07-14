@@ -34,14 +34,12 @@ export function certifyCanonicalSessionConstruction(inputs: readonly CanonicalSe
       validCases += 1;
       if (JSON.stringify(first.snapshot) !== JSON.stringify(second.status === "constructed" ? second.snapshot : null)) determinismFailures.push(input.operational.identity);
       if (first.snapshot.slots.some((slot) => !slot.id || !slot.exerciseId || !slot.lane || !slot.method || !slot.settings.repRange)) invariantViolations.push(`${input.operational.identity}:incomplete_slot`);
-      if (first.snapshot.slots.some((slot) => !("dropOffPercent" in slot.settings))) qualityViolations.push(`${input.operational.identity}:dropoff_not_owned_by_snapshot`);
+      if (first.snapshot.slots.some((slot) => !slot.rest || !slot.progression || !slot.stopRule || !slot.loadingMode)) qualityViolations.push(`${input.operational.identity}:incomplete_exact_prescription`);
     }
   }
   carrierFailures.push("canonical_v2_planned_session_orchestration_not_connected");
   carrierFailures.push("persistence_round_trip_not_proven_for_pipeline_snapshot");
   const blockers = [
-    "exact prescription snapshot lacks explicit rest/progression/stop-rule ownership",
-    "drop-off is represented only indirectly through policy provenance, not a resolved construction output",
     "canonical v2 construction still accepts caller-supplied planned-session snapshots",
     "production planned and extra/custom callers remain on the legacy construction engine",
   ];

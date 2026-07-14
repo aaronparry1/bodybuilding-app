@@ -6,10 +6,9 @@ the legacy production engine.
 
 Blocking gaps are concrete:
 
-- the snapshot does not yet own explicit rest, progression, and stop-rule data;
-- drop-off remains an indirect policy reference rather than a resolved
-  construction output;
 - canonical-v2 construction still accepts caller-supplied planned snapshots;
+- persistence round-trip for internally constructed planned sessions is not
+  yet proven;
 - planned and extra/custom production callers remain legacy-backed.
 
 Accordingly the deterministic certification result is `not_ready` and

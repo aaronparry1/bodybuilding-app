@@ -7,6 +7,6 @@ describe("canonical session construction certification", () => {
     expect(result.readiness).toBe("not_ready");
     expect(result.productionSwitchAllowed).toBe(false);
     expect(result.carrierFailures).toContain("canonical_v2_planned_session_orchestration_not_connected");
-    expect(result.blockers).toHaveLength(4);
+    expect(result.blockers).toHaveLength(2);
   });
 });
