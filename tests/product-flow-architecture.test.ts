@@ -140,9 +140,9 @@ describe("product flow architecture", () => {
       "2026-06-01T00:00:00.000Z",
     );
 
-    expect(totalWeeks(recommended)).toBeGreaterThan(0);
+    expect(totalWeeks(recommended)).toBeGreaterThanOrEqual(48);
     expect(totalWeeks(recommended)).toBeLessThanOrEqual(52);
-    expect(totalWeeks(strength)).toBeGreaterThan(0);
+    expect(totalWeeks(strength)).toBeGreaterThanOrEqual(48);
     expect(totalWeeks(strength)).toBeLessThanOrEqual(52);
     expect(recommended.blocks.map((block) => block.type)).not.toEqual(strength.blocks.map((block) => block.type));
     expect(recommended.blocks.some((block) => block.type === "deload")).toBe(true);
@@ -199,7 +199,8 @@ describe("product flow architecture", () => {
     expect(dashboard.currentDayIndex).toBeGreaterThanOrEqual(0);
     expect(dashboard.planningContext.status).toBe("ready");
     expect(dashboard.planningContext.mesocyclePurpose).toBeTruthy();
-    expect(dashboard.thisWeek).toEqual(weeklySplitForPlan(plan.daysPerWeek, plan.preferredSplit));
+    expect(dashboard.thisWeek).toEqual(plan.currentMicrocycle?.sessionRoles);
+    expect(plan.preferredSplit).toBe("let_app_choose");
     expect(dashboard.recommendationLabel).toBeTruthy();
     expect(dashboard.hasTrainingDirection).toBe(true);
     expect(dashboard.recommendationReasons.length).toBeLessThanOrEqual(2);

@@ -48,7 +48,7 @@ describe("Adaptive Strength Coach positioning", () => {
 
     expect(plan.goal).toBe("get_leaner");
     expect(plan.programmeGoal).toBe("body_recomposition");
-    expect(totalWeeks).toBeGreaterThan(0);
+    expect(totalWeeks).toBeGreaterThanOrEqual(48);
     expect(totalWeeks).toBeLessThanOrEqual(52);
     expect(plan.blocks.map((block) => block.type)).toContain("deload");
   });

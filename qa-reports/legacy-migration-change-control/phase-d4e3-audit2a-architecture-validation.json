@@ -1,0 +1,38 @@
+{
+  "phase": "D4E3-AUDIT-2A",
+  "commitReviewed": "722db27",
+  "architecture": ["macrocycle", "mesocycle", "microcycle", "session_construction", "progress"],
+  "changedAssertionGroups": 17,
+  "dispositionTotals": {
+    "validated_correct": 12,
+    "correct_but_coverage_incomplete": 3,
+    "test_blesses_wrong_production_behaviour": 2,
+    "test_conflates_architectural_layers": 0,
+    "product_intent_ambiguous": 0,
+    "unrelated_wording_only": 0
+  },
+  "findings": [
+    {"id":"D4E3-F03","test":"end-to-end simulator dashboard session labels","disposition":"validated_correct","authority":"microcycle.sessionRoles","evidence":"dashboard now asserts the active role list and preserves planning readiness and navigation"},
+    {"id":"D4E3-F10","test":"Home premium start/continue guard","disposition":"validated_correct","authority":"access-control boundary","evidence":"test asserts gating before train navigation without making paywall state a programming input"},
+    {"id":"D4E3-F24","test":"body-part split session 0","disposition":"validated_correct","authority":"microcycle.sessionRoles","evidence":"split remains fixture preference while current role owns generated label"},
+    {"id":"D4E3-F25","test":"body-part split session 1","disposition":"validated_correct","authority":"microcycle.sessionRoles","evidence":"same conflict is tested explicitly"},
+    {"id":"D4E3-F26","test":"body-part split session 2","disposition":"validated_correct","authority":"microcycle.sessionRoles","evidence":"same conflict is tested explicitly"},
+    {"id":"D4E3-F27","test":"body-part split session 3","disposition":"validated_correct","authority":"microcycle.sessionRoles","evidence":"same conflict is tested explicitly"},
+    {"id":"D4E3-F28","test":"body-part split session 4","disposition":"validated_correct","authority":"microcycle.sessionRoles","evidence":"same conflict is tested explicitly"},
+    {"id":"D4E3-F29","test":"body-part split session 5","disposition":"correct_but_coverage_incomplete","authority":"microcycle.sessionRoles plus session-construction capability","evidence":"unsupported Priority isolation role fails safely, but a dedicated role-to-construction coverage test is still needed"},
+    {"id":"D4E3-F31","test":"setup plan duration","disposition":"test_blesses_wrong_production_behaviour","authority":"macrocycle time horizon","evidence":"AUDIT-2 weakened the 48-week invariant to >0; canonical horizon assertion is restored"},
+    {"id":"D4E3-F32","test":"Home dashboard planning context","disposition":"validated_correct","authority":"microcycle/session construction view model","evidence":"dashboard label follows current role and retains context fields"},
+    {"id":"D4E3-F33","test":"onboarding review","disposition":"correct_but_coverage_incomplete","authority":"session construction boundary","evidence":"review/finish flow is asserted, while persistence is covered by repository tests rather than source-string coupling"},
+    {"id":"D4E3-F34","test":"Plan roadmap","disposition":"validated_correct","authority":"mesocycle/microcycle planning context","evidence":"current training context and approved next states replace removed roadmap-card contract"},
+    {"id":"D4E3-F35","test":"onboarding goal labels","disposition":"validated_correct","authority":"product presentation","evidence":"asserts current option labels without making UI strings domain state"},
+    {"id":"D4E3-F36","test":"Lose Fat annual horizon","disposition":"test_blesses_wrong_production_behaviour","authority":"macrocycle time horizon","evidence":"AUDIT-2 weakened the 48-week invariant; canonical horizon assertion is restored"},
+    {"id":"D4E3-F37","test":"Powerlifting Meet phase catalogue","disposition":"validated_correct","authority":"macrocycle/mesocycle sequencing","evidence":"asserts peak and specificity without assuming a removed exact block sequence"},
+    {"id":"D4E3-F38","test":"training-system guide","disposition":"validated_correct","authority":"product communication","evidence":"asserts current guide content, not programming authority"},
+    {"id":"D4E3-F39","test":"programme skeleton/home overview","disposition":"correct_but_coverage_incomplete","authority":"persistence/application boundary","evidence":"asserts current review and passive overview contracts; persistence behavior remains separately covered"}
+  ],
+  "productionChanged": false,
+  "runtimeAuthority": "production_only",
+  "unresolvedProductDecisions": [],
+  "postReviewFullSuite": {"failedTests":14,"passedTests":1820,"failedFiles":10},
+  "genuineDefectsExposed": ["recommended and leaner macrocycles currently fail the canonical 48-week horizon assertions"]
+}
