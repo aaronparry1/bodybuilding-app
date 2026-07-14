@@ -1,0 +1,383 @@
+{
+  "phase": "D4E3 remaining-conflicts audit",
+  "commit": "b9b513d6d602fc77cf75c8e484daa077f96480bf",
+  "baseline": {
+    "failedTests": 43,
+    "passedTests": 1790,
+    "failedFiles": 14,
+    "historicalFailedFiles": 15
+  },
+  "source": "/tmp/d4e3-audit-full.json",
+  "constraints": {
+    "productionAuthority": "production_only",
+    "runtimeShadowObservation": "disabled",
+    "v2Authority": "disabled",
+    "buildStarted": false,
+    "deploymentStarted": false
+  },
+  "failureMatrix": "qa-reports/legacy-migration-change-control/phase-d4e3-failure-matrix.json",
+  "categories": [
+    "environment_tooling_configuration_failure",
+    "fixture_or_evidence_artifact_drift",
+    "incomplete_planning_context_migration",
+    "legacy_block_rep_range_authority_conflict",
+    "stale_test_asserting_intentionally_removed_behaviour",
+    "ui_view_model_mismatch",
+    "uncertain_requires_investigation"
+  ],
+  "nextTask": "D4E3-AUDIT-1 reconcile planning-context and active-plan naming authority",
+  "dependencyOrder": [
+    "D4E3-AUDIT-0 baseline and failure inventory (this audit)",
+    "D4E3-AUDIT-1 reconcile planning-context/active-plan naming and generated session view models",
+    "D4E3-AUDIT-2 replace stale UI/source architecture expectations after product contract decision",
+    "D4E3-AUDIT-3 investigate numeric history/load/recovery semantics with independent fixtures",
+    "D4E3-AUDIT-4 resolve missing support-function-policy architecture fixture or retire its contract",
+    "D4E3-AUDIT-5 rerun full suite; zero unexplained failures before any build or rollout"
+  ],
+  "failureRows": [
+    {
+      "id": "D4E3-F01",
+      "file": "tests/design-qa-fixtures.test.ts",
+      "test": "Design QA fixtures > generates expected local state for plan_block_transition_accepted",
+      "error": "AssertionError: expected 'hypertrophy' to be 'powerbuilding' // Object.is equality",
+      "category": "fixture_or_evidence_artifact_drift",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F02",
+      "file": "tests/design-qa-fixtures.test.ts",
+      "test": "Design QA fixtures > generates expected local state for plan_event_custom",
+      "error": "AssertionError: expected [ 'powerbuilding', 'strength', …(4) ] to deeply equal [ 'powerbuilding', 'strength', …(2) ]",
+      "category": "fixture_or_evidence_artifact_drift",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F03",
+      "file": "tests/end-to-end-simulator-qa.test.ts",
+      "test": "end-to-end simulator QA regression > validates onboarding choices and home dashboard output",
+      "error": "AssertionError: expected [ 'Push hypertrophy', …(3) ] to deeply equal [ 'Upper', 'Lower', 'Upper', 'Lower' ]",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F04",
+      "file": "tests/event-taper.test.ts",
+      "test": "event countdown and taper model > short timelines create a sensible short plan and long timelines create a fuller runway",
+      "error": "AssertionError: expected [ 'powerbuilding', 'strength', …(4) ] to deeply equal [ 'peak' ]",
+      "category": "legacy_block_rep_range_authority_conflict",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F05",
+      "file": "tests/load-selection.test.ts",
+      "test": "adaptive load selection > ignores extra-session history when selecting planned starting load",
+      "error": "AssertionError: expected 95 to be 100 // Object.is equality",
+      "category": "uncertain_requires_investigation",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F06",
+      "file": "tests/master-architecture.test.ts",
+      "test": "Adaptive Strength Coach master architecture > keeps programme mutation authority out of lower-level policies",
+      "error": "Error: ENOENT: no such file or directory, open 'src/domain/training/support-function-policy.ts'",
+      "category": "environment_tooling_configuration_failure",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F07",
+      "file": "tests/master-architecture.test.ts",
+      "test": "Adaptive Strength Coach master architecture > keeps learned-athlete-trait writes behind the Coaching Evidence Engine",
+      "error": "Error: ENOENT: no such file or directory, open 'src/domain/training/support-function-policy.ts'",
+      "category": "environment_tooling_configuration_failure",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F08",
+      "file": "tests/master-architecture.test.ts",
+      "test": "Adaptive Strength Coach master architecture > keeps random exercise, method, and conditioning selection out of builder-facing policies",
+      "error": "Error: ENOENT: no such file or directory, open 'src/domain/training/support-function-policy.ts'",
+      "category": "environment_tooling_configuration_failure",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F09",
+      "file": "tests/master-architecture.test.ts",
+      "test": "Adaptive Strength Coach master architecture > requires reason-code architecture across locked engine outputs",
+      "error": "Error: ENOENT: no such file or directory, open 'src/domain/training/support-function-policy.ts'",
+      "category": "environment_tooling_configuration_failure",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F10",
+      "file": "tests/paywall-trial-flow.test.ts",
+      "test": "paywall and trial flow > gates Home Start and Continue Workout before session creation or navigation",
+      "error": "AssertionError: expected 'import { router, useLocalSearchParams…' to contain 'if (!requirePremiumForTodayWorkout(\"s…'",
+      "category": "stale_test_asserting_intentionally_removed_behaviour",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F11",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > builds today's train session from the active plan instead of a two-exercise placeholder",
+      "error": "AssertionError: expected 'Push hypertrophy' to be 'Push' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F12",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > uses the selected training sequence slot instead of a rest placeholder",
+      "error": "AssertionError: expected 'Push hypertrophy' to be 'Push' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F13",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > starts a fresh plan on session 1 instead of the weekday slot",
+      "error": "AssertionError: expected 'Upper hypertrophy' to be 'Upper' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F14",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > fresh 2-day plans start on session 1",
+      "error": "AssertionError: expected 'Upper hypertrophy' to be 'Upper' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F15",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > fresh 3-day plans start on session 1",
+      "error": "AssertionError: expected 'Full body 1' to be 'Full Body' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F16",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > fresh 4-day plans start on session 1",
+      "error": "AssertionError: expected 'Upper hypertrophy' to be 'Upper' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F17",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > fresh 5-day plans start on session 1",
+      "error": "AssertionError: expected 'Push hypertrophy' to be 'Push' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F18",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > fresh 6-day plans start on session 1",
+      "error": "AssertionError: expected 'Push hypertrophy' to be 'Push' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F19",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > allows selecting any session out of order",
+      "error": "AssertionError: expected 'Lower hypertrophy' to be 'Lower' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F20",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > does not shorten a normal first-block intermediate Pull session",
+      "error": "AssertionError: expected 'Pull hypertrophy' to be 'Pull' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F21",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > keeps Push and Pull coherent in the same first block without making Pull a short session",
+      "error": "AssertionError: expected 'Push hypertrophy' to be 'Push' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F22",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > allows beginner Pull to stay conservative while retaining biceps support",
+      "error": "AssertionError: expected 'Pull hypertrophy' to be 'Pull' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F23",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > trims Pull only when fatigue/drop-off evidence justifies a reduced first-block dose",
+      "error": "AssertionError: expected 'Pull hypertrophy' to be 'Pull' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F24",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > maps body-part split session 0 (Chest) to a planned workout",
+      "error": "AssertionError: expected 'Push hypertrophy' to be 'Chest' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F25",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > maps body-part split session 1 (Back) to a planned workout",
+      "error": "AssertionError: expected 'Pull hypertrophy' to be 'Back' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F26",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > maps body-part split session 2 (Legs) to a planned workout",
+      "error": "AssertionError: expected 'Legs hypertrophy' to be 'Legs' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F27",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > maps body-part split session 3 (Shoulders) to a planned workout",
+      "error": "AssertionError: expected 'Upper support' to be 'Shoulders' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F28",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > maps body-part split session 4 (Arms) to a planned workout",
+      "error": "AssertionError: expected 'Lower support' to be 'Arms' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F29",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > maps body-part split session 5 (Full Body) to a planned workout",
+      "error": "AssertionError: expected undefined to be 'Full Body' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F30",
+      "file": "tests/planned-workout.test.ts",
+      "test": "planned workout resolution > moves the recommended session from completed plan slot metadata",
+      "error": "AssertionError: expected 'Lower hypertrophy' to be 'Lower' // Object.is equality",
+      "category": "incomplete_planning_context_migration",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F31",
+      "file": "tests/product-flow-architecture.test.ts",
+      "test": "product flow architecture > creates truthful setup plans for recommended, single-block, and event users",
+      "error": "AssertionError: expected 27 to be greater than or equal to 48",
+      "category": "stale_test_asserting_intentionally_removed_behaviour",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F32",
+      "file": "tests/product-flow-architecture.test.ts",
+      "test": "product flow architecture > builds a home dashboard with current planning context, upcoming week, and strategic direction",
+      "error": "AssertionError: expected 'Start Bench and hypertrophy' to be 'Start Push' // Object.is equality",
+      "category": "stale_test_asserting_intentionally_removed_behaviour",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F33",
+      "file": "tests/product-flow-architecture.test.ts",
+      "test": "product flow architecture > keeps the final onboarding summary scannable and roadmap-light",
+      "error": "AssertionError: expected 'import { Stack, router } from \"expo-r…' to contain 'programmeSkeletonRepository.save'",
+      "category": "stale_test_asserting_intentionally_removed_behaviour",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F34",
+      "file": "tests/product-flow-architecture.test.ts",
+      "test": "product flow architecture > presents the Plan roadmap as coached stages instead of a flat learn-heavy list",
+      "error": "AssertionError: expected 'import { router } from \"expo-router\";…' to contain 'RoadmapSummaryCard'",
+      "category": "stale_test_asserting_intentionally_removed_behaviour",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F35",
+      "file": "tests/product-positioning.test.ts",
+      "test": "Adaptive Strength Coach positioning > shows the new onboarding goals and removes old goal labels",
+      "error": "AssertionError: expected 'import { Stack, router } from \"expo-r…' to contain 'label: \"Build Muscle\"'",
+      "category": "stale_test_asserting_intentionally_removed_behaviour",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F36",
+      "file": "tests/product-positioning.test.ts",
+      "test": "Adaptive Strength Coach positioning > maps Lose Fat to body recomposition with sustainable annual planning",
+      "error": "AssertionError: expected 18 to be greater than or equal to 48",
+      "category": "stale_test_asserting_intentionally_removed_behaviour",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F37",
+      "file": "tests/product-positioning.test.ts",
+      "test": "Adaptive Strength Coach positioning > maps Powerlifting Meet to meet-date planning and specificity",
+      "error": "AssertionError: expected [ 'powerbuilding', 'strength', …(4) ] to deeply equal [ 'powerbuilding', 'strength', …(2) ]",
+      "category": "stale_test_asserting_intentionally_removed_behaviour",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F38",
+      "file": "tests/product-positioning.test.ts",
+      "test": "Adaptive Strength Coach positioning > updates the guide and keeps old goal names out of user-facing guide copy",
+      "error": "AssertionError: expected 'Why Adaptive Strength Coach Exists Tr…' to contain 'Lose Fat is still performance-based c…'",
+      "category": "stale_test_asserting_intentionally_removed_behaviour",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F39",
+      "file": "tests/programme-skeleton.test.ts",
+      "test": "programme skeleton > wires onboarding persistence and passive home overview without changing generation",
+      "error": "AssertionError: expected 'import { Stack, router } from \"expo-r…' to contain 'programmeSkeletonRepository.save'",
+      "category": "stale_test_asserting_intentionally_removed_behaviour",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F40",
+      "file": "tests/progress-dashboard.test.ts",
+      "test": "progress dashboard view model > accepting a Recovery Window changes the active generated prescription, not just the roadmap",
+      "error": "TypeError: Cannot read properties of null (reading 'days')",
+      "category": "ui_view_model_mismatch",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F41",
+      "file": "tests/recommendation-actions.test.ts",
+      "test": "recommendation action flows > applies a stalled exercise replacement to future planned sessions only",
+      "error": "AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string",
+      "category": "fixture_or_evidence_artifact_drift",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F42",
+      "file": "tests/recovery-capacity.test.ts",
+      "test": "recovery and capacity system > resolves peak/taper/event and unknown next lifting contexts conservatively",
+      "error": "AssertionError: expected 'squat_focused' to be 'heavy_upper' // Object.is equality",
+      "category": "legacy_block_rep_range_authority_conflict",
+      "cause": null
+    },
+    {
+      "id": "D4E3-F43",
+      "file": "tests/workout-history.test.ts",
+      "test": "workout history summaries > returns previous exercise performance excluding the current session",
+      "error": "AssertionError: expected 102.5 to be 100 // Object.is equality",
+      "category": "uncertain_requires_investigation",
+      "cause": null
+    }
+  ]
+}
