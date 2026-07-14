@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "d4e3c4e1c.v1",
+  "certificationResult": {"selectedFirstCandidate": null, "status": "no_eligible_branch_family", "reason": "incomplete_shadow_coverage"},
+  "coverageScope": "family_scoped_gaps_with_global_fail_closed_result",
+  "fixtures": [
+    {"id":"ordinary_primary","family":"ordinary","productionAuthority":"retained","v2Evidence":"not_evaluated","repEvidence":"retained","laneEvidence":"retained","translationEvidence":"missing","rollbackEvidence":"missing","eligible":false,"blockers":["shadow_not_evaluated","rollback_coverage_incomplete"],"productionObservable":true,"runtimeChangeRequired":false},
+    {"id":"ordinary_secondary","family":"ordinary","productionAuthority":"retained","v2Evidence":"not_evaluated","repEvidence":"retained","laneEvidence":"retained","translationEvidence":"missing","rollbackEvidence":"missing","eligible":false,"blockers":["shadow_not_evaluated","rollback_coverage_incomplete"],"productionObservable":true,"runtimeChangeRequired":false},
+    {"id":"ordinary_accessory","family":"ordinary","productionAuthority":"retained","v2Evidence":"not_evaluated","repEvidence":"retained","laneEvidence":"retained","translationEvidence":"missing","rollbackEvidence":"missing","eligible":false,"blockers":["shadow_not_evaluated","rollback_coverage_incomplete"],"productionObservable":true,"runtimeChangeRequired":false},
+    {"id":"explicit_slot_override","family":"override","productionAuthority":"unavailable","v2Evidence":"not_evaluated","eligible":false,"blockers":["production_authority_unavailable","public_facade_gap"],"productionObservable":false,"runtimeChangeRequired":false},
+    {"id":"advanced_method","family":"advanced_method","productionAuthority":"unavailable","v2Evidence":"not_evaluated","eligible":false,"blockers":["production_authority_unavailable","incomplete_method_coverage"],"productionObservable":false,"runtimeChangeRequired":false},
+    {"id":"family_override_collision","family":"family_role_collision","productionAuthority":"unavailable","v2Evidence":"not_evaluated","eligible":false,"blockers":["production_authority_unavailable","characterization_gap"],"productionObservable":false,"runtimeChangeRequired":false},
+    {"id":"explicit_inferred_role","family":"role_collision","productionAuthority":"unavailable","v2Evidence":"not_evaluated","eligible":false,"blockers":["production_authority_unavailable","incomplete_role_coverage"],"productionObservable":false,"runtimeChangeRequired":false},
+    {"id":"corrective_family","family":"special_family","productionAuthority":"unavailable","v2Evidence":"not_evaluated","eligible":false,"blockers":["production_authority_unavailable","incomplete_special_family_coverage"],"productionObservable":false,"runtimeChangeRequired":false},
+    {"id":"recovery_family","family":"special_family","productionAuthority":"unavailable","v2Evidence":"not_evaluated","eligible":false,"blockers":["production_authority_unavailable","incomplete_special_family_coverage"],"productionObservable":false,"runtimeChangeRequired":false},
+    {"id":"power_family","family":"special_family","productionAuthority":"unavailable","v2Evidence":"not_evaluated","eligible":false,"blockers":["production_authority_unavailable","incomplete_special_family_coverage"],"productionObservable":false,"runtimeChangeRequired":false},
+    {"id":"planned_order_lanes","family":"planned_order","productionAuthority":"unavailable","v2Evidence":"not_evaluated","eligible":false,"blockers":["production_authority_unavailable","incomplete_lane_coverage"],"productionObservable":false,"runtimeChangeRequired":false},
+    {"id":"partial_public_facade","family":"public_facade","productionAuthority":"unavailable","v2Evidence":"not_evaluated","eligible":false,"blockers":["production_authority_unavailable","public_facade_gap"],"productionObservable":false,"runtimeChangeRequired":false}
+  ]
+}
