@@ -9,7 +9,8 @@ export type ProgressionFamily = "double_progression" | "load_progression" | "vel
 export type CanonicalLaneCharacter = "hypertrophy" | "strength" | "power" | "recovery" | "expression";
 export type TargetGenerationMode = "rep_region" | "established_load" | "velocity_intent" | "expression" | "fatigue_reduction";
 export type ConstructionRole = "primary" | "secondary" | "accessory";
-export type CanonicalTargetEnvelope = Readonly<{ minReps: number; maxReps: number; preferredBias: "higher" | "moderate" | "lower" | "very_low"; loadingMode: "calibrated_load" | "established_percentage" | "rep_progression" | "velocity_intent" | "expression" | "fatigue_reduction"; establishedLoad: "required" | "preferred" | "not_required"; backOffPermitted: boolean; amrapPermitted: boolean; failurePermitted: boolean; dropOffPolicyId: string }>;
+export type CanonicalTargetEnvelope = Readonly<{ minReps: number; maxReps: number; preferredBias: "higher" | "moderate" | "lower" | "very_low"; loadingMode: "calibrated_load" | "established_percentage" | "rep_progression" | "velocity_intent" | "expression" | "fatigue_reduction"; establishedLoad: "required" | "preferred" | "not_required"; backOffPermitted: boolean; amrapPermitted: boolean; failurePermitted: boolean; dropOffPolicyId: string; provenance: readonly string[] }>;
+export type CanonicalTargetCombination = Readonly<{ role: ConstructionRole; lane: TrainingLane; method: PrescriptionMethodFamily; evidence: "established" | "calibrated" | "absent"; outcome: "envelope" | "rejected"; reason?: "method_not_permitted" | "established_load_required" }>;
 
 export type MesocyclePrescriptionPolicy = Readonly<{
   schemaVersion: typeof MESOCYCLE_PRESCRIPTION_POLICY_VERSION;
@@ -55,9 +56,9 @@ export function validateMesocyclePrescriptionPolicy(policy: MesocyclePrescriptio
   if (!policy.lane.allowed.includes(policy.lane.preferred) || policy.lane.allowed.some((lane) => policy.lane.prohibited.includes(lane))) return { status: "invalid", reason: "contradictory_methods" };
   for (const role of ["primary", "secondary", "accessory"] as const) {
     const preferred = policy.concreteLanes.preferredByRole[role];
-    if (!policy.concreteLanes.allowed.includes(preferred) || policy.concreteLanes.prohibited.includes(preferred)) return { status: "invalid", reason: "contradictory_methods" };
+  if (!policy.concreteLanes.allowed.includes(preferred) || policy.concreteLanes.prohibited.includes(preferred)) return { status: "invalid", reason: "contradictory_methods" };
     if (!policy.concreteLanes.fallbacksByRole[role].every((lane) => policy.concreteLanes.allowed.includes(lane))) return { status: "invalid", reason: "contradictory_methods" };
-    if (!policy.targetEnvelopes[role][preferred]) return { status: "invalid", reason: "invalid_transition" };
+    if (!policy.concreteLanes.allowed.every((lane) => policy.targetEnvelopes[role][lane])) return { status: "invalid", reason: "invalid_transition" };
   }
   return { status: "resolved", policy };
 }
@@ -68,6 +69,20 @@ export function allMesocyclePrescriptionPolicies(): readonly MesocyclePrescripti
     if (result.status !== "resolved") throw new Error(`invalid mesocycle policy: ${spec.id}`);
     return result.policy;
   });
+}
+
+export function enumerateMesocycleTargetCombinations(policy: MesocyclePrescriptionPolicy): readonly CanonicalTargetCombination[] {
+  const combinations: CanonicalTargetCombination[] = [];
+  for (const role of ["primary", "secondary", "accessory"] as const) {
+    for (const lane of policy.concreteLanes.allowed) {
+      for (const method of policy.methods.permitted) {
+        const envelope = policy.targetEnvelopes[role][lane];
+        if (!envelope) { combinations.push({ role, lane, method, evidence: "absent", outcome: "rejected", reason: "method_not_permitted" }); continue; }
+        for (const evidence of ["established", "calibrated", "absent"] as const) combinations.push({ role, lane, method, evidence, outcome: envelope.establishedLoad === "required" && evidence === "absent" ? "rejected" : "envelope", ...(envelope.establishedLoad === "required" && evidence === "absent" ? { reason: "established_load_required" as const } : {}) });
+      }
+    }
+  }
+  return combinations;
 }
 
 function policyFor(spec: MesocycleSpec): MesocyclePrescriptionPolicy {
@@ -88,7 +103,7 @@ function policyFor(spec: MesocycleSpec): MesocyclePrescriptionPolicy {
   const primaryLane = allowedLanes[0]!;
   const secondaryLane = allowedLanes.includes("strength_support") ? "strength_support" : allowedLanes.includes("hypertrophy_strength") ? "hypertrophy_strength" : primaryLane;
   const accessoryLane = allowedLanes.includes("maintenance") ? "maintenance" : allowedLanes.includes("hypertrophy") ? "hypertrophy" : primaryLane;
-  const envelope = (role: ConstructionRole, lane: TrainingLane): CanonicalTargetEnvelope => ({ minReps: role === "primary" && (lane === "strength" || lane === "peak" || lane === "power") ? 1 : role === "accessory" ? 8 : 4, maxReps: role === "accessory" ? 20 : lane === "power" || lane === "peak" ? 5 : 15, preferredBias: lane === "power" || lane === "peak" || lane === "strength" ? "lower" : role === "accessory" ? "higher" : "moderate", loadingMode: lane === "power" ? "velocity_intent" : lane === "peak" ? "expression" : isDeload || isTransition ? "fatigue_reduction" : "rep_progression", establishedLoad: lane === "peak" || lane === "strength" ? "preferred" : "not_required", backOffPermitted: lane !== "peak", amrapPermitted: !isDeload && !isTaper && !isRealisation && lane !== "peak", failurePermitted: false, dropOffPolicyId: `mesocycle:${id}:dropoff:v1` });
+  const envelope = (role: ConstructionRole, lane: TrainingLane): CanonicalTargetEnvelope => ({ minReps: role === "primary" && (lane === "strength" || lane === "peak" || lane === "power") ? 1 : role === "accessory" ? 8 : 4, maxReps: role === "accessory" ? 20 : lane === "power" || lane === "peak" ? 5 : 15, preferredBias: lane === "power" || lane === "peak" || lane === "strength" ? "lower" : role === "accessory" ? "higher" : "moderate", loadingMode: lane === "power" ? "velocity_intent" : lane === "peak" ? "expression" : isDeload || isTransition ? "fatigue_reduction" : "rep_progression", establishedLoad: lane === "peak" || lane === "strength" ? "preferred" : "not_required", backOffPermitted: lane !== "peak", amrapPermitted: !isDeload && !isTaper && !isRealisation && lane !== "peak", failurePermitted: false, dropOffPolicyId: `mesocycle:${id}:dropoff:v1`, provenance: [`mesocycle:${id}`, `role:${role}`, `lane:${lane}`] });
   return {
     schemaVersion: MESOCYCLE_PRESCRIPTION_POLICY_VERSION,
     mesocycleId: spec.id,
@@ -100,7 +115,7 @@ function policyFor(spec: MesocycleSpec): MesocyclePrescriptionPolicy {
     lane: { allowed: isDeload || isTransition ? ["recovery", "hypertrophy"] : isRealisation ? ["expression", "strength"] : isPower ? ["power", "strength"] : ["hypertrophy", "strength"], prohibited: isDeload || isTransition ? ["expression", "power"] : [], preferred: isDeload || isTransition ? "recovery" : isRealisation ? "expression" : isPower ? "power" : id.includes("strength") ? "strength" : "hypertrophy", readinessRestriction: isDeload || isTransition ? "recovery_first" : isRealisation ? "expression_only" : "none" },
     concreteLanes: { allowed: allowedLanes, prohibited: isDeload || isTransition ? ["power", "peak", "strength"] : isTaper ? ["power"] : [], required: isDeload || isTransition ? "recovery" : undefined, preferredByRole: { primary: primaryLane, secondary: secondaryLane, accessory: accessoryLane }, fallbacksByRole: { primary: allowedLanes.slice(1), secondary: allowedLanes.slice(1), accessory: allowedLanes.slice(1) }, calibrationRequired: allowedLanes.filter((lane) => lane === "peak" || lane === "power"), establishedLoadRequired: allowedLanes.filter((lane) => lane === "peak" || lane === "strength") },
     targets: { modes: isDeload || isTransition ? ["fatigue_reduction", "rep_region"] : isPower ? ["velocity_intent", "established_load"] : isRealisation ? ["expression", "established_load"] : ["rep_region", "established_load"], minimumRepTarget: isPower || isRealisation ? 1 : 4, maximumRepTarget: isPower || isRealisation ? 12 : 20, establishedLoadRequired: isRealisation, backOffPermitted: !isRealisation, failureOrAmrapPermitted: !isDeload && !isTaper && !isRealisation },
-    targetEnvelopes: { primary: { [primaryLane]: envelope("primary", primaryLane) }, secondary: { [secondaryLane]: envelope("secondary", secondaryLane) }, accessory: { [accessoryLane]: envelope("accessory", accessoryLane) } },
+    targetEnvelopes: { primary: Object.fromEntries(allowedLanes.map((lane) => [lane, envelope("primary", lane)])), secondary: Object.fromEntries(allowedLanes.map((lane) => [lane, envelope("secondary", lane)])), accessory: Object.fromEntries(allowedLanes.map((lane) => [lane, envelope("accessory", lane)])) },
     volume: { character: isDeload || isTransition ? "low" : id.includes("volume") || id.includes("hypertrophy") ? "high" : "moderate", progression: isDeload || isTransition ? "reduce" : id.includes("volume") ? "adaptive" : "increase", recoveryAdjustment: isDeload || isTransition ? "required" : "permitted" },
     methods: { permitted: methods, prohibited: isDeload ? ["amrap", "dynamic_effort", "max_effort", "heavy_single_triple_five_backoffs"] : isTaper ? ["amrap", "eight_across", "max_effort"] : [], conditional: ["cluster", "ladder", "bbb"] },
     exerciseSuitability: { roles: isPower || isRealisation ? ["primary_compound", "secondary_compound", "power"] : ["primary_compound", "secondary_compound", "accessory", "isolation", "recovery"], stability: isPower || isRealisation ? "high" : "moderate", technicalComplexity: isPower || isRealisation ? "high" : "moderate", specificity: isPower || isRealisation ? "specific" : "mixed", fatigueCost: isDeload || isTransition ? "low" : isPower || isRealisation ? "high" : "moderate" },
