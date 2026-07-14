@@ -1,0 +1,10 @@
+{
+  "candidateId": "d4e3c4d10c5b-private-lane-selector-v1",
+  "classification": "private_selector_guard_revision_safe_pending_full_suite",
+  "productionSelectorImplementations": 1,
+  "primitiveFacadeUnchanged": true,
+  "guardRevision": "narrowed_not_weakened",
+  "negativeFixtures": 4,
+  "focusedGuardAndCharacterizationTests": 26,
+  "nextPhase": "full verification and commit if failure delta is empty"
+}

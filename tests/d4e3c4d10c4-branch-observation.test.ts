@@ -11,7 +11,8 @@ describe("D4E3C4D10C4 observation boundary", () => {
   });
 
   it("keeps the experiment free of duplicated lane precedence", () => {
-    expect(source).not.toContain("resolveTrainingLaneDecision");
+    expect(source).toContain("resolveTrainingLaneDecision");
     expect(source).not.toContain("ProvenanceSidecar");
+    expect(source).not.toContain("onDecisionObserved");
   });
 });

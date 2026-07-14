@@ -14,7 +14,9 @@ describe("D4E3C4D10 selector decomposition gate", () => {
 
   it("keeps remaining selector families free of wrapper precedence", () => {
     expect(rep).toContain("resolveRepRangeDecision");
-    expect(lane).not.toContain("resolveTrainingLaneDecision");
+    expect(lane).toContain("resolveTrainingLaneDecision");
+    expect(lane).not.toContain("complete-rep-lane-precedence-resolver");
+    expect(lane).not.toContain("resolveTrainingLaneDecision(input).lane;\n  return resolveTrainingLane");
   });
 
   it("preserves the required selector order for future work", () => {

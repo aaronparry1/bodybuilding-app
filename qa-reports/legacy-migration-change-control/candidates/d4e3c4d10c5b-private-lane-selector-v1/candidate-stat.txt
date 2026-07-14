@@ -1,0 +1,5 @@
+ src/domain/training/block-training-lanes.ts    | 49 +++++++++++++++++---------
+ tests/d4e3c4d10-selector-decomposition.test.ts |  4 ++-
+ tests/d4e3c4d10c3-lane-sidecar.test.ts         |  5 +--
+ tests/d4e3c4d10c4-branch-observation.test.ts   |  3 +-
+ 4 files changed, 41 insertions(+), 20 deletions(-)
