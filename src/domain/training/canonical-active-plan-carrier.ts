@@ -76,6 +76,14 @@ export type CanonicalCarrierValidationCode =
   | "session_link_mismatch" | "session_role_mismatch" | "duplicate_session_id" | "duplicate_session_index"
   | "invalid_prescription_snapshot" | "invalid_progress_reference" | "legacy_authority_present" | "invalid_revision";
 
+export type CanonicalDeepEquivalence = Readonly<{ status: "equivalent" } | { status: "different"; path: string }>;
+
+export function compareCanonicalActivePlans(left: CanonicalActivePlanCarrier, right: CanonicalActivePlanCarrier): CanonicalDeepEquivalence {
+  const a = serializeCanonicalActivePlan(left);
+  const b = serializeCanonicalActivePlan(right);
+  return a === b ? { status: "equivalent" } : { status: "different", path: "$" };
+}
+
 export function assembleCanonicalActivePlan(input: CanonicalCarrierAssemblyInput): CanonicalCarrierValidation {
   const carrier: CanonicalActivePlanCarrier = {
     schema: CANONICAL_ACTIVE_PLAN_SCHEMA,
@@ -113,11 +121,25 @@ export function validateCanonicalActivePlan(value: unknown): CanonicalCarrierVal
     if (ids.has(session.id)) return { status: "invalid", reason: "duplicate_session_id", path: `plannedSessions.${index}.id` };
     if (indexes.has(session.planSessionIndex)) return { status: "invalid", reason: "duplicate_session_index", path: `plannedSessions.${index}.planSessionIndex` };
     if (typeof session.prescriptionSnapshot !== "object" || session.prescriptionSnapshot === null || typeof session.constructionVersion !== "string") return { status: "invalid", reason: "invalid_prescription_snapshot", path: `plannedSessions.${index}` };
+    const snapshot = session.prescriptionSnapshot as Record<string, unknown>;
+    if (snapshot.schemaVersion === "canonical_session_snapshot_v2" && !isCompleteSessionSnapshot(snapshot)) return { status: "invalid", reason: "invalid_prescription_snapshot", path: `plannedSessions.${index}.prescriptionSnapshot` };
     ids.add(session.id); indexes.add(session.planSessionIndex);
   }
   if (!candidate.progress || typeof candidate.progress !== "object" || typeof candidate.progress.evidenceVersion !== "string" || typeof candidate.progress.revision !== "number") return { status: "invalid", reason: "invalid_progress_reference", path: "progress" };
   if (candidate.progress.revision !== candidate.revision) return { status: "invalid", reason: "invalid_progress_reference", path: "progress.revision" };
   return { status: "valid", carrier: value as CanonicalActivePlanCarrier };
+}
+
+function isCompleteSessionSnapshot(snapshot: Record<string, unknown>): boolean {
+  if (typeof snapshot.sessionId !== "string" || typeof snapshot.role !== "string" || !Array.isArray(snapshot.slots) || !snapshot.slots.length || !snapshot.provenance || typeof snapshot.provenance !== "object") return false;
+  const ids = new Set<string>(); const indexes = new Set<number>();
+  for (const slot of snapshot.slots) {
+    if (!slot || typeof slot !== "object") return false;
+    const value = slot as Record<string, unknown>;
+    if (typeof value.id !== "string" || typeof value.index !== "number" || ids.has(value.id) || indexes.has(value.index) || typeof value.exerciseId !== "string" || typeof value.lane !== "string" || typeof value.method !== "string" || !value.settings || typeof value.settings !== "object" || !value.rest || !value.progression || !value.stopRule || typeof value.loadingMode !== "string" || !Array.isArray(value.substitutionConstraints) || typeof value.reason !== "string") return false;
+    ids.add(value.id); indexes.add(value.index);
+  }
+  return true;
 }
 
 function stable(value: unknown): unknown {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createMacrocycle } from "@/domain/training/macrocycle-engine";
 import { selectMesocycles } from "@/domain/training/mesocycle-library";
 import { createMicrocycle } from "@/domain/training/microcycle-scheduler";
-import { assembleCanonicalActivePlan, parseCanonicalActivePlan, serializeCanonicalActivePlan } from "@/domain/training/canonical-active-plan-carrier";
+import { assembleCanonicalActivePlan, compareCanonicalActivePlans, parseCanonicalActivePlan, serializeCanonicalActivePlan } from "@/domain/training/canonical-active-plan-carrier";
 
 function fixture() {
   const macrocycle = createMacrocycle("build_muscle_and_strength", "intermediate", undefined, "2026-01-01T00:00:00.000Z");
@@ -43,7 +43,16 @@ describe("canonical active-plan carrier", () => {
       const serialized = serializeCanonicalActivePlan(result.carrier);
       expect(serializeCanonicalActivePlan(result.carrier)).toBe(serialized);
       expect(parseCanonicalActivePlan(serialized)).toEqual(result);
+      expect(compareCanonicalActivePlans(result.carrier, result.carrier)).toEqual({ status: "equivalent" });
     }
+  });
+
+  it("rejects incomplete v2 prescription snapshots", () => {
+    const result = fixture();
+    expect(result.status).toBe("valid");
+    if (result.status !== "valid") return;
+    const invalid = { ...result.carrier, plannedSessions: [{ ...result.carrier.plannedSessions[0], prescriptionSnapshot: { schemaVersion: "canonical_session_snapshot_v2", sessionId: "s", role: "primary", slots: [] } }] };
+    expect(parseCanonicalActivePlan(JSON.stringify(invalid))).toEqual({ status: "invalid", reason: "invalid_prescription_snapshot", path: "plannedSessions.0.prescriptionSnapshot" });
   });
 
   it.each<[string, Record<string, unknown>]>([
