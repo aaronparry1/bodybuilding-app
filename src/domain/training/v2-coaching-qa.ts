@@ -6,6 +6,8 @@ import { deriveAdaptiveStimulusPlan, type AdaptiveStimulusSessionType } from "@/
 import type { BlockType, TrainingBlock } from "@/domain/training/annual-models";
 import { deriveCycleStrategyContext, type CycleLoadOwnership, type CycleRecoveryFlag, type CycleStrategyContext } from "@/domain/training/cycle-strategy-context";
 import type { ActiveTrainingPlan, TrainingSetupGoal } from "@/domain/training/plan-setup";
+import type { MicrocyclePlan } from "@/domain/training/microcycle-scheduler";
+import type { MesocycleId } from "@/domain/training/mesocycle-library";
 import { decideSessionStrategy, type SessionStrategyDecision } from "@/domain/training/session-strategy";
 import type { Exercise, WorkoutExerciseLog, WorkoutSession } from "@/domain/training/models";
 import { getWorkSets } from "@/domain/training/workout-sets";
@@ -18,6 +20,8 @@ export interface V2CoachingQaContext {
   metadata?: Exercise;
   activePlan?: ActiveTrainingPlan | null;
   currentBlock?: TrainingBlock | null;
+  currentMesocycleId?: MesocycleId;
+  currentMicrocycle?: MicrocyclePlan;
   adaptiveSetDecision?: AdaptiveSetDecision | null;
 }
 
@@ -44,7 +48,7 @@ export function buildV2CoachingQaOutput(context: V2CoachingQaContext): V2Coachin
   if (context.session.sessionKind != null && context.session.sessionKind !== "planned") return null;
 
   const goal = programmingGoalForPlan(context.activePlan?.goal);
-  const trainingPhase = trainingPhaseForBlock(context.currentBlock?.type);
+  const trainingPhase = context.currentMesocycleId ? trainingPhaseForMesocycle(context.currentMesocycleId) : trainingPhaseForBlock(context.currentBlock?.type);
   const exerciseCategory = categoryForExercise(context.exercise, context.metadata);
   const recoveryFlag = recoveryFlagForBlock(context.currentBlock?.type);
   const recentPerformanceSignal = performanceSignalForExercise(context.exercise);
@@ -52,7 +56,7 @@ export function buildV2CoachingQaOutput(context: V2CoachingQaContext): V2Coachin
   const cycle = deriveCycleStrategyContext({
     goal,
     trainingPhase,
-    weekInBlock: context.currentBlock?.currentWeek,
+    weekInBlock: context.currentMicrocycle?.sequenceNumber ?? context.currentBlock?.currentWeek,
     blockLengthWeeks: context.currentBlock?.durationWeeks,
     plannedTrainingDays: context.activePlan?.daysPerWeek,
     currentSessionIndex: context.exerciseIndex + 1,
@@ -158,6 +162,13 @@ export function buildV2CoachingQaOutput(context: V2CoachingQaContext): V2Coachin
     },
     confidence: Math.round((cycle.confidence + sessionStrategy.confidence + repPrescription.confidence + loadPrescription.confidence + (setDecision?.confidence ?? 70)) / 5),
   };
+}
+
+function trainingPhaseForMesocycle(id: MesocycleId): AdaptiveTrainingPhase {
+  if (id.includes("transition")) return "deload";
+  if (id.includes("strength") || id.includes("specific") || id.includes("intensification")) return "intensification";
+  if (id.includes("power") || id.includes("realisation")) return "peak";
+  return "accumulation";
 }
 
 function sessionTypeForWorkout(session: WorkoutSession): AdaptiveStimulusSessionType {

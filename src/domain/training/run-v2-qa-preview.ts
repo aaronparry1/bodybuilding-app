@@ -1,8 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import type { BlockType, TrainingBlock } from "@/domain/training/annual-models";
-import { createTrainingBlock } from "@/domain/training/annual-planner";
-import type { ActiveTrainingPlan, TrainingSetupGoal } from "@/domain/training/plan-setup";
+import { createActiveTrainingPlan, type ActiveTrainingPlan, type TrainingSetupGoal } from "@/domain/training/plan-setup";
 import type { Exercise, SetLog, WorkoutExerciseLog, WorkoutSession } from "@/domain/training/models";
 import { exerciseLibrary } from "@/domain/training/presets";
 import { buildV2CoachingQaOutput, type V2CoachingQaOutput } from "@/domain/training/v2-coaching-qa";
@@ -51,15 +50,16 @@ export function buildV2QaPreviewRecords(cases: V2QaPreviewCase[] = V2_QA_PREVIEW
     const metadata = previewCase.exerciseId ? exerciseLibrary.find((candidate) => candidate.id === previewCase.exerciseId) : undefined;
     const exercise = exerciseLogForCase(previewCase, metadata);
     const session = sessionForCase(previewCase, exercise);
-    const block = blockForCase(previewCase.blockType);
+    const canonicalPlan = activePlanForCase(previewCase);
     const output = buildV2CoachingQaOutput({
       enabled: true,
       session,
       exercise,
       exerciseIndex: 0,
       metadata,
-      activePlan: activePlanForCase(previewCase),
-      currentBlock: block,
+      activePlan: canonicalPlan,
+      currentMesocycleId: canonicalPlan.currentMesocycleId,
+      currentMicrocycle: canonicalPlan.currentMicrocycle,
     });
 
     return {
@@ -158,17 +158,7 @@ function sessionForCase(previewCase: V2QaPreviewCase, exercise: WorkoutExerciseL
 }
 
 function activePlanForCase(previewCase: V2QaPreviewCase): ActiveTrainingPlan {
-  return {
-    goal: previewCase.goal,
-    daysPerWeek: 4,
-  } as ActiveTrainingPlan;
-}
-
-function blockForCase(blockType: BlockType): TrainingBlock {
-  return {
-    ...createTrainingBlock(blockType),
-    currentWeek: blockType === "deload" ? 1 : 3,
-  };
+  return createActiveTrainingPlan({ goal: previewCase.goal, planningChoice: "recommended_12_month", equipmentPreset: "full_gym", daysPerWeek: 4, preferredSplit: "upper_lower", experienceLevel: "intermediate" }, "2026-06-01T00:00:00.000Z");
 }
 
 function flagsForCase(previewCase: V2QaPreviewCase, output: V2CoachingQaOutput | null, metadata: Exercise | undefined) {
