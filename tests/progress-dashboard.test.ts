@@ -238,7 +238,8 @@ describe("progress dashboard view model", () => {
   });
 
   it("accepting a Recovery Window changes the active generated prescription, not just the roadmap", () => {
-    const plan = activePlan();
+    const canonicalPlan = activePlan();
+    const { authority: _authority, currentMesocycleId: _mesocycle, currentMicrocycle: _microcycle, ...plan } = canonicalPlan;
     const normalBlock = plan.blocks.find((block) => block.id === plan.activeBlockId)!;
     const normalProgramme = buildPlannedWorkoutProgramme({
       activePlan: plan,

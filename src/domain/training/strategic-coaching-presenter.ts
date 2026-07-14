@@ -11,6 +11,8 @@ import {
   type PlanningMode,
 } from "@/domain/training/strategic-coaching";
 import type { SuccessModelGoal } from "@/domain/training/success-model";
+import { readCanonicalPlanningProjection } from "@/application/training/canonical-training-architecture";
+import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 
 export interface StrategicCoachingViewModel {
   hasEnoughHistory: boolean;
@@ -40,6 +42,7 @@ export interface StrategicCoachingPresenterOptions {
   currentBlockType?: BlockType;
   minimumSessions?: number;
   goal?: SuccessModelGoal;
+  activePlan?: ActiveTrainingPlan;
 }
 
 const defaultPlanningMode: PlanningMode = "guided_annual";
@@ -55,6 +58,25 @@ export function buildStrategicCoachingViewModel(
   const minimumSessions = options.minimumSessions ?? 3;
   const planningModeLabel = titlePlanningMode(planningMode);
   const currentBlockLabel = titleBlock(currentBlockType);
+
+  if (options.activePlan) {
+    const planning = readCanonicalPlanningProjection(options.activePlan);
+    if (history.length < minimumSessions) {
+      return { hasEnoughHistory: false, emptyMessage: "Log 3-5 completed workouts first. Then the coach can make useful calls.", planningModeLabel: "Canonical training", currentBlockLabel: planning.currentMesocycle?.adaptation ?? "Current training phase" };
+    }
+    const signals = adaptHistoryToStrategicSignals(history, exercises, { goal: options.goal, currentBlockType: options.currentBlockType });
+    const readiness = calculateBlockReadiness(signals);
+    const momentum = calculateTrainingMomentum(signals);
+    const recommendationTitle = readiness.band === "deload_or_adjust" ? "Review the current training response" : "Continue the current training phase";
+    return {
+      hasEnoughHistory: true,
+      planningModeLabel: "Canonical training",
+      currentBlockLabel: planning.currentMesocycle?.adaptation ?? "Current training phase",
+      readiness: { score: readiness.score, band: titleReadinessBand(readiness.band), label: `${readiness.score} - ${titleReadinessBand(readiness.band)}` },
+      momentum: { score: momentum.score, band: momentum.band, label: `${momentum.score} - ${momentum.band}` },
+      recommendation: { title: recommendationTitle, message: `${planning.sessionRole}: ${planning.currentMesocycle?.adaptation ?? "continue the current phase"}.`, reasons: buildPlainReasons(signals, readiness.reasons) },
+    };
+  }
 
   if (history.length < minimumSessions) {
     return {

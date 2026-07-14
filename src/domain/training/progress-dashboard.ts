@@ -131,6 +131,7 @@ export function buildProgressDashboardViewModel(
   const strategic = buildStrategicCoachingViewModel(plannedCompletedWorkouts, exercises, {
     goal: planningContext?.goal ?? activePlan?.goal,
     currentBlockType: activeBlock?.type,
+    activePlan: activePlan ?? undefined,
   });
   const eventTaper = activePlan?.targetDate
     ? resolveEventTaper({

@@ -134,7 +134,7 @@ export function buildHomeDashboardViewModel({
         : todayState === "rest_day"
           ? "Rest day"
         : plannedWorkout;
-  const strategic = buildStrategicCoachingViewModel(history, exercises);
+  const strategic = buildStrategicCoachingViewModel(history, exercises, { activePlan: activePlan ?? undefined, goal: activePlan?.goal });
   const eventTaper = activePlan?.mode === "custom_date_event" && activePlan.targetDate
     ? resolveEventTaper({
         eventType: activePlan.eventType,
