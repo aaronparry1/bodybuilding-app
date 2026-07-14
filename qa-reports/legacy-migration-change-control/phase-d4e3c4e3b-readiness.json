@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "ordinary-v2-readiness.v1",
+  "evidenceClass": "shadow_and_test_canary_only",
+  "status": "insufficient_evidence",
+  "reasonCodes": ["no_real_user_observation_window"],
+  "runtimeActivation": false,
+  "defaultPolicy": "production_only",
+  "thresholds": {"minEvidencePerRole":1,"maxFallbackRate":0,"maxTranslationFailureRate":0,"maxExceptionRate":0,"maxRiskyDifferenceRate":0,"maxBlockedDifferenceRate":0,"maxAgeDays":30}
+}
