@@ -1,0 +1,30 @@
+diff --git a/src/domain/training/ad-hoc-workout-generator.ts b/src/domain/training/ad-hoc-workout-generator.ts
+index ddc6de1..4aa862c 100644
+--- a/src/domain/training/ad-hoc-workout-generator.ts
++++ b/src/domain/training/ad-hoc-workout-generator.ts
+@@ -7,6 +7,7 @@ import { resolveLoadIncrement, type LoadIncrementProfile } from "@/domain/traini
+ import { resolveRepRange } from "@/domain/training/rep-range-strategy";
+ import { withSetPrescription } from "@/domain/training/set-prescription";
+ import { resolveEvidenceBasedSlotPrescription } from "@/domain/training/slot-prescription-matrix";
++import { shadowResolveCompatibilityV2, type CompatibilityV2ShadowResult } from "@/domain/training/compatibility-v2-shadow";
+ import type { TrainingSetupGoal } from "@/domain/training/plan-setup";
+ import type {
+   BlockCompatibility,
+@@ -940,6 +941,7 @@ type CompatibilityFinalRepLaneDecision = Readonly<{
+   winnerRetention: "retained_at_existing_branch" | "unavailable_in_legacy_contract";
+   reasonCodes: readonly string[];
+   fingerprint: string;
++  shadow: CompatibilityV2ShadowResult;
+ }>;
+ 
+ type CompatibilityFinalRepLaneDecisionResult = Readonly<{ status: "resolved"; decision: CompatibilityFinalRepLaneDecision }> | Readonly<{ status: "invalid_input"; reasonCode: string }>;
+@@ -956,7 +958,8 @@ function resolveCompatibilityFinalRepLaneDecision(exercise: Exercise, slot: Temp
+   const roleSource: CompatibilityFinalRepLaneDecision["roleSource"] = slot.role === exerciseRole ? "explicit" : "inferred";
+   const familyAuthority = prescriptionFamily === "corrective" ? "corrective_family" : prescriptionFamily === "recovery" ? "recovery_family" : prescriptionFamily === "power" ? "power_family" : "block_compatibility";
+   const semantic = { schemaVersion: "v1" as const, repRange, lane, exerciseRole, roleSource, prescriptionFamily: prescriptionFamily as CompatibilityFinalRepLaneDecision["prescriptionFamily"], plannedOrderClass: "unknown" as const, ownershipStage: "helper_resolution" as const, repAuthoritySource: familyAuthority as CompatibilityFinalRepLaneDecision["repAuthoritySource"], laneAuthoritySource: laneDecision.source as CompatibilityFinalRepLaneDecision["laneAuthoritySource"], appliedRepAuthorityIdentity: `production.${familyAuthority}.rep`, appliedLaneAuthorityIdentity: `production.${laneDecision.appliedIdentity}.lane`, collision: roleSource === "inferred" ? { selectedAuthority: "inferred_role", reasonCode: "explicit_role_absent_inference_selected", displacedAuthorities: [] as readonly string[] } : null, winnerRetention: laneDecision.winnerRetention, reasonCodes: [laneDecision.reasonCode] };
+-  return { status: "resolved", decision: { ...semantic, fingerprint: `v1|${JSON.stringify(semantic)}` } };
++  const shadow = shadowResolveCompatibilityV2({ blockType: currentBlock?.type, exerciseRole, slotRole: slot.role, exerciseFamily: exercise.family, lane, repMinimum: repRange.min, repMaximum: repRange.max });
++  return { status: "resolved", decision: { ...semantic, fingerprint: `v1|${JSON.stringify(semantic)}`, shadow } };
+ }
+ 
+ function getGeneratedRepRange(exercise: Exercise, slot: TemplateSlot, currentBlock?: TrainingBlock | null): RepRange {

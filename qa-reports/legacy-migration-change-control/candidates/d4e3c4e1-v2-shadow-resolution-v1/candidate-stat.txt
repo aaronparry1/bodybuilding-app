@@ -1,0 +1,2 @@
+ src/domain/training/ad-hoc-workout-generator.ts | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)

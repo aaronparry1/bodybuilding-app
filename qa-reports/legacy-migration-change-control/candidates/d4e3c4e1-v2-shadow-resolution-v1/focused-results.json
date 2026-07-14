@@ -1,0 +1,18 @@
+
+> hypertrophy-app@1.0.0 test
+> vitest run --run tests/d4e3c4e1-v2-shadow-resolution.test.ts tests/d4e3c4d10c7-lane-final-decision.test.ts tests/d4e3c4d10c6-lane-authority.test.ts tests/d4e3c4d10c2-training-lane-characterization.test.ts tests/d4e3c4d10-selector-decomposition.test.ts
+
+
+ RUN  v3.2.6 /Users/aaronparry/Documents/Bodybuilding App
+
+ ✓ tests/d4e3c4d10-selector-decomposition.test.ts (3 tests) 2ms
+ ✓ tests/d4e3c4d10c6-lane-authority.test.ts (2 tests) 1ms
+ ✓ tests/d4e3c4d10c7-lane-final-decision.test.ts (2 tests) 2ms
+ ✓ tests/d4e3c4e1-v2-shadow-resolution.test.ts (2 tests) 2ms
+ ✓ tests/d4e3c4d10c2-training-lane-characterization.test.ts (19 tests) 3ms
+
+ Test Files  5 passed (5)
+      Tests  28 passed (28)
+   Start at  12:10:21
+   Duration  825ms (transform 220ms, setup 0ms, collect 331ms, tests 10ms, environment 0ms, prepare 284ms)
+

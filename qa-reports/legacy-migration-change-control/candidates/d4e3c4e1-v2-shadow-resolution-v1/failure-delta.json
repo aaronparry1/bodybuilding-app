@@ -1,0 +1,8 @@
+{
+  "baselineFailureCount": 43,
+  "candidateFailureCount": 43,
+  "newlyFailing": [],
+  "newlyPassing": [],
+  "baselineFileCountFromArtifact": "preserved_exactly",
+  "note": "authoritative baseline artifact contains exact failure IDs when available"
+}

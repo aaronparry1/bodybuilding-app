@@ -1,0 +1,11 @@
+{
+  "phase": "D4E3C4E1",
+  "eligibility": "explicit_fact_only",
+  "invocation": "one_after_production_decision",
+  "productionAuthority": true,
+  "v2Applied": false,
+  "categories": ["resolved_agreement", "resolved_difference", "v2_resolution_failed", "not_evaluated"],
+  "focusedTestsPassed": 28,
+  "fullSuite": {"failingTests": 43, "passingTests": 1746, "baselineFailingTests": 43, "baselinePassingTests": 1744},
+  "status": "verified_shadow_only"
+}
