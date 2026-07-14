@@ -1,0 +1,5 @@
+[
+  {"guardId":"D4E3C4D10","test":"keeps remaining selector families free of wrapper precedence","classification":"overbroad_guard","candidateTrigger":"resolveTrainingLaneDecision symbol","result":"false_positive_for_private_single_source_helper","requiredAssertion":"exported façade has no branch logic and calls one private selector exactly once"},
+  {"guardId":"D4E3C4D10C3","test":"confirms the primitive selector remains unchanged and primitive","classification":"correct_guard_outdated_policy","candidateTrigger":"resolveTrainingLaneDecision symbol","result":"false_positive_for_same-file_private_helper","requiredAssertion":"primitive return/signature unchanged; no sidecar inference or v2"},
+  {"guardId":"D4E3C4D10C4","test":"keeps the experiment free of duplicated lane precedence","classification":"correct_guard_outdated_policy","candidateTrigger":"resolveTrainingLaneDecision symbol","result":"false_positive_for_single_moved_precedence_body","requiredAssertion":"no duplicate precedence, observer/options seam or rich projection"}
+]
