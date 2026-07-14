@@ -34,5 +34,6 @@
   "runtimeAuthority": "production_only",
   "unresolvedProductDecisions": [],
   "postReviewFullSuite": {"failedTests":14,"passedTests":1820,"failedFiles":10},
-  "genuineDefectsExposed": ["recommended and leaner macrocycles currently fail the canonical 48-week horizon assertions"]
+  "genuineDefectsExposed": [],
+  "followUpSemanticAudit": "D4E3-AUDIT-2B classifies the 48-week assertions as legacy annual-plan requirements pending route-based replacement"
 }

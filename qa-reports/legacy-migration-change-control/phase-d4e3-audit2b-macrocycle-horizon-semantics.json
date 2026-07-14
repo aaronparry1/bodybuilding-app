@@ -1,0 +1,32 @@
+{
+  "phase":"D4E3-AUDIT-2B",
+  "commit":"a458426",
+  "originOf48WeekRequirement":{
+    "sources":["tests/product-flow-architecture.test.ts","tests/product-positioning.test.ts","docs/truthfulness-validation-audit.md","src/domain/training/annual-planner.ts"],
+    "classification":"legacy_annual_plan_requirement",
+    "evidence":"The assertions target annualMacrocycle-style 48-52 week plans, while createActiveTrainingPlan now resolves MacrocycleEngine phases into active mesocycle/block projections; current macrocycle-engine phases are rolling when no target date exists."
+  },
+  "currentContract":{
+    "generalDevelopment":"rolling strategic horizon; active mesocycle plus approved successors; no universal fixed duration",
+    "datedGoal":"deadline-bounded phases reverse-engineered to target date",
+    "singleBlock":"explicit user-selected bounded block",
+    "customSequence":"explicit user-selected sequence",
+    "termination":["approved mesocycle route completion","target/event date","Progress evidence and transition decision","safety/recovery exit","changed circumstances recomputation"]
+  },
+  "models":{
+    "fixedAnnual":{"consistent":false,"compatibilityImpact":"high","finding":"legacy-only for TrainingYear/annual planner"},
+    "universalMinimum":{"consistent":false,"finding":"unsupported by rolling macrocycle engine"},
+    "goalOrDeadlineBounded":{"consistent":true,"finding":"deadline phases bounded; goal selects engine and route"},
+    "rollingStrategic":{"consistent":true,"finding":"general development commits active phase and approved successors, defers exact future sessions"},
+    "hybrid":{"consistent":true,"recommended":true,"finding":"bounded dated goals plus rolling outcome-driven development"}
+  },
+  "affectedAssertions":[
+    {"testId":"D4E3-F31","path":"tests/product-flow-architecture.test.ts","current":">=48 weeks","disposition":"replace_with_strategic_route_validity","reason":"recommended plan uses current macrocycle route, not legacy frozen annual duration"},
+    {"testId":"D4E3-F36","path":"tests/product-positioning.test.ts","current":">=48 weeks","disposition":"goal_specific_or_replace_with_strategic_route","reason":"leaner goal is not evidence for a universal annual minimum"}
+  ],
+  "futureStructure":"active mesocycle committed; approved next mesocycles represented; exact session construction deferred to current evidence",
+  "progressRole":"owns completion, adherence, fatigue and progression evidence; feeds approved transition/continuation decisions but does not become a parallel programming authority",
+  "nextTask":"D4E3-AUDIT-2C replace legacy horizon assertions with canonical route/deadline contract tests",
+  "productionChanged":false,
+  "runtimeAuthority":"production_only"
+}
