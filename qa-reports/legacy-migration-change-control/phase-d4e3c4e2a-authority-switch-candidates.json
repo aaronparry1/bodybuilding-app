@@ -1,0 +1,12 @@
+{
+  "phase": "D4E3C4E2A",
+  "evaluatedBranchFamilies": [],
+  "eligibleFamilyCount": 0,
+  "ineligibleFamilyCount": 0,
+  "selectedFirstCandidate": null,
+  "certification": "no_eligible_branch_family",
+  "reason": "incomplete_shadow_coverage",
+  "productionAuthorityChanges": false,
+  "runtimeSwitchAdded": false,
+  "nextPhase": "expand_fixture_level_shadow_evidence"
+}
