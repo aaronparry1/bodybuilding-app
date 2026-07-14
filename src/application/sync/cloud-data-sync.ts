@@ -4,7 +4,7 @@ import { activeTrainingPlanRepository } from "@/data/local/active-training-plan-
 import { customExerciseRepository } from "@/data/local/custom-exercise-repository";
 import { programmeRepository } from "@/data/local/programme-repository";
 import { recoveryCapacityIgnoreRepository, type RecoveryCapacityIgnoreRecord } from "@/data/local/recovery-capacity-ignore-repository";
-import { trainingYearRepository } from "@/data/local/training-year-repository";
+import { legacyTrainingYearArchive } from "@/application/training/legacy-training-year-archive";
 import { workoutSessionRepository } from "@/data/local/workout-session-repository";
 import { ExerciseCloudRepository } from "@/data/cloud/exercise-cloud-repository";
 import { ProgrammeCloudRepository } from "@/data/cloud/programme-cloud-repository";
@@ -67,7 +67,7 @@ export interface CloudDataSyncDependencies {
   localProgrammeRepository?: typeof programmeRepository;
   localExerciseRepository?: typeof customExerciseRepository;
   localActivePlanRepository?: typeof activeTrainingPlanRepository;
-  localTrainingYearRepository?: typeof trainingYearRepository;
+  localTrainingYearRepository?: typeof legacyTrainingYearArchive;
   localRecoveryIgnoreRepository?: typeof recoveryCapacityIgnoreRepository;
   localSettingsStore?: typeof appSettingsStore;
 }
@@ -111,7 +111,7 @@ export function buildCloudUserDataBackup(dependencies: CloudDataSyncDependencies
     updatedAt: now(),
     appSettings: settingsStore.get(),
     activeTrainingPlan: (dependencies.localActivePlanRepository ?? activeTrainingPlanRepository).getOptional(),
-    trainingYear: (dependencies.localTrainingYearRepository ?? trainingYearRepository).getActiveYear(),
+    trainingYear: (dependencies.localTrainingYearRepository ?? legacyTrainingYearArchive).read(),
     recoveryCapacityIgnore: (dependencies.localRecoveryIgnoreRepository ?? recoveryCapacityIgnoreRepository).get(),
   };
 }
@@ -153,7 +153,7 @@ export async function restoreCloudDataForUser(
   const localProgrammeRepository = dependencies.localProgrammeRepository ?? programmeRepository;
   const localExerciseRepository = dependencies.localExerciseRepository ?? customExerciseRepository;
   const localActivePlanRepository = dependencies.localActivePlanRepository ?? activeTrainingPlanRepository;
-  const localTrainingYearRepository = dependencies.localTrainingYearRepository ?? trainingYearRepository;
+  const localTrainingYearRepository = dependencies.localTrainingYearRepository ?? legacyTrainingYearArchive;
   const localRecoveryIgnoreRepository = dependencies.localRecoveryIgnoreRepository ?? recoveryCapacityIgnoreRepository;
   const localSettingsStore = dependencies.localSettingsStore ?? appSettingsStore;
 
@@ -232,7 +232,7 @@ export async function restoreCloudDataForUser(
       restoredActivePlan = true;
     }
     if (cloudSettings.trainingYear && shouldRestoreTrainingYear) {
-      localTrainingYearRepository.save(cloudSettings.trainingYear);
+      localTrainingYearRepository.write(cloudSettings.trainingYear);
       restoredTrainingYear = true;
     }
     if (!localRecoveryIgnoreRepository.get() && cloudSettings.recoveryCapacityIgnore) {
