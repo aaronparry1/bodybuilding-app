@@ -3,6 +3,9 @@ import { compareCanonicalActivePlans, parseCanonicalActivePlan, serializeCanonic
 
 const key = "iron-logic.canonical-active-plan-v2";
 
+export type CanonicalOpaqueStorage = Readonly<{ read(): string | null; write(value: string): void; remove(): void }>;
+const defaultStorage: CanonicalOpaqueStorage = { read: () => jsonStore.get<string | null>(key, null), write: (value) => jsonStore.set(key, value), remove: () => jsonStore.remove(key) };
+
 export type CanonicalPlanRepositoryResult =
   | Readonly<{ status: "saved"; carrier: CanonicalActivePlanCarrier }>
   | Readonly<{ status: "missing" }>
@@ -10,9 +13,11 @@ export type CanonicalPlanRepositoryResult =
 
 export type CanonicalAtomicWriteResult = CanonicalPlanRepositoryResult | Readonly<{ status: "conflict"; reason: "stale_revision" | "same_revision_different_content" }>;
 
-export const canonicalActivePlanV2Repository = {
+export function createCanonicalActivePlanV2Repository(storage: CanonicalOpaqueStorage = defaultStorage) {
+  const repository = {
   get(): CanonicalPlanRepositoryResult {
-    const raw = jsonStore.get<string | null>(key, null);
+    let raw: string | null;
+    try { raw = storage.read(); } catch { return { status: "invalid", reason: "storage_read_failed" }; }
     if (!raw) return { status: "missing" };
     const parsed = parseCanonicalActivePlan(raw);
     return parsed.status === "valid" ? { status: "saved", carrier: parsed.carrier } : { status: "invalid", reason: parsed.reason };
@@ -20,7 +25,7 @@ export const canonicalActivePlanV2Repository = {
   save(carrier: CanonicalActivePlanCarrier): CanonicalPlanRepositoryResult {
     try {
       const serialized = serializeCanonicalActivePlan(carrier);
-      jsonStore.set(key, serialized);
+      storage.write(serialized);
       const readBack = this.get();
       if (readBack.status !== "saved" || readBack.carrier.planId !== carrier.planId || readBack.carrier.revision !== carrier.revision) return { status: "invalid", reason: "read_back_mismatch" };
       return readBack;
@@ -34,19 +39,24 @@ export const canonicalActivePlanV2Repository = {
     if (previous.status === "saved" && previous.carrier.revision === carrier.revision) {
       return compareCanonicalActivePlans(previous.carrier, carrier).status === "equivalent" ? previous : { status: "conflict", reason: "same_revision_different_content" };
     }
-    const previousRaw = jsonStore.get<string | null>(key, null);
+    let previousRaw: string | null;
+    try { previousRaw = storage.read(); } catch { return { status: "invalid", reason: "storage_read_failed" }; }
     try {
       const serialized = serializeCanonicalActivePlan(carrier);
-      jsonStore.set(key, serialized);
+      storage.write(serialized);
       const readBack = this.get();
       if (readBack.status !== "saved" || compareCanonicalActivePlans(readBack.carrier, carrier).status !== "equivalent") throw new Error("read_back_mismatch");
       return readBack;
     } catch (error) {
-      if (previousRaw === null) jsonStore.remove(key); else jsonStore.set(key, previousRaw);
+      try { if (previousRaw === null) storage.remove(); else storage.write(previousRaw); } catch { return { status: "invalid", reason: "rollback_failed" }; }
       return { status: "invalid", reason: error instanceof Error ? error.message : "atomic_write_failed" };
     }
   },
-  clear(): void { jsonStore.remove(key); },
-};
+  clear(): void { storage.remove(); },
+  };
+  return repository;
+}
+
+export const canonicalActivePlanV2Repository = createCanonicalActivePlanV2Repository();
 
 export function validateCanonicalPlanRepositoryInput(value: unknown): CanonicalCarrierValidation { return parseCanonicalActivePlan(JSON.stringify(value)); }
