@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "canonical_session_pipeline_certification_v1",
+  "readiness": "not_ready",
+  "totalCases": 0,
+  "validCases": 0,
+  "expectedInvalidCases": 0,
+  "invariantViolations": [],
+  "qualityViolations": [],
+  "determinismFailures": [],
+  "carrierFailures": [
+    "canonical_v2_planned_session_orchestration_not_connected",
+    "persistence_round_trip_not_proven_for_pipeline_snapshot"
+  ],
+  "productionSwitchAllowed": false,
+  "blockers": [
+    "exact prescription snapshot lacks explicit rest/progression/stop-rule ownership",
+    "drop-off is represented only indirectly through policy provenance, not a resolved construction output",
+    "canonical v2 construction still accepts caller-supplied planned-session snapshots",
+    "production planned and extra/custom callers remain on the legacy construction engine"
+  ]
+}
