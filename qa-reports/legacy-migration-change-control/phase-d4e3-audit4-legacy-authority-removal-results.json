@@ -1,0 +1,21 @@
+{
+  "phase":"D4E3-AUDIT-4",
+  "commit":"63e84a8",
+  "status":"blocked_typed_provenance_boundary_required",
+  "paths":[
+    {"path":"src/domain/training/strategic-coaching.ts","modernConsumers":["strategic-coaching-presenter","home-dashboard","progress-dashboard"],"legacyAuthority":["createTrainingBlock","recommendNextBlock"],"disposition":"still_blocked"},
+    {"path":"src/domain/training/recommendation-actions.ts","modernConsumers":["progress-dashboard","planned-workout","train","design-qa"],"legacyAuthority":["completeBlock","createTrainingBlock","TrainingYear actions"],"disposition":"still_blocked"},
+    {"path":"src/domain/training/annual-planner.ts","modernConsumers":["plan-setup compatibility inputs","ad-hoc generator","strategic coaching","recommendation actions"],"legacyAuthority":["TrainingYear blocks","annual transitions","block defaults"],"disposition":"compatibility_only_not_yet_contained"}
+  ],
+  "canonicalOwners":{"macrocycle":"macrocycle-engine.ts:createMacrocycle","mesocycle":"mesocycle-library.ts + decideMesocycleTransition","microcycle":"microcycle-scheduler.ts:createMicrocycle","sessionConstruction":"planned-workout.ts + set-prescription.ts","progress":"current-readiness-producer.ts + transition writer/application"},
+  "blockers":[
+    "ActiveTrainingPlan lacks a reliable persisted modern-vs-legacy provenance discriminator.",
+    "strategic-coaching APIs accept TrainingBlock and TrainingYear-shaped inputs and are consumed by modern projections.",
+    "recommendation-actions mixes canonical exercise interventions with legacy TrainingYear block mutation helpers.",
+    "Removing annual imports now would require either a guessed classifier or a parallel recommendation/transition authority."
+  ],
+  "requiredNextTask":"D4E3-AUDIT-4A define and test one read-time modern/legacy provenance adapter, then isolate legacy block mutation callers",
+  "productionChanged":false,
+  "runtimeAuthority":"production_only",
+  "parallelEngineIntroduced":false
+}
