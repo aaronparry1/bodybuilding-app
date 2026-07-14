@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "d4e3c4e1d.v1",
+  "fixtures": [
+    {"id":"ordinary_primary","v2Status":"resolved","translation":"translated","rollback":"production_equivalent"},
+    {"id":"ordinary_secondary","v2Status":"resolved","translation":"translated","rollback":"production_equivalent"},
+    {"id":"ordinary_accessory","v2Status":"resolved","translation":"translated","rollback":"production_equivalent"}
+  ],
+  "runtimeAuthoritySwitch": false,
+  "productionAuthority": true,
+  "d4e3c4e2a": {"selectedFirstCandidate": null,"status":"no_eligible_branch_family","reason":"incomplete_shadow_coverage"}
+}
