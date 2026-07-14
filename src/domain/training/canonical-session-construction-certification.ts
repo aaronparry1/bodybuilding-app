@@ -13,6 +13,9 @@ export type CanonicalPipelineCertification = Readonly<{
   determinismFailures: readonly string[];
   carrierFailures: readonly string[];
   productionSwitchAllowed: false;
+  pipelineReadyForSwitch: boolean;
+  productionSwitchCompleted: false;
+  predicates: Readonly<Record<string, boolean>>;
   blockers: readonly string[];
 }>;
 
@@ -54,6 +57,21 @@ export function certifyCanonicalSessionConstruction(inputs: readonly CanonicalSe
     determinismFailures,
     carrierFailures,
     productionSwitchAllowed: false,
+    pipelineReadyForSwitch: false,
+    productionSwitchCompleted: false,
+    predicates: {
+      orchestration_matrix_passed: inputs.length > 0 && determinismFailures.length === 0,
+      repository_roundtrip_passed: false,
+      atomic_failures_contained: false,
+      stale_revision_protected: false,
+      malformed_carriers_rejected: false,
+      malformed_sessions_rejected: false,
+      historical_snapshots_preserved: false,
+      legacy_history_non_authoritative: false,
+      exact_prescriptions_preserved: qualityViolations.length === 0,
+      no_legacy_fields_persisted: false,
+      deterministic_outputs_verified: determinismFailures.length === 0,
+    },
     blockers,
   };
 }
