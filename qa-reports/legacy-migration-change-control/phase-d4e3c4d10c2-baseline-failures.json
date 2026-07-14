@@ -1,0 +1,6 @@
+{
+  "failureCount": 43,
+  "failingFileCount": 15,
+  "failureIds": [],
+  "note": "The repository baseline inventory records counts but not stable full-suite IDs. Candidate capture must populate IDs before rollback."
+}

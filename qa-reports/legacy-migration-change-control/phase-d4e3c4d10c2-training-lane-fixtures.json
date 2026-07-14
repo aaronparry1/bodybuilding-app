@@ -1,0 +1,19 @@
+[
+  {"fixtureId":"deload-recovery","category":"block-role","facts":{"blockType":"deload","exerciseRole":"recovery"},"primitiveLane":"recovery","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"deload-maintenance","category":"block-default","facts":{"blockType":"deload","exerciseRole":"accessory"},"primitiveLane":"maintenance","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"peak-first-order","category":"planned-order","facts":{"blockType":"peak","plannedOrder":1},"primitiveLane":"peak","authorityObservability":"winner_authority_not_observable","productionActive":true},
+  {"fixtureId":"peak-secondary","category":"role","facts":{"blockType":"peak","exerciseRole":"secondary_compound"},"primitiveLane":"strength_support","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"peak-default","category":"block-default","facts":{"blockType":"peak","exerciseRole":"accessory"},"primitiveLane":"maintenance","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"power-power-role","category":"role","facts":{"blockType":"power","exerciseRole":"power"},"primitiveLane":"power","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"power-primary","category":"role","facts":{"blockType":"power","exerciseRole":"primary_compound"},"primitiveLane":"strength_support","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"power-default","category":"block-default","facts":{"blockType":"power","exerciseRole":"accessory"},"primitiveLane":"maintenance","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"strength-primary","category":"role","facts":{"blockType":"strength","exerciseRole":"primary_compound"},"primitiveLane":"strength","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"strength-secondary","category":"role","facts":{"blockType":"strength","exerciseRole":"secondary_compound"},"primitiveLane":"strength_support","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"strength-default","category":"block-default","facts":{"blockType":"strength","exerciseRole":"accessory"},"primitiveLane":"maintenance","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"powerbuilding-primary","category":"role","facts":{"blockType":"powerbuilding","exerciseRole":"primary_compound"},"primitiveLane":"strength","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"powerbuilding-secondary","category":"role","facts":{"blockType":"powerbuilding","exerciseRole":"secondary_compound"},"primitiveLane":"hypertrophy_strength","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"powerbuilding-default","category":"block-default","facts":{"blockType":"powerbuilding","exerciseRole":"accessory"},"primitiveLane":"hypertrophy","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"hypertrophy-primary","category":"role","facts":{"blockType":"hypertrophy","exerciseRole":"primary_compound"},"primitiveLane":"hypertrophy_strength","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"hypertrophy-power","category":"role","facts":{"blockType":"hypertrophy","exerciseRole":"power"},"primitiveLane":"power","authorityObservability":"winner_value_observable","productionActive":true},
+  {"fixtureId":"hypertrophy-default","category":"fallback","facts":{"blockType":"hypertrophy","exerciseRole":"accessory"},"primitiveLane":"hypertrophy","authorityObservability":"winner_value_observable","productionActive":true}
+]
