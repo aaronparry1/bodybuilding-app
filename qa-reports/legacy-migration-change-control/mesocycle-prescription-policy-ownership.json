@@ -1,0 +1,11 @@
+{
+  "schema": "mesocycle_prescription_policy_v1",
+  "legacyMappings": [
+    {"legacy":"block.type","owner":"Mesocycle","replacement":"specialState/loading/volume envelope"},
+    {"legacy":"block.repRange","owner":"Session Construction","replacement":"Mesocycle loading envelope; exact targets remain downstream"},
+    {"legacy":"block.dropOffRule","owner":"Mesocycle + Session Construction","replacement":"Mesocycle fatigue boundary; exact stop rule downstream"},
+    {"legacy":"block.suitableBlocks","owner":"Session Construction","replacement":"Mesocycle exerciseSuitability envelope"},
+    {"legacy":"block.currentWeek","owner":"Microcycle","replacement":"microcycle sequence/position"},
+    {"legacy":"block.active status","owner":"Progress/Mesocycle transition","replacement":"readiness and transition state"}
+  ]
+}
