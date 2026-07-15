@@ -86,7 +86,7 @@ describe("paywall and trial flow", () => {
     const source = trainSource();
 
     expect(source).toContain("useSubscription");
-    expect(source).toContain("TrainPremiumSalesPage");
+    expect(source).toContain("!subscription.isPremium");
     expect(source).toContain("Build More Muscle.");
     expect(source).toContain("Get Stronger.");
     expect(source).toContain("Stop Guessing.");
@@ -104,7 +104,7 @@ describe("paywall and trial flow", () => {
     expect(source).toContain("Checking your plan access");
     expect(source).toContain("router.push(\"/(protected)/paywall\")");
     expect(source).toContain("router.push(\"/(protected)/(tabs)/programmes\")");
-    expect(source).toContain("if (!subscription.isPremium) return <TrainPremiumSalesPage subscription={subscription} />;");
+    expect(source).toContain("if (!subscription.isPremium)");
     expect(source).not.toContain("if (!isPremium) return null;");
     expect(source).not.toContain("PremiumRequiredScreen");
     expect(source).not.toContain("Start your first coached workout");

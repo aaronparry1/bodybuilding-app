@@ -59,7 +59,8 @@ describe("app environment", () => {
     const trainSource = readFileSync("app/(protected)/(tabs)/train.tsx", "utf8");
 
     expect(runtimeSource).toContain("const internal = isInternalRuntime(environment)");
-    expect(trainSource).toContain("v3RuntimeStatus.internal");
-    expect(trainSource).toContain("V3 {v3SessionSource");
+    expect(trainSource).toContain("canonicalActivePlanState");
+    expect(trainSource).not.toContain("v3RuntimeStatus");
+    expect(trainSource).not.toContain("getCoachingEngineV3RuntimeStatus");
   });
 });

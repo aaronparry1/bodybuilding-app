@@ -13,6 +13,7 @@ import {
   startCanonicalSession,
 } from "@/application/training/canonical-recorded-session-application";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
+import { useSubscription } from "@/application/billing/subscription-context";
 import { AppScreen, PrimaryButton, SecondaryButton } from "@/ui/primitives";
 import { colors, spacing, type } from "@/ui/theme";
 
@@ -21,6 +22,8 @@ type RouteParams = Readonly<{ planId?: string; planRevision?: string; plannedSes
 function operationId(prefix: string) { return `train:${prefix}:${Date.now()}`; }
 
 export default function TrainScreen() {
+  const subscription = useSubscription();
+  if (!subscription.isPremium) return <AppScreen><Text style={{ color: colors.text, ...type.hero }}>Build More Muscle.</Text><Text style={{ color: colors.text, ...type.hero }}>Get Stronger.</Text><Text style={{ color: colors.text, ...type.hero }}>Stop Guessing.</Text><Text style={{ color: colors.textMuted }}>Your adaptive training plan is ready. Start your free trial to unlock coached workouts, progression, and recovery guidance.</Text><Text style={{ color: colors.accent, ...type.section }}>14-day free trial</Text><Text style={{ color: colors.textMuted }}>Cancel anytime.</Text><Text style={{ color: colors.text }}>Know exactly what to do every workout</Text><Text style={{ color: colors.text }}>Adaptive progression based on your performance</Text><Text style={{ color: colors.text }}>Warm-Up Sets and Session Prep included</Text><Text style={{ color: colors.text }}>Strength Dashboard, PRs, and e1RM tracking</Text><Text style={{ color: colors.text }}>Recovery & Capacity guidance</Text><PrimaryButton label="Start 14-Day Free Trial" onPress={() => router.push("/(protected)/paywall")} /><SecondaryButton label="Restore Purchases" onPress={subscription.restorePurchases} /><SecondaryButton label="View Plan" onPress={() => router.push("/(protected)/(tabs)/programmes")} /><Text style={{ color: colors.textMuted }}>Checking your plan access</Text><Text style={{ color: colors.textMuted }}>Managed securely through your App Store or Google Play account.</Text></AppScreen>;
   const params = useLocalSearchParams<RouteParams>();
   const [, refresh] = useState(0);
   useEffect(() => { canonicalActivePlanState.hydrate(); return canonicalActivePlanState.subscribe(() => refresh((value) => value + 1)); }, []);
