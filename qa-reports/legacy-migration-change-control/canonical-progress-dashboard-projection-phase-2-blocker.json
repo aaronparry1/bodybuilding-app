@@ -3,14 +3,15 @@
   "sourceCommit": "7be7b30",
   "manifest": "qa-reports/legacy-migration-change-control/canonical-progress-dashboard-coverage-map.json",
   "originalCases": 21,
-  "canonicalCasesCompleted": 3,
-  "blockedCases": 18,
+  "canonicalCasesCompleted": 7,
+  "blockedCases": 14,
+  "implementedExtensions": ["factual recovery/capacity/fatigue summary", "persisted volume/rotation intervention presentation", "bounded ledger history summary", "persisted transition/deload action descriptor"],
   "missingCanonicalFields": ["factual recovery/capacity/fatigue summary", "persisted volume intervention presentation", "persisted microcycle rotation intervention presentation", "recorded-session history aggregation for dashboard cards", "canonical action descriptors for transition/deload review"],
   "decision": "stop_at_missing_canonical_dashboard_projection_fields",
   "legacyBuilderDisposition": "retain_until_meaningful_cases_have_canonical_replacements",
   "mountedProductionCaller": null,
   "productionSwitchCompleted": false,
-  "nextBoundedTask": "extend canonical dashboard input/projection from Progress evidence/intervention and ledger summary owners, then migrate remaining cases",
+  "nextBoundedTask": "migrate remaining dashboard unit and Design-QA cases to the extended canonical projection",
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
 }
