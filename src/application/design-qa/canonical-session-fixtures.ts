@@ -1,0 +1,20 @@
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { startCanonicalSession, prescriptionHash } from "@/application/training/canonical-recorded-session-application";
+import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
+import { exerciseLibrary } from "@/domain/training/presets";
+
+export type CanonicalDesignQaSessionResult = Readonly<{ status: "ready" | "started" | "rejected"; fixtureId: string; planId: string; plannedSessionId?: string; recordedSessionId?: string; reason: string }>;
+
+export function applyCanonicalActiveSessionFixture(fixtureId: string): CanonicalDesignQaSessionResult {
+  const planId = `design-qa:${fixtureId}`;
+  const state = canonicalActivePlanState.create({ planId, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell", "bodyweight"], units: "kg", exercises: exerciseLibrary });
+  if (state.hydration !== "hydrated" || !state.model) return { status: "rejected", fixtureId, planId, reason: state.error ?? "canonical_plan_unavailable" };
+  const planned = state.model.nextSession;
+  if (!planned) return { status: "rejected", fixtureId, planId, reason: "planned_session_unavailable" };
+  const snapshot = state.model.plannedSessions.find((session) => session.id === planned.id)?.snapshot;
+  if (!snapshot) return { status: "rejected", fixtureId, planId, plannedSessionId: planned.id, reason: "planned_snapshot_unavailable" };
+  const started = startCanonicalSession({ planId, expectedPlanRevision: state.model.revision, plannedSessionId: planned.id, expectedPrescriptionHash: prescriptionHash(snapshot), operationId: `design-qa:${fixtureId}:start`, startedAt: "2026-01-01T00:00:00.000Z", provenance: "design_qa_canonical" });
+  return started.recordedSessionId ? { status: started.status === "started" ? "started" : "ready", fixtureId, planId, plannedSessionId: planned.id, recordedSessionId: started.recordedSessionId, reason: started.reason } : { status: "rejected", fixtureId, planId, plannedSessionId: planned.id, reason: started.reason };
+}
+
+export function readCanonicalFixtureSession(recordedSessionId: string) { return canonicalRecordedSessionLedger.get(recordedSessionId); }

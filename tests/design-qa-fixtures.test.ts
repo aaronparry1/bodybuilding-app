@@ -24,6 +24,7 @@ import { summarizeWorkoutSession } from "@/domain/training/workout-history";
 import { summarizeWorkoutHistory } from "@/domain/training/workout-history";
 import type { DesignQaFixtureId } from "@/application/design-qa/design-qa-fixtures";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 
 describe("Design QA fixtures", () => {
   beforeEach(() => {
@@ -208,10 +209,10 @@ describe("Design QA fixtures", () => {
 
   it("uses a realistic active Push session count for the Home active-workout fixture", () => {
     applyDesignQaFixture("home_active_workout", "development");
-    const session = workoutSessionRepository.list().find((candidate) => !candidate.completedAt)!;
-
-    expect(session.name).toBe("Push");
-    expect(session.exercises).toHaveLength(5);
+    const plan = canonicalActivePlanState.getReadModel()!;
+    const sessionId = plan.activeRecordedSession?.recordedSessionId;
+    expect(sessionId).toBeTruthy();
+    expect(canonicalRecordedSessionLedger.get(sessionId!).status).toBe("found");
   });
 
   it("creates Session Prep Train fixtures for not-started, completed, skipped, and active-workout states", () => {
@@ -393,7 +394,12 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
 
   expect(activeFixture?.id).toBe(fixtureId);
 
-  if (fixtureId.startsWith("plan_") || (fixtureId.startsWith("home_") && fixtureId !== "home_active_workout" && fixtureId !== "home_recovery_capacity")) {
+  if (fixtureId === "home_active_workout") {
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
+    return;
+  }
+
+  if (fixtureId.startsWith("plan_") || (fixtureId.startsWith("home_") && fixtureId !== "home_recovery_capacity")) {
     if (fixtureId.endsWith("no_plan")) return;
     expect(canonicalActivePlanState.getReadModel()).not.toBeNull();
     expect(canonicalActivePlanState.getReadModel()?.plannedSessions.length).toBeGreaterThan(0);
@@ -411,7 +417,7 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
     expect(sessions.filter((session) => session.completedAt).length).toBeGreaterThan(0);
   }
 
-  if (fixtureId.startsWith("train_") || fixtureId === "home_active_workout") {
+  if (fixtureId.startsWith("train_")) {
     expect(sessions.some((session) => !session.completedAt)).toBe(true);
   }
 

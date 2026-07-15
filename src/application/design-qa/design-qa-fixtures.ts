@@ -18,6 +18,7 @@ import { exerciseLibrary } from "@/domain/training/presets";
 import { buildSessionPrepRecord, getSessionPrepRoutine, type SessionPrepRecord } from "@/domain/training/session-prep";
 import { summarizeWorkoutSession } from "@/domain/training/workout-history";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { applyCanonicalActiveSessionFixture } from "@/application/design-qa/canonical-session-fixtures";
 
 export type DesignQaFixtureId =
   | "progress_low"
@@ -269,6 +270,17 @@ function applyPlanStateFixture(id: DesignQaFixtureId, environment: AppEnvironmen
   return activeFixture;
 }
 function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
+  if (id === "home_active_workout") {
+    if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
+    clearFixtureViewStateOnly();
+    appSettingsStore.patch({ onboardingCompleted: true });
+    const result = applyCanonicalActiveSessionFixture(id);
+    if (result.status === "rejected") throw new Error(result.reason);
+    const definition = getFixtureDefinition(id);
+    const activeFixture = { id, label: definition.label, appliedAt: new Date().toISOString() };
+    jsonStore.set(activeFixtureKey, activeFixture);
+    return activeFixture;
+  }
   return applyDesignQaFixtureMatrix(id, environment);
 }
 function applyProgressDecisionFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
