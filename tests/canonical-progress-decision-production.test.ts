@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { evaluateCanonicalProgress } from "@/domain/training/canonical-progress-evaluator";
+import { evaluateCanonicalProgressV2 } from "@/domain/training/canonical-progress-evaluator";
+import { resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-prescription-policy";
 import { produceCanonicalProgressDecision } from "@/application/training/canonical-progress-decision-production";
 import { exerciseLibrary } from "@/domain/training/presets";
 import { jsonStore } from "@/data/local/json-store";
@@ -27,5 +29,17 @@ describe("canonical Progress decision production", () => {
     const plan = created.model!;
     const evaluation = evaluateCanonicalProgress({ plan, evidence: [] });
     expect(produceCanonicalProgressDecision({ planId: plan.planId, planRevision: plan.revision - 1, macrocycleId: `${plan.planId}:macrocycle`, mesocycleId: plan.mesocycle.id, microcycleId: plan.microcycle.id, evaluation, evidenceVersions: {}, operationId: "stale" }).reason).toBe("stale_plan_revision");
+  });
+
+  it("expresses transition intent only from explicit canonical evidence", () => {
+    const created = canonicalActivePlanState.create({ planId: "transition-plan", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell"], units: "kg", exercises: exerciseLibrary });
+    const plan = created.model!;
+    const policy = resolveMesocyclePrescriptionPolicy(plan.mesocycle.id as never, { goal: "build_muscle" });
+    expect(policy.status).toBe("resolved");
+    if (policy.status !== "resolved") return;
+    canonicalProgressEvidenceRepository.record({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: "transition-evidence", planId: plan.planId, planRevision: plan.revision, macrocycleId: `${plan.planId}:macrocycle`, mesocycleId: plan.mesocycle.id as never, microcycleId: plan.microcycle.id, athleteId: "a", observedAt: "2026-01-01T00:00:00.000Z", source: "test", kind: "readiness", observations: { exitCriteriaSatisfied: true }, evidenceVersion: "progress_v1" });
+    const evaluation = evaluateCanonicalProgressV2({ plan, evidence: canonicalProgressEvidenceRepository.list(plan.planId), policy: policy.policy });
+    expect(evaluation.schemaVersion).toBe("canonical_progress_evaluation_v2");
+    expect(evaluation.outcome).toBe("transition_recommended");
   });
 });
