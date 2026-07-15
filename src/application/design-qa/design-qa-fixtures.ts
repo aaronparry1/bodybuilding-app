@@ -17,6 +17,7 @@ import type { TrainingYear } from "@/domain/training/annual-models";
 import { exerciseLibrary } from "@/domain/training/presets";
 import { buildSessionPrepRecord, getSessionPrepRoutine, type SessionPrepRecord } from "@/domain/training/session-prep";
 import { summarizeWorkoutSession } from "@/domain/training/workout-history";
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 
 export type DesignQaFixtureId =
   | "progress_low"
@@ -219,8 +220,8 @@ export function ensureDesignQaLocalWorkoutReadyState(environment: AppEnvironment
 
   if (getActiveDesignQaFixture()) return;
 
-  if (!activeTrainingPlanRepository.getOptional()) {
-    activeTrainingPlanRepository.save(basePlan());
+  if (!canonicalActivePlanState.getReadModel()) {
+    canonicalActivePlanState.create({ planId: "design-qa-canonical-plan", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell", "bodyweight"], units: "kg", exercises: exerciseLibrary });
   }
 
   const sessions = workoutSessionRepository.list();

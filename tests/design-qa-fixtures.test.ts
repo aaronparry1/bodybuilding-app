@@ -23,6 +23,7 @@ import { createAnnualPlan, naturalLifterAnnualPlan } from "@/domain/training/ann
 import { summarizeWorkoutSession } from "@/domain/training/workout-history";
 import { summarizeWorkoutHistory } from "@/domain/training/workout-history";
 import type { DesignQaFixtureId } from "@/application/design-qa/design-qa-fixtures";
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 
 describe("Design QA fixtures", () => {
   beforeEach(() => {
@@ -48,7 +49,7 @@ describe("Design QA fixtures", () => {
     ensureDesignQaLocalWorkoutReadyState("development");
 
     expect(appSettingsStore.get().onboardingCompleted).toBe(true);
-    expect(activeTrainingPlanRepository.getOptional()).not.toBeNull();
+    expect(canonicalActivePlanState.getReadModel()).not.toBeNull();
     const openWorkout = workoutSessionRepository.list().find((session) => !session.completedAt);
     expect(openWorkout?.name).toBe("Push");
     expect(openWorkout?.exercises.length).toBeGreaterThan(1);
