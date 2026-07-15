@@ -6,7 +6,7 @@ describe("canonical legacy deletion phase 1 inventory", () => {
   it("keeps the retained legacy allowlist explicit and fail-closed", () => {
     const inventory = JSON.parse(readFileSync(resolve(process.cwd(), "qa-reports/legacy-migration-change-control/canonical-repository-legacy-authority-inventory.json"), "utf8"));
     expect(inventory.schemaVersion).toBe("canonical_repository_legacy_authority_inventory_v1");
-    expect(inventory.nextBoundedDeletionBatch).toEqual(["src/application/design-qa/design-qa-fixtures.ts:prepRecord and session-prep fixture helper"]);
+    expect(inventory.nextBoundedDeletionBatch).toEqual([]);
     expect(inventory.entries.some((entry: { symbol: string; classification: string }) => entry.symbol === "applyDesignQaFixtureMatrix" && entry.classification === "dead_unreferenced")).toBe(true);
     expect(inventory.entries.some((entry: { classification: string }) => entry.classification === "unknown_fail_closed")).toBe(false);
   });

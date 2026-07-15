@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "canonical_legacy_deletion_phase_1g_result_v1",
+  "sourceCommit": "9cd1d05",
+  "candidate": "src/application/design-qa/design-qa-fixtures.ts:prepRecord",
+  "decision": "preserve_live_factual_session_prep_owner",
+  "callers": ["train_prep_completed", "train_prep_skipped"],
+  "repository": "sessionPrepRepository",
+  "legacyAuthority": false,
+  "canonicalPrescriptionAuthority": false,
+  "lifecycleAuthority": "canonical_recorded_session_ledger",
+  "designQaCanonicalMatrixComplete": true,
+  "designQaLegacyReachabilityZero": true,
+  "canonicalVisualWorkoutSetupComplete": true,
+  "canonicalSessionPrepFixtureBoundaryComplete": true,
+  "legacySessionPrepFixtureHelpersRemoved": false,
+  "pipelineReadyForSwitch": true,
+  "productionSwitchCompleted": false,
+  "nextDeletionCandidate": null,
+  "reason": "prepRecord stores factual checklist status only and remains required by the four prep fixture states; no deletion is safe without removing meaningful coverage"
+}
