@@ -338,13 +338,13 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
   const activePlan = activeTrainingPlanRepository.getOptional();
   const sessions = workoutSessionRepository.list();
 
-  expect(activeFixture?.id).toBe(fixtureId);
-
   const canonicalLoadFixtures = ["train_load_no_history", "train_load_strength_unknown", "train_load_exact_progressed", "train_load_exact_held", "train_load_same_family_estimate", "train_load_same_family_low_confidence", "train_load_lb_known", "train_load_bodyweight", "train_increment_barbell_1", "train_increment_barbell_2_5", "train_increment_barbell_5", "train_increment_machine_1", "train_increment_cable_1", "train_increment_exercise_override", "train_load_regression_reduce", "train_load_escalation", "train_load_escalation_modal", "train_load_average_next", "train_productive_below_min", "train_productive_target_zone", "train_productive_soft_cap", "train_productive_over_soft_cap"];
   if (canonicalLoadFixtures.includes(fixtureId)) {
     expect(readCanonicalTrainProjection()).toMatchObject({ fixtureId, snapshotVersion: "canonical_session_snapshot_v3" });
     return;
   }
+
+  expect(activeFixture?.id).toBe(fixtureId);
 
   if (fixtureId === "home_active_workout") {
     expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
