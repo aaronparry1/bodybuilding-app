@@ -19,4 +19,9 @@ describe("canonical Progress production boundary", () => {
     expect(result.decision).toBeNull();
     expect(result.evidenceCount).toBe(0);
   });
+
+  it("does not expose legacy fields or direct prescription controls", () => {
+    expect(source).not.toMatch(/TrainingYear|currentBlock|activeBlockId|volumeAdjustment|nextBlock|setPrescription/);
+    expect(source).not.toContain("generatedWorkout");
+  });
 });
