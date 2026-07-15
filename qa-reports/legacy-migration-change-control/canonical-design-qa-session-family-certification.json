@@ -1,0 +1,12 @@
+{
+  "sourceCommit": "a6b695a",
+  "family": "session_lifecycle",
+  "canonicalFixtureCount": 29,
+  "reclassifiedProgressFixtureCount": 8,
+  "legacyProjectionReachability": 0,
+  "allSessionSetupAndProjectionCanonical": true,
+  "pipelineReadyForSwitch": true,
+  "productionSwitchCompleted": false,
+  "remainingFamily": "progress_decision",
+  "remainingProgressFixtureCount": 8
+}
