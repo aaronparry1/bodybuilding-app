@@ -1,11 +1,13 @@
 {
   "schemaVersion": "canonical_progress_dashboard_coverage_map_v1",
-  "sourceCommit": "6c5a18a",
+  "sourceCommit": "49b9155",
   "legacyUnitCases": 21,
   "designQaConsumers": ["tests/design-qa-fixtures.test.ts"],
-  "canonicalReplacementsAdded": ["canonical-progress-dashboard-projection.test.ts"],
+  "canonicalReplacementsAdded": ["canonical-progress-dashboard-projection.test.ts", "canonical-progress-dashboard-coverage-batch-1.test.ts"],
   "obsoleteLegacyAssertions": ["blocks", "activeBlockId", "currentMicrocycle.progressionState", "annual phase"],
   "remainingLegacyProjection": "src/domain/training/progress-dashboard.ts:buildProgressDashboardViewModel",
-  "migrationStatus": "projection_contract_added_legacy_family_not_deleted",
-  "nextStep": "migrate dashboard unit and Design-QA cases to canonical projection before deleting legacy function"
+  "migrationStatus": "seven_cases_canonical_projection_batch_one_fourteen_classified",
+  "migratedCaseIds": ["batch1:current-context", "batch1:zero-set-history", "batch1:recovery-warning", "batch1:productive-history", "batch1:low-history", "batch1:ledger-history", "batch1:empty-history"],
+  "remainingCaseCount": 14,
+  "nextStep": "resolve the exact missing canonical fields and owners recorded in canonical-progress-dashboard-coverage-batch-1.json"
 }

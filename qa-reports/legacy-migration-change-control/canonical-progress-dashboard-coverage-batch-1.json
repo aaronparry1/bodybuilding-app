@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "canonical_progress_dashboard_coverage_batch_1_v1",
+  "sourceCommit": "49b9155",
+  "originalCases": 21,
+  "migratedCases": 7,
+  "replacementTestIds": [
+    "batch1:current-context",
+    "batch1:zero-set-history",
+    "batch1:recovery-warning",
+    "batch1:productive-history",
+    "batch1:low-history",
+    "batch1:ledger-history",
+    "batch1:empty-history"
+  ],
+  "remainingCases": 14,
+  "remaining": [
+    {"test": "cleans generated workout names before Progress displays them", "classification": "missing_canonical_projection_field", "owner": "recorded-session projection", "nextAction": "define canonical session display-name field"},
+    {"test": "does not recommend a Recovery Window from repeated productive hypertrophy accessory shutdowns alone", "classification": "missing_canonical_owner_or_policy", "owner": "Mesocycle recovery policy", "nextAction": "source and define recovery disposition"},
+    {"test": "does not recommend a Recovery Window after only two planned sessions, even when extra work is noisy", "classification": "missing_canonical_projection_field", "owner": "Progress evidence", "nextAction": "define planned-versus-extra history aggregation"},
+    {"test": "keeps one bad planned session local instead of escalating to a full Recovery Window", "classification": "missing_canonical_owner_or_policy", "owner": "Mesocycle fatigue policy", "nextAction": "define bounded escalation semantics"},
+    {"test": "does not treat a legacy accepted deload block as a current recovery action", "classification": "obsolete_legacy_source_shape", "owner": "Mesocycle deload policy", "nextAction": "replace with canonical decision rejection"},
+    {"test": "keeps mild fatigue evidence below the full Recovery Window action threshold", "classification": "missing_canonical_owner_or_policy", "owner": "Mesocycle fatigue policy", "nextAction": "define source-backed threshold"},
+    {"test": "does not turn repeated systemic historical evidence into an automatic recovery plan", "classification": "missing_canonical_owner_or_policy", "owner": "Progress recovery evaluator", "nextAction": "define bounded recovery outcome"},
+    {"test": "accepting a Recovery Window changes the active generated prescription, not just the roadmap", "classification": "mutation_behavior_inappropriate_for_projection", "owner": "Progress decision application and Session Construction", "nextAction": "migrate only after atomic application chain exists"},
+    {"test": "counts work sets only on recent workout cards after warm-up sets are summarized", "classification": "missing_canonical_projection_field", "owner": "recorded-session ledger", "nextAction": "project warm-up/work-set aggregation"},
+    {"test": "hides warm-up-only completed sessions from Progress coaching metrics", "classification": "missing_canonical_projection_field", "owner": "recorded-session ledger", "nextAction": "project zero-work-set visibility"},
+    {"test": "surfaces meaningful volume recommendations without raw landmark labels", "classification": "missing_canonical_owner_or_policy", "owner": "Mesocycle volume policy", "nextAction": "define bounded presentation contract"},
+    {"test": "suppresses volume recommendations until enough completed history exists", "classification": "missing_canonical_projection_field", "owner": "Progress evidence", "nextAction": "define evidence sufficiency projection"},
+    {"test": "keeps a stalled Tier A history observation non-actionable without an intervention", "classification": "missing_canonical_owner_or_policy", "owner": "Microcycle rotation policy", "nextAction": "define approved rotation observation"},
+    {"test": "suppresses a kept stalled exercise recommendation", "classification": "missing_canonical_owner_or_policy", "owner": "Progress intervention decision", "nextAction": "define persisted keep disposition projection"}
+  ],
+  "designQaConsumersMigrated": [],
+  "legacyProjectionRetainedFor": "14 explicitly classified semantic cases; the 21-case legacy unit suite remains intact until each legacy branch is replaced or obsoleted",
+  "productionSwitchCompleted": false
+}

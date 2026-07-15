@@ -1,6 +1,6 @@
 {
   "schemaVersion": "canonical_progress_dashboard_projection_phase_2_blocker_v1",
-  "sourceCommit": "7be7b30",
+  "sourceCommit": "49b9155",
   "manifest": "qa-reports/legacy-migration-change-control/canonical-progress-dashboard-coverage-map.json",
   "originalCases": 21,
   "canonicalCasesCompleted": 7,
@@ -11,7 +11,7 @@
   "legacyBuilderDisposition": "retain_until_meaningful_cases_have_canonical_replacements",
   "mountedProductionCaller": null,
   "productionSwitchCompleted": false,
-  "nextBoundedTask": "migrate remaining dashboard unit and Design-QA cases to the extended canonical projection",
+  "nextBoundedTask": "resolve the 14 field-level dashboard cases recorded in canonical-progress-dashboard-coverage-batch-1.json",
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
 }
