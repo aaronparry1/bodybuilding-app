@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "canonical_plan_setup_production_migration_blocker_v1",
+  "sourceCommit": "69d674c",
+  "candidate": "src/domain/training/plan-setup.ts:createActiveTrainingPlan",
+  "decision": "blocked_at_current_decision_application_contract",
+  "liveCaller": {
+    "file": "src/domain/training/current-decision-application.ts",
+    "symbol": "applyCurrentMesocycleDecision",
+    "chain": ["Progress decision action", "applyCurrentMesocycleDecision", "activeTrainingPlanRepository.getOptional/save", "ActiveTrainingPlan.currentMicrocycle/currentMesocycleId/blocks"],
+    "capability": "reads current plan and mutates persisted current cycle state"
+  },
+  "canonicalReplacement": "applyCanonicalProgressDecision",
+  "missingContract": "production caller still requires canonical decision/revision linkage and successor validation without ActiveTrainingPlan block-shaped state",
+  "requiredFacts": ["canonical plan revision", "canonical mesocycle successor identity", "canonical microcycle identity", "decision/evidence chain", "atomic canonical carrier application"],
+  "constructorDisposition": "retain_until_live_caller_migrated",
+  "productionSwitchCompleted": false,
+  "ordinaryV2Authority": "inactive",
+  "d4d2": "unchanged"
+}
