@@ -19,6 +19,8 @@ import { WorkoutSyncService } from "@/data/sync/workout-sync-service";
 import type { AppSupabaseClient } from "@/lib/supabase/client";
 import type { Exercise, Programme, WorkoutSession } from "@/domain/training/models";
 import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
+import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
+import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 
 const cloudBackupSchema = "adaptive-strength-coach-cloud-backup";
 const cloudBackupVersion = 1;
@@ -40,6 +42,8 @@ export interface CloudUserDataBackup {
   activeTrainingPlan?: ActiveTrainingPlan | null;
   canonicalActivePlan?: string | null;
   canonicalActivePlanRevision?: number;
+  canonicalRecordedSessions?: readonly { session: import("@/domain/training/canonical-recorded-session-ledger").CanonicalRecordedSession; events: readonly import("@/domain/training/canonical-recorded-session-ledger").CanonicalRecordedSessionEvent[] }[];
+  canonicalProgressEvidence?: readonly import("@/domain/training/canonical-progress-evidence").CanonicalProgressEvidence[];
   trainingYear?: unknown;
   recoveryCapacityIgnore?: RecoveryCapacityIgnoreRecord | null;
 }
@@ -118,6 +122,8 @@ export function buildCloudUserDataBackup(dependencies: CloudDataSyncDependencies
     activeTrainingPlan: (dependencies.localActivePlanRepository ?? activeTrainingPlanRepository).getOptional(),
     canonicalActivePlan: canonical.status === "saved" ? serializeCanonicalActivePlan(canonical.carrier) : null,
     canonicalActivePlanRevision: canonical.status === "saved" ? canonical.carrier.revision : undefined,
+    canonicalRecordedSessions: canonical.status === "saved" ? canonicalRecordedSessionLedger.exportPlan(canonical.carrier.planId) : [],
+    canonicalProgressEvidence: canonical.status === "saved" ? canonicalProgressEvidenceRepository.list(canonical.carrier.planId) : [],
     trainingYear: (dependencies.localTrainingYearRepository ?? legacyTrainingYearArchive).read(),
     recoveryCapacityIgnore: (dependencies.localRecoveryIgnoreRepository ?? recoveryCapacityIgnoreRepository).get(),
   };
@@ -237,14 +243,21 @@ export async function restoreCloudDataForUser(
     if (cloudSettings.canonicalActivePlan) {
       const parsed = validateCanonicalActivePlan(cloudSettings.canonicalActivePlan);
       if (parsed.status === "valid") {
+        const ledgerRestore = canonicalRecordedSessionLedger.restorePlan(cloudSettings.canonicalRecordedSessions ?? []);
+        if (ledgerRestore.status !== "restored") {
+          logSyncStage("canonical ledger restore rejected", ledgerRestore);
+        } else {
+          for (const evidence of cloudSettings.canonicalProgressEvidence ?? []) canonicalProgressEvidenceRepository.record(evidence);
+        }
         const local = canonicalActivePlanV2Repository.get();
-        if (local.status !== "saved" || parsed.carrier.revision > local.carrier.revision) {
+        const referencesResolve = (parsed.carrier.recordedSessionReferences ?? []).every((reference) => canonicalRecordedSessionLedger.get(reference.sessionId).status === "found");
+        if (ledgerRestore.status === "restored" && referencesResolve && (local.status !== "saved" || parsed.carrier.revision > local.carrier.revision)) {
           const saved = canonicalActivePlanV2Repository.saveAtomically(parsed.carrier, local.status === "saved" ? local.carrier.revision : undefined);
           if (saved.status === "saved") {
             canonicalActivePlanState.hydrate();
             restoredActivePlan = true;
           }
-        } else if (local.status === "saved" && parsed.carrier.revision === local.carrier.revision) {
+        } else if (ledgerRestore.status === "restored" && referencesResolve && local.status === "saved" && parsed.carrier.revision === local.carrier.revision) {
           restoredActivePlan = true;
         }
       }
