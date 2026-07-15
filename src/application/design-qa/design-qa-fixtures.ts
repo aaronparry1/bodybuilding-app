@@ -235,6 +235,8 @@ export function ensureDesignQaLocalWorkoutReadyState(environment: AppEnvironment
 export type DesignQaFixtureFamily = "plan_state" | "session_lifecycle" | "progress_decision" | "failure_recovery";
 
 export function designQaFixtureFamily(id: DesignQaFixtureId): DesignQaFixtureFamily {
+  if (id === "home_active_workout") return "session_lifecycle";
+  if (id === "home_recovery_capacity") return "progress_decision";
   if (id.startsWith("plan_") || id.startsWith("home_")) return "plan_state";
   if (id.startsWith("train_")) return "session_lifecycle";
   if (id.startsWith("phase1_") || id.startsWith("progress_")) return "progress_decision";
@@ -252,7 +254,19 @@ export function applyDesignQaFixture(id: DesignQaFixtureId, environment: AppEnvi
 }
 
 function applyPlanStateFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
-  return applyDesignQaFixtureMatrix(id, environment);
+  if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
+  clearFixtureViewStateOnly();
+  appSettingsStore.patch({ onboardingCompleted: true });
+  canonicalActivePlanState.clear();
+  if (id !== "home_no_plan" && id !== "plan_no_plan") {
+    const daysPerWeek = id === "home_rest_day" ? 4 : id === "plan_single_hypertrophy" ? 2 : 4;
+    const result = canonicalActivePlanState.create({ planId: `design-qa:${id}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: id === "plan_event_custom" ? "strength_hypertrophy" : "hypertrophy", macrocycleGoal: id === "plan_event_custom" ? "build_strength" : "build_muscle", experienceLevel: "intermediate", daysPerWeek, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell", "bodyweight"], units: "kg", exercises: exerciseLibrary });
+    if (result.hydration !== "hydrated" || !result.model) throw new Error(`canonical_design_qa_plan_failed:${result.error ?? result.hydration}`);
+  }
+  const definition = getFixtureDefinition(id);
+  const activeFixture = { id, label: definition.label, appliedAt: new Date().toISOString() };
+  jsonStore.set(activeFixtureKey, activeFixture);
+  return activeFixture;
 }
 function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
   return applyDesignQaFixtureMatrix(id, environment);
@@ -655,6 +669,7 @@ export function isDesignQaFixtureSession(session: Pick<WorkoutSession, "notes" |
 
 function clearFixtureViewStateOnly() {
   programmeRepository.clearSelectedProgrammeDay();
+  canonicalActivePlanState.clear();
   jsonStore.remove(activeFixtureKey);
   jsonStore.remove(activeTrainingPlanKey);
   jsonStore.remove(trainingYearKey);

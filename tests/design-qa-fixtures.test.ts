@@ -393,6 +393,13 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
 
   expect(activeFixture?.id).toBe(fixtureId);
 
+  if (fixtureId.startsWith("plan_") || (fixtureId.startsWith("home_") && fixtureId !== "home_active_workout" && fixtureId !== "home_recovery_capacity")) {
+    if (fixtureId.endsWith("no_plan")) return;
+    expect(canonicalActivePlanState.getReadModel()).not.toBeNull();
+    expect(canonicalActivePlanState.getReadModel()?.plannedSessions.length).toBeGreaterThan(0);
+    return;
+  }
+
   if (fixtureId.endsWith("no_plan")) {
     expect(activePlan).toBeNull();
     return;
