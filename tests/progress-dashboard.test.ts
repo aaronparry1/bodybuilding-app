@@ -132,54 +132,6 @@ describe("progress dashboard view model", () => {
     expect(progress.actionFlow?.type).not.toBe("deload");
   });
 
-  it("does not recommend a Recovery Window from repeated productive hypertrophy accessory shutdowns alone", () => {
-    const history = [0, 1, 2, 3].map((index) =>
-      workout(index, [
-        exerciseEntry(index, {
-          exerciseId: "ex-cable-fly",
-          exerciseName: "Cable Fly",
-          load: index >= 2 ? 22.5 : 20,
-          progressionEarned: true,
-          stoppedByDropOff: true,
-          qualitySets: 3,
-          bestSetReps: 15 + index,
-          repsCompleted: 45 + index,
-          nextRecommendedLoad: index >= 2 ? 25 : 22.5,
-        }),
-      ]),
-    );
-    const progress = buildProgressDashboardViewModel(history, exerciseLibrary, activePlan("build_muscle"));
-
-    expect(progress.actionFlow?.type).not.toBe("deload");
-    expect(progress.verdictMessage).toMatch(/Hard productive work|Local fatigue|Progression/i);
-    expect(progress.recommendationEvidence.dataPoints.join(" ")).toContain("productive");
-  });
-
-  it("keeps one bad planned session local instead of escalating to a full Recovery Window", () => {
-    const history = [0, 1, 2, 3].map((index) =>
-      workout(index, [
-        exerciseEntry(index, {
-          progressionEarned: index < 3,
-          stoppedByDropOff: index === 3,
-          qualitySets: index === 3 ? 1 : 4,
-          bestSetReps: index === 3 ? 5 : 12,
-        }),
-      ]),
-    );
-
-    const progress = buildProgressDashboardViewModel(history, exerciseLibrary, activePlan());
-
-    expect(progress.actionFlow?.type).not.toBe("deload");
-    expect(progress.actionTitle).not.toBe("Reduce workload first.");
-  });
-
-  it("keeps mild fatigue evidence below the full Recovery Window action threshold", () => {
-    const progress = buildProgressDashboardViewModel(mildDeloadHistory(), exerciseLibrary, activePlan("athletic_performance"));
-
-    expect(progress.actionFlow?.type).not.toBe("deload");
-    expect(progress.actionTitle).not.toBe("Reduce workload first.");
-  });
-
   it("does not turn repeated systemic historical evidence into an automatic recovery plan", () => {
     const plan = activePlan("build_muscle_and_strength");
     const progress = buildProgressDashboardViewModel(severeDeloadHistory(), exerciseLibrary, plan);

@@ -1,5 +1,6 @@
 export const CANONICAL_PROGRESS_DASHBOARD_PROJECTION_VERSION = "canonical_progress_dashboard_projection_v1" as const;
 import type { CanonicalProgressDashboardEvidence } from "@/domain/training/canonical-progress-dashboard-evidence-contract";
+import type { CanonicalMesocycleRecoveryPolicyResult } from "@/domain/training/canonical-mesocycle-recovery-policy";
 export type CanonicalDashboardRecoverySummary = Readonly<{ completeness: "complete" | "incomplete"; freshness: "fresh" | "stale" | "missing"; recovery: string; capacity: string; fatigue: string; evidenceIds: readonly string[]; reasonCodes: readonly string[] }>;
 export type CanonicalDashboardInterventionSummary = Readonly<{ interventionId: string; family: "volume_adjustment" | "microcycle_rotation"; policyId: string; policyVersion: string; disposition: string; reasonCodes: readonly string[]; application: "supported" | "unsupported" | "review_required"; evidenceIds: readonly string[] }>;
 export type CanonicalDashboardHistorySummary = Readonly<{ windowId: string; recordedSessions: number; completed: number; partial: number; missed: number; performedSets: number; prescribedSets: number; substitutions: number; evidencePending: number }>;
@@ -21,6 +22,7 @@ export type CanonicalProgressDashboardInput = Readonly<{
   interventions?: readonly CanonicalDashboardInterventionSummary[];
   history?: CanonicalDashboardHistorySummary;
   evidenceSufficiency?: CanonicalProgressDashboardEvidence;
+  recoveryPolicy?: CanonicalMesocycleRecoveryPolicyResult;
 }>;
 
 export type CanonicalProgressDashboardProjection = Readonly<{
@@ -37,6 +39,7 @@ export type CanonicalProgressDashboardProjection = Readonly<{
   history?: CanonicalDashboardHistorySummary;
   action: CanonicalDashboardAction;
   evidenceSufficiency?: CanonicalProgressDashboardEvidence;
+  recoveryPolicy?: CanonicalMesocycleRecoveryPolicyResult;
 }>;
 
 function containsLegacy(value: unknown): boolean {
@@ -51,6 +54,7 @@ export function projectCanonicalProgressDashboard(input: CanonicalProgressDashbo
   if (input.contractVersion !== "canonical_current_progress_context_v1" || !input.planId || !Number.isInteger(input.planRevision) || containsLegacy(input)) throw new Error("invalid_canonical_progress_dashboard_input");
   if (input.interventions?.some((item) => !item.interventionId || !item.policyId || !item.policyVersion || !item.evidenceIds.length)) throw new Error("invalid_canonical_dashboard_intervention");
   if (input.evidenceSufficiency && (input.evidenceSufficiency.contractVersion !== "canonical_progress_dashboard_evidence_v1" || input.evidenceSufficiency.planId !== input.planId || input.evidenceSufficiency.planRevision !== input.planRevision || input.evidenceSufficiency.cycleIds.length === 0)) throw new Error("invalid_canonical_dashboard_evidence_sufficiency");
+  if (input.recoveryPolicy && (input.recoveryPolicy.policyId !== "canonical_mesocycle_recovery_policy_v1" || input.recoveryPolicy.planId !== input.planId || !input.recoveryPolicy.mesocycleId || input.recoveryPolicy.evidenceIds.length === 0)) throw new Error("invalid_canonical_dashboard_recovery_policy");
   if (input.history && (!input.history.windowId || Object.values(input.history).some((value) => typeof value === "number" && value < 0))) throw new Error("invalid_canonical_dashboard_history");
   const status = input.evidence.freshness !== "fresh" || input.evidence.completeness !== "complete" || !input.evaluation ? "insufficient_evidence" : input.decision?.kind === "review_required" ? "review_required" : "ready";
   const kind = input.decision?.kind === "transition" || input.decision?.kind === "deload" || input.decision?.kind === "continue" ? input.decision.kind : input.decision ? "review" : "none";
@@ -68,6 +72,7 @@ export function projectCanonicalProgressDashboard(input: CanonicalProgressDashbo
     interventions: [...(input.interventions ?? [])].sort((a, b) => a.interventionId.localeCompare(b.interventionId)),
     ...(input.history ? { history: input.history } : {}),
     ...(input.evidenceSufficiency ? { evidenceSufficiency: input.evidenceSufficiency } : {}),
+    ...(input.recoveryPolicy ? { recoveryPolicy: input.recoveryPolicy } : {}),
     action,
   };
 }
