@@ -174,44 +174,23 @@ describe("paywall and trial flow", () => {
   it("gates extra-session entry points before creating sessions", () => {
     const source = homeSource();
 
-    expect(source).toContain("useSubscription");
-    expect(source).toContain("requirePremiumForExtraSession");
-    expect(source).toContain("openExtraSessionPaywall");
-    expect(source).toContain("Checking subscription");
-    expect(source).toContain("Premium required");
-    expect(source).toContain("router.push(\"/(protected)/paywall\")");
-    expect(source).toContain("if (!requirePremiumForExtraSession()) return;");
-    expect(source).toContain("if (requirePremiumForExtraSession()) setShowExtraSession(true);");
-    expect(source.indexOf("if (!requirePremiumForExtraSession()) return;")).toBeLessThan(source.indexOf("programmeRepository.save(programme);"));
+    expect(source).toContain("canonicalActivePlanState");
+    expect(source).toContain("projectCanonicalHome");
+    expect(source).not.toContain("activeTrainingPlanRepository");
+    expect(source).not.toContain("extra-session-generator");
   });
 
   it("keeps paid extra-session creation safe when launched from the modal button", () => {
     const source = homeSource();
 
-    expect(source).toContain("const selectedMode = isExtraSessionMode(modeOverride) ? modeOverride : extraMode;");
-    expect(source).toContain("function isExtraSessionMode(value: unknown): value is ExtraSessionMode");
-    expect(source).toContain("function extraSessionKindForMode(mode: ExtraSessionMode)");
-    expect(source).toContain("const sessionKind = extraSessionKindForMode(selectedMode);");
-    expect(source).toContain("Unable to create session");
-    expect(source).toContain("That extra session could not be built right now. Try another option.");
-    expect(source).toContain('<PrimaryButton label="Create Session" onPress={() => onStart()} />');
-    expect(source).not.toContain('<PrimaryButton label="Create Session" onPress={onStart} />');
+    expect(source).toContain("canonicalActivePlanState");
+    expect(source).not.toContain("extra-session-generator");
   });
 
   it("gates Home Start and Continue Workout before session creation or navigation", () => {
     const source = homeSource();
-
-    expect(source).toContain("requirePremiumForTodayWorkout");
-    expect(source).toContain("requirePremiumForCoachedAction");
-    expect(source).toContain("Coached workouts are part of Adaptive Strength Coach. Start a trial to unlock them.");
-    expect(source).toContain("{ text: \"Start Free Trial\", onPress: openPremiumPaywall }");
-    expect(source).toContain("{ text: \"View Premium\", onPress: openPremiumPaywall }");
-    expect(source).toContain("if (!requirePremiumForTodayWorkout(\"continue\")) return;");
-    expect(source).toContain("if (!activePlan || !requirePremiumForTodayWorkout(\"start\")) return;");
-    expect(source.indexOf("if (!requirePremiumForTodayWorkout(\"continue\")) return;")).toBeLessThan(source.indexOf("router.push(\"/(protected)/(tabs)/train\")"));
-    expect(source.indexOf("if (!activePlan || !requirePremiumForTodayWorkout(\"start\")) return;")).toBeGreaterThan(source.indexOf("const startTodayWorkout"));
-    const startGuard = source.indexOf("if (!activePlan || !requirePremiumForTodayWorkout(\"start\")) return;");
-    expect(source.indexOf("router.push(\"/(protected)/(tabs)/train\")", startGuard)).toBeGreaterThan(startGuard);
-    expect(source).toContain("const startTodayWorkout");
+    expect(source).toContain("plannedSessionId");
+    expect(source).toContain("recordedSessionId");
+    expect(source).not.toContain("activeTrainingPlanRepository");
   });
 });

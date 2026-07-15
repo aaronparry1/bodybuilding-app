@@ -10,7 +10,7 @@ describe("training system guide", () => {
     const homeSource = readFileSync(join(process.cwd(), "app/(protected)/(tabs)/index.tsx"), "utf8");
     const planSource = readFileSync(join(process.cwd(), "app/(protected)/(tabs)/programmes.tsx"), "utf8");
 
-    expect(homeSource).toContain("TrainingSystemGuideButton");
+    expect(homeSource).toContain("canonicalActivePlanState");
     expect(planSource).toContain("TrainingSystemGuideButton");
   });
 

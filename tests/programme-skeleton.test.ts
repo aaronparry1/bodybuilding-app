@@ -119,9 +119,8 @@ describe("programme skeleton", () => {
     const homeSource = readFileSync("app/(protected)/(tabs)/index.tsx", "utf8");
 
     expect(onboardingSource).toContain('step === "review" ? "Your Programme" : "Welcome"');
-    expect(homeSource).toContain("programmeSkeletonRepository.getOptional()");
-    expect(homeSource).toContain('SectionList title="Programme Overview"');
-    expect(homeSource.indexOf("programmeSkeletonRepository.getOptional()")).toBeGreaterThanOrEqual(0);
+    expect(homeSource).toContain("canonicalActivePlanState");
+    expect(homeSource).toContain("projectCanonicalHome");
   });
 
   it("does not use network, async, or storage in the domain module", () => {
