@@ -1,14 +1,15 @@
 {
   "schemaVersion": "canonical_legacy_deletion_phase_1_result_v1",
-  "sourceCommit": "47ba2c6",
+  "sourceCommit": "a6f41b4",
   "designQaCanonicalMatrixComplete": true,
   "designQaLegacyReachabilityZero": true,
   "productionLegacyAuthorityReachabilityZero": false,
   "migrationLegacyBoundariesIsolated": false,
   "deadLegacyCodeRemoved": true,
+  "legacyFixtureBasePlanRemoved": true,
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
-  "deletedSymbols": ["applyDesignQaFixtureMatrix", "applyFailureRecoveryFixture", "DesignQaFixtureBackup", "fixtureBackupKey"],
-  "nextDeletionCandidate": "src/application/design-qa/design-qa-fixtures.ts:basePlan and fixture-only helper cluster",
+  "deletedSymbols": ["applyDesignQaFixtureMatrix", "applyFailureRecoveryFixture", "DesignQaFixtureBackup", "fixtureBackupKey", "basePlan", "singleHypertrophyPlan", "strengthPlan", "eventPlan", "blockEndingPlan"],
+  "nextDeletionCandidate": "src/application/design-qa/design-qa-fixtures.ts:progressHealthySessions and remaining legacy fixture-only session-data helpers",
   "reason": "certified Design-QA matrix and backup bridge removed; retained production/archive compatibility paths remain classified"
 }

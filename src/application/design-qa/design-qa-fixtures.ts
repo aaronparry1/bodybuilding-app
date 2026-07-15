@@ -8,7 +8,6 @@ import { workoutSessionRepository } from "@/data/local/workout-session-repositor
 import type { AppEnvironment } from "@/application/runtime/app-environment-core";
 import { isDesignQaModeAvailable } from "@/application/runtime/app-environment-core";
 import { calculateNextSessionStartingLoadFromProductiveSets, resolveStartingLoadRecommendation } from "@/domain/training/load-selection";
-import { createActiveTrainingPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { replaceExerciseForFutureSessions } from "@/domain/training/recommendation-actions";
 import type { Exercise, SetLog, WorkoutExerciseLog, WorkoutSession } from "@/domain/training/models";
 import { exerciseLibrary } from "@/domain/training/presets";
@@ -350,86 +349,6 @@ function saveSessions(sessions: WorkoutSession[]) {
 
 function saveSessionPrepRecords(records: SessionPrepRecord[]) {
   jsonStore.set(sessionPrepRecordsKey, records);
-}
-
-function basePlan(overrides: Partial<Parameters<typeof createActiveTrainingPlan>[0]> = {}): ActiveTrainingPlan {
-  return createActiveTrainingPlan(
-    {
-      goal: "build_muscle_and_strength",
-      planningChoice: "recommended_12_month",
-      equipmentPreset: "full_gym",
-      daysPerWeek: 4,
-      preferredSplit: "upper_lower",
-      experienceLevel: "intermediate",
-      ...overrides,
-    },
-    "2026-06-01T08:00:00.000Z",
-  );
-}
-
-function singleHypertrophyPlan(): ActiveTrainingPlan {
-  return createActiveTrainingPlan(
-    {
-      goal: "build_muscle",
-      planningChoice: "single_block",
-      singleBlockType: "hypertrophy",
-      equipmentPreset: "full_gym",
-      daysPerWeek: 4,
-      preferredSplit: "upper_lower",
-      experienceLevel: "intermediate",
-    },
-    "2026-06-01T08:00:00.000Z",
-  );
-}
-
-function strengthPlan(): ActiveTrainingPlan {
-  return createActiveTrainingPlan(
-    {
-      goal: "build_strength",
-      planningChoice: "single_block",
-      singleBlockType: "strength",
-      equipmentPreset: "full_gym",
-      daysPerWeek: 4,
-      preferredSplit: "upper_lower",
-      experienceLevel: "intermediate",
-    },
-    "2026-06-01T08:00:00.000Z",
-  );
-}
-
-function eventPlan(): ActiveTrainingPlan {
-  return createActiveTrainingPlan(
-    {
-      goal: "powerlifting_meet",
-      planningChoice: "custom_date_event",
-      eventType: "powerlifting_meet",
-      targetDate: "2026-10-01",
-      eventPriority: "strength",
-      equipmentPreset: "full_gym",
-      daysPerWeek: 4,
-      preferredSplit: "upper_lower",
-      experienceLevel: "advanced",
-    },
-    "2026-06-01T08:00:00.000Z",
-  );
-}
-
-function blockEndingPlan(): ActiveTrainingPlan {
-  const plan = basePlan();
-  const activeBlockId = plan.blocks[0]?.id ?? plan.activeBlockId;
-  return {
-    ...plan,
-    activeBlockId,
-    blocks: plan.blocks.map((block, index) =>
-      index === 0
-        ? {
-            ...block,
-            currentWeek: block.durationWeeks,
-            status: "active" as const,
-          }
-        : block,
-    ),
-  };
 }
 
 function progressHealthySessions(): WorkoutSession[] {

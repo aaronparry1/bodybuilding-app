@@ -1,6 +1,6 @@
 {
   "schemaVersion": "canonical_repository_legacy_authority_inventory_v1",
-  "sourceCommit": "47ba2c6",
+  "sourceCommit": "a6f41b4",
   "entries": [
     {"file":"src/application/design-qa/design-qa-fixtures.ts","symbol":"applyDesignQaFixtureMatrix","classification":"dead_unreferenced","productionReachability":false,"normalQaReachability":false,"canonicalReplacement":"canonical family dispatchers","deletionBlocker":"none","disposition":"delete_next"},
     {"file":"src/application/design-qa/design-qa-fixtures.ts","symbol":"applyFailureRecoveryFixture","classification":"dead_unreferenced","productionReachability":false,"normalQaReachability":false,"canonicalReplacement":"none","deletionBlocker":"none","disposition":"deleted"},
@@ -10,8 +10,8 @@
     {"file":"src/data/local/workout-session-repository.ts","symbol":"workoutSessionRepository","classification":"production_projection_or_transport","productionReachability":true,"normalQaReachability":false,"canonicalReplacement":"canonical recorded-session ledger","deletionBlocker":"sync/history transport","disposition":"retain_isolate"},
     {"file":"src/application/design-qa/design-qa-fixtures.ts","symbol":"legacy fixture matrix helpers","classification":"dead_unreferenced","productionReachability":false,"normalQaReachability":false,"canonicalReplacement":"canonical plan/session/progress dispatchers","deletionBlocker":"none","disposition":"next_bounded_deletion_batch"}
   ],
-  "deletedSymbols": ["src/application/design-qa/design-qa-fixtures.ts:applyDesignQaFixtureMatrix", "src/application/design-qa/design-qa-fixtures.ts:applyFailureRecoveryFixture", "src/application/design-qa/design-qa-fixtures.ts:DesignQaFixtureBackup", "src/application/design-qa/design-qa-fixtures.ts:fixtureBackupKey"],
-  "nextBoundedDeletionBatch": ["src/application/design-qa/design-qa-fixtures.ts:basePlan and fixture-only helper cluster"],
+  "deletedSymbols": ["src/application/design-qa/design-qa-fixtures.ts:applyDesignQaFixtureMatrix", "src/application/design-qa/design-qa-fixtures.ts:applyFailureRecoveryFixture", "src/application/design-qa/design-qa-fixtures.ts:DesignQaFixtureBackup", "src/application/design-qa/design-qa-fixtures.ts:fixtureBackupKey", "src/application/design-qa/design-qa-fixtures.ts:basePlan", "src/application/design-qa/design-qa-fixtures.ts:singleHypertrophyPlan", "src/application/design-qa/design-qa-fixtures.ts:strengthPlan", "src/application/design-qa/design-qa-fixtures.ts:eventPlan", "src/application/design-qa/design-qa-fixtures.ts:blockEndingPlan"],
+  "nextBoundedDeletionBatch": ["src/application/design-qa/design-qa-fixtures.ts:progressHealthySessions and remaining legacy fixture-only session-data helpers"],
   "retainedLegacyAllowlist": [
     {"file":"src/application/training/legacy-training-year-archive.ts","reason":"historical archive transport only"},
     {"file":"src/data/local/workout-session-repository.ts","reason":"sync and historical transport compatibility"},
