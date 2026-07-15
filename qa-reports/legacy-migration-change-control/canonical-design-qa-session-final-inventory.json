@@ -1,6 +1,6 @@
 {
   "sourceCommit": "b14c400",
-  "sessionFixtureCount": 37,
+  "sessionFixtureCount": 30,
   "customFixtures": [],
   "failureRecoveryFixtures": [],
   "historicalFixtures": ["train_review_prs"],
