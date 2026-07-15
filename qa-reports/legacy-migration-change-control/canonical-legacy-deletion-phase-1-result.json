@@ -1,15 +1,16 @@
 {
   "schemaVersion": "canonical_legacy_deletion_phase_1_result_v1",
-  "sourceCommit": "a6f41b4",
+  "sourceCommit": "b87bb242",
   "designQaCanonicalMatrixComplete": true,
   "designQaLegacyReachabilityZero": true,
   "productionLegacyAuthorityReachabilityZero": false,
   "migrationLegacyBoundariesIsolated": false,
   "deadLegacyCodeRemoved": true,
   "legacyFixtureBasePlanRemoved": true,
+  "legacyFixtureSessionDataRemoved": true,
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
-  "deletedSymbols": ["applyDesignQaFixtureMatrix", "applyFailureRecoveryFixture", "DesignQaFixtureBackup", "fixtureBackupKey", "basePlan", "singleHypertrophyPlan", "strengthPlan", "eventPlan", "blockEndingPlan"],
-  "nextDeletionCandidate": "src/application/design-qa/design-qa-fixtures.ts:progressHealthySessions and remaining legacy fixture-only session-data helpers",
+  "deletedSymbols": ["applyDesignQaFixtureMatrix", "applyFailureRecoveryFixture", "DesignQaFixtureBackup", "fixtureBackupKey", "basePlan", "singleHypertrophyPlan", "strengthPlan", "eventPlan", "blockEndingPlan", "progressHealthySessions", "progressStrengthDashboardSessions", "recentPrFixtureSessions", "homeRecoveryCapacitySessions", "progressFatigueSessions", "progressSlowingSessions", "sameFamilyEstimateFixtureSessions", "regressionHistorySessions"],
+  "nextDeletionCandidate": "src/application/design-qa/design-qa-fixtures.ts:zeroSetFixtureSession and legacy exercise-log helpers",
   "reason": "certified Design-QA matrix and backup bridge removed; retained production/archive compatibility paths remain classified"
 }

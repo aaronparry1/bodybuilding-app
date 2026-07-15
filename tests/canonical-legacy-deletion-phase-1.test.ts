@@ -6,7 +6,7 @@ describe("canonical legacy deletion phase 1 inventory", () => {
   it("keeps the retained legacy allowlist explicit and fail-closed", () => {
     const inventory = JSON.parse(readFileSync(resolve(process.cwd(), "qa-reports/legacy-migration-change-control/canonical-repository-legacy-authority-inventory.json"), "utf8"));
     expect(inventory.schemaVersion).toBe("canonical_repository_legacy_authority_inventory_v1");
-    expect(inventory.nextBoundedDeletionBatch).toEqual(["src/application/design-qa/design-qa-fixtures.ts:progressHealthySessions and remaining legacy fixture-only session-data helpers"]);
+    expect(inventory.nextBoundedDeletionBatch).toEqual(["src/application/design-qa/design-qa-fixtures.ts:zeroSetFixtureSession and legacy exercise-log helpers"]);
     expect(inventory.entries.some((entry: { symbol: string; classification: string }) => entry.symbol === "applyDesignQaFixtureMatrix" && entry.classification === "dead_unreferenced")).toBe(true);
     expect(inventory.entries.some((entry: { classification: string }) => entry.classification === "unknown_fail_closed")).toBe(false);
   });
@@ -15,6 +15,13 @@ describe("canonical legacy deletion phase 1 inventory", () => {
     const source = readFileSync(resolve(process.cwd(), "src/application/design-qa/design-qa-fixtures.ts"), "utf8");
     expect(source).not.toMatch(/function (basePlan|singleHypertrophyPlan|strengthPlan|eventPlan|blockEndingPlan)\\b/);
     expect(source).not.toContain("createActiveTrainingPlan");
+  });
+
+  it("removes legacy fixture session-data builders while retaining live canonical session helpers", () => {
+    const source = readFileSync(resolve(process.cwd(), "src/application/design-qa/design-qa-fixtures.ts"), "utf8");
+    expect(source).not.toMatch(/function (progressHealthySessions|progressStrengthDashboardSessions|recentPrFixtureSessions|homeRecoveryCapacitySessions|progressFatigueSessions|progressSlowingSessions|sameFamilyEstimateFixtureSessions|regressionHistorySessions)\\b/);
+    expect(source).toContain("function openSession");
+    expect(source).toContain("canonicalActivePlanState");
   });
 
   it("does not claim a production switch while legacy authority remains", () => {
