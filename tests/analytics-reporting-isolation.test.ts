@@ -6,7 +6,9 @@ const advancedReporting = readFileSync("src/domain/training/advanced-reporting.t
 
 describe("Analytics and reporting isolation", () => {
   it("keeps Analytics read-only with respect to plan and training-year authority", () => {
-    expect(analyticsScreen).toContain("buildAnalyticsPlanningContext");
+    expect(analyticsScreen).toContain("canonicalActivePlanState");
+    expect(analyticsScreen).toContain("canonicalProgressEvidenceRepository");
+    expect(analyticsScreen).toContain("canonicalProgressDecisionRepository");
     expect(analyticsScreen).not.toContain("trainingYearRepository");
     expect(analyticsScreen).not.toContain("startDeloadTrainingYear");
     expect(analyticsScreen).not.toContain("startDeloadPlan(");
