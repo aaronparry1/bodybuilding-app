@@ -72,7 +72,7 @@ describe("Design QA fixtures", () => {
   it("clears active fixture state and fixture sessions", () => {
     applyDesignQaFixture("train_shutdown", "development");
     expect(getActiveDesignQaFixture()?.id).toBe("train_shutdown");
-    expect(workoutSessionRepository.list().length).toBeGreaterThan(0);
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
 
     clearDesignQaFixtures("development");
 
@@ -399,7 +399,7 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
     return;
   }
 
-  if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups"].includes(fixtureId)) {
+  if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups", "train_swapped", "train_added_exercise", "train_near_threshold", "train_shutdown"].includes(fixtureId)) {
     expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
     return;
   }

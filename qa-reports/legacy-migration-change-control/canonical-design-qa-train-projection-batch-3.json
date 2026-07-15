@@ -1,0 +1,12 @@
+{
+  "sourceCommit": "c72315a",
+  "batch": "CANONICAL-DESIGN-QA-TRAIN-PROJECTIONS-3",
+  "fixtures": [
+    {"id":"train_swapped","behavior":"substitution","canonical":"ledger substitution fact","status":"canonical"},
+    {"id":"train_added_exercise","behavior":"substitution/non-planned addition","canonical":"ledger substitution fact","status":"canonical"},
+    {"id":"train_near_threshold","behavior":"stop_rule_warning","canonical":"immutable snapshot stop rule plus performed event","status":"canonical"},
+    {"id":"train_shutdown","behavior":"stop_rule_stop","canonical":"immutable snapshot stop rule plus performed event","status":"canonical"}
+  ],
+  "emptyCategories": ["prohibited_substitution"],
+  "nextBatch": "completion_and_historical_sessions"
+}
