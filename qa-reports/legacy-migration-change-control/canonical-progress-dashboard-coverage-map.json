@@ -8,6 +8,6 @@
   "remainingLegacyProjection": "src/domain/training/progress-dashboard.ts:buildProgressDashboardViewModel",
   "migrationStatus": "seven_cases_canonical_projection_batch_one_fourteen_classified",
   "migratedCaseIds": ["batch1:current-context", "batch1:zero-set-history", "batch1:recovery-warning", "batch1:productive-history", "batch1:low-history", "batch1:ledger-history", "batch1:empty-history"],
-  "remainingCaseCount": 14,
+  "remainingCaseCount": 13,
   "nextStep": "resolve the exact missing canonical fields and owners recorded in canonical-progress-dashboard-coverage-batch-1.json"
 }

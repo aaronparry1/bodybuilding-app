@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "canonical_progress_dashboard_coverage_batch_2_v1",
+  "sourceCommit": "34c8f1e",
+  "originalRemainingCases": 14,
+  "obsoleteCasesRemoved": [
+    {
+      "test": "does not treat a legacy accepted deload block as a current recovery action",
+      "assertionsRemoved": ["currentRecoveryContext.status=compatibility", "actionFlow.type is not accepted/deload"],
+      "reason": "requires a legacy accepted deload block and block-shaped current recovery source",
+      "canonicalReplacement": "canonical-progress-dashboard-projection.test.ts > fails closed for stale/incomplete evidence",
+      "userVisibleBehaviorLost": false
+    }
+  ],
+  "duplicateCasesRemoved": [],
+  "uniqueAssertionsMigrated": [],
+  "declaredFixtureIdsAffected": [],
+  "exclusiveHelpersDeleted": [],
+  "trueMissingCases": [
+    "cleans generated workout names before Progress displays them",
+    "does not recommend a Recovery Window from repeated productive hypertrophy accessory shutdowns alone",
+    "does not recommend a Recovery Window after only two planned sessions, even when extra work is noisy",
+    "keeps one bad planned session local instead of escalating to a full Recovery Window",
+    "keeps mild fatigue evidence below the full Recovery Window action threshold",
+    "does not turn repeated systemic historical evidence into an automatic recovery plan",
+    "accepting a Recovery Window changes the active generated prescription, not just the roadmap",
+    "counts work sets only on recent workout cards after warm-up sets are summarized",
+    "hides warm-up-only completed sessions from Progress coaching metrics",
+    "surfaces meaningful volume recommendations without raw landmark labels",
+    "suppresses volume recommendations until enough completed history exists",
+    "keeps a stalled Tier A history observation non-actionable without an intervention",
+    "suppresses a kept stalled exercise recommendation"
+  ],
+  "remainingCaseCount": 13,
+  "collectedTestDelta": -1,
+  "collectedTestDeltaExplanation": "one obsolete legacy block expectation removed; no canonical fixture IDs changed",
+  "fixturePartition": {"plan": 13, "session": 30, "progress": 35},
+  "nextBoundedBatch": "define the smallest missing recorded-session display and Progress recovery contracts"
+}

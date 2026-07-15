@@ -203,25 +203,6 @@ describe("progress dashboard view model", () => {
     expect(progress.actionTitle).not.toBe("Reduce workload first.");
   });
 
-  it("does not treat a legacy accepted deload block as a current recovery action", () => {
-    const history = [0, 1, 2, 3].map((index) =>
-      workout(index, [
-        exerciseEntry(index, {
-          progressionEarned: false,
-          stoppedByDropOff: true,
-          qualitySets: 5 - index,
-          bestSetReps: 12 - index,
-        }),
-      ]),
-    );
-    const plan = startDeloadPlan(activePlan());
-    const progress = buildProgressDashboardViewModel(history, exerciseLibrary, plan);
-
-    expect(progress.currentRecoveryContext).toMatchObject({ status: "compatibility" });
-    expect(progress.actionFlow?.type).not.toBe("accepted");
-    expect(progress.actionFlow?.type).not.toBe("deload");
-  });
-
   it("keeps mild fatigue evidence below the full Recovery Window action threshold", () => {
     const progress = buildProgressDashboardViewModel(mildDeloadHistory(), exerciseLibrary, activePlan("athletic_performance"));
 

@@ -12,13 +12,13 @@
     "batch1:ledger-history",
     "batch1:empty-history"
   ],
-  "remainingCases": 14,
+  "remainingCases": 13,
   "remaining": [
     {"test": "cleans generated workout names before Progress displays them", "classification": "missing_canonical_projection_field", "owner": "recorded-session projection", "nextAction": "define canonical session display-name field"},
     {"test": "does not recommend a Recovery Window from repeated productive hypertrophy accessory shutdowns alone", "classification": "missing_canonical_owner_or_policy", "owner": "Mesocycle recovery policy", "nextAction": "source and define recovery disposition"},
     {"test": "does not recommend a Recovery Window after only two planned sessions, even when extra work is noisy", "classification": "missing_canonical_projection_field", "owner": "Progress evidence", "nextAction": "define planned-versus-extra history aggregation"},
     {"test": "keeps one bad planned session local instead of escalating to a full Recovery Window", "classification": "missing_canonical_owner_or_policy", "owner": "Mesocycle fatigue policy", "nextAction": "define bounded escalation semantics"},
-    {"test": "does not treat a legacy accepted deload block as a current recovery action", "classification": "obsolete_legacy_source_shape", "owner": "Mesocycle deload policy", "nextAction": "replace with canonical decision rejection"},
+    {"test": "does not treat a legacy accepted deload block as a current recovery action", "classification": "obsolete_legacy_source_shape", "owner": "Mesocycle deload policy", "nextAction": "removed in dashboard coverage batch 2"},
     {"test": "keeps mild fatigue evidence below the full Recovery Window action threshold", "classification": "missing_canonical_owner_or_policy", "owner": "Mesocycle fatigue policy", "nextAction": "define source-backed threshold"},
     {"test": "does not turn repeated systemic historical evidence into an automatic recovery plan", "classification": "missing_canonical_owner_or_policy", "owner": "Progress recovery evaluator", "nextAction": "define bounded recovery outcome"},
     {"test": "accepting a Recovery Window changes the active generated prescription, not just the roadmap", "classification": "mutation_behavior_inappropriate_for_projection", "owner": "Progress decision application and Session Construction", "nextAction": "migrate only after atomic application chain exists"},
