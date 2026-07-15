@@ -1,0 +1,8 @@
+{
+  "sourceCommit": "37e9364",
+  "selectedIds": ["train_rotation_accepted", "train_end_workout_confirm", "train_prep_not_started", "train_prep_completed", "train_prep_skipped"],
+  "sharedBehavior": "canonical active session with bounded Train preparation/action state",
+  "canonicalProjection": ["recordedSessionId", "lifecycle", "immutable snapshot slots", "performed set count", "session prep status"],
+  "excludedGroups": ["load recommendation", "productive-set coaching", "completion/history", "custom", "failure/recovery"],
+  "status": "canonical"
+}

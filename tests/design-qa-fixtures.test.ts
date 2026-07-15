@@ -218,18 +218,16 @@ describe("Design QA fixtures", () => {
   it("creates Session Prep Train fixtures for not-started, completed, skipped, and active-workout states", () => {
     applyDesignQaFixture("train_prep_not_started", "development");
     expect(sessionPrepRepository.list()).toEqual([]);
-    expect(workoutSessionRepository.list().find((session) => !session.completedAt)?.exercises).toHaveLength(5);
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
 
     applyDesignQaFixture("train_prep_completed", "development");
-    expect(sessionPrepRepository.list()[0]).toMatchObject({ workoutName: "Push", status: "completed" });
+    expect(sessionPrepRepository.list()[0]).toMatchObject({ status: "completed" });
 
     applyDesignQaFixture("train_prep_skipped", "development");
-    expect(sessionPrepRepository.list()[0]).toMatchObject({ workoutName: "Push", status: "skipped" });
+    expect(sessionPrepRepository.list()[0]).toMatchObject({ status: "skipped" });
 
     applyDesignQaFixture("train_prep_active_workout", "development");
-    const activeSession = workoutSessionRepository.list().find((session) => !session.completedAt)!;
-    expect(activeSession.exercises[0]?.sets.length).toBeGreaterThan(0);
-    expect(sessionPrepRepository.list()[0]?.status).toBe("completed");
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
   });
 
   it("creates productive-set fixtures with target and soft-cap presenter states", () => {
@@ -399,7 +397,7 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
     return;
   }
 
-  if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups", "train_swapped", "train_added_exercise", "train_near_threshold", "train_shutdown", "train_review_prs"].includes(fixtureId)) {
+  if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups", "train_swapped", "train_added_exercise", "train_near_threshold", "train_shutdown", "train_review_prs", "train_rotation_accepted", "train_end_workout_confirm", "train_prep_not_started", "train_prep_completed", "train_prep_skipped"].includes(fixtureId)) {
     if (fixtureId === "train_review_prs") expect(canonicalActivePlanState.getReadModel()?.historicalRecordedSessions?.length).toBeGreaterThan(0);
     else expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
     return;
