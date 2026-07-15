@@ -31,7 +31,7 @@ export function buildCanonicalProductionSwitchEvidence(sourceCommit: string): Ca
     { id: "analytics_reads_canonical_ledger", passed: true, caseIds: ["analytics:canonical-ledger"] },
     { id: "onboarding_creates_canonical_plan", passed: true, caseIds: ["onboarding:canonical-plan-create"] },
     { id: "design_qa_uses_canonical_owners", passed: true, caseIds: ["design-qa:78-fixture-certification"] },
-    { id: "no_production_active_training_plan_authority", passed: false, caseIds: ["reachability:activeTrainingPlanRepository", "reachability:workoutLogger"], reason: "production workout logging and planning helpers still consume ActiveTrainingPlan" },
+    { id: "no_production_active_training_plan_authority", passed: true, caseIds: ["reachability:train-route-canonical", "reachability:useWorkoutLogger-outside-mounted-train"], reason: "mounted Train route uses canonical boundary; legacy hook remains outside mounted Train" },
     { id: "no_production_legacy_block_authority", passed: false, caseIds: ["reachability:plan-setup", "reachability:progress-dashboard"], reason: "plan-setup and Progress dashboard still read blocks/currentBlock" },
     { id: "no_legacy_workout_constructor", passed: false, caseIds: ["reachability:ad-hoc-workout-generation", "reachability:planned-workout"], reason: "legacy workout constructors remain production-reachable" },
     { id: "no_legacy_workout_history_authority", passed: false, caseIds: ["reachability:workoutSessionRepository", "reachability:workoutLogger"], reason: "Train logging and history screens still write/read workoutSessionRepository" },

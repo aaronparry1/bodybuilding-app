@@ -11,7 +11,7 @@ describe("canonical production switch completion audit", () => {
     expect(result.schemaVersion).toBe("canonical_production_switch_evidence_v1");
     expect(result.pipelineReadyForSwitch).toBe(true);
     expect(result.productionSwitchCompleted).toBe(false);
-    expect(result.firstFalsePredicate).toBe("no_production_active_training_plan_authority");
+    expect(result.firstFalsePredicate).toBe("no_production_legacy_block_authority");
     expect(result.predicates).toHaveLength(24);
   });
 
@@ -29,9 +29,18 @@ describe("canonical production switch completion audit", () => {
     expect(fixtureSource).not.toContain("applyDesignQaFixtureMatrix");
   });
 
+  it("records the mounted Train route as canonical while retaining the old hook outside its graph", () => {
+    const train = readFileSync(resolve(root, "app/(protected)/(tabs)/train.tsx"), "utf8");
+    expect(train).not.toContain("useWorkoutLogger");
+    expect(train).toContain("startCanonicalSession");
+    expect(train).toContain("recordCanonicalPerformedWork");
+    const result = buildCanonicalProductionSwitchEvidence("6041ed8");
+    expect(result.predicates.find((predicate) => predicate.id === "no_production_active_training_plan_authority")?.passed).toBe(true);
+  });
+
   it("does not hardcode completion in the final artifact", () => {
     const artifact = JSON.parse(readFileSync(resolve(root, "qa-reports/legacy-migration-change-control/canonical-production-switch-final-result.json"), "utf8"));
     expect(artifact.productionSwitchCompleted).toBe(false);
-    expect(artifact.firstFalsePredicate).toBe("no_production_active_training_plan_authority");
+    expect(artifact.firstFalsePredicate).toBe("no_production_legacy_block_authority");
   });
 });

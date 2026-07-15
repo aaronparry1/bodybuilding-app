@@ -8,5 +8,6 @@
     {"symbol":"annual-planner","file":"src/domain/training/annual-planner.ts","classification":"production_legacy_authority","callers":["src/domain/training/plan-setup.ts","src/domain/training/run-v2-qa-preview.ts"],"capability":"construct blocks and TrainingYear"},
     {"symbol":"legacyTrainingYearArchive","file":"src/application/training/legacy-training-year-archive.ts","classification":"transport_only","callers":["src/application/sync/cloud-data-sync.ts"],"capability":"archive transport; not current authority"}
   ],
-  "firstLiveBlocker": {"predicate":"no_production_active_training_plan_authority","file":"src/features/workout-logging/use-workout-logger.ts","symbol":"useWorkoutLogger","callerChain":["Train route","useWorkoutLogger","activeTrainingPlanRepository/workoutSessionRepository"],"capability":"current session/history mutation","canonicalReplacement":"canonical recorded-session ledger and Session Construction"}
+  "mountedTrain": {"file":"app/(protected)/(tabs)/train.tsx","classification":"canonical_authority","callerChain":["Train route","canonicalTrainSessionBoundary","canonical recorded-session owners"],"capability":"canonical lifecycle/performance/completion"},
+  "firstLiveBlocker": {"predicate":"no_production_legacy_block_authority","file":"src/domain/training/plan-setup.ts","symbol":"createActiveTrainingPlan","callerChain":["active plan repository","plan-setup","annual-planner"],"capability":"constructs block-shaped plan authority","canonicalReplacement":"canonical active-plan construction"}
 }
