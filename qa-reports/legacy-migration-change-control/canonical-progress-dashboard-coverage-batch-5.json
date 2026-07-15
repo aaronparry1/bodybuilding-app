@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "canonical_progress_dashboard_coverage_batch_5_v1",
+  "sourceCommit": "a74961e",
+  "startingRemainingCases": 9,
+  "selectedBatch": null,
+  "selectionResult": "no_projection_only_group",
+  "cases": [
+    {"test": "cleans generated workout names before Progress displays them", "behavior": "session display naming", "owner": "Session Construction", "ownerExists": false, "projectionOnly": false, "newPolicyRequired": false, "applicationOwnerRequired": false, "selectedBatch": null},
+    {"test": "does not recommend a Recovery Window from repeated productive hypertrophy accessory shutdowns alone", "behavior": "recovery disposition", "owner": "Mesocycle", "ownerExists": false, "projectionOnly": false, "newPolicyRequired": true, "applicationOwnerRequired": false, "selectedBatch": null},
+    {"test": "keeps one bad planned session local instead of escalating to a full Recovery Window", "behavior": "fatigue escalation", "owner": "Mesocycle", "ownerExists": false, "projectionOnly": false, "newPolicyRequired": true, "applicationOwnerRequired": false, "selectedBatch": null},
+    {"test": "keeps mild fatigue evidence below the full Recovery Window action threshold", "behavior": "fatigue threshold", "owner": "Mesocycle", "ownerExists": false, "projectionOnly": false, "newPolicyRequired": true, "applicationOwnerRequired": false, "selectedBatch": null},
+    {"test": "does not turn repeated systemic historical evidence into an automatic recovery plan", "behavior": "recovery intervention", "owner": "Progress intervention", "ownerExists": false, "projectionOnly": false, "newPolicyRequired": true, "applicationOwnerRequired": true, "selectedBatch": null},
+    {"test": "accepting a Recovery Window changes the active generated prescription, not just the roadmap", "behavior": "recovery application", "owner": "Progress decision application / Session Construction", "ownerExists": false, "projectionOnly": false, "newPolicyRequired": false, "applicationOwnerRequired": true, "selectedBatch": null},
+    {"test": "surfaces meaningful volume recommendations without raw landmark labels", "behavior": "volume presentation", "owner": "Mesocycle", "ownerExists": false, "projectionOnly": false, "newPolicyRequired": true, "applicationOwnerRequired": false, "selectedBatch": null},
+    {"test": "keeps a stalled Tier A history observation non-actionable without an intervention", "behavior": "rotation observation", "owner": "Microcycle", "ownerExists": false, "projectionOnly": false, "newPolicyRequired": true, "applicationOwnerRequired": false, "selectedBatch": null},
+    {"test": "suppresses a kept stalled exercise recommendation", "behavior": "persisted keep disposition", "owner": "Progress intervention", "ownerExists": false, "projectionOnly": false, "newPolicyRequired": true, "applicationOwnerRequired": false, "selectedBatch": null}
+  ],
+  "remainingCaseCount": 9,
+  "fixturePartition": {"plan": 13, "session": 30, "progress": 35},
+  "nextBoundedTask": "define and certify the first missing canonical owner contract; do not migrate dashboard cases before then",
+  "productionSwitchCompleted": false
+}
