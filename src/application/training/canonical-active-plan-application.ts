@@ -31,6 +31,16 @@ export function loadCanonicalActivePlan(): CanonicalActivePlanApplicationResult 
   return { status: "ok", model: projectCanonicalActivePlan(reconciliation.carrier) };
 }
 
+/** Explicit hydration boundary for callers that need reconciliation outcome semantics. */
+export function hydrateCanonicalActivePlan(): Readonly<{ status: "ready" | "ready_after_reconciliation"; model: CanonicalActivePlanReadModel }> | Readonly<{ status: "reconciliation_retry_required" | "recorded_history_missing" | "recorded_history_corrupt" | "immutable_linkage_conflict"; reason: string }> {
+  const reconciliation = reconcileCanonicalActivePlanReferences();
+  if (!reconciliation.carrier) {
+    const status: "reconciliation_retry_required" | "recorded_history_missing" | "recorded_history_corrupt" | "immutable_linkage_conflict" = reconciliation.status === "retry_required" ? "reconciliation_retry_required" : reconciliation.status === "recorded_history_missing" || reconciliation.status === "recorded_history_corrupt" || reconciliation.status === "immutable_linkage_conflict" ? reconciliation.status : "recorded_history_corrupt";
+    return { status, reason: reconciliation.reason ?? status };
+  }
+  return { status: reconciliation.status === "ready_after_reconciliation" ? "ready_after_reconciliation" : "ready", model: projectCanonicalActivePlan(reconciliation.carrier) };
+}
+
 export function projectCanonicalActivePlan(carrier: CanonicalActivePlanCarrier): CanonicalActivePlanReadModel {
   const plannedSessions = carrier.plannedSessions.slice().sort((a, b) => a.planSessionIndex - b.planSessionIndex).map((session) => ({ id: session.id, microcycleId: session.microcycleId, role: session.role, planSessionIndex: session.planSessionIndex, status: session.status, constructionVersion: session.constructionVersion, revision: session.revision, snapshot: session.prescriptionSnapshot }));
   const next = plannedSessions.find((session) => session.status === "planned");
