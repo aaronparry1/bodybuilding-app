@@ -2,12 +2,18 @@ import type { CanonicalActivePlanReadModel } from "@/application/training/canoni
 import type { CanonicalProgressEvidence } from "@/domain/training/canonical-progress-evidence";
 import type { CanonicalProgressIntervention } from "@/domain/training/canonical-progress-intervention";
 import type { MesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-prescription-policy";
+import type { CanonicalMesocycleRecoveryPolicyResult } from "@/domain/training/canonical-mesocycle-recovery-policy";
 
 type Input = Readonly<{ plan: CanonicalActivePlanReadModel; policy: MesocyclePrescriptionPolicy; evidence: readonly CanonicalProgressEvidence[]; evidenceState: "missing" | "insufficient" | "stale" | "fresh" | "conflicting"; operationId: string; intent: "recovery" | "goal_or_phase" }>;
 export function evaluateCanonicalRecoveryPhaseIntervention(input: Input): CanonicalProgressIntervention {
   const evidence = input.evidence.filter((item) => item.planId === input.plan.planId && item.microcycleId === input.plan.microcycle.id).sort((a, b) => a.evidenceId.localeCompare(b.evidenceId));
   const disposition = input.evidenceState === "missing" || input.evidenceState === "insufficient" ? "insufficient_evidence" : input.evidenceState === "fresh" && input.evidence.some((item) => item.observations.deloadRequired === true) ? "deload" : input.evidenceState === "fresh" ? "continue" : "pause_review";
   return { schemaVersion: "canonical_progress_intervention_v1", decisionId: input.operationId, evaluationId: `${input.plan.planId}:recovery:${input.plan.revision}:${evidence.map((item) => item.evidenceId).join(",")}`, planId: input.plan.planId, planRevision: input.plan.revision, macrocycleId: `${input.plan.planId}:macrocycle`, mesocycleId: input.plan.mesocycle.id, microcycleId: input.plan.microcycle.id, evidenceIds: evidence.map((item) => item.evidenceId), evidenceVersions: Object.fromEntries(evidence.map((item) => [item.evidenceId, item.evidenceVersion])), reason: `recovery_evidence_${input.evidenceState}`, policyVersion: input.policy.schemaVersion, applicationOwner: "Progress", provenance: [`mesocycle:${input.policy.mesocycleId}`, `policy:${input.policy.schemaVersion}`], family: "recovery_action", disposition };
+}
+
+export function evaluateCanonicalRecoveryPolicyIntervention(input: Readonly<{ policy: CanonicalMesocycleRecoveryPolicyResult; evaluationId: string; operationId: string; evidenceVersions: Readonly<Record<string, string>>; macrocycleId: string; microcycleId: string }>): CanonicalProgressIntervention {
+  const disposition = input.policy.disposition === "review_stress_reduction" ? "reduce_stress" : input.policy.disposition === "pause_for_review" ? "pause_review" : input.policy.disposition === "insufficient_evidence" || input.policy.disposition === "unsupported_policy" ? "insufficient_evidence" : "continue";
+  return { schemaVersion: "canonical_progress_intervention_v1", decisionId: input.operationId, evaluationId: input.evaluationId, planId: input.policy.planId, planRevision: 0, macrocycleId: input.macrocycleId, mesocycleId: input.policy.mesocycleId, microcycleId: input.microcycleId, evidenceIds: [...input.policy.evidenceIds].sort(), evidenceVersions: input.evidenceVersions, reason: input.policy.reasonCodes[0] ?? "recovery_policy_result", policyVersion: input.policy.policyId, applicationOwner: "Progress", provenance: [`policy:${input.policy.policyId}`, `policy-version:${input.policy.policyVersion}`, `disposition:${input.policy.disposition}`], family: "recovery_action", disposition };
 }
 
 export function evaluateCanonicalGoalPhaseIntervention(input: Input): CanonicalProgressIntervention {
