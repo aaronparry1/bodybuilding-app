@@ -1,0 +1,13 @@
+{
+  "sourceCommit": "d3e5102",
+  "evaluationVersions": ["canonical_progress_evaluation_v1", "canonical_progress_evaluation_v2"],
+  "v1TransitionDeload": "rejected_by_absence_of_explicit_intent",
+  "v2Outcomes": ["insufficient_evidence", "continue", "review_required", "transition_recommended", "deload_required"],
+  "transitionIntent": "derived_from_explicit_exit_criteria_evidence",
+  "deloadIntent": "derived_from_explicit_recovery_policy_evidence",
+  "successorResolution": "canonical_mesocycle_successor_owner",
+  "decisionPersistence": "existing_v1_contract_with_successorMesocycleId",
+  "applicationSeparation": "production_does_not_mutate_plan",
+  "designQaProgressMigrationReady": false,
+  "firstRemainingFalsePredicate": "transition_and_deload fixture coverage still requires canonical evidence scenarios and application acceptance certification"
+}
