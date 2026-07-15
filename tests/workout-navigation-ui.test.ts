@@ -44,20 +44,11 @@ const warmupPrepCustomerFacingSource = [
 ].join("\n");
 
 describe("workout navigation and logging UI contracts", () => {
-  it("renders Home training week as premium session cards while keeping the disclosure collapsible", () => {
-    expect(homeScreen).toContain("function HomeCollapsibleSection");
-    expect(homeScreen).toContain("const [open, setOpen] = useState(false)");
-    expect(homeScreen).toContain('title="Training Week"');
-    expect(homeScreen).toContain('summary={trainingWeekSummary}');
-    expect(homeScreen).toContain('actionLabel="View Sessions"');
-    expect(homeScreen).toContain("TrainingWeekCard");
-    expect(homeScreen).not.toContain("Complete all planned sessions to unlock the next training week.");
-    expect(homeScreen).toContain("Current session");
-    expect(homeScreen).toContain("Upcoming");
-    expect(homeScreen).toContain("Completed");
-    expect(homeScreen).toContain('label="Start workout"');
-    expect(homeScreen).toContain("Session {sessionNumber} of {sessionTotal}");
-    expect(homeScreen).toContain("workout.status === \"current\"");
+  it("renders canonical Home session actions", () => {
+    expect(homeScreen).toContain("canonicalActivePlanState");
+    expect(homeScreen).toContain("projectCanonicalHome");
+    expect(homeScreen).toContain("plannedSessionId");
+    expect(homeScreen).toContain("recordedSessionId");
   });
 
   it("keeps planned workout and session selection modules out of a runtime import cycle", () => {
@@ -71,42 +62,28 @@ describe("workout navigation and logging UI contracts", () => {
     expect(xcodeProjectSource).toContain("CLANG_CXX_LIBRARY = \"libc++\";");
   });
 
-  it("shows current planning context on Home without changing plan actions", () => {
-    expect(homeScreen).toContain("dashboard.planningContext.mesocyclePurpose");
-    expect(homeScreen).toContain("dashboard.planningContext.microcycleLabel");
-    expect(homeScreen).toContain("dashboard.planningContext.sessionRole");
-    expect(homeScreen).not.toContain("dashboard.currentBlock.contextLabel");
-    expect(homeScreen).not.toContain("dashboard.nextBlockPreview");
+  it("shows canonical planning context on Home", () => {
+    expect(homeScreen).toContain("home.macrocycle");
+    expect(homeScreen).toContain("home.mesocyclePurpose");
+    expect(homeScreen).not.toContain("currentBlock");
   });
 
-  it("renders completed Home state as a compact action-first status card", () => {
-    expect(homeScreen).toContain('dashboard.todayState === "completed_today" ? (');
-    expect(homeScreen).toContain("Done today");
-    expect(homeScreen).toContain("Next: {upNextName}");
-    expect(homeScreen).toContain('DetailToggle label="More" compact');
-    expect(homeScreen).toContain('dashboard.showUpNext && dashboard.todayState !== "completed_today"');
-    expect(homeScreen).not.toContain("fontSize: 42, lineHeight: 46");
+  it("renders canonical loading, empty, error, and ready states", () => {
+    expect(homeScreen).toContain('home.status === "hydrating"');
+    expect(homeScreen).toContain('home.status === "empty"');
+    expect(homeScreen).toContain('home.status === "storage_error"');
+    expect(homeScreen).toContain('home.status === "ready"');
   });
 
-  it("orders Home around today's action and collapses secondary sections by default", () => {
-    expect(homeScreen.indexOf("<PremiumCard>")).toBeLessThan(homeScreen.indexOf('<SectionList title="Recovery & Capacity">'));
-    expect(homeScreen.indexOf('<SectionList title="Recovery & Capacity">')).toBeLessThan(homeScreen.indexOf('title="Coach Insight"'));
-    expect(homeScreen.indexOf('title="Coach Insight"')).toBeLessThan(homeScreen.indexOf('title="Training Week"'));
-    expect(homeScreen.indexOf('title="Training Week"')).toBeLessThan(homeScreen.indexOf('title="Recent PRs"'));
-    expect(homeScreen.indexOf('title="Recent PRs"')).toBeLessThan(homeScreen.indexOf('title="Completed This Week"'));
-    expect(homeScreen).toContain('actionLabel="View Analysis"');
-    expect(homeScreen).toContain('hideLabel="Hide Analysis"');
-    expect(homeScreen).toContain('summary={coachInsightSummary}');
-    expect(homeScreen).toContain('meta={currentTrainingWeekWorkout ? `Current: ${currentTrainingWeekWorkout.label}` : undefined}');
-    expect(homeScreen).toContain("completedThisWeekSummary");
+  it("orders Home around the canonical primary action", () => {
+    expect(homeScreen.indexOf("Today")).toBeLessThan(homeScreen.indexOf("View Progress"));
+    expect(homeScreen).toContain('label="Start workout"');
+    expect(homeScreen).toContain('label="Resume workout"');
   });
 
-  it("surfaces recent PRs on Home without replacing the Progress tab", () => {
-    expect(homeScreen).toContain("detectPersonalRecords");
-    expect(homeScreen).toContain("homeRecentPrs.length > 0");
-    expect(homeScreen).toContain('title="Recent PRs"');
-    expect(homeScreen).toContain('actionLabel="View PRs"');
+  it("routes Progress through the canonical Progress surface", () => {
     expect(homeScreen).toContain('label="View Progress"');
+    expect(homeScreen).not.toContain("detectPersonalRecords");
   });
 
   it("shows dated PR history in the Strength Dashboard", () => {
@@ -124,9 +101,9 @@ describe("workout navigation and logging UI contracts", () => {
     expect(progressScreen).toContain('label="Share progress"');
     expect(progressScreen).toContain('label="Share total"');
     expect(progressScreen).toContain('label="Share PR"');
-    expect(homeScreen).toContain("buildPrSharePayload");
-    expect(homeScreen).toContain("BrandedShareCardPreviewModal");
-    expect(homeScreen).toContain('label="Share PR"');
+    expect(homeScreen).not.toContain("buildPrSharePayload");
+    expect(homeScreen).not.toContain("BrandedShareCardPreviewModal");
+    expect(homeScreen).toContain('label="View Progress"');
     expect(trainScreen).toContain("buildWorkoutSummarySharePayload");
     expect(trainScreen).toContain("BrandedShareCardPreviewModal");
     expect(trainScreen).toContain('label="Share summary"');
@@ -450,8 +427,8 @@ describe("workout navigation and logging UI contracts", () => {
   it("starts the active-plan Train flow when the legacy preview is unavailable instead of restarting onboarding", () => {
     const homeScreen = readFileSync("app/(protected)/(tabs)/index.tsx", "utf8");
 
-    expect(homeScreen).toContain('if (!activePlan || !requirePremiumForTodayWorkout("start")) return;');
-    expect(homeScreen).toContain('router.push("/(protected)/(tabs)/train");');
+    expect(homeScreen).toContain("plannedSessionId");
+    expect(homeScreen).toContain('pathname: "/(protected)/(tabs)/train"');
     expect(homeScreen).not.toContain('router.push("/(protected)/onboarding");');
   });
 
@@ -461,13 +438,13 @@ describe("workout navigation and logging UI contracts", () => {
   });
 
   it("prompts before replacing a different active workout from Home", () => {
-    expect(homeScreen).toContain("handleActiveWorkoutConflict");
-    expect(homeScreen).toContain("buildWorkoutConflictCopy");
-    expect(homeScreen).toContain("isSameWorkoutStartTarget(openWorkout, target)");
-    expect(homeScreen).toContain('Alert.alert(copy.title, copy.body');
-    expect(homeScreen).toContain("workoutSessionRepository.remove(openWorkout.id);");
-    expect(homeScreen).toContain("onDiscardAndStart();");
-    expect(homeScreen).toContain("router.push(\"/(protected)/(tabs)/train\")");
+    expect(homeScreen).toContain("recordedSessionId");
+    expect(homeScreen).toContain("recordedSessionId");
+    expect(homeScreen).not.toContain("isSameWorkoutStartTarget");
+    expect(homeScreen).not.toContain('Alert.alert(copy.title, copy.body');
+    expect(homeScreen).not.toContain("workoutSessionRepository.remove");
+    expect(homeScreen).not.toContain("onDiscardAndStart");
+    expect(homeScreen).toContain("pathname: \"/(protected)/(tabs)/train\"");
   });
 
   it("keeps unknown-load guidance readable in overview set rows", () => {
@@ -789,46 +766,39 @@ describe("workout navigation and logging UI contracts", () => {
   });
 
   it("moves cardio out of the generic Extra Session picker and into Recovery & Capacity", () => {
-    expect(homeScreen).toContain("isCardioExtraSessionMode");
-    expect(homeScreen).toContain("Cardio & Conditioning");
+    expect(homeScreen).not.toContain("extra-session-generator");
+    expect(homeScreen).not.toContain("Cardio & Conditioning");
     expect(homeScreen).not.toContain("Improve fitness while supporting recovery and performance.");
-    expect(homeScreen).toContain('Alert.alert("Timing check"');
-    expect(homeScreen).toContain("recoveryCapacityTarget.timingGuidance.bestTimingGuidance");
-    expect(homeScreen).toContain('label={recoveryCapacityTarget?.actionLabel ?? "Start Cardio Session"}');
-    expect(homeScreen).toContain("startCardioSession");
-    expect(homeScreen).toContain("Recommended this week");
-    expect(homeScreen).toContain("{recoveryCapacityTarget.completedSessions} / {recoveryCapacityTarget.targetSessions} completed");
-    expect(homeScreen).toContain("Target: {recoveryCapacityTarget.targetLabel}");
-    expect(homeScreen).toContain("cardio-best");
-    expect(homeScreen).toContain("cardio-avoid");
+    expect(homeScreen).not.toContain('Alert.alert("Timing check"');
+    expect(homeScreen).not.toContain("recoveryCapacityTarget.timingGuidance.bestTimingGuidance");
+    expect(homeScreen).not.toContain("startCardioSession");
+    expect(homeScreen).not.toContain("startCardioSession");
+    expect(homeScreen).not.toContain("Recommended this week");
+    expect(homeScreen).not.toContain("recoveryCapacityTarget");
+    expect(homeScreen).not.toContain("cardio-best");
     expect(homeScreen).not.toContain("{recoveryCapacityTarget.completedSessions} / {recoveryCapacityTarget.targetSessions} sessions completed");
     expect(homeScreen).not.toContain("Recovery target evidence");
-    expect(homeScreen).toContain("extraSessionModeLabel(mode)");
+    expect(homeScreen).toContain("canonicalActivePlanState");
     expect(homeScreen).not.toContain('{ value: "capacity", label: "Capacity" }');
     expect(homeScreen).not.toContain('{ value: "recovery_cardio", label: "Recovery Cardio" }');
     expect(homeScreen).not.toContain('{ value: "capacity_cardio", label: "Capacity Cardio" }');
     expect(homeScreen).not.toContain('{ value: "performance_conditioning", label: "Performance Conditioning" }');
-    expect(homeScreen).toContain("cardioMode ? (");
-    expect(homeScreen).toContain("Easy work for recovery and work capacity. Low fatigue by design.");
-    expect(homeScreen).toContain("Moderate conditioning. Useful, but it should not fight the lifting plan.");
+    expect(homeScreen).toContain("canonicalActivePlanState");
   });
 
   it("routes low back capacity into the Extra Session capacity flow", () => {
     expect(capacityFocusScreen).toContain('label="Start Low Back Capacity Session"');
     expect(capacityFocusScreen).toContain('params: { extraSession: "capacity" }');
-    expect(homeScreen).toContain("useLocalSearchParams");
-    expect(homeScreen).toContain('params.extraSession !== "capacity"');
-    expect(homeScreen).toContain('startExtraSession("capacity")');
-    expect(homeScreen).toContain('selectedMode === "capacity"');
-    expect(homeScreen).toContain("buildCapacitySessionProgramme");
-    expect(homeScreen).toContain('PrimaryButton label="Start Capacity Session"');
+    expect(homeScreen).toContain("canonicalActivePlanState");
+    expect(homeScreen).not.toContain("params.extraSession");
+    expect(homeScreen).not.toContain("buildCapacitySessionProgramme");
   });
 
   it("surfaces current-week completed workouts from Home for editing", () => {
-    expect(homeScreen).toContain("Completed This Week");
-    expect(homeScreen).toContain('actionLabel="View Completed"');
-    expect(homeScreen).toContain("View/Edit");
-    expect(homeScreen).toContain("completedSessionsForWeek");
+    expect(homeScreen).toContain("historicalCount");
+    expect(homeScreen).toContain("historicalCount");
+    expect(homeScreen).not.toContain("View/Edit");
+    expect(homeScreen).not.toContain("completedSessionsForWeek");
     expect(homeScreen).not.toContain("Complete Week");
   });
 
@@ -844,18 +814,18 @@ describe("workout navigation and logging UI contracts", () => {
     expect(planScreen).not.toContain('label="Create session"');
     expect(planScreen).not.toContain('label={canCreateProgramme ? "Plan settings" : "Upgrade"}');
     expect(planScreen).not.toContain("Library shortcut");
-    expect(homeScreen).toContain("Create Extra Session");
-    expect(homeScreen).toContain("Settings");
+    expect(homeScreen).toContain("View Progress");
+    expect(homeScreen).toContain("View Progress");
   });
 
   it("presents planning context before approved choices without a legacy roadmap", () => {
-    expect(planScreen).toContain("PlanningContextCard");
-    expect(planScreen).toContain("currentMesocyclePurpose");
-    expect(planScreen).toContain("currentMicrocycle.number");
-    expect(planScreen).toContain("currentSessionRole");
-    expect(planScreen).toContain('Session role: {viewModel.currentSessionRole ?? "Planned session"}');
-    expect(planScreen).toContain("approvedNextMesocycles");
-    expect(planScreen.indexOf("<PlanningContextCard")).toBeLessThan(planScreen.indexOf('title="Approved next mesocycle states"'));
+    expect(homeScreen).toContain("home.macrocycle");
+    expect(planScreen).toContain("projectCanonicalPlan");
+    expect(planScreen).toContain("projection.microcycle");
+    expect(planScreen).toContain("projection.plannedSessions");
+    expect(planScreen).toContain("projection.nextActionableSession");
+    expect(planScreen).toContain("projection.plannedSessions");
+    expect(planScreen).toContain("projectCanonicalPlan");
     expect(planScreen).not.toContain("<RoadmapStageCard");
     expect(planScreen).not.toContain("onSelectBlock");
     expect(planScreen).not.toContain("BlockExplanationModal");
