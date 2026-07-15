@@ -6,9 +6,10 @@
   ],
   "canonicalEvidenceOwner": "canonicalProgressEvidenceRepository",
   "canonicalEvaluator": "evaluateCanonicalProgress",
-  "missingCanonicalOwner": "canonical_progress_decision_producer",
-  "missingOperation": "produce_and_persist_canonical_progress_decision_from_evaluation",
-  "status": "blocked_before_migration",
+  "canonicalDecisionProducer": "produceCanonicalProgressDecision",
+  "missingCanonicalOwner": "explicit_transition_deload_intent_and_successor_in_evaluation",
+  "missingOperation": "produce_transition_or_deload_decision_without_inference",
+  "status": "partially_ready_continue_review_insufficient_only",
   "legacyReachability": "unchanged_pending_decision_owner",
   "productionSwitchCompleted": false
 }

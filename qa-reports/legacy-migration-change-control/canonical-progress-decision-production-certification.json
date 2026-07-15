@@ -1,0 +1,16 @@
+{
+  "sourceCommit": "a318712",
+  "supportedOutcomes": ["continue", "review_required", "insufficient_evidence"],
+  "transitionOutcome": "blocked_missing_evaluation_successor_intent",
+  "deloadOutcome": "blocked_missing_evaluation_successor_intent",
+  "evidenceLinkage": "validated",
+  "evaluationLinkage": "validated_in_memory",
+  "successorResolution": "not_invoked_without_explicit_transition_or_deload_intent",
+  "idempotency": "validated",
+  "conflictRejection": "validated_by_repository_contract",
+  "productionApplicationSeparation": "validated",
+  "planMutationDuringProduction": false,
+  "readyForProgressFixtureMigration": false,
+  "firstMissingCanonicalContract": "canonical_progress_evaluation_v1 does not carry an explicit transition/deload outcome or approved successor identity",
+  "affectedFixtureGroups": ["progress_deload_action", "plan_block_transition_action", "plan_block_transition_accepted", "plan_deload_accepted", "phase1_deload_mild", "phase1_deload_clear", "phase1_deload_severe"]
+}
