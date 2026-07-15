@@ -14,8 +14,8 @@
   "designQaLegacyReachabilityZero": true,
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
-  "failedFixtureIds": []
-  ,"legacyMachinery": {
+  "failedFixtureIds": [],
+  "legacyMachinery": {
     "normalReachability": "zero",
     "retainedDeadCode": ["applyDesignQaFixtureMatrix", "applyFailureRecoveryFixture"],
     "reason": "retained for separate repository-wide deletion phase; no declared fixture family dispatches to it"
