@@ -8,8 +8,8 @@
   "missingCanonicalInputs": ["expectedPlanRevision", "macrocycleId", "canonicalMicrocycleId", "evaluationId/version", "linkedEvidenceIds/versions", "persistedCanonicalDecisionId", "deterministicOperationId"],
   "legacyAuthorityStillUsed": ["activeTrainingPlanRepository.getOptional", "activeTrainingPlanRepository.save", "ActiveTrainingPlan.currentMicrocycle", "ActiveTrainingPlan.currentMesocycleId", "ActiveTrainingPlan.blocks"],
   "canonicalReplacement": "canonicalActivePlanState.applyProgressDecision",
-  "decision": "stop_at_missing_canonical_command_contract",
-  "nextBoundedTask": "migrate recommendation action production boundary to canonical decision command inputs",
+  "decision": "resolved_for_recommendation_callers",
+  "nextBoundedTask": "migrate remaining plan-setup/annual-planner production authority",
   "productionSwitchCompleted": false,
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"

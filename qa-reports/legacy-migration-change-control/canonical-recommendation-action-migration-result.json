@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "canonical_recommendation_action_migration_result_v1",
+  "sourceCommit": "f20927d",
+  "productionCallersMigrated": ["src/application/training/canonical-recommendation-actions.ts:applyCanonicalRecommendationAction", "src/domain/training/current-decision-recommendation.ts:applyCurrentDecisionRecommendation"],
+  "canonicalProjection": "persisted canonical progress decision and evidence",
+  "canonicalApplication": "canonicalActivePlanState.applyProgressDecision",
+  "legacyDecisionApplicationReachability": false,
+  "activePlanRepositoryReachabilityFromRecommendationPath": false,
+  "dualWrite": false,
+  "callerSelectedSuccessor": false,
+  "productionSwitchCompleted": false,
+  "nextBlocker": "remaining production plan-setup/annual-planner authority outside recommendation path"
+}
