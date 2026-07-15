@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "canonical_progress_dashboard_context_migration_blocker_v1",
+  "sourceCommit": "ff3ce64",
+  "candidate": "src/domain/training/progress-dashboard.ts:buildProgressDashboardViewModel",
+  "mountedProductionCallers": [],
+  "nonProductionCallers": ["tests/progress-dashboard.test.ts", "tests/design-qa-fixtures.test.ts"],
+  "legacyInputs": ["ActiveTrainingPlan", "blocks", "activeBlockId", "currentMicrocycle.progressionState", "legacy strategic/recovery/volume helpers"],
+  "missingCanonicalContract": ["canonical dashboard projection replacing legacy planning inputs", "canonical history/evidence projection for all existing dashboard behaviors", "canonical action model for recovery/rotation/volume flows"],
+  "decision": "stop_at_unmounted_dashboard_projection_scope",
+  "productionSwitchCompleted": false,
+  "nextBoundedTask": "migrate progress dashboard projection and its Design-QA/unit fixture suite as one bounded family",
+  "ordinaryV2Authority": "inactive",
+  "d4d2": "unchanged"
+}
