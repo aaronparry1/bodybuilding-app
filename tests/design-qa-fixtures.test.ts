@@ -399,7 +399,7 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
     return;
   }
 
-  if (["train_overview_fresh", "train_first_set", "train_work_sets"].includes(fixtureId)) {
+  if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups"].includes(fixtureId)) {
     expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
     return;
   }
