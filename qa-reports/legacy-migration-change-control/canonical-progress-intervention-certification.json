@@ -1,0 +1,14 @@
+{
+  "sourceCommit": "e0fd094",
+  "fixtureCounts": {"total": 78, "plan_state": 13, "session_lifecycle": 30, "progress_decision": 35, "unclassified": 0},
+  "interventions": {
+    "load_adjustment": {"owner":"Mesocycle -> Session Construction","status":"contract_validated","fixtureIds":["train_load_regression_reduce","train_load_escalation","train_load_escalation_modal","train_load_average_next"]},
+    "volume_adjustment": {"owner":"Mesocycle -> Session Construction","status":"contract_validated","fixtureIds":["progress_volume_large_low","progress_volume_ladder_apply","progress_volume_large_high_fatigue","progress_volume_small_progressing"]},
+    "microcycle_rotation": {"owner":"Microcycle -> Session Construction","status":"contract_validated","fixtureIds":["progress_rotation_stalled_tier_a","progress_rotation_action","progress_rotation_progressing_tier_a","progress_rotation_tier_c"]},
+    "recovery_action": {"owner":"Progress -> Mesocycle","status":"contract_validated","fixtureIds":["progress_fatigue","progress_deload_action","phase1_deload_mild","phase1_deload_clear","phase1_deload_severe"]},
+    "goal_or_phase_review": {"owner":"Macrocycle -> Mesocycle","status":"contract_validated","fixtureIds":["phase1_goal_strength","phase1_goal_muscle","phase1_goal_muscle_strength","phase1_goal_athletic","phase1_goal_event","phase1_goal_general"]}
+  },
+  "exactPrescriptionAuthorityInInterventions": false,
+  "progressFixtureMigrationReady": false,
+  "firstRemainingContract": "canonical policy evaluators and application owners for load/volume/rotation/goal intervention semantics"
+}
