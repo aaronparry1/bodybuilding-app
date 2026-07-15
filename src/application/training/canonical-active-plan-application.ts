@@ -7,9 +7,10 @@ import { reconcileCanonicalActivePlanReferences } from "@/application/training/c
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
+import type { CanonicalLoadEvidence } from "@/domain/training/canonical-load-prescription";
 
 export type CanonicalActivePlanCreateCommand = Readonly<{
-  planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: CanonicalGeneratedPlanInput["macrocycleGoal"]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: CanonicalGeneratedPlanInput["preferredSplit"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; exercises: readonly Exercise[]; limitations?: readonly string[]; history?: readonly WorkoutHistorySummary[]; establishedLoads?: Readonly<Record<string, number>>;
+  planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: CanonicalGeneratedPlanInput["macrocycleGoal"]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: CanonicalGeneratedPlanInput["preferredSplit"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; exercises: readonly Exercise[]; limitations?: readonly string[]; history?: readonly WorkoutHistorySummary[]; establishedLoads?: Readonly<Record<string, number>>; loadEvidence?: Readonly<Record<string, CanonicalLoadEvidence>>;
 }>;
 
 export type CanonicalRecordedSessionProjection = Readonly<{ recordedSessionId: string; role: string; macrocycleId: string; mesocycleId: string; microcycleId: string; status: string; prescribedSlots: number; performedSets: number; performedReps: number; performedLoad: number; completedSlots: number; partialSlots: number; missedSlots: number; substitutions: readonly string[]; startedAt?: string; completedAt?: string; completionSummaryId?: string; progressEvidence: "pending" | "complete"; restorationIdentity: string }>;

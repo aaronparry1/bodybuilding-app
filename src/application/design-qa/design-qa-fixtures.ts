@@ -287,7 +287,7 @@ function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnv
     if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
     clearFixtureViewStateOnly();
     appSettingsStore.patch({ onboardingCompleted: true });
-    if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups", "train_swapped", "train_added_exercise", "train_near_threshold", "train_shutdown", "train_review_prs", "train_rotation_accepted", "train_end_workout_confirm", "train_prep_not_started", "train_prep_completed", "train_prep_skipped", "train_prep_active_workout"].includes(id)) {
+    if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups", "train_swapped", "train_added_exercise", "train_near_threshold", "train_shutdown", "train_review_prs", "train_rotation_accepted", "train_end_workout_confirm", "train_prep_not_started", "train_prep_completed", "train_prep_skipped", "train_prep_active_workout", "train_load_no_history", "train_load_strength_unknown", "train_load_exact_progressed", "train_load_exact_held", "train_load_same_family_estimate", "train_load_same_family_low_confidence", "train_load_lb_known", "train_load_bodyweight", "train_increment_barbell_1", "train_increment_barbell_2_5", "train_increment_barbell_5", "train_increment_machine_1", "train_increment_cable_1", "train_increment_exercise_override"].includes(id)) {
       createCanonicalTrainProjection(id);
       if (id === "train_prep_completed" || id === "train_prep_skipped") saveSessionPrepRecords([prepRecord("Canonical", id.endsWith("completed") ? "completed" : "skipped")]);
       const definition = getFixtureDefinition(id);

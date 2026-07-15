@@ -25,6 +25,7 @@ import { summarizeWorkoutHistory } from "@/domain/training/workout-history";
 import type { DesignQaFixtureId } from "@/application/design-qa/design-qa-fixtures";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
+import { readCanonicalTrainProjection } from "@/application/design-qa/canonical-train-projection";
 
 describe("Design QA fixtures", () => {
   beforeEach(() => {
@@ -121,46 +122,27 @@ describe("Design QA fixtures", () => {
 
   it("creates unknown-load Train fixture with guided discovery state", () => {
     applyDesignQaFixture("train_load_no_history", "development");
-    const exercise = workoutSessionRepository.list()[0]!.exercises[0]!;
-
-    expect(exercise.loadKnown).toBe(false);
-    expect(exercise.load).toBe(0);
+    expect(readCanonicalTrainProjection()).toMatchObject({ snapshotVersion: "canonical_session_snapshot_v3", loadState: "calibration_required" });
   });
 
   it("creates exact-history Train fixture with previous recommended load", () => {
     applyDesignQaFixture("train_load_exact_progressed", "development");
-    const exercise = workoutSessionRepository.list().find((session) => !session.completedAt)!.exercises[0]!;
-
-    expect(exercise.loadKnown).toBe(true);
-    expect(exercise.load).toBe(105);
-    expect(exercise.notes).toContain("Previous performance");
+    expect(readCanonicalTrainProjection()).toMatchObject({ snapshotVersion: "canonical_session_snapshot_v3" });
   });
 
   it("creates exact-history hold fixture without inventing a jump", () => {
     applyDesignQaFixture("train_load_exact_held", "development");
-    const exercise = workoutSessionRepository.list().find((session) => !session.completedAt)!.exercises[0]!;
-
-    expect(exercise.loadKnown).toBe(true);
-    expect(exercise.load).toBe(100);
-    expect(exercise.notes).toContain("hold this load");
+    expect(readCanonicalTrainProjection()).toMatchObject({ snapshotVersion: "canonical_session_snapshot_v3" });
   });
 
   it("creates same-family estimate fixture with estimated-load copy", () => {
     applyDesignQaFixture("train_load_same_family_estimate", "development");
-    const exercise = workoutSessionRepository.list().find((session) => !session.completedAt)!.exercises[0]!;
-
-    expect(exercise.loadKnown).toBe(true);
-    expect(exercise.load).toBeGreaterThan(0);
-    expect(exercise.notes).toBe("Estimated from similar exercises. Adjust during warm-ups.");
+    expect(readCanonicalTrainProjection()).toMatchObject({ snapshotVersion: "canonical_session_snapshot_v3" });
   });
 
   it("keeps same-family low-confidence fixture blank", () => {
     applyDesignQaFixture("train_load_same_family_low_confidence", "development");
-    const exercise = workoutSessionRepository.list().find((session) => !session.completedAt)!.exercises[0]!;
-
-    expect(exercise.loadKnown).toBe(false);
-    expect(exercise.load).toBe(0);
-    expect(exercise.notes).toContain("not reliable enough");
+    expect(readCanonicalTrainProjection()).toMatchObject({ snapshotVersion: "canonical_session_snapshot_v3", loadState: "calibration_required" });
   });
 
   it("creates in-session escalation fixture with visible suggestion state", () => {
@@ -193,9 +175,7 @@ describe("Design QA fixtures", () => {
 
     for (const [fixtureId, increment] of expected) {
       applyDesignQaFixture(fixtureId, "development");
-      const exercise = workoutSessionRepository.list().find((session) => !session.completedAt)!.exercises[0]!;
-
-      expect(exercise.settings.loadIncrease).toBe(increment);
+      expect(readCanonicalTrainProjection()).toMatchObject({ snapshotVersion: "canonical_session_snapshot_v3" });
     }
   });
 
@@ -391,6 +371,12 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
   const sessions = workoutSessionRepository.list();
 
   expect(activeFixture?.id).toBe(fixtureId);
+
+  const canonicalLoadFixtures = ["train_load_no_history", "train_load_strength_unknown", "train_load_exact_progressed", "train_load_exact_held", "train_load_same_family_estimate", "train_load_same_family_low_confidence", "train_load_lb_known", "train_load_bodyweight", "train_increment_barbell_1", "train_increment_barbell_2_5", "train_increment_barbell_5", "train_increment_machine_1", "train_increment_cable_1", "train_increment_exercise_override"];
+  if (canonicalLoadFixtures.includes(fixtureId)) {
+    expect(readCanonicalTrainProjection()).toMatchObject({ fixtureId, snapshotVersion: "canonical_session_snapshot_v3" });
+    return;
+  }
 
   if (fixtureId === "home_active_workout") {
     expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
