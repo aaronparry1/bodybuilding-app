@@ -1,0 +1,15 @@
+{
+  "sourceCommit": "0bdbb06",
+  "normalMountedSettingsProgressReachability": "canonical_only",
+  "entries": [
+    {"file":"src/application/sync/cloud-data-sync.ts","classification":"migration_parser_importer","authority":"legacy archive transport only","replacement":"canonical active-plan repository and recorded-session ledger","deletionAction":"retain until cloud archive migration is retired","coverage":"tests/cloud-data-sync.test.ts"},
+    {"file":"src/application/design-qa/design-qa-fixtures.ts","classification":"production-adjacent_fixture","authority":"legacy fixture setup","replacement":"canonical state fixtures","deletionAction":"migrate in design-QA phase","coverage":"tests/design-qa-fixtures.test.ts"},
+    {"file":"src/application/training/legacy-training-year-archive.ts","classification":"inert_historical_archive_transport","authority":"none","replacement":"canonical lineage/history","deletionAction":"delete after archive export retention decision","coverage":"tests/cloud-data-sync.test.ts"},
+    {"file":"src/application/training/canonical-recommendation-actions.ts","classification":"obsolete_unreachable","authority":"legacy recommendation adapter","replacement":"canonical Progress decision application","deletionAction":"delete after importer callers reach zero","coverage":"tests/canonical-recommendation-actions.test.ts"},
+    {"file":"src/domain/training/current-decision-application.ts","classification":"obsolete_unreachable","authority":"legacy active-plan mutation","replacement":"canonical-progress-decision-application.ts","deletionAction":"delete after caller audit","coverage":"tests/current-decision-application.test.ts"},
+    {"file":"src/domain/training/strategic-coaching-presenter.ts","classification":"compatibility_domain_module","authority":"legacy presentation only","replacement":"canonical Progress projection","deletionAction":"delete after non-UI callers reach zero","coverage":"tests/strategic-coaching-presenter.test.ts"},
+    {"file":"app/(protected)/analytics/exercise/[id].tsx","classification":"remaining_production_reachable","authority":"legacy workout-history read","replacement":"canonical recorded-session projection","deletionAction":"next analytics detail migration","coverage":"analytics detail tests"},
+    {"file":"app/(protected)/analytics/muscles.tsx","classification":"remaining_production_reachable","authority":"legacy workout-history read","replacement":"canonical recorded-session/evidence projection","deletionAction":"next analytics detail migration","coverage":"muscle analytics tests"}
+  ],
+  "exactNextDeletionPhase":"migrate analytics detail views, then design-QA fixtures, then retire obsolete adapters"
+}
