@@ -1,5 +1,5 @@
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
-import { startCanonicalSession, prescriptionHash, pauseCanonicalSession, resumeCanonicalSession, recordCanonicalPerformedWork } from "@/application/training/canonical-recorded-session-application";
+import { startCanonicalSession, prescriptionHash, pauseCanonicalSession, resumeCanonicalSession, completeCanonicalSession, recordCanonicalPerformedWork } from "@/application/training/canonical-recorded-session-application";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { exerciseLibrary } from "@/domain/training/presets";
 
@@ -24,6 +24,7 @@ export function applyCanonicalActiveSessionFixture(fixtureId: string): Canonical
     const refreshed = canonicalRecordedSessionLedger.get(recordedSessionId);
     if (refreshed.status === "found" && fixtureId.includes("pause")) { pauseCanonicalSession({ ...base, expectedLedgerVersion: refreshed.session.version, operationId: `${fixtureId}:pause` }); }
     if (fixtureId.includes("resume")) { const paused = canonicalRecordedSessionLedger.get(recordedSessionId); if (paused.status === "found") resumeCanonicalSession({ ...base, expectedLedgerVersion: paused.session.version, operationId: `${fixtureId}:resume` }); }
+    if (fixtureId.includes("review_prs")) { const completed = canonicalRecordedSessionLedger.get(recordedSessionId); if (completed.status === "found") completeCanonicalSession({ ...base, expectedLedgerVersion: completed.session.version, operationId: `${fixtureId}:complete` }); }
   }
   return { status: started.status === "started" ? "started" : "ready", fixtureId, planId, plannedSessionId: planned.id, recordedSessionId, reason: started.reason };
 }

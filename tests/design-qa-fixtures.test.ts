@@ -399,8 +399,9 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
     return;
   }
 
-  if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups", "train_swapped", "train_added_exercise", "train_near_threshold", "train_shutdown"].includes(fixtureId)) {
-    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
+  if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups", "train_swapped", "train_added_exercise", "train_near_threshold", "train_shutdown", "train_review_prs"].includes(fixtureId)) {
+    if (fixtureId === "train_review_prs") expect(canonicalActivePlanState.getReadModel()?.historicalRecordedSessions?.length).toBeGreaterThan(0);
+    else expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
     return;
   }
 

@@ -1,0 +1,10 @@
+{
+  "sourceCommit": "3371211",
+  "batch": "CANONICAL-DESIGN-QA-TRAIN-PROJECTIONS-4",
+  "fixtures": [{"id":"train_review_prs","behavior":"completed_session_summary","canonicalSequence":["create_plan","start_session","record_performed_work","complete_session","derive_evidence"],"status":"canonical"}],
+  "historicalFixtures": [],
+  "partialOrMissedFixtures": [],
+  "evidencePendingFixtures": [],
+  "remainingGroups": {"custom":"pending", "failureRecovery":"pending", "historical":"no fixture identified"},
+  "nextBatch":"custom_and_failure_recovery"
+}
