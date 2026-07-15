@@ -1,19 +1,14 @@
 import { useLocalSearchParams } from "expo-router";
-import { useMemo } from "react";
 import { Text, View } from "react-native";
-import { customExerciseRepository } from "@/data/local/custom-exercise-repository";
-import { workoutHistoryRepository } from "@/data/local/workout-history-repository";
-import { getExerciseAnalytics } from "@/domain/training/analytics";
-import { summarizeWorkoutHistory } from "@/domain/training/workout-history";
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { queryCanonicalExerciseHistory } from "@/application/training/canonical-analytics-queries";
 import { EmptyState, PremiumCard, Screen, ScreenHeader, StatTile } from "@/ui/primitives";
 import { colors, spacing, type } from "@/ui/theme";
 
 export default function ExerciseAnalyticsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const exercises = customExerciseRepository.listAll();
-  const exercise = exercises.find((candidate) => candidate.id === id);
-  const history = useMemo(() => summarizeWorkoutHistory(workoutHistoryRepository.listCompletedSessions()), []);
-  const analytics = getExerciseAnalytics(history, id);
+  const plan = canonicalActivePlanState.getReadModel();
+  const analytics = plan ? queryCanonicalExerciseHistory(plan.planId, id) : null;
 
   if (!analytics) {
     return (
@@ -27,19 +22,19 @@ export default function ExerciseAnalyticsScreen() {
     <Screen>
       <ScreenHeader
         eyebrow="Exercise analytics"
-        title={exercise?.name ?? analytics.exerciseName}
+        title={analytics.exerciseName}
         subtitle="Trend data from actual logged reps. No vibes were harmed."
       />
 
       <View style={{ flexDirection: "row", gap: spacing.sm }}>
         <StatTile label="Frequency" value={`${analytics.frequency}`} />
         <StatTile label="Sets" value={`${analytics.totalSets}`} />
-        <StatTile label="PR rate" value={`${Math.round(analytics.progressionRate * 100)}%`} />
+        <StatTile label="Recorded sessions" value={`${analytics.frequency}`} />
       </View>
       <PremiumCard tone="locked">
         <Text selectable style={{ ...type.label, color: colors.accent }}>RECOMMENDED LOAD</Text>
         <Text selectable style={{ ...type.metric, color: colors.text }}>
-          {analytics.currentRecommendedLoad === null ? "-" : `${analytics.currentRecommendedLoad}`}
+          {analytics.loadTrend.at(-1) ?? "-"}
         </Text>
       </PremiumCard>
 
@@ -51,13 +46,11 @@ export default function ExerciseAnalyticsScreen() {
       </Panel>
 
       <Panel title="Last 5 Sessions">
-        {analytics.lastFiveSessions.map((entry) => (
-          <View key={entry.exerciseLogId} style={{ flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
-            <Text selectable style={{ flex: 1, color: colors.textMuted }}>{entry.completedAt ? new Date(entry.completedAt).toLocaleDateString() : "-"}</Text>
-            <Text selectable style={{ color: colors.text, fontWeight: "900" }}>{entry.load}{entry.unit} · best {entry.bestSetReps}</Text>
-            <Text selectable style={{ color: entry.progressionEarned ? colors.success : colors.textSubtle, fontWeight: "900" }}>
-              {entry.progressionEarned ? "Earned" : "Hold"}
-            </Text>
+        {analytics.lastFive.map((entry) => (
+          <View key={`${entry.sessionId}:${entry.occurredAt}`} style={{ flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
+            <Text selectable style={{ flex: 1, color: colors.textMuted }}>{new Date(entry.occurredAt).toLocaleDateString()}</Text>
+            <Text selectable style={{ color: colors.text, fontWeight: "900" }}>{entry.load}{entry.unit} · {entry.reps} reps</Text>
+            <Text selectable style={{ color: entry.substitution ? colors.warning : colors.textSubtle, fontWeight: "900" }}>{entry.substitution ? "Substituted" : entry.completion}</Text>
           </View>
         ))}
       </Panel>
@@ -74,7 +67,7 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-function Sparkline({ values }: { values: number[] }) {
+function Sparkline({ values }: { values: readonly number[] }) {
   const max = Math.max(1, ...values);
   return (
     <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 6, height: 84 }}>
