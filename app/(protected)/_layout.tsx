@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/application/auth/auth-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { getActiveDesignQaFixture, subscribeDesignQaFixture } from "@/application/design-qa/design-qa-fixtures";
-import { activeTrainingPlanRepository } from "@/data/local/active-training-plan-repository";
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { colors, spacing } from "@/ui/theme";
 
 export default function ProtectedLayout() {
@@ -15,11 +15,15 @@ export default function ProtectedLayout() {
   const { settings } = useAppSettings();
   const segments = useSegments();
   const [activeFixture, setActiveFixture] = useState(() => getActiveDesignQaFixture());
-  const [hasActivePlan, setHasActivePlan] = useState(() => Boolean(activeTrainingPlanRepository.getOptional()));
+  const [hasActivePlan, setHasActivePlan] = useState(() => Boolean(canonicalActivePlanState.getReadModel()));
   const isOnboardingRoute = segments.includes("onboarding");
 
   useEffect(() => subscribeDesignQaFixture(() => setActiveFixture(getActiveDesignQaFixture())), []);
-  useEffect(() => activeTrainingPlanRepository.subscribe(() => setHasActivePlan(Boolean(activeTrainingPlanRepository.getOptional()))), []);
+  useEffect(() => {
+    const unsubscribe = canonicalActivePlanState.subscribe(() => setHasActivePlan(Boolean(canonicalActivePlanState.getReadModel())));
+    canonicalActivePlanState.hydrate();
+    return unsubscribe;
+  }, []);
 
   if (isLoading) {
     return (

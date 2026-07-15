@@ -2,11 +2,11 @@ import { Stack, router } from "expo-router";
 import { useMemo, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { useAppSettings } from "@/application/settings/app-settings";
-import { activeTrainingPlanRepository } from "@/data/local/active-training-plan-repository";
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { exerciseLibrary } from "@/domain/training/presets";
 import type { ExperienceLevel, ProgrammeGoal, UnitSystem } from "@/domain/training/models";
 import { getFrameworkOptionsForGoal, type ProgrammeFrameworkSuitability, type UserProgrammeFrameworkId } from "@/domain/training/programme-framework-rules";
 import {
-  createActiveTrainingPlan,
   type EventType,
   type PlanningChoice,
   type PreferredSplit,
@@ -105,19 +105,23 @@ export default function OnboardingScreen() {
   };
 
   const finish = () => {
-    const activePlan = createActiveTrainingPlan({
-      goal: setupGoal,
-      planningChoice: effectivePlanningChoice,
-      eventType: effectiveEventType,
+    if (daysPerWeek < 3) return;
+    const now = new Date().toISOString();
+    const state = canonicalActivePlanState.create({
+      planId: `canonical-plan:${now}`,
+      createdAt: now,
+      updatedAt: now,
+      goal: programmeGoalForSetup(setupGoal, experienceLevel),
+      macrocycleGoal: setupGoal,
       targetDate: trainingCommitment.targetDate,
-      equipmentPreset: "full_gym",
-      daysPerWeek,
+      daysPerWeek: daysPerWeek as 3 | 4 | 5 | 6,
       preferredSplit,
       experienceLevel,
-      recoveryCardioPreference,
-      rotationFrequency: "every_4_weeks",
+      equipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight", "bands", "other"],
+      units: unit,
+      exercises: exerciseLibrary,
     });
-    activeTrainingPlanRepository.save(activePlan);
+    if (state.hydration !== "hydrated") return;
     updateSettings({
       unit,
       trainingGoal: programmeGoalForSetup(setupGoal, experienceLevel),

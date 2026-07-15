@@ -5,16 +5,19 @@ import type { CanonicalPlannedSessionSnapshot } from "@/domain/training/canonica
 
 export type CanonicalActivePlanState = Readonly<{ hydration: "empty" | "hydrated" | "error"; model: CanonicalActivePlanReadModel | null; error?: string }>;
 
-export type CanonicalActivePlanStateStore = Readonly<{ getState(): CanonicalActivePlanState; hydrate(): CanonicalActivePlanState; create(command: CanonicalActivePlanCreateCommand): CanonicalActivePlanState; refresh(): CanonicalActivePlanState; clear(): CanonicalActivePlanState; getReadModel(): CanonicalActivePlanReadModel | null; getPlannedSession(id: string): CanonicalPlannedSessionSnapshot | null; getNextActionableSession(): CanonicalPlannedSessionSnapshot | null; restoreRecordedSession(input: Readonly<{ snapshot: CanonicalPlannedSessionSnapshot; status: RecordedSessionStatus; expectedMicrocycleId: string; currentRevision: number; performedSets?: readonly unknown[] }>): CanonicalRestorationResult }>;
+export type CanonicalActivePlanStateStore = Readonly<{ getState(): CanonicalActivePlanState; subscribe(listener: () => void): () => void; hydrate(): CanonicalActivePlanState; create(command: CanonicalActivePlanCreateCommand): CanonicalActivePlanState; refresh(): CanonicalActivePlanState; clear(): CanonicalActivePlanState; getReadModel(): CanonicalActivePlanReadModel | null; getPlannedSession(id: string): CanonicalPlannedSessionSnapshot | null; getNextActionableSession(): CanonicalPlannedSessionSnapshot | null; restoreRecordedSession(input: Readonly<{ snapshot: CanonicalPlannedSessionSnapshot; status: RecordedSessionStatus; expectedMicrocycleId: string; currentRevision: number; performedSets?: readonly unknown[] }>): CanonicalRestorationResult }>;
 
 export function createCanonicalActivePlanStateStore(): CanonicalActivePlanStateStore {
   let state: CanonicalActivePlanState = { hydration: "empty", model: null };
+  const listeners = new Set<() => void>();
+  const publish = () => listeners.forEach((listener) => listener());
   const store: CanonicalActivePlanStateStore = {
     getState: () => state,
-    hydrate: () => { const result = loadCanonicalActivePlan(); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : result.reason === "canonical_plan_missing" ? { hydration: "empty", model: null } : { hydration: "error", model: null, error: result.reason }; return state; },
-    create: (command) => { const result = createCanonicalActivePlan(command); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : { hydration: "error", model: null, error: result.reason }; return state; },
+    subscribe: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
+    hydrate: () => { const result = loadCanonicalActivePlan(); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : result.reason === "canonical_plan_missing" ? { hydration: "empty", model: null } : { hydration: "error", model: null, error: result.reason }; publish(); return state; },
+    create: (command) => { const result = createCanonicalActivePlan(command); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : { hydration: "error", model: null, error: result.reason }; publish(); return state; },
     refresh: () => store.hydrate(),
-    clear: () => { canonicalActivePlanV2Repository.clear(); state = { hydration: "empty", model: null }; return state; },
+    clear: () => { canonicalActivePlanV2Repository.clear(); state = { hydration: "empty", model: null }; publish(); return state; },
     getReadModel: () => state.model,
     getPlannedSession: (id) => { const session = state.model?.plannedSessions.find((candidate) => candidate.id === id); return session ? { id: session.id, microcycleId: session.microcycleId, planSessionIndex: session.planSessionIndex, role: session.role, kind: "planned", status: session.status as "planned" | "open" | "completed", constructionVersion: session.constructionVersion, revision: session.revision, prescriptionSnapshot: session.snapshot } : null; },
     getNextActionableSession: () => { const session = state.model?.nextSession; return session ? store.getPlannedSession(session.id) : null; },
@@ -22,3 +25,6 @@ export function createCanonicalActivePlanStateStore(): CanonicalActivePlanStateS
   };
   return store;
 }
+
+/** The application-owned active-plan state boundary used by production callers. */
+export const canonicalActivePlanState = createCanonicalActivePlanStateStore();
