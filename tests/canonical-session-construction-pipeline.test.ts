@@ -22,7 +22,11 @@ describe("canonical session construction pipeline", () => {
   it("constructs without block or annual inputs", () => {
     const result = constructCanonicalSession(input());
     expect(result.status).toBe("constructed");
-    if (result.status === "constructed") expect(result.snapshot.slots.length).toBeGreaterThan(0);
+    if (result.status === "constructed") {
+      expect(result.snapshot.schemaVersion).toBe("canonical_session_snapshot_v3");
+      expect(result.snapshot.slots.length).toBeGreaterThan(0);
+      expect(result.snapshot.slots[0]?.loadPrescription.state).toBe("calibration_required");
+    }
   });
 
   it("fails closed when the exercise catalogue is empty", () => {

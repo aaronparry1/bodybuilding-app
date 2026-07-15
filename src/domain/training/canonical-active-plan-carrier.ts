@@ -3,6 +3,7 @@ import type { MesocycleSpec, MesocycleId } from "@/domain/training/mesocycle-lib
 import type { MicrocyclePlan } from "@/domain/training/microcycle-scheduler";
 import type { Equipment, ExperienceLevel, ProgrammeGoal, UnitSystem } from "@/domain/training/models";
 import { validateCanonicalLineage } from "@/domain/training/canonical-session-lineage";
+import { validateCanonicalLoadPrescription } from "@/domain/training/canonical-load-prescription";
 
 /** Persisted migration target. This module stores owner outputs; it makes no training decisions. */
 export const CANONICAL_ACTIVE_PLAN_SCHEMA = "canonical_plan_v2" as const;
@@ -126,7 +127,7 @@ export function validateCanonicalActivePlan(value: unknown): CanonicalCarrierVal
     if (indexes.has(session.planSessionIndex)) return { status: "invalid", reason: "duplicate_session_index", path: `plannedSessions.${index}.planSessionIndex` };
     if (typeof session.prescriptionSnapshot !== "object" || session.prescriptionSnapshot === null || typeof session.constructionVersion !== "string") return { status: "invalid", reason: "invalid_prescription_snapshot", path: `plannedSessions.${index}` };
     const snapshot = session.prescriptionSnapshot as Record<string, unknown>;
-    if (snapshot.schemaVersion === "canonical_session_snapshot_v2" && !isCompleteSessionSnapshot(snapshot)) return { status: "invalid", reason: "invalid_prescription_snapshot", path: `plannedSessions.${index}.prescriptionSnapshot` };
+    if ((snapshot.schemaVersion === "canonical_session_snapshot_v2" || snapshot.schemaVersion === "canonical_session_snapshot_v3") && !isCompleteSessionSnapshot(snapshot, snapshot.schemaVersion === "canonical_session_snapshot_v3")) return { status: "invalid", reason: "invalid_prescription_snapshot", path: `plannedSessions.${index}.prescriptionSnapshot` };
     ids.add(session.id); indexes.add(session.planSessionIndex);
   }
   if (!candidate.progress || typeof candidate.progress !== "object" || typeof candidate.progress.evidenceVersion !== "string" || typeof candidate.progress.revision !== "number") return { status: "invalid", reason: "invalid_progress_reference", path: "progress" };
@@ -138,13 +139,14 @@ export function validateCanonicalActivePlan(value: unknown): CanonicalCarrierVal
   return { status: "valid", carrier: value as CanonicalActivePlanCarrier };
 }
 
-function isCompleteSessionSnapshot(snapshot: Record<string, unknown>): boolean {
+function isCompleteSessionSnapshot(snapshot: Record<string, unknown>, requiresLoadPrescription = false): boolean {
   if (typeof snapshot.sessionId !== "string" || typeof snapshot.role !== "string" || !Array.isArray(snapshot.slots) || !snapshot.slots.length || !snapshot.provenance || typeof snapshot.provenance !== "object") return false;
   const ids = new Set<string>(); const indexes = new Set<number>();
   for (const slot of snapshot.slots) {
     if (!slot || typeof slot !== "object") return false;
     const value = slot as Record<string, unknown>;
     if (typeof value.id !== "string" || typeof value.index !== "number" || ids.has(value.id) || indexes.has(value.index) || typeof value.exerciseId !== "string" || typeof value.lane !== "string" || typeof value.method !== "string" || !value.settings || typeof value.settings !== "object" || !value.rest || !value.progression || !value.stopRule || typeof value.loadingMode !== "string" || !Array.isArray(value.substitutionConstraints) || typeof value.reason !== "string") return false;
+    if (requiresLoadPrescription && validateCanonicalLoadPrescription(value.loadPrescription).status !== "valid") return false;
     ids.add(value.id); indexes.add(value.index);
   }
   return true;

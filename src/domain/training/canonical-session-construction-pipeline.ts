@@ -6,6 +6,8 @@ import { resolveCanonicalLaneEnvelope, resolveCanonicalTargetEnvelope } from "@/
 import type { MicrocyclePlan } from "@/domain/training/microcycle-scheduler";
 import { withSetPrescription } from "@/domain/training/set-prescription";
 import { resolveCanonicalProgression, resolveCanonicalRest, resolveCanonicalStopRule, type CanonicalProgressionRule, type CanonicalRestInstruction, type CanonicalStopRule } from "@/domain/training/canonical-prescription-components";
+import { resolveCanonicalLoadPrescription } from "@/domain/training/canonical-load-resolution";
+import type { CanonicalLoadEvidence, CanonicalLoadPrescription } from "@/domain/training/canonical-load-prescription";
 
 export type CanonicalSessionConstructionInput = Readonly<{
   schemaVersion: "canonical_session_construction_input_v1";
@@ -13,13 +15,16 @@ export type CanonicalSessionConstructionInput = Readonly<{
   mesocycle: Readonly<{ id: MesocyclePrescriptionPolicy["mesocycleId"]; policy: MesocyclePrescriptionPolicy; position: number }>;
   microcycle: Readonly<{ id: string; output: MicrocyclePlan; sessionId: string; planSessionIndex: number; sessionRole: string; sessionOrder: number; stressIntent: string; recoveryDays: number; kind: "planned" | "extra" | "custom" }>;
   athlete: Readonly<{ experienceLevel: ExperienceLevel; preferredSplit: string; equipment: readonly Equipment[]; limitations: readonly string[]; exercisePreferences?: Readonly<Record<string, unknown>>; units: UnitSystem; exercises: readonly Exercise[] }>;
-  progress: Readonly<{ evidenceVersion: string; readiness?: "ready" | "restricted"; recoveryConstraint?: string; history: readonly WorkoutHistorySummary[]; establishedLoads?: Readonly<Record<string, number>>; calibration?: Readonly<Record<string, { confidence: "low" | "moderate" | "high"; fresh: boolean }>>; fatigueEvidence?: readonly string[] }>;
+  progress: Readonly<{ evidenceVersion: string; readiness?: "ready" | "restricted"; recoveryConstraint?: string; history: readonly WorkoutHistorySummary[]; establishedLoads?: Readonly<Record<string, number>>; loadEvidence?: Readonly<Record<string, CanonicalLoadEvidence>>; calibration?: Readonly<Record<string, { confidence: "low" | "moderate" | "high"; fresh: boolean }>>; fatigueEvidence?: readonly string[] }>;
   operational: Readonly<{ constructionVersion: string; seed: string; identity: string; revision: string }>;
 }>;
 
 export type SessionBlueprint = Readonly<{ sessionId: string; role: string; purpose: string; slots: readonly Readonly<{ role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; index: number; reason: string }>[]; strengthAnchorRequired: boolean; specialState: string }>;
 export type PlannedSessionSlot = Readonly<{ id: string; index: number; role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; laneCandidates: readonly TrainingLane[]; preferredLane: TrainingLane; methods: readonly PrescriptionMethodFamily[]; reason: string }>;
-export type CanonicalSessionSnapshot = Readonly<{ schemaVersion: "canonical_session_snapshot_v2"; sessionId: string; operationalIdentity: string; role: string; planSessionIndex: number; slots: readonly Readonly<{ id: string; index: number; exerciseId: string; lane: TrainingLane; method: PrescriptionMethodFamily; settings: ProgressionSettings; rest: CanonicalRestInstruction; progression: CanonicalProgressionRule; stopRule: CanonicalStopRule; loadingMode: string; prescribedLoad?: number; substitutionConstraints: readonly string[]; reason: string }>[]; provenance: Readonly<{ inputVersion: string; policyVersion: string; constructionVersion: string; evidenceVersion: string }> }>;
+type CanonicalSessionSnapshotBase = Readonly<{ sessionId: string; operationalIdentity: string; role: string; planSessionIndex: number; slots: readonly Readonly<{ id: string; index: number; exerciseId: string; lane: TrainingLane; method: PrescriptionMethodFamily; settings: ProgressionSettings; rest: CanonicalRestInstruction; progression: CanonicalProgressionRule; stopRule: CanonicalStopRule; loadingMode: string; prescribedLoad?: number; substitutionConstraints: readonly string[]; reason: string }>[]; provenance: Readonly<{ inputVersion: string; policyVersion: string; constructionVersion: string; evidenceVersion: string }> }>;
+export type CanonicalSessionSnapshotV2 = CanonicalSessionSnapshotBase & Readonly<{ schemaVersion: "canonical_session_snapshot_v2" }>;
+export type CanonicalSessionSnapshotV3 = Omit<CanonicalSessionSnapshotBase, "slots"> & Readonly<{ schemaVersion: "canonical_session_snapshot_v3"; slots: readonly (CanonicalSessionSnapshotBase["slots"][number] & Readonly<{ loadPrescription: CanonicalLoadPrescription }>)[] }>;
+export type CanonicalSessionSnapshot = CanonicalSessionSnapshotV2 | CanonicalSessionSnapshotV3;
 
 export type CanonicalConstructionResult = Readonly<{ status: "constructed"; blueprint: SessionBlueprint; slotPlan: readonly PlannedSessionSlot[]; snapshot: CanonicalSessionSnapshot } | { status: "blocked"; reason: "invalid_input" | "duplicate_session_identity" | "no_valid_blueprint" | "no_suitable_exercise" | "no_valid_lane" | "no_valid_method" | "established_load_required" | "incomplete_prescription" | "invalid_linkage" }>;
 
@@ -58,7 +63,7 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
   if (!blueprint) return { status: "blocked", reason: "no_valid_blueprint" };
   const slotPlan = planSessionSlots(input, blueprint);
   if (!slotPlan) return { status: "blocked", reason: "no_valid_lane" };
-  const slots: Array<CanonicalSessionSnapshot["slots"][number]> = [];
+  const slots: Array<CanonicalSessionSnapshotV3["slots"][number]> = [];
   for (const slot of slotPlan) {
     const exercise = input.athlete.exercises
       .filter((candidate) => candidate.roles.includes(slot.role))
@@ -76,8 +81,9 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
     const rest = resolveCanonicalRest(input.mesocycle.policy, lane, method, slot.role);
     const progression = resolveCanonicalProgression(input.mesocycle.policy, lane, method, input.operational.revision);
     const stopRule = resolveCanonicalStopRule(input.mesocycle.policy, lane, slot.role, target.envelope.minReps);
-    slots.push({ id: slot.id, index: slot.index, exerciseId: exercise.id, lane, method, settings, rest, progression, stopRule, loadingMode: target.envelope.loadingMode, prescribedLoad: input.progress.establishedLoads?.[exercise.id], substitutionConstraints: [...input.athlete.limitations], reason: slot.reason });
+    const loadPrescription = resolveCanonicalLoadPrescription({ exercise, equipment: input.athlete.equipment, lane, loadingMode: target.envelope.loadingMode, establishedLoad: input.progress.establishedLoads?.[exercise.id], evidence: input.progress.loadEvidence?.[exercise.id], increment: exercise.defaultLoadJump || 1, calibrationSupported: true });
+    slots.push({ id: slot.id, index: slot.index, exerciseId: exercise.id, lane, method, settings, rest, progression, stopRule, loadingMode: target.envelope.loadingMode, prescribedLoad: input.progress.establishedLoads?.[exercise.id], substitutionConstraints: [...input.athlete.limitations], reason: slot.reason, loadPrescription } as CanonicalSessionSnapshotV3["slots"][number]);
   }
-  const snapshot: CanonicalSessionSnapshot = { schemaVersion: "canonical_session_snapshot_v2", sessionId: blueprint.sessionId, operationalIdentity: input.operational.identity, role: blueprint.role, planSessionIndex: input.microcycle.planSessionIndex, slots, provenance: { inputVersion: input.schemaVersion, policyVersion: input.mesocycle.policy.schemaVersion, constructionVersion: input.operational.constructionVersion, evidenceVersion: input.progress.evidenceVersion } };
+  const snapshot: CanonicalSessionSnapshotV3 = { schemaVersion: "canonical_session_snapshot_v3", sessionId: blueprint.sessionId, operationalIdentity: input.operational.identity, role: blueprint.role, planSessionIndex: input.microcycle.planSessionIndex, slots, provenance: { inputVersion: input.schemaVersion, policyVersion: input.mesocycle.policy.schemaVersion, constructionVersion: input.operational.constructionVersion, evidenceVersion: input.progress.evidenceVersion } };
   return { status: "constructed", blueprint, slotPlan, snapshot };
 }
