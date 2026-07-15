@@ -231,7 +231,40 @@ export function ensureDesignQaLocalWorkoutReadyState(environment: AppEnvironment
   }
 }
 
+/** Family boundary retained while each fixture family is migrated to canonical operations. */
+export type DesignQaFixtureFamily = "plan_state" | "session_lifecycle" | "progress_decision" | "failure_recovery";
+
+export function designQaFixtureFamily(id: DesignQaFixtureId): DesignQaFixtureFamily {
+  if (id.startsWith("plan_") || id.startsWith("home_")) return "plan_state";
+  if (id.startsWith("train_")) return "session_lifecycle";
+  if (id.startsWith("phase1_") || id.startsWith("progress_")) return "progress_decision";
+  return "failure_recovery";
+}
+
 export function applyDesignQaFixture(id: DesignQaFixtureId, environment: AppEnvironment = "development"): ActiveDesignQaFixture {
+  const family = designQaFixtureFamily(id);
+  // Dispatch is explicit even while non-plan families retain their legacy-compatible fixtures.
+  // This prevents future branches from silently crossing family boundaries.
+  if (family === "plan_state") return applyPlanStateFixture(id, environment);
+  if (family === "session_lifecycle") return applySessionLifecycleFixture(id, environment);
+  if (family === "progress_decision") return applyProgressDecisionFixture(id, environment);
+  return applyFailureRecoveryFixture(id, environment);
+}
+
+function applyPlanStateFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
+  return applyDesignQaFixtureMatrix(id, environment);
+}
+function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
+  return applyDesignQaFixtureMatrix(id, environment);
+}
+function applyProgressDecisionFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
+  return applyDesignQaFixtureMatrix(id, environment);
+}
+function applyFailureRecoveryFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
+  return applyDesignQaFixtureMatrix(id, environment);
+}
+
+function applyDesignQaFixtureMatrix(id: DesignQaFixtureId, environment: AppEnvironment = "development"): ActiveDesignQaFixture {
   if (!isDesignQaModeAvailable(environment)) {
     throw new Error("Design QA fixtures are not available in production.");
   }
