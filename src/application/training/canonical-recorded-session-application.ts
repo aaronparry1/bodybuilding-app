@@ -3,6 +3,7 @@ import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
+import { reconcileCanonicalRecordedReference } from "@/application/training/canonical-recorded-reference-reconciliation";
 
 export type CanonicalStartSessionCommand = Readonly<{ planId: string; expectedPlanRevision: number; plannedSessionId: string; expectedPrescriptionHash: string; operationId: string; startedAt: string; provenance: string }>;
 export type CanonicalStartSessionResult = Readonly<{ status: "started" | "already_started" | "rejected" | "retryable"; reason: string; recordedSessionId?: string; planRevision?: number }>;
@@ -80,8 +81,15 @@ export function restoreCanonicalRecordedSessionFromLedger(planId: string, record
   const aggregate = canonicalRecordedSessionLedger.get(recordedSessionId);
   if (!reference || aggregate.status !== "found") return { status: "rejected" as const, reason: "recorded_session_reference_missing" };
   if (aggregate.session.planId !== planId || aggregate.session.microcycleId !== reference.microcycleId || aggregate.session.prescriptionHash !== prescriptionHash(aggregate.session.prescriptionSnapshot)) return { status: "rejected" as const, reason: "recorded_session_integrity_mismatch" };
-  if (reference.status !== aggregate.session.status || reference.revision > carrier.carrier.revision) return { status: "rejected" as const, reason: "recorded_session_status_mismatch" };
-  return { status: "restored" as const, session: aggregate.session, events: aggregate.events };
+  if (reference.status !== aggregate.session.status || reference.revision > carrier.carrier.revision) {
+    const repaired = reconcileCanonicalRecordedReference({ planId, expectedPlanRevision: carrier.carrier.revision, recordedSessionId, operationId: `restore:${recordedSessionId}` });
+    if (repaired.status === "retry_required") return { status: "retry_required" as const, reason: repaired.reason };
+    if (repaired.status === "rejected") return { status: "rejected" as const, reason: repaired.reason };
+    const refreshed = canonicalRecordedSessionLedger.get(recordedSessionId);
+    if (refreshed.status !== "found") return { status: "rejected" as const, reason: "recorded_session_reference_missing" };
+    return { status: "restored" as const, session: refreshed.session, events: refreshed.events, completionSummary: refreshed.session.status === "completed" ? deriveCanonicalCompletionSummary(refreshed.session, refreshed.events) : undefined };
+  }
+  return { status: "restored" as const, session: aggregate.session, events: aggregate.events, completionSummary: aggregate.session.status === "completed" ? deriveCanonicalCompletionSummary(aggregate.session, aggregate.events) : undefined };
 }
 
 function updateRecordedStatus(command: CanonicalRecordedLifecycleCommand, target: "paused" | "started" | "completed", eventType: "pause" | "resumed" | "completed"): CanonicalRecordedLifecycleResult {
