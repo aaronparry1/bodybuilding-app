@@ -1,12 +1,12 @@
 import { createMacrocycle, macrocycleEngineForGoal } from "@/domain/training/macrocycle-engine";
 import { selectMesocycles } from "@/domain/training/mesocycle-library";
-import { createMicrocycle } from "@/domain/training/microcycle-scheduler";
+import { createMicrocycle, type CanonicalTrainingDaysPerWeek } from "@/domain/training/microcycle-scheduler";
 import { assembleCanonicalActivePlan, type CanonicalActivePlanCarrier, type CanonicalPlannedSessionSnapshot } from "@/domain/training/canonical-active-plan-carrier";
 import { resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-prescription-policy";
 import { constructCanonicalSession, resolveCanonicalSessionIdentity } from "@/domain/training/canonical-session-construction-pipeline";
 import type { Equipment, ExperienceLevel, Exercise, ProgrammeGoal, UnitSystem, WorkoutHistorySummary } from "@/domain/training/models";
 
-export type CanonicalConstructionInput = Readonly<{ planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: Parameters<typeof createMacrocycle>[0]; experienceLevel: ExperienceLevel; daysPerWeek: 3 | 4 | 5 | 6; preferredSplit: Parameters<typeof createMicrocycle>[0]["split"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; plannedSessions: readonly CanonicalPlannedSessionSnapshot[] }>;
+export type CanonicalConstructionInput = Readonly<{ planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: Parameters<typeof createMacrocycle>[0]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: Parameters<typeof createMicrocycle>[0]["split"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; plannedSessions: readonly CanonicalPlannedSessionSnapshot[] }>;
 export type CanonicalConstructionResult = Readonly<{ status: "constructed"; carrier: CanonicalActivePlanCarrier } | { status: "invalid_input" | "no_initial_mesocycle" | "session_role_mismatch" | "carrier_validation_failed"; reason: string }>;
 
 export type CanonicalGeneratedPlanInput = Readonly<Omit<CanonicalConstructionInput, "plannedSessions"> & { exercises: readonly Exercise[]; limitations?: readonly string[]; history?: readonly WorkoutHistorySummary[]; establishedLoads?: Readonly<Record<string, number>> }>;

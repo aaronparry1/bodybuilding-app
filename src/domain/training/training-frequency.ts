@@ -8,7 +8,7 @@ export interface TrainingFrequency {
   coachingSummary: string;
 }
 
-export const trainingFrequencyOptions = [3, 4, 5, 6] as const satisfies readonly TrainingDaysPerWeek[];
+export const trainingFrequencyOptions = [2, 3, 4, 5, 6] as const satisfies readonly TrainingDaysPerWeek[];
 
 export function deriveTrainingFrequency(daysPerWeek: number): TrainingFrequency {
   if (!isTrainingDaysPerWeek(daysPerWeek)) {

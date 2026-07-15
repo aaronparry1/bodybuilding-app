@@ -105,7 +105,6 @@ export default function OnboardingScreen() {
   };
 
   const finish = () => {
-    if (daysPerWeek < 3) return;
     const now = new Date().toISOString();
     const state = canonicalActivePlanState.create({
       planId: `canonical-plan:${now}`,
@@ -114,7 +113,7 @@ export default function OnboardingScreen() {
       goal: programmeGoalForSetup(setupGoal, experienceLevel),
       macrocycleGoal: setupGoal,
       targetDate: trainingCommitment.targetDate,
-      daysPerWeek: daysPerWeek as 3 | 4 | 5 | 6,
+      daysPerWeek,
       preferredSplit,
       experienceLevel,
       equipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight", "bands", "other"],
