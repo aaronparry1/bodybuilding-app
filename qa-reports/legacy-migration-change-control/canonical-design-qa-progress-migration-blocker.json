@@ -1,0 +1,28 @@
+{
+  "sourceCommit": "1118ff4",
+  "declaredFixtureCount": 34,
+  "sourceInventoryUniqueAffectedIds": 35,
+  "inventoryDiscrepancy": "canonical-design-qa-fixture-family-inventory currently enumerates 35 Progress IDs although the migration manifest declares 34; this must be reconciled before migration",
+  "canonicalOwnersAvailable": ["canonicalProgressEvidenceRepository", "evaluateCanonicalProgress", "evaluateCanonicalProgressV2", "produceCanonicalProgressDecision", "canonicalActivePlanState.applyProgressDecision"],
+  "migrationStatus": "blocked_before_fixture_migration",
+  "missingCanonicalContracts": [
+    {
+      "contract": "progress_decision_policy_for_load_and_productive_range",
+      "missing": "canonical outcome/reason semantics for regression, escalation, average-next, below-min, target-zone, soft-cap, and over-soft-cap",
+      "affectedFixtureIds": ["train_load_regression_reduce", "train_load_escalation", "train_load_escalation_modal", "train_load_average_next", "train_productive_below_min", "train_productive_target_zone", "train_productive_soft_cap", "train_productive_over_soft_cap"]
+    },
+    {
+      "contract": "progress_decision_policy_for_volume_and_rotation",
+      "missing": "canonical Progress decision owner for volume recommendations and exercise-rotation outcomes",
+      "affectedFixtureIds": ["progress_volume_large_low", "progress_volume_ladder_apply", "progress_volume_large_high_fatigue", "progress_volume_small_progressing", "progress_rotation_stalled_tier_a", "progress_rotation_action", "progress_rotation_progressing_tier_a", "progress_rotation_tier_c"]
+    },
+    {
+      "contract": "progress_decision_policy_for_goal_and_recovery_projection",
+      "missing": "canonical decision/evidence semantics for goal-specific recommendation projections, recovery-capacity presentation, and phase-1 outcome distinctions",
+      "affectedFixtureIds": ["progress_low", "progress_healthy", "progress_strength_dashboard", "progress_fatigue", "progress_slowing", "progress_recent_clean", "progress_deload_action", "phase1_deload_mild", "phase1_deload_clear", "phase1_deload_severe", "phase1_load_one_bad_session", "phase1_goal_strength", "phase1_goal_muscle", "phase1_goal_muscle_strength", "phase1_goal_athletic", "phase1_goal_event", "phase1_goal_general", "phase1_low_history_no_deload", "home_recovery_capacity"]
+    }
+  ],
+  "transitionDeloadPipeline": "available_for_explicit_v2_intent_only",
+  "legacyProgressBridge": "must_remain_until_missing_contracts_are_defined",
+  "productionSwitchCompleted": false
+}
