@@ -10,6 +10,8 @@ describe("canonical active-plan application boundary", () => {
     if (result.status === "ok") {
       expect(result.model.schemaVersion).toBe("canonical_active_plan_read_model_v1");
       expect(result.model.nextSession).not.toBeNull();
+      expect(result.model.activeRecordedSession).toBeNull();
+      expect(result.model.historicalRecordedSessions).toEqual([]);
       expect(JSON.stringify(result.model)).not.toContain("blocks");
     }
   });
