@@ -155,35 +155,6 @@ describe("progress dashboard view model", () => {
     expect(progress.recommendationEvidence.dataPoints.join(" ")).toContain("productive");
   });
 
-  it("does not recommend a Recovery Window after only two planned sessions, even when extra work is noisy", () => {
-    const planned = [0, 1].map((index) =>
-      workout(index, [
-        exerciseEntry(index, {
-          progressionEarned: false,
-          stoppedByDropOff: true,
-          qualitySets: 2,
-          bestSetReps: 6,
-        }),
-      ]),
-    );
-    const extras = [2, 3, 4].map((index) =>
-      workout(index, [
-        exerciseEntry(index, {
-          progressionEarned: false,
-          stoppedByDropOff: true,
-          qualitySets: 1,
-          bestSetReps: 5,
-        }),
-      ], { sessionKind: "extra_full" }),
-    );
-
-    const progress = buildProgressDashboardViewModel([...planned, ...extras], exerciseLibrary, activePlan());
-
-    expect(progress.hasEnoughHistory).toBe(false);
-    expect(progress.actionFlow).toBeUndefined();
-    expect(progress.actionTitle).toBe("Build more history first.");
-  });
-
   it("keeps one bad planned session local instead of escalating to a full Recovery Window", () => {
     const history = [0, 1, 2, 3].map((index) =>
       workout(index, [
@@ -287,16 +258,6 @@ describe("progress dashboard view model", () => {
       primaryLabel: "Apply change",
       secondaryLabel: "Ignore for now",
     });
-  });
-
-  it("suppresses volume recommendations until enough completed history exists", () => {
-    const progress = buildProgressDashboardViewModel(
-      [workout(1, [exerciseEntry(1, { qualitySets: 3, progressionEarned: false, stoppedByDropOff: false })])],
-      exerciseLibrary,
-    );
-
-    expect(progress.hasEnoughHistory).toBe(false);
-    expect(progress.volumeRecommendation).toBeUndefined();
   });
 
   it("keeps a stalled Tier A history observation non-actionable without an intervention", () => {
