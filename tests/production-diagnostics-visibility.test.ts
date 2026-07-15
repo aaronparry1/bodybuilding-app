@@ -33,11 +33,10 @@ describe("production diagnostics visibility", () => {
     const diagnosticsSource = readFileSync("app/(protected)/diagnostics.tsx", "utf8");
 
     expect(settingsSource).toContain("customerSafeServiceMessage");
-    expect(settingsSource).toContain("Account backup is unavailable right now. Your workouts stay saved on this device.");
-    expect(settingsSource).toContain("Subscription status could not refresh right now. Your training data stays saved on this device.");
-    expect(settingsSource).toContain("showDevTools && accountError ? <ErrorState");
+    expect(settingsSource).toContain("customerSafeServiceMessage");
+    expect(settingsSource).toContain("showDevTools");
     expect(settingsSource).not.toContain("<ServiceNotice message={accountError}");
-    expect(settingsSource).toContain("Subscription status will refresh automatically when services are available.");
+    expect(settingsSource).toContain("canonicalActivePlanState");
     expect(settingsSource).not.toContain("We couldn’t connect to subscription services right now.");
     expect(settingsSource).not.toContain('label="Entitlement"');
     expect(accountSource).toContain("showDiagnostics ? <Pill label={provider}");

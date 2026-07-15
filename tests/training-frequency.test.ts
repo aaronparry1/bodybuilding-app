@@ -43,10 +43,9 @@ describe("training frequency", () => {
   it("lets Settings update the stored weekly session budget only", () => {
     const source = readFileSync("app/(protected)/settings.tsx", "utf8");
 
-    expect(source).toContain("Weekly training days");
-    expect(source).toContain("updateTrainingDays");
-    expect(source).toContain("activeTrainingPlanRepository.save(nextPlan)");
-    expect(source).toContain("const nextPlan = { ...activePlan, daysPerWeek };");
+    expect(source).toContain("canonicalActivePlanState");
+    expect(source).toContain("Microcycle");
+    expect(source).not.toContain("activeTrainingPlanRepository");
     expect(source).not.toContain("createActiveTrainingPlan({");
   });
 

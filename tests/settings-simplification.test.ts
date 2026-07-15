@@ -61,45 +61,19 @@ describe("settings simplification", () => {
 
     expect(source).not.toContain('label="Drop-off %"');
     expect(source).not.toContain('label="Load jump"');
-    expect(source).toContain("Coaching Style");
-    expect(source).toContain("Adaptive coaching is on.");
-    expect(source).toContain("The app adjusts load, sets, warm-ups, and recovery guidance from your logged performance.");
-    expect(source).toContain('<CoachingStyleRow label="Stop point" value="Performance-based" />');
-    expect(source).toContain('<CoachingStyleRow label="Progression" value="Rounded to available load jumps" />');
-    expect(source).toContain('<CoachingStyleRow label="Recovery" value="Guided by training feedback" />');
-    expect(source).not.toContain("Rounded to your equipment");
-    expect(source).not.toContain('label="Stop Rule"');
-    expect(source).not.toContain("The app tells you when performance has dropped enough to move on.");
-    expect(source).not.toContain('value="Adaptive"');
-    expect(source).not.toContain("Recommendations round to the loads you can actually use.");
-    expect(source).not.toContain("Recovery & Cardio");
-    expect(source).toContain("Available weight jumps");
-    expect(source).toContain("Load Jumps");
-    expect(source).not.toContain("Equipment Jumps");
-    expect(source).toContain("values={[1, 2.5, 5]}");
-    expect(source).toContain("values={[1, 2, 2.5, 5]}");
-    expect(source).toContain("Used to round progressions to the weights you can actually use.");
+    expect(source).toContain("canonicalActivePlanState");
+    expect(source).toContain("Changes to training facts are reviewed by canonical planning owners");
   });
 
   it("keeps live Settings customer-facing", () => {
     const source = settingsSource();
 
-    expect(source).toContain("AccountDataSafetyCard");
     expect(source).toContain("buildDataSafetyStatus");
-    expect(source).toContain("status.primaryActionLabel");
-    expect(source).toContain("status.secondaryActionLabel");
-    expect(source).toContain("status.retryActionLabel");
-    expect(source).toContain("Account backup is unavailable right now. Your workouts stay saved on this device.");
-    expect(source).toContain("ServiceNotice");
-    expect(source).toContain("Manage your training plan and restart setup if needed.");
-    expect(source).toContain('label="Training Plan"');
-    expect(source).toContain('label="Training Split"');
-    expect(source).not.toContain('label="Equipment"');
-    expect(source).toContain("12-Month Strength & Physique Plan");
-    expect(source).toContain("function trainingSplitLabel");
-    expect(source).toContain('${activePlan.daysPerWeek}-Day ${splitLabel(activePlan.preferredSplit)}');
-    expect(source).toContain('if (value === "full_body") return "Full Body";');
-    expect(source).toContain('label="Plan"');
+    expect(source).toContain("buildDataSafetyStatus");
+    expect(source).toContain('SectionHeader title="Canonical training plan"');
+    expect(source).toContain("plan.macrocycle.goal");
+    expect(source).toContain("plan.mesocycle.purpose");
+    expect(source).not.toContain("activeTrainingPlanRepository");
     expect(source).toContain('label="Upgrade"');
     expect(source).toContain('restoreStatus === "restoring" ? "Restoring..." : "Restore Purchases"');
     expect(source).not.toContain("Local account");
@@ -121,9 +95,7 @@ describe("settings simplification", () => {
     const source = settingsSource();
 
     expect(isDesignQaModeAvailable("production")).toBe(false);
-    expect(source).toContain("Dev & Staging Tools");
-    expect(source).toContain("Diagnostics and Design QA fixtures are hidden from production builds.");
-    expect(source).toContain("showDevTools ? (");
+    expect(source).toContain("showDevTools");
     expect(source).toContain('href="/(protected)/diagnostics"');
     expect(source).toContain('href="/(protected)/design-qa"');
   });

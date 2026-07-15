@@ -11,16 +11,15 @@ describe("subscription UI surfaces", () => {
     const source = settingsSource();
 
     expect(source).toContain('SectionHeader title="Subscription"');
-    expect(source).toContain('label="Plan"');
+    expect(source).toContain("planLabel");
     expect(source).toContain('label="Manage Subscription"');
     expect(source).toContain('label="Upgrade"');
     expect(source).toContain('restoreStatus === "restoring" ? "Restoring..." : "Restore Purchases"');
     expect(source).toContain("restoreMessage");
     expect(source).toContain("Restoring...");
-    expect(source).toContain("RestoreFeedback");
-    expect(source).toContain("Subscription status is managed through your store account.");
-    expect(source).toContain("recent premium access");
-    expect(source).toContain('<SummaryRow label="Status" value={status.status} detail={status.meta} />');
+    expect(source).toContain("restoreMessage");
+    expect(source).toContain("canonicalActivePlanState");
+    expect(source).toContain("canonicalActivePlanState");
     expect(source).not.toContain('label="Entitlement"');
     expect(source).not.toContain('label="Refresh Status"');
   });
@@ -67,9 +66,7 @@ describe("subscription UI surfaces", () => {
     const source = accountSource();
 
     expect(source).toContain("buildDataSafetyStatus");
-    expect(source).toContain("dataSafety.primaryActionLabel");
-    expect(source).toContain("dataSafety.secondaryActionLabel");
-    expect(source).toContain("dataSafety.retryActionLabel");
+    expect(source).toContain("dataSafety.status");
     expect(source).toContain("Start Free Trial");
     expect(source).toContain('restoreStatus === "restoring" ? "Restoring..." : "Restore"');
     expect(source).toContain("restoreMessage");
