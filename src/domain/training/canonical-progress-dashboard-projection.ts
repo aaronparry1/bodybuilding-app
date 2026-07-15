@@ -1,6 +1,7 @@
 export const CANONICAL_PROGRESS_DASHBOARD_PROJECTION_VERSION = "canonical_progress_dashboard_projection_v1" as const;
 import type { CanonicalProgressDashboardEvidence } from "@/domain/training/canonical-progress-dashboard-evidence-contract";
 import type { CanonicalMesocycleRecoveryPolicyResult } from "@/domain/training/canonical-mesocycle-recovery-policy";
+import type { CanonicalProgressIntervention } from "@/domain/training/canonical-progress-intervention";
 export type CanonicalDashboardRecoverySummary = Readonly<{ completeness: "complete" | "incomplete"; freshness: "fresh" | "stale" | "missing"; recovery: string; capacity: string; fatigue: string; evidenceIds: readonly string[]; reasonCodes: readonly string[] }>;
 export type CanonicalDashboardInterventionSummary = Readonly<{ interventionId: string; family: "volume_adjustment" | "microcycle_rotation"; policyId: string; policyVersion: string; disposition: string; reasonCodes: readonly string[]; application: "supported" | "unsupported" | "review_required"; evidenceIds: readonly string[] }>;
 export type CanonicalDashboardHistorySummary = Readonly<{ windowId: string; recordedSessions: number; completed: number; partial: number; missed: number; performedSets: number; prescribedSets: number; substitutions: number; evidencePending: number }>;
@@ -23,6 +24,7 @@ export type CanonicalProgressDashboardInput = Readonly<{
   history?: CanonicalDashboardHistorySummary;
   evidenceSufficiency?: CanonicalProgressDashboardEvidence;
   recoveryPolicy?: CanonicalMesocycleRecoveryPolicyResult;
+  recoveryIntervention?: CanonicalProgressIntervention;
 }>;
 
 export type CanonicalProgressDashboardProjection = Readonly<{
@@ -40,6 +42,7 @@ export type CanonicalProgressDashboardProjection = Readonly<{
   action: CanonicalDashboardAction;
   evidenceSufficiency?: CanonicalProgressDashboardEvidence;
   recoveryPolicy?: CanonicalMesocycleRecoveryPolicyResult;
+  recoveryIntervention?: CanonicalProgressIntervention;
 }>;
 
 function containsLegacy(value: unknown): boolean {
@@ -55,6 +58,7 @@ export function projectCanonicalProgressDashboard(input: CanonicalProgressDashbo
   if (input.interventions?.some((item) => !item.interventionId || !item.policyId || !item.policyVersion || !item.evidenceIds.length)) throw new Error("invalid_canonical_dashboard_intervention");
   if (input.evidenceSufficiency && (input.evidenceSufficiency.contractVersion !== "canonical_progress_dashboard_evidence_v1" || input.evidenceSufficiency.planId !== input.planId || input.evidenceSufficiency.planRevision !== input.planRevision || input.evidenceSufficiency.cycleIds.length === 0)) throw new Error("invalid_canonical_dashboard_evidence_sufficiency");
   if (input.recoveryPolicy && (input.recoveryPolicy.policyId !== "canonical_mesocycle_recovery_policy_v1" || input.recoveryPolicy.planId !== input.planId || !input.recoveryPolicy.mesocycleId || input.recoveryPolicy.evidenceIds.length === 0)) throw new Error("invalid_canonical_dashboard_recovery_policy");
+  if (input.recoveryIntervention && (input.recoveryIntervention.schemaVersion !== "canonical_progress_intervention_v1" || input.recoveryIntervention.family !== "recovery_action" || input.recoveryIntervention.planId !== input.planId || input.recoveryIntervention.planRevision !== input.planRevision || input.recoveryIntervention.mesocycleId !== input.mesocycle.id || input.recoveryIntervention.microcycleId !== input.microcycle.id || !input.recoveryIntervention.evidenceIds.length || input.recoveryIntervention.policyVersion !== "canonical_mesocycle_recovery_policy_v1")) throw new Error("invalid_canonical_dashboard_recovery_intervention");
   if (input.history && (!input.history.windowId || Object.values(input.history).some((value) => typeof value === "number" && value < 0))) throw new Error("invalid_canonical_dashboard_history");
   const status = input.evidence.freshness !== "fresh" || input.evidence.completeness !== "complete" || !input.evaluation ? "insufficient_evidence" : input.decision?.kind === "review_required" ? "review_required" : "ready";
   const kind = input.decision?.kind === "transition" || input.decision?.kind === "deload" || input.decision?.kind === "continue" ? input.decision.kind : input.decision ? "review" : "none";
@@ -73,6 +77,7 @@ export function projectCanonicalProgressDashboard(input: CanonicalProgressDashbo
     ...(input.history ? { history: input.history } : {}),
     ...(input.evidenceSufficiency ? { evidenceSufficiency: input.evidenceSufficiency } : {}),
     ...(input.recoveryPolicy ? { recoveryPolicy: input.recoveryPolicy } : {}),
+    ...(input.recoveryIntervention ? { recoveryIntervention: input.recoveryIntervention } : {}),
     action,
   };
 }

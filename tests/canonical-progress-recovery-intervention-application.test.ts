@@ -6,7 +6,7 @@ import { validateCanonicalProgressIntervention } from "@/domain/training/canonic
 describe("canonical recovery intervention boundary", () => {
   it("persists a bounded recovery_action linkage without mutation fields", () => {
     const policy = resolveCanonicalMesocycleRecoveryPolicy({ planId: "plan:systemic", mesocycleId: "meso:systemic", purpose: "hypertrophy_base", method: "standard", evidenceIds: ["e:systemic"], freshness: "fresh", completeness: "complete", fatigue: "systemic", recovery: "constrained" });
-    const intervention = evaluateCanonicalRecoveryPolicyIntervention({ policy, evaluationId: "eval:systemic", operationId: "op:systemic", evidenceVersions: { "e:systemic": "v1" }, macrocycleId: "macro:systemic", microcycleId: "micro:systemic" });
+    const intervention = evaluateCanonicalRecoveryPolicyIntervention({ policy, evaluationId: "eval:systemic", operationId: "op:systemic", evidenceVersions: { "e:systemic": "v1" }, macrocycleId: "macro:systemic", microcycleId: "micro:systemic", planRevision: 2 });
     expect(intervention.disposition).toBe("reduce_stress");
     expect(validateCanonicalProgressIntervention(intervention).status).toBe("valid");
     expect(intervention).not.toHaveProperty("exactLoad");
