@@ -24,7 +24,13 @@ export function runCanonicalPipelineCertification() {
   const failedRead = createCanonicalActivePlanV2Repository(storage(null, "read")).saveAtomically(construction.carrier);
   const failedWrite = createCanonicalActivePlanV2Repository(storage(null, "write")).saveAtomically(construction.carrier);
   evidence.atomic_failures_contained = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "storage_fault_injection", caseIds: ["atomic:read_failure", "atomic:write_failure"], passed: failedRead.status === "invalid" && failedWrite.status === "invalid" };
-  evidence.stale_revision_protected = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "repository_conflicts", caseIds: ["revision:stale", "revision:identical_retry"], passed: true };
+  const staleCandidate = { ...construction.carrier, revision: construction.carrier.revision + 1, progress: { ...construction.carrier.progress, revision: construction.carrier.revision + 1 } };
+  const staleRepository = createCanonicalActivePlanV2Repository();
+  staleRepository.clear();
+  staleRepository.saveAtomically(construction.carrier);
+  const staleWrite = staleRepository.saveAtomically(staleCandidate, -1);
+  const retry = repository.saveAtomically(construction.carrier, construction.carrier.revision);
+  evidence.stale_revision_protected = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "repository_conflicts", caseIds: ["revision:stale", "revision:identical_retry"], passed: staleWrite.status === "conflict" && retry.status === "saved", firstFailure: staleWrite.status === "conflict" && retry.status === "saved" ? undefined : { caseId: "revision:stale", reason: "conflict_or_retry_not_protected" } };
   const malformed = parseCanonicalActivePlan(JSON.stringify({ ...construction.carrier, blocks: [] }));
   evidence.malformed_carriers_rejected = { evidenceVersion: "canonical_pipeline_evidence_v1", producer: "carrier_validator", caseIds: ["malformed:legacy_fields"], passed: malformed.status === "invalid" };
   const session = construction.carrier.plannedSessions[0]!;

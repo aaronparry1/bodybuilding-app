@@ -1,0 +1,9 @@
+[
+  {"file":"src/domain/training/plan-setup.ts","authority":"TrainingBlock/annual planner","replacement":"constructCanonicalActivePlanFromCanonicalInputs","order":1},
+  {"file":"src/domain/training/planned-workout.ts","authority":"legacy currentBlock construction","replacement":"canonical session snapshot pipeline","order":2},
+  {"file":"src/domain/training/ad-hoc-workout-generator.ts","authority":"blockType/drop-off/legacy lane helpers","replacement":"canonical Session Construction","order":3},
+  {"file":"src/domain/training/extra-session-generator.ts","authority":"legacy ad-hoc generator","replacement":"canonical extra/custom operation","order":4},
+  {"file":"src/application/design-qa/design-qa-fixtures.ts","authority":"legacy fixture construction","replacement":"canonical QA orchestration","order":5},
+  {"file":"src/domain/training/run-v2-qa-preview.ts","authority":"block-shaped QA inputs","replacement":"canonical v2 QA inputs","order":6},
+  {"file":"src/domain/training/annual-planner.ts","authority":"TrainingBlock/TrainingYear","replacement":"archive after caller migration","order":7}
+]

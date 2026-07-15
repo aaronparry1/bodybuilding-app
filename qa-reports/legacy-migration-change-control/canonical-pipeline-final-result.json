@@ -1,0 +1,36 @@
+{
+  "sourceCommit": "3d1fe2efbe3d9beef6b84b6b99ab4c02cf2d396c",
+  "evidenceVersion": "canonical_pipeline_evidence_v1",
+  "executedCaseCount": 13,
+  "caseIdsByPredicate": {
+    "orchestration_matrix_passed": ["orchestration:build_muscle:3day"],
+    "repository_roundtrip_passed": ["repository:atomic_roundtrip"],
+    "atomic_failures_contained": ["atomic:read_failure", "atomic:write_failure"],
+    "stale_revision_protected": ["revision:stale", "revision:identical_retry"],
+    "malformed_carriers_rejected": ["malformed:legacy_fields"],
+    "malformed_sessions_rejected": ["malformed:wrong_linkage"],
+    "historical_snapshots_preserved": ["restoration:paused"],
+    "legacy_history_non_authoritative": ["restoration:legacy_nested_authority"],
+    "exact_prescriptions_preserved": ["prescription:roundtrip"],
+    "no_legacy_fields_persisted": ["persistence:recursive_legacy_scan"],
+    "deterministic_outputs_verified": ["determinism:repeat_identity"]
+  },
+  "predicates": {
+    "orchestration_matrix_passed": true,
+    "repository_roundtrip_passed": true,
+    "atomic_failures_contained": true,
+    "stale_revision_protected": true,
+    "malformed_carriers_rejected": true,
+    "malformed_sessions_rejected": true,
+    "historical_snapshots_preserved": true,
+    "legacy_history_non_authoritative": true,
+    "exact_prescriptions_preserved": true,
+    "no_legacy_fields_persisted": true,
+    "deterministic_outputs_verified": true
+  },
+  "firstFailure": null,
+  "pipelineReadyForSwitch": true,
+  "productionSwitchCompleted": false,
+  "classification": "canonical_pipeline_certified_for_production_switch",
+  "productionSwitchInventory": "qa-reports/legacy-migration-change-control/canonical-production-switch-inventory.json"
+}
