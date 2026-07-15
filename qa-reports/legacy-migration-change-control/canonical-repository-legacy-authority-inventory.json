@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "canonical_repository_legacy_authority_inventory_v1",
+  "sourceCommit": "36d1917",
+  "entries": [
+    {"file":"src/application/design-qa/design-qa-fixtures.ts","symbol":"applyDesignQaFixtureMatrix","classification":"dead_unreferenced","productionReachability":false,"normalQaReachability":false,"canonicalReplacement":"canonical family dispatchers","deletionBlocker":"none","disposition":"delete_next"},
+    {"file":"src/application/design-qa/design-qa-fixtures.ts","symbol":"applyFailureRecoveryFixture","classification":"dead_unreferenced","productionReachability":false,"normalQaReachability":false,"canonicalReplacement":"none","deletionBlocker":"none","disposition":"deleted_dispatch_wrapper"},
+    {"file":"src/data/local/active-training-plan-repository.ts","symbol":"activeTrainingPlanRepository","classification":"production_projection_or_transport","productionReachability":true,"normalQaReachability":false,"canonicalReplacement":"canonicalActivePlanState","deletionBlocker":"legacy persistence restore/migration callers","disposition":"retain_isolate"},
+    {"file":"src/application/training/legacy-training-year-archive.ts","symbol":"legacyTrainingYearArchive","classification":"archive_only","productionReachability":true,"normalQaReachability":false,"canonicalReplacement":"canonical plan lineage","deletionBlocker":"historical archive transport","disposition":"retain_allowlisted"},
+    {"file":"src/domain/training/annual-planner.ts","symbol":"createAnnualPlan","classification":"production_projection_or_transport","productionReachability":true,"normalQaReachability":false,"canonicalReplacement":"Macrocycle/Mesocycle owners","deletionBlocker":"active product flows and historical compatibility","disposition":"retain_isolate"},
+    {"file":"src/data/local/workout-session-repository.ts","symbol":"workoutSessionRepository","classification":"production_projection_or_transport","productionReachability":true,"normalQaReachability":false,"canonicalReplacement":"canonical recorded-session ledger","deletionBlocker":"sync/history transport","disposition":"retain_isolate"},
+    {"file":"src/application/design-qa/design-qa-fixtures.ts","symbol":"legacy fixture matrix helpers","classification":"dead_unreferenced","productionReachability":false,"normalQaReachability":false,"canonicalReplacement":"canonical plan/session/progress dispatchers","deletionBlocker":"none","disposition":"next_bounded_deletion_batch"}
+  ],
+  "nextBoundedDeletionBatch": ["src/application/design-qa/design-qa-fixtures.ts:applyDesignQaFixtureMatrix"],
+  "retainedLegacyAllowlist": [
+    {"file":"src/application/training/legacy-training-year-archive.ts","reason":"historical archive transport only"},
+    {"file":"src/data/local/workout-session-repository.ts","reason":"sync and historical transport compatibility"},
+    {"file":"src/data/local/active-training-plan-repository.ts","reason":"validated migration/restore callers remain"}
+  ],
+  "productionSwitchCompleted": false
+}

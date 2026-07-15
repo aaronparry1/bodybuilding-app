@@ -327,8 +327,8 @@ function applyProgressDecisionFixture(id: DesignQaFixtureId, environment: AppEnv
   }
   return applyDesignQaFixtureMatrix(id, environment);
 }
-function applyFailureRecoveryFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
-  return applyDesignQaFixtureMatrix(id, environment);
+function applyFailureRecoveryFixture(id: DesignQaFixtureId, _environment: AppEnvironment): ActiveDesignQaFixture {
+  throw new Error(`unsupported_design_qa_fixture_family:${id}`);
 }
 
 function applyDesignQaFixtureMatrix(id: DesignQaFixtureId, environment: AppEnvironment = "development"): ActiveDesignQaFixture {

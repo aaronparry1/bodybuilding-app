@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "canonical_legacy_deletion_phase_1_result_v1",
+  "sourceCommit": "36d1917",
+  "designQaCanonicalMatrixComplete": true,
+  "designQaLegacyReachabilityZero": true,
+  "productionLegacyAuthorityReachabilityZero": false,
+  "migrationLegacyBoundariesIsolated": false,
+  "deadLegacyCodeRemoved": false,
+  "pipelineReadyForSwitch": false,
+  "productionSwitchCompleted": false,
+  "firstBlockingSymbol": "src/application/design-qa/design-qa-fixtures.ts:applyDesignQaFixtureMatrix",
+  "reason": "dead Design-QA matrix remains present and must be deleted in the next bounded batch; retained production/archive compatibility paths remain classified and isolated work is incomplete"
+}
