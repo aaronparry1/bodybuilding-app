@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "canonical_mesocycle_decision_application_migration_blocker_v1",
+  "sourceCommit": "c142ac4",
+  "directCallers": [
+    {"file":"src/application/training/canonical-recommendation-actions.ts","symbol":"applyCanonicalRecommendationAction","status":"production_application_boundary","legacyRead":"activeTrainingPlanRepository.getOptional","legacyDelegate":"applyCurrentMesocycleDecision"},
+    {"file":"src/domain/training/current-decision-recommendation.ts","symbol":"applyCurrentDecisionRecommendation","status":"domain_compatibility_boundary","legacyDelegate":"applyCurrentMesocycleDecision"}
+  ],
+  "missingCanonicalInputs": ["expectedPlanRevision", "macrocycleId", "canonicalMicrocycleId", "evaluationId/version", "linkedEvidenceIds/versions", "persistedCanonicalDecisionId", "deterministicOperationId"],
+  "legacyAuthorityStillUsed": ["activeTrainingPlanRepository.getOptional", "activeTrainingPlanRepository.save", "ActiveTrainingPlan.currentMicrocycle", "ActiveTrainingPlan.currentMesocycleId", "ActiveTrainingPlan.blocks"],
+  "canonicalReplacement": "canonicalActivePlanState.applyProgressDecision",
+  "decision": "stop_at_missing_canonical_command_contract",
+  "nextBoundedTask": "migrate recommendation action production boundary to canonical decision command inputs",
+  "productionSwitchCompleted": false,
+  "ordinaryV2Authority": "inactive",
+  "d4d2": "unchanged"
+}
