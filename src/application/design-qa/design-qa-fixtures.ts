@@ -1,19 +1,16 @@
 import { appSettingsStore } from "@/application/settings/app-settings";
 import { cacheSubscription } from "@/application/billing/subscription-cache";
 import { seedMockSubscriptionStatus } from "@/application/billing/mock-revenuecat";
-import { activeTrainingPlanRepository } from "@/data/local/active-training-plan-repository";
 import { jsonStore } from "@/data/local/json-store";
 import { programmeRepository } from "@/data/local/programme-repository";
 import { sessionPrepRepository } from "@/data/local/session-prep-repository";
-import { legacyTrainingYearArchive } from "@/application/training/legacy-training-year-archive";
 import { workoutSessionRepository } from "@/data/local/workout-session-repository";
 import type { AppEnvironment } from "@/application/runtime/app-environment-core";
 import { isDesignQaModeAvailable } from "@/application/runtime/app-environment-core";
 import { calculateNextSessionStartingLoadFromProductiveSets, resolveStartingLoadRecommendation } from "@/domain/training/load-selection";
-import { createActiveTrainingPlan, transitionToApprovedMesocycle, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
+import { createActiveTrainingPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { replaceExerciseForFutureSessions } from "@/domain/training/recommendation-actions";
 import type { Exercise, SetLog, WorkoutExerciseLog, WorkoutSession } from "@/domain/training/models";
-import type { TrainingYear } from "@/domain/training/annual-models";
 import { exerciseLibrary } from "@/domain/training/presets";
 import { buildSessionPrepRecord, getSessionPrepRoutine, type SessionPrepRecord } from "@/domain/training/session-prep";
 import { summarizeWorkoutSession } from "@/domain/training/workout-history";
@@ -118,18 +115,8 @@ export interface ActiveDesignQaFixture {
 export const designQaFixtureMarker = "[Design QA Fixture]";
 
 const activeFixtureKey = "iron-logic.design-qa-fixture";
-const fixtureBackupKey = "iron-logic.design-qa-backup";
 const workoutSessionsKey = "iron-logic.workout-sessions";
-const activeTrainingPlanKey = "iron-logic.active-training-plan";
-const trainingYearKey = "iron-logic.training-year";
 const sessionPrepRecordsKey = "iron-logic.session-prep-records";
-
-interface DesignQaFixtureBackup {
-  activePlan: ActiveTrainingPlan | null;
-  trainingYear: TrainingYear;
-  workoutSessions: WorkoutSession[];
-  sessionPrepRecords: SessionPrepRecord[];
-}
 
 export const designQaFixtures: DesignQaFixtureDefinition[] = [
   { id: "progress_low", area: "Progress", label: "Low history", description: "One completed workout, no strategic verdict yet.", targetHref: "/(protected)/(tabs)/analytics" },
@@ -253,7 +240,7 @@ export function applyDesignQaFixture(id: DesignQaFixtureId, environment: AppEnvi
   if (family === "plan_state") return applyPlanStateFixture(id, environment);
   if (family === "session_lifecycle") return applySessionLifecycleFixture(id, environment);
   if (family === "progress_decision") return applyProgressDecisionFixture(id, environment);
-  return applyFailureRecoveryFixture(id, environment);
+  throw new Error(`unsupported_design_qa_fixture_family:${id}`);
 }
 
 function applyPlanStateFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
@@ -325,387 +312,15 @@ function applyProgressDecisionFixture(id: DesignQaFixtureId, environment: AppEnv
     jsonStore.set(activeFixtureKey, activeFixture);
     return activeFixture;
   }
-  return applyDesignQaFixtureMatrix(id, environment);
-}
-function applyFailureRecoveryFixture(id: DesignQaFixtureId, _environment: AppEnvironment): ActiveDesignQaFixture {
-  throw new Error(`unsupported_design_qa_fixture_family:${id}`);
+  throw new Error(`unsupported_progress_fixture:${id}`);
 }
 
-function applyDesignQaFixtureMatrix(id: DesignQaFixtureId, environment: AppEnvironment = "development"): ActiveDesignQaFixture {
-  if (!isDesignQaModeAvailable(environment)) {
-    throw new Error("Design QA fixtures are not available in production.");
-  }
-
-  if (!getActiveDesignQaFixture() && !jsonStore.get<DesignQaFixtureBackup | null>(fixtureBackupKey, null)) {
-    jsonStore.set<DesignQaFixtureBackup>(fixtureBackupKey, {
-      activePlan: activeTrainingPlanRepository.getOptional(),
-      trainingYear: legacyTrainingYearArchive.read() as TrainingYear,
-      workoutSessions: workoutSessionRepository.list(),
-      sessionPrepRecords: sessionPrepRepository.list(),
-    });
-  }
-
-  clearFixtureViewStateOnly();
-  appSettingsStore.patch({ onboardingCompleted: true });
-
-  switch (id) {
-    case "home_no_plan":
-    case "plan_no_plan":
-      break;
-    case "plan_single_hypertrophy":
-      activeTrainingPlanRepository.save(singleHypertrophyPlan());
-      break;
-    case "plan_event_custom":
-      activeTrainingPlanRepository.save(eventPlan());
-      break;
-    case "plan_block_ending":
-      activeTrainingPlanRepository.save(blockEndingPlan());
-      break;
-    case "plan_block_transition_action":
-      activeTrainingPlanRepository.save(blockEndingPlan());
-      break;
-    case "plan_block_transition_accepted":
-      activeTrainingPlanRepository.save(transitionToApprovedMesocycle(blockEndingPlan(), "powerbuilding_hypertrophy"));
-      break;
-    case "plan_deload_accepted":
-      activeTrainingPlanRepository.save({ ...basePlan(), currentMicrocycle: basePlan().currentMicrocycle ? { ...basePlan().currentMicrocycle!, progressionState: "deload" } : undefined });
-      break;
-    case "train_rotation_accepted":
-      activeTrainingPlanRepository.save(
-        replaceExerciseForFutureSessions(
-          basePlan(),
-          "ex-bench-press",
-          "ex-floor-press",
-          "Bench Press stalled across repeated exposures.",
-          "2026-06-06T10:00:00.000Z",
-        ),
-      );
-      saveSessions([
-        openSession({
-          id: "qa-train-rotation-accepted",
-          name: "Push",
-          exercises: [exerciseLog(findExercise("ex-floor-press"), { reps: [], status: "active", load: 90 }), inclineExercise([], "active")],
-        }),
-      ]);
-      break;
-    case "home_rest_day":
-      activeTrainingPlanRepository.save(basePlan({ daysPerWeek: 4, preferredSplit: "upper_lower" }));
-      break;
-    case "home_completed_today":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([completedSession({ id: "qa-home-completed", name: "Upper", completedAt: todayIso(11), exercises: [benchExercise([12, 11, 10])] })]);
-      break;
-    case "home_active_workout":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([
-        openSession({
-          id: "qa-home-active",
-          name: "Push",
-          exercises: [
-            benchExercise([12, 11], "active"),
-            inclineExercise([], "active"),
-            lateralRaiseExercise([], "active"),
-            cableFlyExercise([], "active"),
-            tricepsPushdownExercise([], "active"),
-          ],
-        }),
-      ]);
-      break;
-    case "home_recovery_capacity":
-      activeTrainingPlanRepository.save(basePlan({ goal: "get_leaner", recoveryCardioPreference: "recommended" }));
-      saveSessions(homeRecoveryCapacitySessions());
-      break;
-    case "home_recent_prs":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(recentPrFixtureSessions());
-      break;
-    case "progress_low":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([completedSession({ id: "qa-progress-low", name: "Push", completedAt: daysAgoIso(1), exercises: [benchExercise([12, 11, 8], "shutdown")] })]);
-      break;
-    case "progress_healthy":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(progressHealthySessions());
-      break;
-    case "progress_strength_dashboard":
-      activeTrainingPlanRepository.save(basePlan({ goal: "powerlifting_meet", planningChoice: "custom_date_event", eventType: "powerlifting_meet", targetDate: "2026-10-01" }));
-      saveSessions(progressStrengthDashboardSessions());
-      break;
-    case "progress_fatigue":
-    case "progress_deload_action":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(progressFatigueSessions());
-      break;
-    case "progress_slowing":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(progressSlowingSessions());
-      break;
-    case "progress_recent_clean":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([...progressHealthySessions(), zeroSetFixtureSession()]);
-      break;
-    case "progress_volume_large_low":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(progressLargeLowVolumeSessions());
-      break;
-    case "progress_volume_ladder_apply":
-      activeTrainingPlanRepository.save(basePlan({ goal: "build_muscle" }));
-      saveSessions(progressVolumeLadderApplySessions());
-      break;
-    case "progress_volume_large_high_fatigue":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(progressLargeHighFatigueSessions());
-      break;
-    case "progress_volume_small_progressing":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(progressSmallProgressingSessions());
-      break;
-    case "progress_rotation_stalled_tier_a":
-    case "progress_rotation_action":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(progressRotationStalledTierASessions());
-      break;
-    case "progress_rotation_progressing_tier_a":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(progressRotationProgressingTierASessions());
-      break;
-    case "progress_rotation_tier_c":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(progressRotationTierCSessions());
-      break;
-    case "phase1_deload_mild":
-    case "phase1_goal_athletic":
-      activeTrainingPlanRepository.save(basePlan({ goal: "athletic_performance" }));
-      saveSessions(phase1MildDeloadSessions());
-      break;
-    case "phase1_deload_clear":
-      activeTrainingPlanRepository.save(basePlan({ goal: "build_muscle_and_strength" }));
-      saveSessions(phase1ClearDeloadSessions());
-      break;
-    case "phase1_deload_severe":
-      activeTrainingPlanRepository.save(basePlan({ goal: "build_muscle_and_strength" }));
-      saveSessions(phase1SevereDeloadSessions());
-      break;
-    case "phase1_load_one_bad_session":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([
-        openSession({ id: "qa-phase1-one-bad-active", name: "Push", exercises: [benchExercise([], "active", { load: 100, notes: "Hold load. One poor session is not enough evidence to reduce." })] }),
-        completedSession({ id: "qa-phase1-one-bad-history", name: "Push", completedAt: daysAgoIso(7), exercises: [benchExercise([8, 7], "shutdown", { load: 100 })] }),
-      ]);
-      break;
-    case "phase1_goal_strength":
-      activeTrainingPlanRepository.save(basePlan({ goal: "build_strength" }));
-      saveSessions(phase1StrengthGoalSessions());
-      break;
-    case "phase1_goal_muscle":
-      activeTrainingPlanRepository.save(basePlan({ goal: "build_muscle" }));
-      saveSessions(phase1LowFatigueFlatProgressSessions());
-      break;
-    case "phase1_goal_muscle_strength":
-      activeTrainingPlanRepository.save(basePlan({ goal: "build_muscle_and_strength" }));
-      saveSessions(phase1BalancedGoalSessions());
-      break;
-    case "phase1_goal_event":
-      activeTrainingPlanRepository.save(basePlan({ goal: "powerlifting_meet", planningChoice: "custom_date_event", eventType: "powerlifting_meet", targetDate: "2026-10-01" }));
-      saveSessions(phase1MildDeloadSessions());
-      break;
-    case "phase1_goal_general":
-      activeTrainingPlanRepository.save(basePlan({ goal: "get_leaner" }));
-      saveSessions(phase1LowFatigueFlatProgressSessions());
-      break;
-    case "phase1_low_history_no_deload":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([completedSession({ id: "qa-phase1-low-history", name: "Push", completedAt: daysAgoIso(1), exercises: [benchExercise([8, 7], "shutdown", { load: 100 })] })]);
-      break;
-    case "train_overview_fresh":
-    case "train_first_set":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: `qa-${id}`, name: "Push", exercises: [benchExercise([], "active"), inclineExercise([], "active"), lateralRaiseExercise([], "active")] })]);
-      break;
-    case "train_warmups":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-warmups", name: "Push", exercises: [benchExercise([], "active", { warmups: [{ load: 40, reps: 8 }, { load: 60, reps: 5 }] }), inclineExercise([], "active")] })]);
-      break;
-    case "train_work_sets":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-work", name: "Push", exercises: [benchExercise([12, 11], "active"), inclineExercise([], "active")] })]);
-      break;
-    case "train_near_threshold":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-near", name: "Push", exercises: [benchExercise([12, 11, 10], "active"), inclineExercise([], "active")] })]);
-      break;
-    case "train_shutdown":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-shutdown", name: "Push", exercises: [benchExercise([12, 11, 10, 8], "shutdown")] })]);
-      break;
-    case "train_swapped":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-swapped", name: "Push", exercises: [machineChestPressSwappedFromBench(), inclineExercise([], "active")] })]);
-      break;
-    case "train_added_exercise":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-added", name: "Push", exercises: [benchExercise([12, 11], "active"), inclineExercise([], "active"), tricepsPushdownExercise([], "active", "added_during_workout")] })]);
-      break;
-    case "train_load_no_history":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-load-no-history", name: "Push", exercises: [benchExercise([], "active", { load: 0, loadKnown: false })] })]);
-      break;
-    case "train_load_strength_unknown":
-      activeTrainingPlanRepository.save(strengthPlan());
-      saveSessions([openSession({ id: "qa-train-load-strength-unknown", name: "Push", exercises: [benchExercise([], "active", { load: 0, loadKnown: false })] })]);
-      break;
-    case "train_load_exact_progressed":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([
-        openSession({ id: "qa-train-load-exact-progressed", name: "Push", exercises: [benchExercise([], "active", { load: 105, notes: "Previous performance sets today's starting load." })] }),
-        completedSession({ id: "qa-load-exact-history", name: "Push", completedAt: daysAgoIso(7), exercises: [benchExercise([12, 11, 10], "complete", { load: 102.5 })] }),
-      ]);
-      break;
-    case "train_load_exact_held":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([
-        openSession({ id: "qa-train-load-exact-held", name: "Push", exercises: [benchExercise([], "active", { load: 100, notes: "Previous performance says hold this load and earn more reps." })] }),
-        completedSession({ id: "qa-load-exact-held-history", name: "Push", completedAt: daysAgoIso(7), exercises: [benchExercise([10, 10, 9], "complete", { load: 100 })] }),
-      ]);
-      break;
-    case "train_load_same_family_estimate":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions(sameFamilyEstimateFixtureSessions());
-      break;
-    case "train_load_same_family_low_confidence":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-load-low-confidence", name: "Push", exercises: [benchExercise([], "active", { load: 0, loadKnown: false, notes: "Choose a starting load. Similar exercise history is not reliable enough yet." })] })]);
-      break;
-    case "train_load_lb_known":
-      appSettingsStore.patch({ unit: "lb" });
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-load-lb-known", name: "Push", exercises: [benchExercise([], "active", { load: 225, loadIncrease: 5, unit: "lb", notes: "Previous performance sets today's starting load." })] })]);
-      break;
-    case "train_load_bodyweight":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-load-bodyweight", name: "Pull", exercises: [bodyweightPullUpExercise()] })]);
-      break;
-    case "train_end_workout_confirm":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-end-workout-confirm", name: "Push", exercises: [benchExercise([12, 11], "active")] })]);
-      break;
-    case "train_review_prs":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([
-        ...recentPrFixtureSessions(),
-        openSession({
-          id: "qa-train-review-prs-current",
-          name: "Push",
-          exercises: [
-            benchExercise([12, 12, 12], "complete", { load: 110 }),
-            rowExercise([12, 11, 10], "complete", { load: 90 }),
-          ],
-        }),
-      ]);
-      break;
-    case "train_load_regression_reduce":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([
-        openSession({ id: "qa-train-load-regression", name: "Push", exercises: [benchExercise([], "active", { load: 95, notes: "Recent performance suggests the current load is too demanding. Use 95kg next time." })] }),
-        ...regressionHistorySessions(),
-      ]);
-      break;
-    case "train_load_escalation":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-load-escalation", name: "Push", exercises: [benchExercise([12, 12, 12], "active", { load: 100, loadIncrease: 2.5 })] })]);
-      break;
-    case "train_load_escalation_modal":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-load-escalation-modal", name: "Push", exercises: [benchExercise([12, 12], "active", { load: 100, loadIncrease: 2.5 })] })]);
-      break;
-    case "train_load_average_next":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-load-average-next", name: "Push", exercises: [benchExercise([12, 12, 12, 12, 12, 12, 12], "active", { load: 100, perSetLoads: [100, 100, 100, 102.5, 105, 107.5, 110], notes: "Next session load comes from average productive load rounded up." })] })]);
-      break;
-    case "train_increment_barbell_1":
-      appSettingsStore.patch({ loadIncrementProfile: { ...appSettingsStore.get().loadIncrementProfile, barbellPlateLoadedKg: 1 } });
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-increment-barbell-1", name: "Push", exercises: [benchExercise([12, 12, 12], "active", { load: 103, loadIncrease: 1, notes: "Barbell increment set to 1kg. Next jump uses 1kg." })] })]);
-      break;
-    case "train_increment_barbell_2_5":
-      appSettingsStore.patch({ loadIncrementProfile: { ...appSettingsStore.get().loadIncrementProfile, barbellPlateLoadedKg: 2.5 } });
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-increment-barbell-2-5", name: "Push", exercises: [benchExercise([12, 12, 12], "active", { load: 102.5, loadIncrease: 2.5, notes: "Barbell increment set to 2.5kg. Next jump uses 2.5kg." })] })]);
-      break;
-    case "train_increment_barbell_5":
-      appSettingsStore.patch({ loadIncrementProfile: { ...appSettingsStore.get().loadIncrementProfile, barbellPlateLoadedKg: 5 } });
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-increment-barbell-5", name: "Push", exercises: [benchExercise([12, 12, 12], "active", { load: 100, loadIncrease: 5, notes: "Barbell increment set to 5kg. Next jump uses 5kg." })] })]);
-      break;
-    case "train_increment_machine_1":
-      appSettingsStore.patch({ loadIncrementProfile: { ...appSettingsStore.get().loadIncrementProfile, machineKg: 1 } });
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-increment-machine-1", name: "Push", exercises: [exerciseLog(findExercise("ex-machine-chest-press"), { reps: [12, 12, 12], status: "active", load: 101, loadIncrease: 1, notes: "Machine increment set to 1kg." })] })]);
-      break;
-    case "train_increment_cable_1":
-      appSettingsStore.patch({ loadIncrementProfile: { ...appSettingsStore.get().loadIncrementProfile, cableKg: 1 } });
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-increment-cable-1", name: "Arms", exercises: [tricepsPushdownExercise([12, 12, 12], "active", { load: 31, loadIncrease: 1 })] })]);
-      break;
-    case "train_increment_exercise_override":
-      appSettingsStore.patch({ loadIncrementProfile: { ...appSettingsStore.get().loadIncrementProfile, dumbbellKg: 5 } });
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-increment-override", name: "Push", exercises: [lateralRaiseExercise([15, 15, 15], "active", { load: 12, loadIncrease: 1, notes: "Exercise override set to 1kg despite dumbbells set to 5kg." })] })]);
-      break;
-    case "train_productive_below_min":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-productive-below-min", name: "Push", exercises: [benchExercise([12, 11], "active"), inclineExercise([], "active")] })]);
-      break;
-    case "train_productive_target_zone":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-productive-target-zone", name: "Push", exercises: [benchExercise([12, 11, 10, 10], "active"), inclineExercise([], "active")] })]);
-      break;
-    case "train_productive_soft_cap":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-productive-soft-cap", name: "Push", exercises: [benchExercise([12, 11, 10, 10, 10, 10, 10, 10], "active"), inclineExercise([], "active")] })]);
-      break;
-    case "train_productive_over_soft_cap":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-productive-over-soft-cap", name: "Push", exercises: [benchExercise([12, 11, 10, 10, 10, 10, 10, 10, 10], "active"), inclineExercise([], "active")] })]);
-      break;
-    case "train_prep_not_started":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-prep-not-started", name: "Push", exercises: pushExerciseList() })]);
-      break;
-    case "train_prep_completed":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-prep-completed", name: "Push", exercises: pushExerciseList() })]);
-      saveSessionPrepRecords([prepRecord("Push", "completed")]);
-      break;
-    case "train_prep_skipped":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-prep-skipped", name: "Push", exercises: pushExerciseList() })]);
-      saveSessionPrepRecords([prepRecord("Push", "skipped")]);
-      break;
-    case "train_prep_active_workout":
-      activeTrainingPlanRepository.save(basePlan());
-      saveSessions([openSession({ id: "qa-train-prep-active-workout", name: "Push", exercises: [benchExercise([12, 11], "active"), inclineExercise([], "active"), lateralRaiseExercise([], "active")] })]);
-      saveSessionPrepRecords([prepRecord("Push", "completed")]);
-      break;
-    case "home_active_plan":
-    case "plan_recommended":
-    default:
-      activeTrainingPlanRepository.save(basePlan());
-      break;
-  }
-
-  const definition = getFixtureDefinition(id);
-  const activeFixture = { id, label: definition.label, appliedAt: new Date().toISOString() };
-  jsonStore.set(activeFixtureKey, activeFixture);
-  return activeFixture;
-}
 
 export function clearDesignQaFixtures(environment: AppEnvironment = "development"): void {
   if (!isDesignQaModeAvailable(environment)) {
     throw new Error("Design QA fixtures are not available in production.");
   }
   clearFixtureViewStateOnly();
-  restoreBackedUpState();
 }
 
 export function getActiveDesignQaFixture(): ActiveDesignQaFixture | null {
@@ -724,26 +339,10 @@ function clearFixtureViewStateOnly() {
   programmeRepository.clearSelectedProgrammeDay();
   canonicalActivePlanState.clear();
   jsonStore.remove(activeFixtureKey);
-  jsonStore.remove(activeTrainingPlanKey);
-  jsonStore.remove(trainingYearKey);
   jsonStore.set(workoutSessionsKey, []);
   jsonStore.set(sessionPrepRecordsKey, []);
 }
 
-function restoreBackedUpState() {
-  const backup = jsonStore.get<DesignQaFixtureBackup | null>(fixtureBackupKey, null);
-  if (!backup) return;
-
-  if (backup.activePlan) {
-    jsonStore.set(activeTrainingPlanKey, backup.activePlan);
-  } else {
-    jsonStore.remove(activeTrainingPlanKey);
-  }
-  jsonStore.set(trainingYearKey, backup.trainingYear);
-  jsonStore.set(workoutSessionsKey, backup.workoutSessions);
-  jsonStore.set(sessionPrepRecordsKey, backup.sessionPrepRecords ?? []);
-  jsonStore.remove(fixtureBackupKey);
-}
 
 function saveSessions(sessions: WorkoutSession[]) {
   jsonStore.set(workoutSessionsKey, sessions);

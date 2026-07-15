@@ -1,13 +1,14 @@
 {
   "schemaVersion": "canonical_legacy_deletion_phase_1_result_v1",
-  "sourceCommit": "36d1917",
+  "sourceCommit": "47ba2c6",
   "designQaCanonicalMatrixComplete": true,
   "designQaLegacyReachabilityZero": true,
   "productionLegacyAuthorityReachabilityZero": false,
   "migrationLegacyBoundariesIsolated": false,
-  "deadLegacyCodeRemoved": false,
-  "pipelineReadyForSwitch": false,
+  "deadLegacyCodeRemoved": true,
+  "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
-  "firstBlockingSymbol": "src/application/design-qa/design-qa-fixtures.ts:applyDesignQaFixtureMatrix",
-  "reason": "dead Design-QA matrix remains present and must be deleted in the next bounded batch; retained production/archive compatibility paths remain classified and isolated work is incomplete"
+  "deletedSymbols": ["applyDesignQaFixtureMatrix", "applyFailureRecoveryFixture", "DesignQaFixtureBackup", "fixtureBackupKey"],
+  "nextDeletionCandidate": "src/application/design-qa/design-qa-fixtures.ts:basePlan and fixture-only helper cluster",
+  "reason": "certified Design-QA matrix and backup bridge removed; retained production/archive compatibility paths remain classified"
 }

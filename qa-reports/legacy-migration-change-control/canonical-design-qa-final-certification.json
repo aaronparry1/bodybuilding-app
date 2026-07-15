@@ -1,5 +1,6 @@
 {
   "schemaVersion": "canonical_design_qa_final_certification_v1",
+  "sourceCommit": "47ba2c6",
   "fixtureCount": 78,
   "familyCounts": {
     "plan_state": 13,
@@ -15,9 +16,5 @@
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
   "failedFixtureIds": [],
-  "legacyMachinery": {
-    "normalReachability": "zero",
-    "retainedDeadCode": ["applyDesignQaFixtureMatrix", "applyFailureRecoveryFixture"],
-    "reason": "retained for separate repository-wide deletion phase; no declared fixture family dispatches to it"
-  }
+  "deadDesignQaMatrixRemoved": true
 }
