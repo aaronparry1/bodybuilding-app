@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "canonical_dashboard_missing_owner_phase_1_v1",
+  "sourceCommit": "5e036a3",
+  "selectedOwner": "progress_factual_evidence_sufficiency",
+  "contractVersion": "canonical_progress_dashboard_evidence_v1",
+  "affectedCaseIds": ["does not recommend a Recovery Window after only two planned sessions, even when extra work is noisy", "suppresses volume recommendations until enough completed history exists"],
+  "unlockedCaseCount": 2,
+  "ownerRationale": "Both cases require factual completed/planned/extra history sufficiency and no policy or mutation; the contract is read/evaluation-only.",
+  "adjacentContracts": ["canonical_progress_evaluation_v2", "canonical_progress_dashboard_projection_v1", "canonical recorded-session ledger/history"],
+  "nonGoals": ["recovery thresholds", "volume policy", "dashboard migration", "plan mutation", "Session Construction"],
+  "allNineCases": [
+    {"case": "cleans generated workout names before Progress displays them", "owner": "Session Construction", "missing": "display-name projection", "unlocked": false},
+    {"case": "does not recommend a Recovery Window from repeated productive hypertrophy accessory shutdowns alone", "owner": "Mesocycle", "missing": "recovery policy", "unlocked": false},
+    {"case": "keeps one bad planned session local instead of escalating to a full Recovery Window", "owner": "Mesocycle", "missing": "fatigue escalation policy", "unlocked": false},
+    {"case": "keeps mild fatigue evidence below the full Recovery Window action threshold", "owner": "Mesocycle", "missing": "source-backed threshold", "unlocked": false},
+    {"case": "does not turn repeated systemic historical evidence into an automatic recovery plan", "owner": "Progress intervention", "missing": "bounded recovery outcome", "unlocked": false},
+    {"case": "accepting a Recovery Window changes the active generated prescription, not just the roadmap", "owner": "Progress application", "missing": "atomic application chain", "unlocked": false},
+    {"case": "surfaces meaningful volume recommendations without raw landmark labels", "owner": "Mesocycle", "missing": "volume presentation policy", "unlocked": false},
+    {"case": "keeps a stalled Tier A history observation non-actionable without an intervention", "owner": "Microcycle", "missing": "rotation observation policy", "unlocked": false},
+    {"case": "suppresses a kept stalled exercise recommendation", "owner": "Progress intervention", "missing": "keep disposition projection", "unlocked": false}
+  ],
+  "dashboardMigrationReady": false,
+  "firstRemainingBlocker": "canonical recovery/volume/rotation policy or application contracts",
+  "productionSwitchCompleted": false
+}
