@@ -281,6 +281,12 @@ function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnv
     jsonStore.set(activeFixtureKey, activeFixture);
     return activeFixture;
   }
+  if (id.startsWith("train_")) {
+    if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
+    clearFixtureViewStateOnly();
+    appSettingsStore.patch({ onboardingCompleted: true });
+    applyCanonicalActiveSessionFixture(id);
+  }
   return applyDesignQaFixtureMatrix(id, environment);
 }
 function applyProgressDecisionFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
