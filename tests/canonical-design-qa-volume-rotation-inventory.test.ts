@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { designQaFixtures } from "@/application/design-qa/design-qa-fixtures";
+import { applyDesignQaFixture, designQaFixtures, getActiveDesignQaFixture } from "@/application/design-qa/design-qa-fixtures";
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 
 const volume = ["progress_volume_large_low", "progress_volume_ladder_apply", "progress_volume_large_high_fatigue", "progress_volume_small_progressing"] as const;
 const rotation = ["progress_rotation_stalled_tier_a", "progress_rotation_action", "progress_rotation_progressing_tier_a", "progress_rotation_tier_c"] as const;
@@ -11,5 +12,12 @@ describe("Design-QA volume/rotation inventory", () => {
     for (const id of [...volume, ...rotation]) expect(ids.has(id)).toBe(true);
     expect(new Set([...volume, ...rotation]).size).toBe(8);
     expect([...volume, ...rotation].some((id) => (load as readonly string[]).includes(id))).toBe(false);
+  });
+  it("routes every inventoried ID through canonical plan setup", () => {
+    for (const id of [...volume, ...rotation]) {
+      applyDesignQaFixture(id, "development");
+      expect(getActiveDesignQaFixture()?.id).toBe(id);
+      expect(canonicalActivePlanState.getReadModel()?.planId).toBe(`design-qa:${id}`);
+    }
   });
 });

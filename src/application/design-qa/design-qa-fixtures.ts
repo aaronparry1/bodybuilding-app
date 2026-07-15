@@ -313,6 +313,18 @@ function applyProgressDecisionFixture(id: DesignQaFixtureId, environment: AppEnv
     jsonStore.set(activeFixtureKey, activeFixture);
     return activeFixture;
   }
+  if (["progress_volume_large_low", "progress_volume_ladder_apply", "progress_volume_large_high_fatigue", "progress_volume_small_progressing", "progress_rotation_stalled_tier_a", "progress_rotation_action", "progress_rotation_progressing_tier_a", "progress_rotation_tier_c"].includes(id)) {
+    if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
+    clearFixtureViewStateOnly();
+    appSettingsStore.patch({ onboardingCompleted: true });
+    canonicalActivePlanState.clear();
+    const result = canonicalActivePlanState.create({ planId: `design-qa:${id}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell"], units: "kg", exercises: exerciseLibrary, history: [] });
+    if (result.hydration !== "hydrated" || !result.model) throw new Error(`canonical_progress_fixture_failed:${result.error ?? result.hydration}`);
+    const definition = getFixtureDefinition(id);
+    const activeFixture = { id, label: definition.label, appliedAt: "2026-01-01T00:00:00.000Z" };
+    jsonStore.set(activeFixtureKey, activeFixture);
+    return activeFixture;
+  }
   return applyDesignQaFixtureMatrix(id, environment);
 }
 function applyFailureRecoveryFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
