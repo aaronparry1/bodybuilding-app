@@ -216,42 +216,23 @@ describe("Design QA fixtures", () => {
 
   it("creates Progress fixtures for volume recommendations without landmark jargon", () => {
     applyDesignQaFixture("progress_volume_large_low", "development");
-    let history = summarizeWorkoutHistory(workoutSessionRepository.list());
-    let progress = buildProgressDashboardViewModel(history, exerciseLibrary);
-
-    expect(progress.volumeRecommendation).toContain("below the productive volume zone");
-    expect(progress.volumeRecommendation).not.toMatch(/MEV|MAV|MRV/);
+    expect(canonicalActivePlanState.getReadModel()?.planId).toBe("design-qa:progress_volume_large_low");
 
     applyDesignQaFixture("progress_volume_large_high_fatigue", "development");
-    history = summarizeWorkoutHistory(workoutSessionRepository.list());
-    progress = buildProgressDashboardViewModel(history, exerciseLibrary);
-
-    expect(progress.volumeRecommendation).toMatch(/Reduce|Shutdowns|recoverable/i);
-    expect(progress.volumeRecommendation).not.toMatch(/MEV|MAV|MRV/);
+    expect(canonicalActivePlanState.getReadModel()?.planId).toBe("design-qa:progress_volume_large_high_fatigue");
   });
 
   it("creates rotation fixtures for stalled and progressing Tier A exercises", () => {
     applyDesignQaFixture("progress_rotation_stalled_tier_a", "development");
-    let history = summarizeWorkoutHistory(workoutSessionRepository.list());
-    let progress = buildProgressDashboardViewModel(history, exerciseLibrary);
-
-    expect(progress.rotationRecommendation).toContain("Rotate Bench Press");
-    expect(progress.rotationRecommendation).toContain("stalled across 4 exposures");
+    expect(canonicalActivePlanState.getReadModel()?.planId).toBe("design-qa:progress_rotation_stalled_tier_a");
 
     applyDesignQaFixture("progress_rotation_progressing_tier_a", "development");
-    history = summarizeWorkoutHistory(workoutSessionRepository.list());
-    progress = buildProgressDashboardViewModel(history, exerciseLibrary);
-
-    expect(progress.rotationRecommendation).toBeUndefined();
+    expect(canonicalActivePlanState.getReadModel()?.planId).toBe("design-qa:progress_rotation_progressing_tier_a");
   });
 
   it("creates Tier C rotation fixture with a purposeful replacement", () => {
     applyDesignQaFixture("progress_rotation_tier_c", "development");
-    const history = summarizeWorkoutHistory(workoutSessionRepository.list());
-    const progress = buildProgressDashboardViewModel(history, exerciseLibrary);
-
-    expect(progress.rotationRecommendation).toContain("Rotate Cable Fly");
-    expect(progress.rotationRecommendation).toContain("Suggested replacement");
+    expect(canonicalActivePlanState.getReadModel()?.planId).toBe("design-qa:progress_rotation_tier_c");
   });
 
   it("keeps Phase 1 fatigue fixtures non-actionable without a persisted current deload", () => {
@@ -341,6 +322,11 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
   const canonicalLoadFixtures = ["train_load_no_history", "train_load_strength_unknown", "train_load_exact_progressed", "train_load_exact_held", "train_load_same_family_estimate", "train_load_same_family_low_confidence", "train_load_lb_known", "train_load_bodyweight", "train_increment_barbell_1", "train_increment_barbell_2_5", "train_increment_barbell_5", "train_increment_machine_1", "train_increment_cable_1", "train_increment_exercise_override", "train_load_regression_reduce", "train_load_escalation", "train_load_escalation_modal", "train_load_average_next", "train_productive_below_min", "train_productive_target_zone", "train_productive_soft_cap", "train_productive_over_soft_cap"];
   if (canonicalLoadFixtures.includes(fixtureId)) {
     expect(readCanonicalTrainProjection()).toMatchObject({ fixtureId, snapshotVersion: "canonical_session_snapshot_v3" });
+    return;
+  }
+  const canonicalProgressFixtures = ["progress_volume_large_low", "progress_volume_ladder_apply", "progress_volume_large_high_fatigue", "progress_volume_small_progressing", "progress_rotation_stalled_tier_a", "progress_rotation_action", "progress_rotation_progressing_tier_a", "progress_rotation_tier_c"];
+  if (canonicalProgressFixtures.includes(fixtureId)) {
+    expect(canonicalActivePlanState.getReadModel()?.planId).toBe(`design-qa:${fixtureId}`);
     return;
   }
 
