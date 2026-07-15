@@ -30,7 +30,7 @@
     "keeps a stalled Tier A history observation non-actionable without an intervention",
     "suppresses a kept stalled exercise recommendation"
   ],
-  "remainingCaseCount": 13,
+  "remainingCaseCount": 11,
   "collectedTestDelta": -1,
   "collectedTestDeltaExplanation": "one obsolete legacy block expectation removed; no canonical fixture IDs changed",
   "fixturePartition": {"plan": 13, "session": 30, "progress": 35},

@@ -4,14 +4,14 @@
   "manifest": "qa-reports/legacy-migration-change-control/canonical-progress-dashboard-coverage-map.json",
   "originalCases": 21,
   "canonicalCasesCompleted": 7,
-  "blockedCases": 13,
+  "blockedCases": 11,
   "implementedExtensions": ["factual recovery/capacity/fatigue summary", "persisted volume/rotation intervention presentation", "bounded ledger history summary", "persisted transition/deload action descriptor"],
   "missingCanonicalFields": ["factual recovery/capacity/fatigue summary", "persisted volume intervention presentation", "persisted microcycle rotation intervention presentation", "recorded-session history aggregation for dashboard cards", "canonical action descriptors for transition/deload review"],
   "decision": "stop_at_missing_canonical_dashboard_projection_fields_after_obsolete_case_removal",
   "legacyBuilderDisposition": "retain_until_meaningful_cases_have_canonical_replacements",
   "mountedProductionCaller": null,
   "productionSwitchCompleted": false,
-  "nextBoundedTask": "resolve the 13 field-level dashboard cases recorded in canonical-progress-dashboard-coverage-batch-2.json",
+  "nextBoundedTask": "resolve the 11 field-level dashboard cases recorded in canonical-progress-dashboard-coverage-batch-3.json",
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
 }

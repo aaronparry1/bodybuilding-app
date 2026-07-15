@@ -1,13 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { buildProgressDashboardViewModel, cleanGeneratedSessionName } from "@/domain/training/progress-dashboard";
 import { buildPlannedWorkoutProgramme } from "@/domain/training/planned-workout";
-import type { ExerciseHistorySummary, WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
+import type { ExerciseHistorySummary, WorkoutHistorySummary } from "@/domain/training/models";
 import { exerciseLibrary } from "@/domain/training/presets";
 import { createActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { keepExerciseDespiteRotationRecommendation, startDeloadPlan } from "@/domain/training/recommendation-actions";
 import type { TrainingSetupGoal } from "@/domain/training/plan-setup";
 import { resolveSetPrescription } from "@/domain/training/set-prescription";
-import { summarizeWorkoutSession } from "@/domain/training/workout-history";
 
 function exerciseEntry(index: number, patch: Partial<ExerciseHistorySummary> = {}): ExerciseHistorySummary {
   return {
@@ -264,74 +263,6 @@ describe("progress dashboard view model", () => {
     expect(progress.actionFlow).toBeUndefined();
     expect(progress.journeyActions.primary).toEqual({ label: "Log a workout", href: "/(protected)/(tabs)/train" });
     expect(progress.journeyActions.secondary?.label).toBe("Review plan");
-  });
-
-  it("counts work sets only on recent workout cards after warm-up sets are summarized", () => {
-    const session: WorkoutSession = {
-      id: "warmup-session",
-      userId: "guest-local",
-      name: "AI Push • Push",
-      startedAt: "2026-06-04T10:00:00.000Z",
-      completedAt: "2026-06-04T11:00:00.000Z",
-      updatedAt: "2026-06-04T11:00:00.000Z",
-      syncState: "local",
-      exercises: [
-        {
-          id: "bench-log",
-          exerciseId: "ex-bench-press",
-          exerciseName: "Bench Press",
-          settings: exerciseLibrary.find((exercise) => exercise.id === "ex-bench-press")!.defaultSettings,
-          load: 100,
-          loadKnown: true,
-          status: "complete",
-          sets: [
-            { id: "warmup-1", setNumber: 1, reps: 8, load: 40, loggedAt: "2026-06-04T10:05:00.000Z", type: "warmup" },
-            { id: "work-1", setNumber: 1, reps: 12, load: 100, loggedAt: "2026-06-04T10:15:00.000Z", type: "work" },
-            { id: "work-2", setNumber: 2, reps: 11, load: 100, loggedAt: "2026-06-04T10:20:00.000Z", type: "work" },
-          ],
-        },
-      ],
-    };
-    const summary = summarizeWorkoutSession(session)!;
-    const progress = buildProgressDashboardViewModel([summary], exerciseLibrary);
-
-    expect(summary.setsCompleted).toBe(2);
-    expect(progress.recentWorkouts[0]?.workSetsLabel).toBe("2 work sets");
-  });
-
-  it("hides warm-up-only completed sessions from Progress coaching metrics", () => {
-    const session: WorkoutSession = {
-      id: "warmup-only",
-      userId: "guest-local",
-      name: "Push",
-      startedAt: "2026-06-04T10:00:00.000Z",
-      completedAt: "2026-06-04T10:20:00.000Z",
-      updatedAt: "2026-06-04T10:20:00.000Z",
-      syncState: "local",
-      exercises: [
-        {
-          id: "bench-log",
-          exerciseId: "ex-bench-press",
-          exerciseName: "Bench Press",
-          settings: exerciseLibrary.find((exercise) => exercise.id === "ex-bench-press")!.defaultSettings,
-          load: 80,
-          loadKnown: true,
-          status: "active",
-          sets: [
-            { id: "warmup-1", setNumber: 1, reps: 12, load: 40, loggedAt: "2026-06-04T10:05:00.000Z", type: "warmup" },
-            { id: "warmup-2", setNumber: 2, reps: 8, load: 60, loggedAt: "2026-06-04T10:10:00.000Z", type: "warmup" },
-          ],
-        },
-      ],
-    };
-    const summary = summarizeWorkoutSession(session)!;
-    const progress = buildProgressDashboardViewModel([summary], exerciseLibrary);
-
-    expect(summary.setsCompleted).toBe(0);
-    expect(progress.completedWorkouts).toEqual([]);
-    expect(progress.hiddenZeroSetWorkouts).toEqual([summary]);
-    expect(progress.recentWorkouts).toEqual([]);
-    expect(progress.recommendationEvidence.confidence).toBe("insufficient_data");
   });
 
   it("uses real history only and does not create placeholder recent workouts", () => {

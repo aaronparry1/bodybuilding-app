@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "canonical_progress_dashboard_coverage_batch_3_v1",
+  "sourceCommit": "f9dc383",
+  "startingRemainingCases": 13,
+  "selectedOwnerGroup": "canonical_recorded_session_ledger_history",
+  "selectedCases": [
+    {"test": "counts work sets only on recent workout cards after warm-up sets are summarized", "replacementTestId": "batch3:ledger-work-set-aggregation", "ownerExists": true, "newPolicyRequired": false, "applicationBoundaryRequired": false},
+    {"test": "hides warm-up-only completed sessions from Progress coaching metrics", "replacementTestId": "batch3:ledger-warmup-only-visibility", "ownerExists": true, "newPolicyRequired": false, "applicationBoundaryRequired": false}
+  ],
+  "remainingCases": [
+    {"test": "cleans generated workout names before Progress displays them", "owner": "Session Construction prescription projection", "missing": "canonical display-name field"},
+    {"test": "does not recommend a Recovery Window from repeated productive hypertrophy accessory shutdowns alone", "owner": "Mesocycle", "missing": "recovery policy disposition"},
+    {"test": "does not recommend a Recovery Window after only two planned sessions, even when extra work is noisy", "owner": "Progress evidence/evaluation", "missing": "planned-versus-extra aggregation"},
+    {"test": "keeps one bad planned session local instead of escalating to a full Recovery Window", "owner": "Mesocycle", "missing": "fatigue escalation policy"},
+    {"test": "keeps mild fatigue evidence below the full Recovery Window action threshold", "owner": "Mesocycle", "missing": "source-backed threshold"},
+    {"test": "does not turn repeated systemic historical evidence into an automatic recovery plan", "owner": "Progress intervention", "missing": "bounded recovery outcome"},
+    {"test": "accepting a Recovery Window changes the active generated prescription, not just the roadmap", "owner": "Progress decision application/Session Construction", "missing": "atomic application chain"},
+    {"test": "surfaces meaningful volume recommendations without raw landmark labels", "owner": "Mesocycle", "missing": "bounded volume presentation policy"},
+    {"test": "suppresses volume recommendations until enough completed history exists", "owner": "Progress evidence", "missing": "evidence sufficiency projection"},
+    {"test": "keeps a stalled Tier A history observation non-actionable without an intervention", "owner": "Microcycle", "missing": "approved rotation observation"},
+    {"test": "suppresses a kept stalled exercise recommendation", "owner": "Progress intervention", "missing": "persisted keep disposition projection"}
+  ],
+  "exclusiveHelpersRemoved": ["WorkoutSession fixture construction", "summarizeWorkoutSession test import"],
+  "remainingCaseCount": 11,
+  "fixturePartition": {"plan": 13, "session": 30, "progress": 35},
+  "nextBatch": "canonical Session Construction display-name projection or Progress evidence aggregation"
+}
