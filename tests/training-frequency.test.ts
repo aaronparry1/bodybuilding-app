@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { deriveTrainingFrequency, isTrainingDaysPerWeek, trainingFrequencyOptions } from "@/domain/training/training-frequency";
 
 describe("training frequency", () => {
-  it("accepts 3 to 6 training days", () => {
-    expect(trainingFrequencyOptions).toEqual([3, 4, 5, 6]);
+  it("accepts 2 to 6 training days", () => {
+    expect(trainingFrequencyOptions).toEqual([2, 3, 4, 5, 6]);
 
     for (const days of trainingFrequencyOptions) {
       expect(isTrainingDaysPerWeek(days)).toBe(true);

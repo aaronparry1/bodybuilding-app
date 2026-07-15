@@ -25,5 +25,5 @@ export function deriveTrainingFrequency(daysPerWeek: number): TrainingFrequency 
 }
 
 export function isTrainingDaysPerWeek(value: number): value is TrainingDaysPerWeek {
-  return Number.isInteger(value) && (value === 3 || value === 4 || value === 5 || value === 6);
+  return Number.isInteger(value) && (value === 2 || value === 3 || value === 4 || value === 5 || value === 6);
 }

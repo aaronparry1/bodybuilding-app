@@ -296,7 +296,7 @@ describe("product flow architecture", () => {
     expect(source).not.toContain("Dumbbells only");
     expect(source).not.toContain("Machines only");
     expect(source).not.toContain('SummaryRow label="Equipment"');
-    expect(source).toContain('equipmentPreset: "full_gym"');
+    expect(source).toContain('equipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight", "bands", "other"]');
   });
 
   it("keeps the final onboarding summary scannable and roadmap-light", () => {
