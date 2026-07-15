@@ -1,8 +1,9 @@
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
-import type { CanonicalProgressEvaluation } from "@/domain/training/canonical-progress-evaluator";
+import type { CanonicalProgressEvaluation, CanonicalProgressEvaluationV2 } from "@/domain/training/canonical-progress-evaluator";
 import type { CanonicalProgressDecision } from "@/domain/training/canonical-progress-decision";
+import { resolveCanonicalMesocycleSuccessor } from "@/domain/training/canonical-mesocycle-successor";
 
 export type CanonicalProgressDecisionProductionCommand = Readonly<{
   planId: string;
@@ -10,7 +11,7 @@ export type CanonicalProgressDecisionProductionCommand = Readonly<{
   macrocycleId: string;
   mesocycleId: string;
   microcycleId: string;
-  evaluation: CanonicalProgressEvaluation;
+  evaluation: CanonicalProgressEvaluation | CanonicalProgressEvaluationV2;
   evidenceVersions: Readonly<Record<string, string>>;
   operationId: string;
 }>;
@@ -24,7 +25,8 @@ export function produceCanonicalProgressDecision(command: CanonicalProgressDecis
   if (plan.revision !== command.planRevision) return { status: "rejected", reason: "stale_plan_revision" };
   if (`${plan.planId}:macrocycle` !== command.macrocycleId || plan.mesocycle.id !== command.mesocycleId || plan.microcycle.id !== command.microcycleId) return { status: "rejected", reason: "canonical_identity_mismatch" };
   const evaluation = command.evaluation;
-  if (evaluation.schemaVersion !== "canonical_progress_evaluation_v1" || evaluation.evaluationId !== `${command.planId}:progress:${command.planRevision}:${evaluation.evidenceIds.join(",")}` || evaluation.planId !== command.planId || evaluation.planRevision !== command.planRevision || evaluation.mesocycleId !== command.mesocycleId || evaluation.microcycleId !== command.microcycleId) return { status: "rejected", reason: "evaluation_chain_mismatch" };
+  if (evaluation.planId !== command.planId || evaluation.planRevision !== command.planRevision || evaluation.mesocycleId !== command.mesocycleId || evaluation.microcycleId !== command.microcycleId) return { status: "rejected", reason: "evaluation_chain_mismatch" };
+  if (evaluation.schemaVersion === "canonical_progress_evaluation_v1" && evaluation.evaluationId !== `${command.planId}:progress:${command.planRevision}:${evaluation.evidenceIds.join(",")}`) return { status: "rejected", reason: "evaluation_chain_mismatch" };
   const evidenceIds = [...evaluation.evidenceIds].sort();
   if (new Set(evidenceIds).size !== evidenceIds.length) return { status: "rejected", reason: "duplicate_evidence" };
   for (const evidenceId of evidenceIds) {
@@ -32,9 +34,15 @@ export function produceCanonicalProgressDecision(command: CanonicalProgressDecis
     if (evidence.status !== "found") return { status: "rejected", reason: "evidence_not_found" };
     if (evidence.evidence.planId !== command.planId || evidence.evidence.planRevision > command.planRevision || evidence.evidence.microcycleId !== command.microcycleId || command.evidenceVersions[evidenceId] !== evidence.evidence.evidenceVersion) return { status: "rejected", reason: "evidence_chain_mismatch" };
   }
-  const outcome = evaluation.state === "review_required" ? "review_required" : evaluation.state === "ready" ? "continue" : "insufficient_evidence";
+  const outcome = evaluation.schemaVersion === "canonical_progress_evaluation_v2" ? (evaluation.outcome === "transition_recommended" ? "transition" : evaluation.outcome === "deload_required" ? "deload" : evaluation.outcome) : evaluation.state === "review_required" ? "review_required" : evaluation.state === "ready" ? "continue" : "insufficient_evidence";
+  let successorMesocycleId: string | undefined;
+  if (outcome === "transition" || outcome === "deload") {
+    const successor = resolveCanonicalMesocycleSuccessor({ macrocycleId: command.macrocycleId, macrocycleEngine: plan.macrocycle.goal === "build_strength" ? "strength" : plan.macrocycle.goal === "build_muscle_and_strength" ? "powerbuilding" : plan.macrocycle.goal === "athletic_performance" ? "athletic_performance" : "hypertrophy", currentMesocycleId: command.mesocycleId as never, decisionId: command.operationId, evaluationId: evaluation.evaluationId, evidenceIds, outcome, sequenceNumber: plan.microcycle.sequenceNumber + 1, planRevision: plan.revision });
+    if (successor.status !== "resolved") return { status: "rejected", reason: successor.reason };
+    successorMesocycleId = successor.successorMesocycleId;
+  }
   const decisionId = command.operationId;
-  const decision: CanonicalProgressDecision = { schemaVersion: "canonical_progress_decision_v1", decisionId, planId: command.planId, expectedPlanRevision: command.planRevision, macrocycleId: command.macrocycleId, mesocycleId: command.mesocycleId, microcycleId: command.microcycleId, evaluationId: evaluation.evaluationId, evidenceIds, outcome, owner: "mesocycle", reason: evaluation.reason, explanation: evaluation.explanation, status: "current" };
+  const decision: CanonicalProgressDecision = { schemaVersion: "canonical_progress_decision_v1", decisionId, planId: command.planId, expectedPlanRevision: command.planRevision, macrocycleId: command.macrocycleId, mesocycleId: command.mesocycleId, microcycleId: command.microcycleId, evaluationId: evaluation.evaluationId, evidenceIds, outcome, ...(successorMesocycleId ? { successorMesocycleId } : {}), owner: "mesocycle", reason: evaluation.reason, explanation: evaluation.explanation, status: "current" };
   const existing = canonicalProgressDecisionRepository.get(decisionId);
   if (existing.status === "found") return JSON.stringify(existing.decision) === JSON.stringify(decision) ? { status: "produced", reason: "idempotent_retry", decision: existing.decision } : { status: "rejected", reason: "decision_id_conflict" };
   const saved = canonicalProgressDecisionRepository.save(decision);
