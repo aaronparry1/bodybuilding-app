@@ -287,7 +287,7 @@ function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnv
     if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
     clearFixtureViewStateOnly();
     appSettingsStore.patch({ onboardingCompleted: true });
-    if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups", "train_swapped", "train_added_exercise", "train_near_threshold", "train_shutdown", "train_review_prs", "train_rotation_accepted", "train_end_workout_confirm", "train_prep_not_started", "train_prep_completed", "train_prep_skipped"].includes(id)) {
+    if (["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups", "train_swapped", "train_added_exercise", "train_near_threshold", "train_shutdown", "train_review_prs", "train_rotation_accepted", "train_end_workout_confirm", "train_prep_not_started", "train_prep_completed", "train_prep_skipped", "train_prep_active_workout"].includes(id)) {
       createCanonicalTrainProjection(id);
       if (id === "train_prep_completed" || id === "train_prep_skipped") saveSessionPrepRecords([prepRecord("Canonical", id.endsWith("completed") ? "completed" : "skipped")]);
       const definition = getFixtureDefinition(id);
