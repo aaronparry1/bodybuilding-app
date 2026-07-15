@@ -281,9 +281,9 @@ describe("product flow architecture", () => {
     expect(deloadActionBlock).toContain('type: "deload"');
     expect(deloadActionBlock).not.toContain("secondaryLabel");
     expect(deloadActionBlock).not.toContain("Ignore for now");
-    expect(progressSource).toContain('progress.actionFlow.type === "deload"');
+    expect(progressSource).toContain("canonicalProgressDecisionRepository");
+    expect(progressSource).toContain("Apply current decision");
     expect(progressSource).not.toContain("startDeloadPlan(activePlan");
-    expect(progressSource).toContain('href="/(protected)/(tabs)/programmes"');
   });
 
   it("does not ask users to choose available equipment during onboarding", () => {
@@ -318,11 +318,10 @@ describe("product flow architecture", () => {
   it("presents the Plan roadmap as coached stages instead of a flat learn-heavy list", () => {
     const source = readFileSync(join(process.cwd(), "app/(protected)/(tabs)/programmes.tsx"), "utf8");
 
-    expect(source).toContain("PlanningContextCard");
-    expect(source).toContain("Approved next mesocycle states");
-    expect(source).toContain("Current microcycle");
-    expect(source).toContain("Approved next mesocycle states");
-    expect(source).toContain("Current training context");
+    expect(source).toContain("projectCanonicalPlan");
+    expect(source).toContain("Mesocycle");
+    expect(source).toContain("Microcycle");
+    expect(source).toContain("Planned sessions");
     expect(source).not.toContain(">Learn<");
     expect(source).not.toContain("Learn\n      </Text>");
   });
