@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "canonical_current_progress_context_migration_blocker_v1",
+  "sourceCommit": "dfccebb",
+  "candidate": "src/domain/training/current-progress-context.ts:resolveCurrentProgressContext",
+  "productionCallers": ["src/domain/training/progress-dashboard.ts:buildProgressDashboardViewModel"],
+  "additionalConsumers": ["current-progress-recovery-context", "current-progress-strategic-summary", "current-progress-rotation-context"],
+  "legacyFieldsConsumed": ["planId", "mesocycleId", "microcycleNumber", "snapshotId", "decisionId", "decisionOutcome", "decisionLifecycle", "advanceTargetMesocycleId", "currentMicrocycle.progressionState", "ActiveTrainingPlan.blocks"],
+  "missingCanonicalContract": ["canonical context compatibility projection for existing pure consumers", "canonical Progress dashboard plan/cycle projection replacing ActiveTrainingPlan block fields", "canonical evidence-to-context mapping for current readiness states"],
+  "decision": "stop_at_progress_dashboard_projection_gap",
+  "productionSwitchCompleted": false,
+  "nextBoundedTask": "migrate Progress dashboard and pure context consumers to canonical current-progress context",
+  "ordinaryV2Authority": "inactive",
+  "d4d2": "unchanged"
+}
