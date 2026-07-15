@@ -1,6 +1,9 @@
 import { appSettingsStore, defaultAppSettings, type AppSettings } from "@/application/settings/app-settings";
 import type { SubscriptionState } from "@/application/billing/subscription";
 import { activeTrainingPlanRepository } from "@/data/local/active-training-plan-repository";
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
+import { serializeCanonicalActivePlan, validateCanonicalActivePlan } from "@/domain/training/canonical-active-plan-carrier";
 import { customExerciseRepository } from "@/data/local/custom-exercise-repository";
 import { programmeRepository } from "@/data/local/programme-repository";
 import { recoveryCapacityIgnoreRepository, type RecoveryCapacityIgnoreRecord } from "@/data/local/recovery-capacity-ignore-repository";
@@ -35,6 +38,8 @@ export interface CloudUserDataBackup {
   updatedAt: string;
   appSettings: AppSettings;
   activeTrainingPlan?: ActiveTrainingPlan | null;
+  canonicalActivePlan?: string | null;
+  canonicalActivePlanRevision?: number;
   trainingYear?: unknown;
   recoveryCapacityIgnore?: RecoveryCapacityIgnoreRecord | null;
 }
@@ -104,12 +109,15 @@ function resolveRepositories(dependencies: CloudDataSyncDependencies, client: Ap
 
 export function buildCloudUserDataBackup(dependencies: CloudDataSyncDependencies = {}): CloudUserDataBackup {
   const settingsStore = dependencies.localSettingsStore ?? appSettingsStore;
+  const canonical = canonicalActivePlanV2Repository.get();
   return {
     schema: cloudBackupSchema,
     version: cloudBackupVersion,
     updatedAt: now(),
     appSettings: settingsStore.get(),
     activeTrainingPlan: (dependencies.localActivePlanRepository ?? activeTrainingPlanRepository).getOptional(),
+    canonicalActivePlan: canonical.status === "saved" ? serializeCanonicalActivePlan(canonical.carrier) : null,
+    canonicalActivePlanRevision: canonical.status === "saved" ? canonical.carrier.revision : undefined,
     trainingYear: (dependencies.localTrainingYearRepository ?? legacyTrainingYearArchive).read(),
     recoveryCapacityIgnore: (dependencies.localRecoveryIgnoreRepository ?? recoveryCapacityIgnoreRepository).get(),
   };
@@ -226,9 +234,23 @@ export async function restoreCloudDataForUser(
       localSettingsStore.set(cloudSettings.appSettings);
       restoredSettings = true;
     }
-    if (!localActivePlanRepository.getOptional() && cloudSettings.activeTrainingPlan) {
-      localActivePlanRepository.save(cloudSettings.activeTrainingPlan);
-      restoredActivePlan = true;
+    if (cloudSettings.canonicalActivePlan) {
+      const parsed = validateCanonicalActivePlan(cloudSettings.canonicalActivePlan);
+      if (parsed.status === "valid") {
+        const local = canonicalActivePlanV2Repository.get();
+        if (local.status !== "saved" || parsed.carrier.revision > local.carrier.revision) {
+          const saved = canonicalActivePlanV2Repository.saveAtomically(parsed.carrier, local.status === "saved" ? local.carrier.revision : undefined);
+          if (saved.status === "saved") {
+            canonicalActivePlanState.hydrate();
+            restoredActivePlan = true;
+          }
+        } else if (local.status === "saved" && parsed.carrier.revision === local.carrier.revision) {
+          restoredActivePlan = true;
+        }
+      }
+    } else if (!localActivePlanRepository.getOptional() && cloudSettings.activeTrainingPlan) {
+      // Legacy active plans remain recovery input only; they are not installed as live state.
+      logSyncStage("legacy active plan retained for canonical migration");
     }
     if (cloudSettings.trainingYear && shouldRestoreTrainingYear) {
       localTrainingYearRepository.write(cloudSettings.trainingYear);

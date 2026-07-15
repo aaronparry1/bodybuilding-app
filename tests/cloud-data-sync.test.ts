@@ -106,7 +106,7 @@ describe("cloud data sync and restore", () => {
       userSettingsCloudRepository: { loadUserSettingsBlob: async () => backup },
     });
 
-    expect(activeTrainingPlanRepository.getOptional()?.goal).toBe("build_strength");
+    expect(activeTrainingPlanRepository.getOptional()).toBeNull();
     expect((legacyTrainingYearArchive.read() as { id: string }).id).toBe(cloudYear.id);
     expect(appSettingsStore.get().unit).toBe("lb");
     expect(appSettingsStore.get().onboardingCompleted).toBe(true);
