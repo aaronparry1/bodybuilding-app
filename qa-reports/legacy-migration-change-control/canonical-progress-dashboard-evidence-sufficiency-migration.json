@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "canonical_progress_dashboard_evidence_sufficiency_migration_v1",
+  "sourceCommit": "fa65332",
+  "startingBlocked": 9,
+  "migratedCases": [
+    {"legacyCase": "does not recommend a Recovery Window after only two planned sessions, even when extra work is noisy", "replacementTestId": "batch4:evidence-insufficient-planned-history", "contractVersion": "canonical_progress_dashboard_evidence_v1"},
+    {"legacyCase": "suppresses volume recommendations until enough completed history exists", "replacementTestId": "batch4:evidence-insufficient-volume-history", "contractVersion": "canonical_progress_dashboard_evidence_v1"}
+  ],
+  "overlap": "existing Batch-4 replacements were linked; no duplicate tests created",
+  "remainingBlocked": 7,
+  "remainingOwners": ["Session Construction display projection", "Mesocycle recovery policy", "Progress recovery intervention", "Progress decision application", "Mesocycle volume policy", "Microcycle rotation policy"],
+  "designQaFixturePartition": {"plan": 13, "session": 30, "progress": 35},
+  "dashboardMigrationCompleted": false,
+  "nextOwner": {"owner": "Mesocycle recovery policy", "affectedCases": ["does not recommend a Recovery Window from repeated productive hypertrophy accessory shutdowns alone", "keeps one bad planned session local instead of escalating to a full Recovery Window", "keeps mild fatigue evidence below the full Recovery Window action threshold"], "missingContract": "source-backed bounded recovery disposition and fatigue semantics", "requiresSourceBackedPolicy": true, "requiresApplicationAuthority": false}
+}

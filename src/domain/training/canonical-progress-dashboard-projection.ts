@@ -1,4 +1,5 @@
 export const CANONICAL_PROGRESS_DASHBOARD_PROJECTION_VERSION = "canonical_progress_dashboard_projection_v1" as const;
+import type { CanonicalProgressDashboardEvidence } from "@/domain/training/canonical-progress-dashboard-evidence-contract";
 export type CanonicalDashboardRecoverySummary = Readonly<{ completeness: "complete" | "incomplete"; freshness: "fresh" | "stale" | "missing"; recovery: string; capacity: string; fatigue: string; evidenceIds: readonly string[]; reasonCodes: readonly string[] }>;
 export type CanonicalDashboardInterventionSummary = Readonly<{ interventionId: string; family: "volume_adjustment" | "microcycle_rotation"; policyId: string; policyVersion: string; disposition: string; reasonCodes: readonly string[]; application: "supported" | "unsupported" | "review_required"; evidenceIds: readonly string[] }>;
 export type CanonicalDashboardHistorySummary = Readonly<{ windowId: string; recordedSessions: number; completed: number; partial: number; missed: number; performedSets: number; prescribedSets: number; substitutions: number; evidencePending: number }>;
@@ -19,6 +20,7 @@ export type CanonicalProgressDashboardInput = Readonly<{
   recovery?: CanonicalDashboardRecoverySummary;
   interventions?: readonly CanonicalDashboardInterventionSummary[];
   history?: CanonicalDashboardHistorySummary;
+  evidenceSufficiency?: CanonicalProgressDashboardEvidence;
 }>;
 
 export type CanonicalProgressDashboardProjection = Readonly<{
@@ -34,6 +36,7 @@ export type CanonicalProgressDashboardProjection = Readonly<{
   interventions: readonly CanonicalDashboardInterventionSummary[];
   history?: CanonicalDashboardHistorySummary;
   action: CanonicalDashboardAction;
+  evidenceSufficiency?: CanonicalProgressDashboardEvidence;
 }>;
 
 function containsLegacy(value: unknown): boolean {
@@ -47,6 +50,7 @@ function containsLegacy(value: unknown): boolean {
 export function projectCanonicalProgressDashboard(input: CanonicalProgressDashboardInput): CanonicalProgressDashboardProjection {
   if (input.contractVersion !== "canonical_current_progress_context_v1" || !input.planId || !Number.isInteger(input.planRevision) || containsLegacy(input)) throw new Error("invalid_canonical_progress_dashboard_input");
   if (input.interventions?.some((item) => !item.interventionId || !item.policyId || !item.policyVersion || !item.evidenceIds.length)) throw new Error("invalid_canonical_dashboard_intervention");
+  if (input.evidenceSufficiency && (input.evidenceSufficiency.contractVersion !== "canonical_progress_dashboard_evidence_v1" || input.evidenceSufficiency.planId !== input.planId || input.evidenceSufficiency.planRevision !== input.planRevision || input.evidenceSufficiency.cycleIds.length === 0)) throw new Error("invalid_canonical_dashboard_evidence_sufficiency");
   if (input.history && (!input.history.windowId || Object.values(input.history).some((value) => typeof value === "number" && value < 0))) throw new Error("invalid_canonical_dashboard_history");
   const status = input.evidence.freshness !== "fresh" || input.evidence.completeness !== "complete" || !input.evaluation ? "insufficient_evidence" : input.decision?.kind === "review_required" ? "review_required" : "ready";
   const kind = input.decision?.kind === "transition" || input.decision?.kind === "deload" || input.decision?.kind === "continue" ? input.decision.kind : input.decision ? "review" : "none";
@@ -63,6 +67,7 @@ export function projectCanonicalProgressDashboard(input: CanonicalProgressDashbo
     ...(input.recovery ? { recovery: input.recovery } : {}),
     interventions: [...(input.interventions ?? [])].sort((a, b) => a.interventionId.localeCompare(b.interventionId)),
     ...(input.history ? { history: input.history } : {}),
+    ...(input.evidenceSufficiency ? { evidenceSufficiency: input.evidenceSufficiency } : {}),
     action,
   };
 }
