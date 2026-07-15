@@ -25,7 +25,7 @@ describe("canonical session construction pipeline", () => {
     if (result.status === "constructed") {
       expect(result.snapshot.schemaVersion).toBe("canonical_session_snapshot_v3");
       expect(result.snapshot.slots.length).toBeGreaterThan(0);
-      expect(result.snapshot.slots[0]?.loadPrescription.state).toBe("calibration_required");
+      if (result.snapshot.schemaVersion === "canonical_session_snapshot_v3") expect(result.snapshot.slots[0]?.loadPrescription.state).toBe("calibration_required");
     }
   });
 

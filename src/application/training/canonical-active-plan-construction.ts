@@ -31,12 +31,12 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
       microcycle: { id: microcycleId, output: microcycle, sessionId: "", planSessionIndex: index, sessionRole: role, sessionOrder: index, stressIntent: microcycle.priority, recoveryDays: microcycle.recoveryDays, kind: "planned" as const },
       athlete: { experienceLevel: input.experienceLevel, preferredSplit: input.preferredSplit, equipment: input.equipment, limitations: input.limitations ?? [], units: input.units, exercises: input.exercises },
       progress: { evidenceVersion: "progress_v1", history: input.history ?? [], establishedLoads: input.establishedLoads },
-      operational: { constructionVersion: "canonical_plan_v2", seed: `${input.planId}:${index}`, identity: "", revision: input.updatedAt },
+      operational: { constructionVersion: "canonical_plan_v3", seed: `${input.planId}:${index}`, identity: "", revision: input.updatedAt },
     };
     const identity = resolveCanonicalSessionIdentity(sessionInput);
     const constructed = constructCanonicalSession({ ...sessionInput, microcycle: { ...sessionInput.microcycle, sessionId: identity }, operational: { ...sessionInput.operational, identity } });
     if (constructed.status !== "constructed") return { status: "carrier_validation_failed", reason: `session_${index}:${constructed.reason}` };
-    sessions.push({ id: identity, microcycleId, planSessionIndex: index, role, kind: "planned", status: "planned", constructionVersion: "canonical_plan_v2", revision: 0, prescriptionSnapshot: constructed.snapshot });
+    sessions.push({ id: identity, microcycleId, planSessionIndex: index, role, kind: "planned", status: "planned", constructionVersion: "canonical_plan_v3", revision: 0, prescriptionSnapshot: constructed.snapshot });
   }
   const result = constructCanonicalActivePlan({ ...input, plannedSessions: sessions });
   if (result.status !== "constructed") return result;
