@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "canonical_train_workout_logger_migration_blocker_v1",
+  "sourceCommit": "c6afe1a",
+  "candidate": "src/features/workout-logging/use-workout-logger.ts:useWorkoutLogger",
+  "status": "blocked_by_missing_canonical_train_projection_contract",
+  "productionCallers": ["app/(protected)/(tabs)/train.tsx", "src/features/workout-logging/use-workout-logger.ts"],
+  "legacyDependencies": [
+    {"symbol":"activeTrainingPlanRepository","capability":"current plan read and subscription"},
+    {"symbol":"workoutSessionRepository","capability":"session restore, performed-work writes, completion/history writes"},
+    {"symbol":"WorkoutSession","capability":"hook state and public callback payload"},
+    {"symbol":"WorkoutExerciseLog","capability":"mutable exercise/set projection"}
+  ],
+  "canonicalOperationsAvailable": ["startCanonicalSession", "restoreCanonicalRecordedSessionFromLedger", "recordCanonicalPerformedWork", "pauseCanonicalSession", "resumeCanonicalSession", "completeCanonicalSession"],
+  "missingContract": "A canonical ledger-to-Train projection and callback contract that does not recreate WorkoutSession or caller-authored prescription state",
+  "firstBlockedFeature": "initial session resolution and hook return shape",
+  "requiredBeforeMigration": ["canonical Train projection type", "canonical route identity input", "ledger-backed exercise/set projection", "canonical substitution command boundary", "canonical recovery and completion UI command contract"],
+  "decision": "do_not_modify_production_until_contract_exists",
+  "productionSwitchCompleted": false,
+  "ordinaryV2Authority": "inactive",
+  "d4d2": "unchanged"
+}
