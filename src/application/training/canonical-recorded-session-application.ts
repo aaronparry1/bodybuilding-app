@@ -2,6 +2,7 @@ import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-p
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
+import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
 
 export type CanonicalStartSessionCommand = Readonly<{ planId: string; expectedPlanRevision: number; plannedSessionId: string; expectedPrescriptionHash: string; operationId: string; startedAt: string; provenance: string }>;
 export type CanonicalStartSessionResult = Readonly<{ status: "started" | "already_started" | "rejected" | "retryable"; reason: string; recordedSessionId?: string; planRevision?: number }>;
@@ -38,7 +39,19 @@ export type CanonicalRecordedLifecycleResult = Readonly<{ status: "applied" | "i
 
 export function pauseCanonicalSession(command: CanonicalRecordedLifecycleCommand): CanonicalRecordedLifecycleResult { return updateRecordedStatus(command, "paused", "pause"); }
 export function resumeCanonicalSession(command: CanonicalRecordedLifecycleCommand): CanonicalRecordedLifecycleResult { return updateRecordedStatus(command, "started", "resumed"); }
-export function completeCanonicalSession(command: CanonicalRecordedLifecycleCommand): CanonicalRecordedLifecycleResult { return updateRecordedStatus(command, "completed", "completed"); }
+export function completeCanonicalSession(command: CanonicalRecordedLifecycleCommand): CanonicalRecordedLifecycleResult {
+  const aggregate = canonicalRecordedSessionLedger.get(command.recordedSessionId);
+  if (aggregate.status !== "found") return { status: "rejected", reason: "recorded_session_not_found" };
+  if (aggregate.session.version !== command.expectedLedgerVersion) return { status: "rejected", reason: "stale_ledger_version" };
+  if (aggregate.session.status === "completed") return { status: "idempotent", reason: "completion_already_applied", ledgerVersion: aggregate.session.version };
+  if (!["started", "paused"].includes(aggregate.session.status)) return { status: "rejected", reason: "completion_not_allowed_in_current_status" };
+  const summary = deriveCanonicalCompletionSummary(aggregate.session, aggregate.events);
+  const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, { eventId: `${command.recordedSessionId}:completed:${command.operationId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "completed", occurredAt: command.occurredAt, operationId: command.operationId, payload: { summary } });
+  if (appended.status !== "saved") return { status: "rejected", reason: appended.reason ?? "completion_conflict" };
+  const evidence = canonicalProgressEvidenceRepository.record({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:completion-evidence:${appended.session!.version}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}`, kind: "completion", observations: { completion: summary.completion, performedSets: summary.performedSets, performedReps: summary.performedReps, performedLoad: summary.performedLoad }, evidenceVersion: "progress_v1" });
+  canonicalActivePlanState.hydrate();
+  return { status: evidence.status === "saved" || evidence.status === "duplicate" ? "applied" : "retryable", reason: evidence.status === "saved" || evidence.status === "duplicate" ? "session_completed" : "completed_with_evidence_pending", ledgerVersion: appended.session!.version };
+}
 
 export type CanonicalPerformedWorkCommand = Readonly<CanonicalRecordedLifecycleCommand & { slotId: string; exerciseId: string; setId: string; setOrder: number; reps: number; load: number; unit: string; effort?: number; substitutionId?: string; completion: "complete" | "partial" | "missed" }>;
 export function recordCanonicalPerformedWork(command: CanonicalPerformedWorkCommand): CanonicalRecordedLifecycleResult {
