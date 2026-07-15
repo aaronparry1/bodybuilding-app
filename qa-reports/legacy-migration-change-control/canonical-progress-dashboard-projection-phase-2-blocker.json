@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "canonical_progress_dashboard_projection_phase_2_blocker_v1",
+  "sourceCommit": "7be7b30",
+  "manifest": "qa-reports/legacy-migration-change-control/canonical-progress-dashboard-coverage-map.json",
+  "originalCases": 21,
+  "canonicalCasesCompleted": 3,
+  "blockedCases": 18,
+  "missingCanonicalFields": ["factual recovery/capacity/fatigue summary", "persisted volume intervention presentation", "persisted microcycle rotation intervention presentation", "recorded-session history aggregation for dashboard cards", "canonical action descriptors for transition/deload review"],
+  "decision": "stop_at_missing_canonical_dashboard_projection_fields",
+  "legacyBuilderDisposition": "retain_until_meaningful_cases_have_canonical_replacements",
+  "mountedProductionCaller": null,
+  "productionSwitchCompleted": false,
+  "nextBoundedTask": "extend canonical dashboard input/projection from Progress evidence/intervention and ledger summary owners, then migrate remaining cases",
+  "ordinaryV2Authority": "inactive",
+  "d4d2": "unchanged"
+}
