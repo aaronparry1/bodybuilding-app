@@ -1,9 +1,9 @@
 {
   "sourceCommit": "99e41e8",
   "loadFixtureCount": 14,
-  "loadFixturesMigrated": [],
-  "loadFixturesPending": ["train_load_no_history", "train_load_strength_unknown", "train_load_exact_progressed", "train_load_exact_held", "train_load_same_family_estimate", "train_load_same_family_low_confidence", "train_load_lb_known", "train_load_bodyweight", "train_increment_barbell_1", "train_increment_barbell_2_5", "train_increment_barbell_5", "train_increment_machine_1", "train_increment_cable_1", "train_increment_exercise_override"],
+  "loadFixturesMigrated": ["train_load_no_history", "train_load_strength_unknown", "train_load_exact_progressed", "train_load_exact_held", "train_load_same_family_estimate", "train_load_same_family_low_confidence", "train_load_lb_known", "train_load_bodyweight", "train_increment_barbell_1", "train_increment_barbell_2_5", "train_increment_barbell_5", "train_increment_machine_1", "train_increment_cable_1", "train_increment_exercise_override"],
+  "loadFixturesPending": [],
   "namedFixturesCanonical": ["train_rotation_accepted", "train_end_workout_confirm", "train_prep_active_workout"],
-  "legacySessionBridge": "present_for_load_fixtures",
-  "nextCanonicalInputGap": "loading-mode-and-established-load-facts-in-session-construction"
+  "legacySessionBridge": "removed_for_session_family",
+  "nextCanonicalInputGap": "progress-decision-fixtures-only"
 }

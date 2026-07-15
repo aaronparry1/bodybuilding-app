@@ -1,0 +1,24 @@
+{
+  "sourceCommit": "b14c400",
+  "fixtureCount": 14,
+  "fixtures": [
+    {"id":"train_load_no_history","state":"calibration_required","evidence":"missing"},
+    {"id":"train_load_strength_unknown","state":"calibration_required","evidence":"missing"},
+    {"id":"train_load_exact_progressed","state":"calibration_required","evidence":"not-retained-in-fixture-construction"},
+    {"id":"train_load_exact_held","state":"calibration_required","evidence":"not-retained-in-fixture-construction"},
+    {"id":"train_load_same_family_estimate","state":"calibration_required","evidence":"not-retained-in-fixture-construction"},
+    {"id":"train_load_same_family_low_confidence","state":"calibration_required","evidence":"missing"},
+    {"id":"train_load_lb_known","state":"calibration_required","evidence":"not-retained-in-fixture-construction"},
+    {"id":"train_load_bodyweight","state":"bodyweight","evidence":"not-applicable"},
+    {"id":"train_increment_barbell_1","state":"calibration_required","evidence":"missing"},
+    {"id":"train_increment_barbell_2_5","state":"calibration_required","evidence":"missing"},
+    {"id":"train_increment_barbell_5","state":"calibration_required","evidence":"missing"},
+    {"id":"train_increment_machine_1","state":"calibration_required","evidence":"missing"},
+    {"id":"train_increment_cable_1","state":"calibration_required","evidence":"missing"},
+    {"id":"train_increment_exercise_override","state":"calibration_required","evidence":"missing"}
+  ],
+  "snapshotVersion":"canonical_session_snapshot_v3",
+  "legacyProjectionReachability":"zero",
+  "remainingSessionFixtures":0,
+  "remainingProgressDecisionFixtures":8
+}

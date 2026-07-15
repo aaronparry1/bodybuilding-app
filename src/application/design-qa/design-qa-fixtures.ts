@@ -295,7 +295,12 @@ function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnv
       jsonStore.set(activeFixtureKey, activeFixture);
       return activeFixture;
     }
-    applyCanonicalActiveSessionFixture(id);
+    const result = applyCanonicalActiveSessionFixture(id);
+    if (result.status === "rejected") throw new Error(`canonical_session_fixture_unavailable:${result.reason}`);
+    const definition = getFixtureDefinition(id);
+    const activeFixture = { id, label: definition.label, appliedAt: new Date().toISOString() };
+    jsonStore.set(activeFixtureKey, activeFixture);
+    return activeFixture;
   }
   return applyDesignQaFixtureMatrix(id, environment);
 }
