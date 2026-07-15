@@ -1,0 +1,13 @@
+{
+  "sourceCommit": "2856588",
+  "existingOwners": {
+    "mesocycleLoadingPolicy": "mesocycle-prescription-policy and canonical session snapshot loadingMode",
+    "progressEvidence": "canonical-progress-evidence-repository and canonical-construction-facts",
+    "sessionConstruction": "canonical-session-construction-pipeline"
+  },
+  "missingConnection": "canonical session construction currently carries loadingMode and prescription settings but does not retain established-load evidence identity/version or an explicit calibration/unavailable load state in the snapshot",
+  "requiredChange": "extend the canonical construction input/snapshot contract before migrating load fixtures",
+  "loadFixturesBlocked": ["train_load_no_history", "train_load_strength_unknown", "train_load_exact_progressed", "train_load_exact_held", "train_load_same_family_estimate", "train_load_same_family_low_confidence", "train_load_lb_known", "train_load_bodyweight", "train_increment_barbell_1", "train_increment_barbell_2_5", "train_increment_barbell_5", "train_increment_machine_1", "train_increment_cable_1", "train_increment_exercise_override"],
+  "status": "blocked_by_missing_canonical_load_evidence_connection",
+  "productionAuthorityChanged": false
+}
