@@ -2,6 +2,7 @@ import type { MacrocycleSpec } from "@/domain/training/macrocycle-engine";
 import type { MesocycleSpec, MesocycleId } from "@/domain/training/mesocycle-library";
 import type { MicrocyclePlan } from "@/domain/training/microcycle-scheduler";
 import type { Equipment, ExperienceLevel, ProgrammeGoal, UnitSystem } from "@/domain/training/models";
+import { validateCanonicalLineage } from "@/domain/training/canonical-session-lineage";
 
 /** Persisted migration target. This module stores owner outputs; it makes no training decisions. */
 export const CANONICAL_ACTIVE_PLAN_SCHEMA = "canonical_plan_v2" as const;
@@ -52,6 +53,8 @@ export type CanonicalActivePlanCarrier = Readonly<{
   }>;
   operational: Readonly<{ openWorkoutId?: string; migrationId?: string; recoverySourceReference?: string; syncRevision?: string }>;
   constructionInputs?: Readonly<{ schemaVersion: "canonical_construction_inputs_v1"; athleteId: string; exerciseCatalogueSource: string; equipmentSource: string; limitationsSource: string; preferencesSource: string; progressEvidenceScope: string; establishedLoadSource: string }>;
+  cycleLineage?: readonly import("@/domain/training/canonical-session-lineage").CanonicalCycleLineage[];
+  recordedSessionReferences?: readonly import("@/domain/training/canonical-session-lineage").CanonicalRecordedSessionReference[];
 }>;
 
 export type CanonicalCarrierAssemblyInput = Readonly<{
@@ -75,7 +78,7 @@ export type CanonicalCarrierValidationCode =
   | "invalid_schema" | "invalid_identity" | "invalid_timestamp" | "invalid_macrocycle"
   | "invalid_mesocycle" | "invalid_microcycle" | "mesocycle_link_mismatch" | "microcycle_link_mismatch"
   | "session_link_mismatch" | "session_role_mismatch" | "duplicate_session_id" | "duplicate_session_index"
-  | "invalid_prescription_snapshot" | "invalid_progress_reference" | "legacy_authority_present" | "invalid_revision";
+  | "invalid_prescription_snapshot" | "invalid_progress_reference" | "legacy_authority_present" | "invalid_revision" | "invalid_cycle_lineage" | "invalid_recorded_session_reference" | "recorded_session_lineage_missing";
 
 export type CanonicalDeepEquivalence = Readonly<{ status: "equivalent" } | { status: "different"; path: string }>;
 
@@ -128,6 +131,10 @@ export function validateCanonicalActivePlan(value: unknown): CanonicalCarrierVal
   }
   if (!candidate.progress || typeof candidate.progress !== "object" || typeof candidate.progress.evidenceVersion !== "string" || typeof candidate.progress.revision !== "number") return { status: "invalid", reason: "invalid_progress_reference", path: "progress" };
   if (candidate.progress.revision !== candidate.revision) return { status: "invalid", reason: "invalid_progress_reference", path: "progress.revision" };
+  if (candidate.cycleLineage || candidate.recordedSessionReferences) {
+    const lineageError = validateCanonicalLineage(candidate.cycleLineage ?? [], candidate.recordedSessionReferences ?? []);
+    if (lineageError) return { status: "invalid", reason: lineageError as CanonicalCarrierValidationCode };
+  }
   return { status: "valid", carrier: value as CanonicalActivePlanCarrier };
 }
 
