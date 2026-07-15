@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "canonical_progress_dashboard_coverage_map_v1",
+  "sourceCommit": "6c5a18a",
+  "legacyUnitCases": 21,
+  "designQaConsumers": ["tests/design-qa-fixtures.test.ts"],
+  "canonicalReplacementsAdded": ["canonical-progress-dashboard-projection.test.ts"],
+  "obsoleteLegacyAssertions": ["blocks", "activeBlockId", "currentMicrocycle.progressionState", "annual phase"],
+  "remainingLegacyProjection": "src/domain/training/progress-dashboard.ts:buildProgressDashboardViewModel",
+  "migrationStatus": "projection_contract_added_legacy_family_not_deleted",
+  "nextStep": "migrate dashboard unit and Design-QA cases to canonical projection before deleting legacy function"
+}
