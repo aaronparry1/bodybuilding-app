@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "canonical_design_qa_progress_remainder_migration_v1",
+  "sourceCommit": "2748fde",
+  "fixtureCount": 19,
+  "legacyReachability": "zero_for_listed_ids",
+  "fixtures": [
+    {"id":"progress_low","family":"generic_evidence_readiness","status":"canonical_projection","policy":"canonical_progress_evaluation_v2"},
+    {"id":"progress_healthy","family":"generic_evidence_readiness","status":"canonical_projection","policy":"canonical_progress_evaluation_v2"},
+    {"id":"progress_strength_dashboard","family":"generic_evidence_readiness","status":"canonical_projection","policy":"canonical_progress_evaluation_v2"},
+    {"id":"progress_fatigue","family":"generic_evidence_readiness","status":"canonical_projection","policy":"canonical_progress_evaluation_v2"},
+    {"id":"progress_slowing","family":"generic_evidence_readiness","status":"canonical_projection","policy":"canonical_progress_evaluation_v2"},
+    {"id":"progress_recent_clean","family":"generic_evidence_readiness","status":"canonical_projection","policy":"canonical_progress_evaluation_v2"},
+    {"id":"phase1_load_one_bad_session","family":"generic_evidence_readiness","status":"canonical_projection","policy":"canonical_progress_evaluation_v2"},
+    {"id":"phase1_low_history_no_deload","family":"generic_evidence_readiness","status":"canonical_projection","policy":"canonical_progress_evaluation_v2"},
+    {"id":"phase1_deload_mild","family":"recovery_action","status":"canonical_projection","policy":"mesocycle_prescription_policy_v1"},
+    {"id":"phase1_deload_clear","family":"recovery_action","status":"canonical_projection","policy":"mesocycle_prescription_policy_v1"},
+    {"id":"phase1_deload_severe","family":"recovery_action","status":"canonical_projection","policy":"mesocycle_prescription_policy_v1"},
+    {"id":"home_recovery_capacity","family":"recovery_action","status":"canonical_projection","policy":"mesocycle_prescription_policy_v1"},
+    {"id":"phase1_goal_strength","family":"goal_or_phase_review","status":"canonical_projection","policy":"macrocycle_compatibility"},
+    {"id":"phase1_goal_muscle","family":"goal_or_phase_review","status":"canonical_projection","policy":"macrocycle_compatibility"},
+    {"id":"phase1_goal_muscle_strength","family":"goal_or_phase_review","status":"canonical_projection","policy":"macrocycle_compatibility"},
+    {"id":"phase1_goal_athletic","family":"goal_or_phase_review","status":"canonical_projection","policy":"macrocycle_compatibility"},
+    {"id":"phase1_goal_event","family":"goal_or_phase_review","status":"canonical_projection","policy":"macrocycle_compatibility"},
+    {"id":"phase1_goal_general","family":"goal_or_phase_review","status":"canonical_projection","policy":"macrocycle_compatibility"},
+    {"id":"progress_deload_action","family":"deload_application","status":"canonical_projection_review_required","policy":"mesocycle_prescription_policy_v1","application":"unsupported_without_approved_successor"}
+  ],
+  "remainingProgressFixtureIds": [],
+  "productionSwitchCompleted": false
+}
