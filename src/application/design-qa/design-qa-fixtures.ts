@@ -373,25 +373,12 @@ function completedSession({ id, name, completedAt, exercises }: { id: string; na
   };
 }
 
-function zeroSetFixtureSession(): WorkoutSession {
-  return completedSession({
-    id: "qa-zero-set-hidden",
-    name: "AI Pull • Pull",
-    completedAt: daysAgoIso(2),
-    exercises: [benchExercise([], "complete")],
-  });
-}
-
 function benchExercise(
   reps: number[],
   status: WorkoutExerciseLog["status"] = "active",
   options: { load?: number; loadKnown?: boolean; warmups?: Array<{ load: number; reps: number }>; perSetLoads?: number[]; loadIncrease?: number; notes?: string; unit?: "kg" | "lb" } = {},
 ): WorkoutExerciseLog {
   return exerciseLog(findExercise("ex-bench-press"), { reps, status, load: options.load ?? 100, loadKnown: options.loadKnown, warmups: options.warmups, perSetLoads: options.perSetLoads, loadIncrease: options.loadIncrease, notes: options.notes, unit: options.unit });
-}
-
-function bodyweightPullUpExercise(): WorkoutExerciseLog {
-  return exerciseLog(findExercise("ex-pull-up"), { reps: [], status: "active", load: 0, loadKnown: true });
 }
 
 function inclineExercise(reps: number[], status: WorkoutExerciseLog["status"] = "active"): WorkoutExerciseLog {
@@ -404,10 +391,6 @@ function lateralRaiseExercise(
   options: { load?: number; loadIncrease?: number; notes?: string } = {},
 ): WorkoutExerciseLog {
   return exerciseLog(findExercise("ex-dumbbell-lateral-raise"), { reps, status, load: options.load ?? 12, loadIncrease: options.loadIncrease, notes: options.notes });
-}
-
-function rowExercise(reps: number[], status: WorkoutExerciseLog["status"] = "active", options: { load?: number } = {}): WorkoutExerciseLog {
-  return exerciseLog(findExercise("ex-t-bar-row-chest-supported"), { reps, status, load: options.load ?? 80 });
 }
 
 function cableFlyExercise(reps: number[], status: WorkoutExerciseLog["status"] = "active", options: { load?: number } = {}): WorkoutExerciseLog {
@@ -440,29 +423,6 @@ function prepRecord(workoutName: string, status: "completed" | "skipped"): Sessi
     status,
     now: new Date(status === "completed" ? todayIso(8, 45) : todayIso(8, 50)),
   });
-}
-
-function machineChestPressSwappedFromBench(): WorkoutExerciseLog {
-  const replacement = exerciseLog(findExercise("ex-machine-chest-press"), { reps: [], status: "active", load: 90 });
-  return {
-    ...replacement,
-    swappedFromExerciseId: "ex-bench-press",
-    swappedFromExerciseName: "Bench Press",
-    swapHistory: [
-      {
-        exerciseId: "ex-bench-press",
-        exerciseName: "Bench Press",
-        settings: findExercise("ex-bench-press").defaultSettings,
-        load: 100,
-        loadKnown: true,
-        sets: workSets([12, 11], 100),
-        status: "swapped",
-        swappedToExerciseId: replacement.exerciseId,
-        swappedToExerciseName: replacement.exerciseName,
-        notes: "Swapped during Design QA fixture.",
-      },
-    ],
-  };
 }
 
 function exerciseLog(

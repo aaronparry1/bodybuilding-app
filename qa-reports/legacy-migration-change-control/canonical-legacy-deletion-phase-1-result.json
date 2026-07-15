@@ -1,6 +1,6 @@
 {
   "schemaVersion": "canonical_legacy_deletion_phase_1_result_v1",
-  "sourceCommit": "b87bb242",
+  "sourceCommit": "5c907b3",
   "designQaCanonicalMatrixComplete": true,
   "designQaLegacyReachabilityZero": true,
   "productionLegacyAuthorityReachabilityZero": false,
@@ -8,9 +8,10 @@
   "deadLegacyCodeRemoved": true,
   "legacyFixtureBasePlanRemoved": true,
   "legacyFixtureSessionDataRemoved": true,
+  "legacyFixtureExerciseLogsRemoved": true,
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
   "deletedSymbols": ["applyDesignQaFixtureMatrix", "applyFailureRecoveryFixture", "DesignQaFixtureBackup", "fixtureBackupKey", "basePlan", "singleHypertrophyPlan", "strengthPlan", "eventPlan", "blockEndingPlan", "progressHealthySessions", "progressStrengthDashboardSessions", "recentPrFixtureSessions", "homeRecoveryCapacitySessions", "progressFatigueSessions", "progressSlowingSessions", "sameFamilyEstimateFixtureSessions", "regressionHistorySessions"],
-  "nextDeletionCandidate": "src/application/design-qa/design-qa-fixtures.ts:zeroSetFixtureSession and legacy exercise-log helpers",
+  "nextDeletionCandidate": "src/application/design-qa/design-qa-fixtures.ts:legacy exercise-log helper cluster rooted at exerciseLog",
   "reason": "certified Design-QA matrix and backup bridge removed; retained production/archive compatibility paths remain classified"
 }
