@@ -15,6 +15,7 @@ export type CanonicalProgressDecision = Readonly<{
   reason: string;
   explanation: string;
   status: "current" | "consumed";
+  intervention?: import("@/domain/training/canonical-progress-intervention").CanonicalProgressIntervention;
 }>;
 
 export function validateCanonicalProgressDecision(value: unknown): { status: "valid"; decision: CanonicalProgressDecision } | { status: "invalid"; reason: string } {

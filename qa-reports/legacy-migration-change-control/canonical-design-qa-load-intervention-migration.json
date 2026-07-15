@@ -1,0 +1,28 @@
+{
+  "sourceCommit": "af5ed3b",
+  "policyVersion": "canonical_mesocycle_load_adjustment_policy_v1",
+  "interventionVersion": "canonical_progress_intervention_v1",
+  "fixtureIds": [
+    "train_load_regression_reduce",
+    "train_load_escalation",
+    "train_load_escalation_modal",
+    "train_load_average_next",
+    "train_productive_below_min",
+    "train_productive_target_zone",
+    "train_productive_soft_cap",
+    "train_productive_over_soft_cap"
+  ],
+  "canonicalEvidence": "canonical_session_and_performed_work_setup",
+  "loadStates": "resolved_from_canonical_session_prescription",
+  "policyResult": "manual_review_required",
+  "interventionResult": "review_required_or_calibration_required",
+  "automaticIncreaseSupported": false,
+  "automaticReductionSupported": false,
+  "prescriptionMutation": false,
+  "planRevisionMutation": false,
+  "sessionConstructionDuringEvaluation": false,
+  "legacyDispatcherReachability": "bypassed_for_eight_ids",
+  "remainingProgressLegacyIds": "all_non_load_progress_decision_ids",
+  "readiness": "canonical_fail_closed_coverage_only",
+  "firstRemainingFalsePredicate": "source_backed_bounded_adjustment_rule_not_yet_approved"
+}

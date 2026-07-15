@@ -305,6 +305,14 @@ function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnv
   return applyDesignQaFixtureMatrix(id, environment);
 }
 function applyProgressDecisionFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
+  if (["train_load_regression_reduce", "train_load_escalation", "train_load_escalation_modal", "train_load_average_next", "train_productive_below_min", "train_productive_target_zone", "train_productive_soft_cap", "train_productive_over_soft_cap"].includes(id)) {
+    if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
+    createCanonicalTrainProjection(id);
+    const definition = getFixtureDefinition(id);
+    const activeFixture = { id, label: definition.label, appliedAt: "2026-01-01T00:00:00.000Z" };
+    jsonStore.set(activeFixtureKey, activeFixture);
+    return activeFixture;
+  }
   return applyDesignQaFixtureMatrix(id, environment);
 }
 function applyFailureRecoveryFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {

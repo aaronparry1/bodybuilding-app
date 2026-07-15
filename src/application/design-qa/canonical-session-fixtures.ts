@@ -5,6 +5,12 @@ import { exerciseLibrary } from "@/domain/training/presets";
 
 export type CanonicalDesignQaSessionResult = Readonly<{ status: "ready" | "started" | "rejected"; fixtureId: string; planId: string; plannedSessionId?: string; recordedSessionId?: string; reason: string }>;
 
+export function applyCanonicalLoadInterventionFixture(fixtureId: string): CanonicalDesignQaSessionResult {
+  // Load-intervention fixtures intentionally exercise canonical session/evidence setup;
+  // unsupported numeric adjustment remains an explicit Progress review outcome.
+  return applyCanonicalActiveSessionFixture(fixtureId);
+}
+
 export function applyCanonicalActiveSessionFixture(fixtureId: string): CanonicalDesignQaSessionResult {
   const planId = `design-qa:${fixtureId}`;
   const state = canonicalActivePlanState.create({ planId, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell", "bodyweight"], units: "kg", exercises: exerciseLibrary });

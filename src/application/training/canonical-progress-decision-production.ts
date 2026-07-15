@@ -4,6 +4,7 @@ import { canonicalProgressDecisionRepository } from "@/data/local/canonical-prog
 import type { CanonicalProgressEvaluation, CanonicalProgressEvaluationV2 } from "@/domain/training/canonical-progress-evaluator";
 import type { CanonicalProgressDecision } from "@/domain/training/canonical-progress-decision";
 import { resolveCanonicalMesocycleSuccessor } from "@/domain/training/canonical-mesocycle-successor";
+import type { CanonicalProgressIntervention } from "@/domain/training/canonical-progress-intervention";
 
 export type CanonicalProgressDecisionProductionCommand = Readonly<{
   planId: string;
@@ -14,6 +15,7 @@ export type CanonicalProgressDecisionProductionCommand = Readonly<{
   evaluation: CanonicalProgressEvaluation | CanonicalProgressEvaluationV2;
   evidenceVersions: Readonly<Record<string, string>>;
   operationId: string;
+  intervention?: CanonicalProgressIntervention;
 }>;
 
 export type CanonicalProgressDecisionProductionResult = Readonly<{ status: "produced" | "rejected"; reason: string; decision?: CanonicalProgressDecision }>;
@@ -42,7 +44,7 @@ export function produceCanonicalProgressDecision(command: CanonicalProgressDecis
     successorMesocycleId = successor.successorMesocycleId;
   }
   const decisionId = command.operationId;
-  const decision: CanonicalProgressDecision = { schemaVersion: "canonical_progress_decision_v1", decisionId, planId: command.planId, expectedPlanRevision: command.planRevision, macrocycleId: command.macrocycleId, mesocycleId: command.mesocycleId, microcycleId: command.microcycleId, evaluationId: evaluation.evaluationId, evidenceIds, outcome, ...(successorMesocycleId ? { successorMesocycleId } : {}), owner: "mesocycle", reason: evaluation.reason, explanation: evaluation.explanation, status: "current" };
+  const decision: CanonicalProgressDecision = { schemaVersion: "canonical_progress_decision_v1", decisionId, planId: command.planId, expectedPlanRevision: command.planRevision, macrocycleId: command.macrocycleId, mesocycleId: command.mesocycleId, microcycleId: command.microcycleId, evaluationId: evaluation.evaluationId, evidenceIds, outcome, ...(successorMesocycleId ? { successorMesocycleId } : {}), ...(command.intervention ? { intervention: command.intervention } : {}), owner: "mesocycle", reason: evaluation.reason, explanation: evaluation.explanation, status: "current" };
   const existing = canonicalProgressDecisionRepository.get(decisionId);
   if (existing.status === "found") return JSON.stringify(existing.decision) === JSON.stringify(decision) ? { status: "produced", reason: "idempotent_retry", decision: existing.decision } : { status: "rejected", reason: "decision_id_conflict" };
   const saved = canonicalProgressDecisionRepository.save(decision);
