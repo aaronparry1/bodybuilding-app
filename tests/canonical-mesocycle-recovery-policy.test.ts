@@ -1,0 +1,9 @@
+import { describe, expect, it } from "vitest";
+import { resolveCanonicalMesocycleRecoveryPolicy } from "@/domain/training/canonical-mesocycle-recovery-policy";
+
+const input = { planId: "plan:r", mesocycleId: "meso:r", purpose: "hypertrophy_base", method: "standard", evidenceIds: ["e2", "e1"], freshness: "fresh" as const, completeness: "complete" as const, fatigue: "stable" as const, recovery: "ready" as const };
+describe("canonical Mesocycle recovery policy", () => {
+  it("returns deterministic continue with canonical provenance", () => { const result = resolveCanonicalMesocycleRecoveryPolicy(input); expect(result.disposition).toBe("continue"); expect(result.policyId).toBe("canonical_mesocycle_recovery_policy_v1"); expect(result.evidenceIds).toEqual(["e1", "e2"]); expect(result.provenance.numericRules).toEqual([]); });
+  it("fails closed for stale, conflicting, unsupported, and systemic facts", () => { expect(resolveCanonicalMesocycleRecoveryPolicy({ ...input, freshness: "stale" }).disposition).toBe("insufficient_evidence"); expect(resolveCanonicalMesocycleRecoveryPolicy({ ...input, completeness: "conflicting" }).disposition).toBe("pause_for_review"); expect(resolveCanonicalMesocycleRecoveryPolicy({ ...input, purpose: "unsupported" }).disposition).toBe("unsupported_policy"); expect(resolveCanonicalMesocycleRecoveryPolicy({ ...input, fatigue: "systemic" }).disposition).toBe("review_stress_reduction"); });
+  it("rejects legacy-shaped input and contains no prescription mutation", () => { expect(() => resolveCanonicalMesocycleRecoveryPolicy({ ...input, legacy: { blocks: [] } } as never)).toThrow("invalid_canonical_mesocycle_recovery_policy_input"); const result = resolveCanonicalMesocycleRecoveryPolicy(input); expect(result).not.toHaveProperty("sets"); expect(result).not.toHaveProperty("successorId"); });
+});
