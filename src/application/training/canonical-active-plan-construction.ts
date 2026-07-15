@@ -40,7 +40,7 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
   }
   const result = constructCanonicalActivePlan({ ...input, plannedSessions: sessions });
   if (result.status !== "constructed") return result;
-  return { ...result, carrier: { ...result.carrier, constructionInputs: canonicalConstructionReferencesForPlan(result.carrier) } };
+  return { ...result, carrier: { ...result.carrier, constructionInputs: canonicalConstructionReferencesForPlan(result.carrier), cycleLineage: [{ schemaVersion: "canonical_session_lineage_v1", planId: result.carrier.planId, macrocycleId: result.carrier.macrocycle.id, mesocycleId: result.carrier.mesocycle.id, microcycleId: result.carrier.microcycle.id, revision: result.carrier.revision, sequenceNumber: result.carrier.microcycle.output.sequenceNumber, status: "current" as const }] } };
 }
 
 /** Orchestrates existing owners; prescription snapshots must be supplied by Session Construction. */
