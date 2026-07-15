@@ -1,40 +1,31 @@
 {
-  "sourceCommit": "3952ca6",
-  "classification": "blocked_by_missing_source_corpus",
-  "sourceCorpusPath": "/workspace/scratch/bdf7016e47ed/project_sources/",
-  "sourceCorpusAvailable": false,
-  "existingMesocyclePolicyVersion": "mesocycle_prescription_policy_v1",
-  "interventionVersion": "canonical_progress_intervention_v1",
-  "supportedCanonicalFacts": [
-    "loading_modes",
-    "progression_families",
-    "rep_target_envelopes",
-    "dropoff_response",
-    "evidence_required_flags",
-    "session_construction_exact_load_ownership"
+  "sourceCommit": "03e139a",
+  "policyVersion": "canonical_mesocycle_load_adjustment_policy_v1",
+  "sourceDirectory": "/Users/aaronparry/Downloads/canonical-policy-source-corpus",
+  "sourceFiles": [
+    {"file":"01-Wendler-531-Manual.pdf","bytes":7716370,"pages":97},
+    {"file":"02-Vault-T-Nation.pdf","bytes":26195848,"pages":200},
+    {"file":"03-531-Football.pdf","bytes":514379,"pages":169},
+    {"file":"04-Managing-the-Training-of-Weightlifters-0-112-allx.pdf","bytes":5493335,"pages":130},
+    {"file":"05-Zatsiorsky-Science-and-Practice.pdf","bytes":36016663,"pages":247},
+    {"file":"06-Fundamentals-of-Special-Strength-Training-in-Sport-Y.V.-Verkhoshansky-1977-1986-1-200x.pdf","bytes":7954121,"pages":207},
+    {"file":"07-WestsideforAthletes.pdf","bytes":537448,"pages":32},
+    {"file":"08-Tier-System-Manual-Athletic-Based-Strength-Training.pdf","bytes":5383428,"pages":251},
+    {"file":"09-Weightlifting-Training-Database-Book.pdf","bytes":5930984,"pages":239},
+    {"file":"10-The-Poliquin-Principles.pdf","bytes":80471953,"pages":139},
+    {"file":"11-Pavel-Tsatsouline-Bullet-Proof-Abs-2.pdf","bytes":2343023,"pages":134},
+    {"file":"12-Mike-Mentzer-Heavy-Duty.pdf","bytes":761776,"pages":43},
+    {"file":"13-Chad-Waterbury-s-Programs.pdf","bytes":820441,"pages":33},
+    {"file":"14-Charles-Atlas-Bodybuilding-Course.pdf","bytes":4183385,"pages":91},
+    {"file":"15-Development-of-the-Russian-Conjugate-SS.pdf","bytes":558036,"pages":40},
+    {"file":"16-Applied-Strongman-Training-for-Sport-POLIQUIN-and-McDERMOTT.pdf","bytes":15159296,"pages":null}
   ],
-  "unresolvedNumericRules": [
-    "bounded_adjustment_step",
-    "productive_load_range",
-    "soft_cap_semantics",
-    "minimum_evidence_count",
-    "evidence_freshness_limit",
-    "regression_dropoff_load_response"
-  ],
-  "policyLibraryAdded": false,
-  "policyResolverAdded": false,
-  "progressEvaluatorAdded": false,
-  "applicationOwnerAdded": false,
-  "fixtureMigrationStarted": false,
-  "affectedFixtureIds": [
-    "train_load_regression_reduce",
-    "train_load_escalation",
-    "train_load_escalation_modal",
-    "train_load_average_next",
-    "train_productive_below_min",
-    "train_productive_target_zone",
-    "train_productive_soft_cap",
-    "train_productive_over_soft_cap"
-  ],
-  "firstRemainingMissingContract": "source-backed versioned Mesocycle load-adjustment policy"
+  "supportedCombinations": [],
+  "reviewRequiredCombinations": ["established:straight_sets", "established:back_off_sets", "calibration_required:*", "autoregulated:*", "bodyweight:*", "unavailable:*"],
+  "numericRules": [],
+  "repositoryCanonicalRulesUsed": ["mesocycle_target_envelopes", "mesocycle_progression_permissions", "mesocycle_evidence_required", "mesocycle_dropoff_response", "construction_equipment_increment"],
+  "affectedFixtureIds": ["train_load_regression_reduce", "train_load_escalation", "train_load_escalation_modal", "train_load_average_next", "train_productive_below_min", "train_productive_target_zone", "train_productive_soft_cap", "train_productive_over_soft_cap"],
+  "readyForCanonicalLoadInterventionEvaluator": false,
+  "firstRemainingFalsePredicate": "source_backed_bounded_adjustment_rule_not_yet_approved",
+  "exactLoadOwner": "Session Construction"
 }
