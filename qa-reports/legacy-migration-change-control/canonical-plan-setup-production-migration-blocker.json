@@ -2,17 +2,17 @@
   "schemaVersion": "canonical_plan_setup_production_migration_blocker_v1",
   "sourceCommit": "69d674c",
   "candidate": "src/domain/training/plan-setup.ts:createActiveTrainingPlan",
-  "decision": "blocked_at_current_decision_application_contract",
+  "decision": "resolved_for_recommendation_callers",
   "liveCaller": {
-    "file": "src/domain/training/current-decision-application.ts",
-    "symbol": "applyCurrentMesocycleDecision",
-    "chain": ["Progress decision action", "applyCurrentMesocycleDecision", "activeTrainingPlanRepository.getOptional/save", "ActiveTrainingPlan.currentMicrocycle/currentMesocycleId/blocks"],
-    "capability": "reads current plan and mutates persisted current cycle state"
+    "file": "src/domain/training/current-progress-context.ts",
+    "symbol": "resolveCurrentProgressContext",
+    "chain": ["Progress dashboard", "resolveCurrentProgressContext", "activeTrainingPlanRepository.getOptional", "ActiveTrainingPlan.currentMicrocycle/currentMesocycleId"],
+    "capability": "reads legacy-shaped current plan context"
   },
   "canonicalReplacement": "applyCanonicalProgressDecision",
-  "missingContract": "production caller still requires canonical decision/revision linkage and successor validation without ActiveTrainingPlan block-shaped state",
-  "requiredFacts": ["canonical plan revision", "canonical mesocycle successor identity", "canonical microcycle identity", "decision/evidence chain", "atomic canonical carrier application"],
-  "constructorDisposition": "retain_until_live_caller_migrated",
+  "missingContract": "Progress context still requires canonical plan/revision and canonical decision/evidence projection",
+  "requiredFacts": ["canonical plan revision", "canonical Mesocycle identity", "canonical Microcycle identity", "canonical evidence status", "canonical decision projection"],
+  "constructorDisposition": "retain_for_migration_and_nonproduction_qa",
   "productionSwitchCompleted": false,
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
