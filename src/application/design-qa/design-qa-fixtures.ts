@@ -19,6 +19,7 @@ import { buildSessionPrepRecord, getSessionPrepRoutine, type SessionPrepRecord }
 import { summarizeWorkoutSession } from "@/domain/training/workout-history";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { applyCanonicalActiveSessionFixture } from "@/application/design-qa/canonical-session-fixtures";
+import { createCanonicalTrainProjection } from "@/application/design-qa/canonical-train-projection";
 
 export type DesignQaFixtureId =
   | "progress_low"
@@ -285,6 +286,13 @@ function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnv
     if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
     clearFixtureViewStateOnly();
     appSettingsStore.patch({ onboardingCompleted: true });
+    if (["train_overview_fresh", "train_first_set", "train_work_sets"].includes(id)) {
+      createCanonicalTrainProjection(id);
+      const definition = getFixtureDefinition(id);
+      const activeFixture = { id, label: definition.label, appliedAt: new Date().toISOString() };
+      jsonStore.set(activeFixtureKey, activeFixture);
+      return activeFixture;
+    }
     applyCanonicalActiveSessionFixture(id);
   }
   return applyDesignQaFixtureMatrix(id, environment);

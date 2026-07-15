@@ -1,0 +1,11 @@
+{
+  "sourceCommit": "2e1d3ce",
+  "batch": "CANONICAL-DESIGN-QA-TRAIN-PROJECTIONS-1",
+  "fixtures": [
+    {"id":"train_overview_fresh","group":"started_active","status":"canonical"},
+    {"id":"train_first_set","group":"started_active","status":"canonical"},
+    {"id":"train_work_sets","group":"performed_work_in_progress","status":"canonical"}
+  ],
+  "remainingTrainFixtures": "all other train_* IDs remain pending by explicit group",
+  "nextBatch": "pause_resume_and_substitution_stop"
+}

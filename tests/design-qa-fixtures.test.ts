@@ -399,6 +399,11 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
     return;
   }
 
+  if (["train_overview_fresh", "train_first_set", "train_work_sets"].includes(fixtureId)) {
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
+    return;
+  }
+
   if (fixtureId.startsWith("plan_") || (fixtureId.startsWith("home_") && fixtureId !== "home_recovery_capacity")) {
     if (fixtureId.endsWith("no_plan")) return;
     expect(canonicalActivePlanState.getReadModel()).not.toBeNull();
