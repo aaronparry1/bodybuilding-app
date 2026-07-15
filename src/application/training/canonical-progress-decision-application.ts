@@ -2,6 +2,9 @@ import { loadCanonicalActivePlan } from "@/application/training/canonical-active
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { resolveCanonicalMesocycleSuccessor } from "@/domain/training/canonical-mesocycle-successor";
+import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
+import { resolveCanonicalConstructionFacts } from "@/application/training/canonical-construction-facts";
+import { constructCanonicalActivePlanFromCanonicalInputs } from "@/application/training/canonical-active-plan-construction";
 
 export type CanonicalProgressDecisionApplicationCommand = Readonly<{ planId: string; expectedPlanRevision: number; macrocycleId: string; mesocycleId: string; microcycleId: string; decisionId: string; evaluationId: string; expectedEvidenceIds: readonly string[] }>;
 export type CanonicalProgressDecisionApplicationResult = Readonly<{ status: "unchanged" | "applied" | "rejected"; reason: string; planId: string; priorRevision: number; newRevision: number; decisionId: string; stateChanged: boolean; futureSessionsRegenerated: boolean; reviewRequired: boolean }>;
@@ -23,7 +26,17 @@ export function applyCanonicalProgressDecision(command: CanonicalProgressDecisio
   if (decision.decision.outcome !== "continue") {
     const successor = resolveCanonicalMesocycleSuccessor({ macrocycleId: `${plan.planId}:macrocycle`, macrocycleEngine: engineForGoal(plan.macrocycle.goal), currentMesocycleId: command.mesocycleId as never, decisionId: decision.decision.decisionId, evaluationId: command.evaluationId, evidenceIds: actual, outcome: decision.decision.outcome === "transition" ? "transition" : "deload", successorMesocycleId: decision.decision.successorMesocycleId as never, sequenceNumber: plan.microcycle.sequenceNumber + 1, planRevision: plan.revision });
     if (successor.status !== "resolved") return rejected(command, plan.revision, successor.reason);
-    return rejected(command, plan.revision, "canonical_future_regeneration_inputs_required");
+    const raw = canonicalActivePlanV2Repository.get();
+    if (raw.status !== "saved") return rejected(command, plan.revision, "canonical_plan_unavailable");
+    const facts = resolveCanonicalConstructionFacts(raw.carrier);
+    if (facts.status !== "ready") return rejected(command, plan.revision, facts.reason);
+    const constructed = constructCanonicalActivePlanFromCanonicalInputs({ planId: raw.carrier.planId, createdAt: raw.carrier.createdAt, updatedAt: new Date().toISOString(), goal: raw.carrier.constraints.goal, macrocycleGoal: successor.successor.engine === "hypertrophy" ? "build_muscle" : successor.successor.engine === "powerbuilding" ? "build_muscle_and_strength" : successor.successor.engine === "strength" ? "build_strength" : "athletic_performance", experienceLevel: raw.carrier.constraints.experienceLevel, daysPerWeek: raw.carrier.constraints.daysPerWeek as 2 | 3 | 4 | 5 | 6, preferredSplit: raw.carrier.constraints.preferredSplit as never, equipment: facts.facts.equipment, units: raw.carrier.constraints.units, exercises: facts.facts.exercises, limitations: facts.facts.limitations, history: facts.facts.history, establishedLoads: facts.facts.establishedLoads });
+    if (constructed.status !== "constructed") return rejected(command, plan.revision, "canonical_future_session_construction_failed");
+    const nextRevision = raw.carrier.revision + 1;
+    const generated = { ...constructed.carrier, revision: nextRevision, progress: { ...constructed.carrier.progress, revision: nextRevision }, constructionInputs: facts.facts.references };
+    const saved = canonicalActivePlanV2Repository.saveAtomically(generated, raw.carrier.revision);
+    if (saved.status !== "saved") return rejected(command, plan.revision, saved.status === "conflict" ? "stale_plan_revision" : "canonical_plan_save_failed");
+    return { status: "applied", reason: "canonical_successor_applied", planId: command.planId, priorRevision: raw.carrier.revision, newRevision: nextRevision, decisionId: command.decisionId, stateChanged: true, futureSessionsRegenerated: true, reviewRequired: false };
   }
   return { status: "unchanged", reason: "continue_requires_no_plan_change", planId: plan.planId, priorRevision: plan.revision, newRevision: plan.revision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: false, reviewRequired: false };
 }
