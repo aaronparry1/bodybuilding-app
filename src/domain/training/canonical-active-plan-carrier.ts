@@ -51,6 +51,7 @@ export type CanonicalActivePlanCarrier = Readonly<{
     customSequence?: readonly string[];
   }>;
   operational: Readonly<{ openWorkoutId?: string; migrationId?: string; recoverySourceReference?: string; syncRevision?: string }>;
+  constructionInputs?: Readonly<{ schemaVersion: "canonical_construction_inputs_v1"; athleteId: string; exerciseCatalogueSource: string; equipmentSource: string; limitationsSource: string; preferencesSource: string; progressEvidenceScope: string; establishedLoadSource: string }>;
 }>;
 
 export type CanonicalCarrierAssemblyInput = Readonly<{

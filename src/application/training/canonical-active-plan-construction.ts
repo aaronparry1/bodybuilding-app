@@ -5,6 +5,7 @@ import { assembleCanonicalActivePlan, type CanonicalActivePlanCarrier, type Cano
 import { resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-prescription-policy";
 import { constructCanonicalSession, resolveCanonicalSessionIdentity } from "@/domain/training/canonical-session-construction-pipeline";
 import type { Equipment, ExperienceLevel, Exercise, ProgrammeGoal, UnitSystem, WorkoutHistorySummary } from "@/domain/training/models";
+import { canonicalConstructionReferencesForPlan } from "@/application/training/canonical-construction-facts";
 
 export type CanonicalConstructionInput = Readonly<{ planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: Parameters<typeof createMacrocycle>[0]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: Parameters<typeof createMicrocycle>[0]["split"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; plannedSessions: readonly CanonicalPlannedSessionSnapshot[] }>;
 export type CanonicalConstructionResult = Readonly<{ status: "constructed"; carrier: CanonicalActivePlanCarrier } | { status: "invalid_input" | "no_initial_mesocycle" | "session_role_mismatch" | "carrier_validation_failed"; reason: string }>;
@@ -37,7 +38,9 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
     if (constructed.status !== "constructed") return { status: "carrier_validation_failed", reason: `session_${index}:${constructed.reason}` };
     sessions.push({ id: identity, microcycleId, planSessionIndex: index, role, kind: "planned", status: "planned", constructionVersion: "canonical_plan_v2", revision: 0, prescriptionSnapshot: constructed.snapshot });
   }
-  return constructCanonicalActivePlan({ ...input, plannedSessions: sessions });
+  const result = constructCanonicalActivePlan({ ...input, plannedSessions: sessions });
+  if (result.status !== "constructed") return result;
+  return { ...result, carrier: { ...result.carrier, constructionInputs: canonicalConstructionReferencesForPlan(result.carrier) } };
 }
 
 /** Orchestrates existing owners; prescription snapshots must be supplied by Session Construction. */
