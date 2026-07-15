@@ -1,0 +1,11 @@
+{
+  "sourceCommit": "b1e0f47",
+  "batch": "CANONICAL-DESIGN-QA-TRAIN-PROJECTIONS-2",
+  "fixtures": [
+    {"id":"train_warmups","behavior":"performed_work","canonicalSequence":["create_plan","start_session","record_performed_work","project_ledger"],"status":"canonical"}
+  ],
+  "pauseFixtures": [],
+  "resumeFixtures": [],
+  "remainingGroups": {"performedWork":"remaining specialized load/stop fixtures", "pauseResume":[], "substitutionStop":"pending", "completionHistory":"pending", "custom":"pending", "failureRecovery":"pending"},
+  "nextBatch":"substitution_and_stop_dropoff"
+}
