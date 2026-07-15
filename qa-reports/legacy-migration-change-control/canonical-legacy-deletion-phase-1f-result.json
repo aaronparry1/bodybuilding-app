@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "canonical_legacy_deletion_phase_1f_result_v1",
+  "sourceCommit": "fd3d910",
+  "candidate": "src/application/design-qa/design-qa-fixtures.ts:exerciseLog",
+  "deleted": [],
+  "callerProof": {
+    "exerciseLog": {
+      "classification": "production_projection_or_transport",
+      "directCallers": ["benchExercise", "inclineExercise", "lateralRaiseExercise", "cableFlyExercise", "tricepsPushdownExercise"],
+      "reachableThrough": ["pushExerciseList", "ensureDesignQaLocalWorkoutReadyState"],
+      "canonicalLedgerCaller": false,
+      "migrationArchiveRejectionCaller": false,
+      "decision": "preserve_shared_live_visual_qa_dependency"
+    }
+  },
+  "designQaCanonicalMatrixComplete": true,
+  "designQaLegacyReachabilityZero": true,
+  "legacyFixtureExerciseLogsRemoved": false,
+  "pipelineReadyForSwitch": true,
+  "productionSwitchCompleted": false,
+  "firstBlockingSymbol": "src/application/design-qa/design-qa-fixtures.ts:exerciseLog",
+  "reason": "exerciseLog has live callers in the active local visual QA setup; deleting it would remove required fixture behavior or require an unapproved adapter"
+}
