@@ -2,10 +2,11 @@ import { createCanonicalActivePlan, loadCanonicalActivePlan, type CanonicalActiv
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { restoreCanonicalRecordedSession, type CanonicalRestorationResult, type RecordedSessionStatus } from "@/domain/training/canonical-session-restoration";
 import type { CanonicalPlannedSessionSnapshot } from "@/domain/training/canonical-active-plan-carrier";
+import { applyCanonicalProgressDecision, type CanonicalProgressDecisionApplicationCommand, type CanonicalProgressDecisionApplicationResult } from "@/application/training/canonical-progress-decision-application";
 
 export type CanonicalActivePlanState = Readonly<{ hydration: "empty" | "hydrated" | "error"; model: CanonicalActivePlanReadModel | null; error?: string }>;
 
-export type CanonicalActivePlanStateStore = Readonly<{ getState(): CanonicalActivePlanState; subscribe(listener: () => void): () => void; hydrate(): CanonicalActivePlanState; create(command: CanonicalActivePlanCreateCommand): CanonicalActivePlanState; refresh(): CanonicalActivePlanState; clear(): CanonicalActivePlanState; getReadModel(): CanonicalActivePlanReadModel | null; getPlannedSession(id: string): CanonicalPlannedSessionSnapshot | null; getNextActionableSession(): CanonicalPlannedSessionSnapshot | null; restoreRecordedSession(input: Readonly<{ snapshot: CanonicalPlannedSessionSnapshot; status: RecordedSessionStatus; expectedMicrocycleId: string; currentRevision: number; performedSets?: readonly unknown[] }>): CanonicalRestorationResult }>;
+export type CanonicalActivePlanStateStore = Readonly<{ getState(): CanonicalActivePlanState; subscribe(listener: () => void): () => void; hydrate(): CanonicalActivePlanState; create(command: CanonicalActivePlanCreateCommand): CanonicalActivePlanState; applyProgressDecision(command: CanonicalProgressDecisionApplicationCommand): CanonicalProgressDecisionApplicationResult; refresh(): CanonicalActivePlanState; clear(): CanonicalActivePlanState; getReadModel(): CanonicalActivePlanReadModel | null; getPlannedSession(id: string): CanonicalPlannedSessionSnapshot | null; getNextActionableSession(): CanonicalPlannedSessionSnapshot | null; restoreRecordedSession(input: Readonly<{ snapshot: CanonicalPlannedSessionSnapshot; status: RecordedSessionStatus; expectedMicrocycleId: string; currentRevision: number; performedSets?: readonly unknown[] }>): CanonicalRestorationResult }>;
 
 export function createCanonicalActivePlanStateStore(): CanonicalActivePlanStateStore {
   let state: CanonicalActivePlanState = { hydration: "empty", model: null };
@@ -16,6 +17,7 @@ export function createCanonicalActivePlanStateStore(): CanonicalActivePlanStateS
     subscribe: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
     hydrate: () => { const result = loadCanonicalActivePlan(); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : result.reason === "canonical_plan_missing" ? { hydration: "empty", model: null } : { hydration: "error", model: null, error: result.reason }; publish(); return state; },
     create: (command) => { const result = createCanonicalActivePlan(command); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : { hydration: "error", model: null, error: result.reason }; publish(); return state; },
+    applyProgressDecision: (command) => { const result = applyCanonicalProgressDecision(command); if (result.status === "applied" || result.status === "unchanged") store.hydrate(); return result; },
     refresh: () => store.hydrate(),
     clear: () => { canonicalActivePlanV2Repository.clear(); state = { hydration: "empty", model: null }; publish(); return state; },
     getReadModel: () => state.model,
