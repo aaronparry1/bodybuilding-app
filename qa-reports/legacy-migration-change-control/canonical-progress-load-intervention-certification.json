@@ -1,0 +1,48 @@
+{
+  "sourceCommit": "699292213131fb7b4706e1f28183520e1e54a1b5",
+  "classification": "blocked_by_missing_mesocycle_load_adjustment_policy",
+  "policyVersion": "mesocycle_prescription_policy_v1",
+  "interventionVersion": "canonical_progress_intervention_v1",
+  "affectedFixtureIds": [
+    "train_load_regression_reduce",
+    "train_load_escalation",
+    "train_load_escalation_modal",
+    "train_load_average_next",
+    "train_productive_below_min",
+    "train_productive_target_zone",
+    "train_productive_soft_cap",
+    "train_productive_over_soft_cap"
+  ],
+  "existingCanonicalCapabilities": [
+    "loading_modes",
+    "progression_families",
+    "rep_target_envelopes",
+    "dropoff_response",
+    "canonical_load_states",
+    "established_load_evidence",
+    "stale_evidence_chain_rejection",
+    "exact_future_load_session_construction"
+  ],
+  "missingPolicyFields": [
+    "bounded_load_adjustment_magnitude_or_step",
+    "productive_load_target_range",
+    "load_soft_cap_semantics",
+    "minimum_load_evidence_count",
+    "load_evidence_freshness_window",
+    "load_adjustment_contraindications",
+    "regression_dropoff_load_response",
+    "load_adjustment_policy_identity_and_version"
+  ],
+  "forbiddenSubstitutes": [
+    "legacy_recommendation_helpers",
+    "legacy_block_thresholds",
+    "adaptive_load_prescription_heuristics",
+    "exact_load_in_progress_intervention",
+    "final_lane_or_rep_inference"
+  ],
+  "evaluatorImplemented": false,
+  "applicationOwnerImplemented": false,
+  "fixturesMigrated": false,
+  "pipelineReadyForLoadFixtureMigration": false,
+  "firstRemainingMissingContract": "versioned Mesocycle load-adjustment policy with bounded magnitude, target/soft-cap semantics, evidence freshness/minimums, and contraindications"
+}
