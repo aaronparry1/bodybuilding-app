@@ -1,0 +1,40 @@
+{
+  "sourceCommit": "3952ca6",
+  "classification": "blocked_by_missing_source_corpus",
+  "sourceCorpusPath": "/workspace/scratch/bdf7016e47ed/project_sources/",
+  "sourceCorpusAvailable": false,
+  "existingMesocyclePolicyVersion": "mesocycle_prescription_policy_v1",
+  "interventionVersion": "canonical_progress_intervention_v1",
+  "supportedCanonicalFacts": [
+    "loading_modes",
+    "progression_families",
+    "rep_target_envelopes",
+    "dropoff_response",
+    "evidence_required_flags",
+    "session_construction_exact_load_ownership"
+  ],
+  "unresolvedNumericRules": [
+    "bounded_adjustment_step",
+    "productive_load_range",
+    "soft_cap_semantics",
+    "minimum_evidence_count",
+    "evidence_freshness_limit",
+    "regression_dropoff_load_response"
+  ],
+  "policyLibraryAdded": false,
+  "policyResolverAdded": false,
+  "progressEvaluatorAdded": false,
+  "applicationOwnerAdded": false,
+  "fixtureMigrationStarted": false,
+  "affectedFixtureIds": [
+    "train_load_regression_reduce",
+    "train_load_escalation",
+    "train_load_escalation_modal",
+    "train_load_average_next",
+    "train_productive_below_min",
+    "train_productive_target_zone",
+    "train_productive_soft_cap",
+    "train_productive_over_soft_cap"
+  ],
+  "firstRemainingMissingContract": "source-backed versioned Mesocycle load-adjustment policy"
+}
