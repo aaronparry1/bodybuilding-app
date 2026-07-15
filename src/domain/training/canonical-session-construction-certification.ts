@@ -39,7 +39,7 @@ export function certifyCanonicalSessionConstruction(inputs: readonly CanonicalSe
       validCases += 1;
       if (JSON.stringify(first.snapshot) !== JSON.stringify(second.status === "constructed" ? second.snapshot : null)) determinismFailures.push(input.operational.identity);
       if (first.snapshot.slots.some((slot) => !slot.id || !slot.exerciseId || !slot.lane || !slot.method || !slot.settings.repRange)) invariantViolations.push(`${input.operational.identity}:incomplete_slot`);
-      if (first.snapshot.slots.some((slot) => !slot.rest || !slot.progression || !slot.stopRule || !slot.loadingMode)) qualityViolations.push(`${input.operational.identity}:incomplete_exact_prescription`);
+      if (first.snapshot.slots.some((slot) => !slot.rest || !slot.progression || !slot.stopRule || !slot.loadingMode) || (first.snapshot.schemaVersion === "canonical_session_snapshot_v3" && first.snapshot.slots.some((slot) => !slot.loadPrescription))) qualityViolations.push(`${input.operational.identity}:incomplete_exact_prescription`);
     }
   }
   carrierFailures.push("canonical_v2_planned_session_orchestration_not_connected");
