@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "canonical_retained_compatibility_allowlist_v1",
+  "sourceCommit": "6041ed8",
+  "entries": [
+    {"symbol":"legacyTrainingYearArchive","file":"src/application/training/legacy-training-year-archive.ts","classification":"archive_only","owner":"cloud sync","reason":"historical archive transport; validated migration required before install"},
+    {"symbol":"saved-plan-migration","file":"src/application/training/saved-plan-migration.ts","classification":"migration_only","owner":"migration boundary","reason":"validated legacy payload conversion"},
+    {"symbol":"canonical-recorded-session-migration","file":"src/application/training/canonical-recorded-session-migration.ts","classification":"rejection_only","owner":"recorded-session migration","reason":"malformed or ambiguous history fails closed"},
+    {"symbol":"workoutSessionRepository","file":"src/data/local/workout-session-repository.ts","classification":"transport_only","owner":"history/sync","reason":"not yet removed; live Train/history callers remain"}
+  ]
+}

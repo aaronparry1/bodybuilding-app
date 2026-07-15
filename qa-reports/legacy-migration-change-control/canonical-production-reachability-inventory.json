@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "canonical_production_reachability_inventory_v1",
+  "sourceCommit": "6041ed8",
+  "entrypoints": ["app/(protected)/onboarding.tsx", "app/(protected)/(tabs)/index.tsx", "app/(protected)/(tabs)/programmes.tsx", "app/(protected)/(tabs)/train.tsx", "app/(protected)/(tabs)/analytics.tsx", "app/(protected)/history/[id].tsx", "src/application/sync/cloud-data-sync.ts"],
+  "legacyReachability": [
+    {"symbol":"activeTrainingPlanRepository","file":"src/data/local/active-training-plan-repository.ts","classification":"production_legacy_authority","callers":["src/features/workout-logging/use-workout-logger.ts","src/domain/training/current-decision-application.ts"],"capability":"read/write current plan"},
+    {"symbol":"workoutSessionRepository","file":"src/data/local/workout-session-repository.ts","classification":"production_legacy_authority","callers":["src/features/workout-logging/use-workout-logger.ts","app/(protected)/history/[id].tsx","src/domain/training/current-completion-orchestration.ts"],"capability":"read/write workout history"},
+    {"symbol":"annual-planner","file":"src/domain/training/annual-planner.ts","classification":"production_legacy_authority","callers":["src/domain/training/plan-setup.ts","src/domain/training/run-v2-qa-preview.ts"],"capability":"construct blocks and TrainingYear"},
+    {"symbol":"legacyTrainingYearArchive","file":"src/application/training/legacy-training-year-archive.ts","classification":"transport_only","callers":["src/application/sync/cloud-data-sync.ts"],"capability":"archive transport; not current authority"}
+  ],
+  "firstLiveBlocker": {"predicate":"no_production_active_training_plan_authority","file":"src/features/workout-logging/use-workout-logger.ts","symbol":"useWorkoutLogger","callerChain":["Train route","useWorkoutLogger","activeTrainingPlanRepository/workoutSessionRepository"],"capability":"current session/history mutation","canonicalReplacement":"canonical recorded-session ledger and Session Construction"}
+}

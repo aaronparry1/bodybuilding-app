@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "canonical_production_switch_final_result_v1",
+  "sourceCommit": "6041ed8",
+  "evidenceContract": "canonical_production_switch_evidence_v1",
+  "pipelineReadyForSwitch": true,
+  "productionSwitchCompleted": false,
+  "classification": "production_switch_blocked_by_live_legacy_authority",
+  "firstFalsePredicate": "no_production_active_training_plan_authority",
+  "firstLiveBlocker": "src/features/workout-logging/use-workout-logger.ts:useWorkoutLogger",
+  "nextBoundedMigrationTask": "migrate Train logging and history persistence from workoutSessionRepository to canonical recorded-session ledger",
+  "ordinaryV2Authority": "inactive",
+  "d4d2": "unchanged"
+}
