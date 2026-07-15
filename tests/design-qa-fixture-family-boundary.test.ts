@@ -13,6 +13,8 @@ describe("Design-QA fixture family boundary", () => {
     expect(designQaFixtureFamily("home_active_plan")).toBe("plan_state");
     expect(designQaFixtureFamily("train_work_sets")).toBe("session_lifecycle");
     expect(designQaFixtureFamily("progress_healthy")).toBe("progress_decision");
+    expect(designQaFixtureFamily("train_load_escalation")).toBe("progress_decision");
+    expect(designQaFixtureFamily("train_productive_target_zone")).toBe("progress_decision");
   });
   it("uses the canonical state boundary for plan fixtures", () => {
     const source = readFileSync(resolve(process.cwd(), "src/application/design-qa/design-qa-fixtures.ts"), "utf8");

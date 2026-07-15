@@ -1,11 +1,12 @@
 {
   "sourceCommit": "ab1d0c6",
-  "sessionFixtureCount": 37,
+  "sessionFixtureCount": 29,
   "customFixtures": [],
   "failureRecoveryFixtures": [],
   "historicalFixtures": ["train_review_prs"],
   "canonicalProjectionFixtures": ["train_overview_fresh", "train_first_set", "train_work_sets", "train_warmups", "train_swapped", "train_added_exercise", "train_near_threshold", "train_shutdown", "train_review_prs"],
-  "remainingLegacyProjectionFixtures": ["train_rotation_accepted", "train_load_no_history", "train_load_strength_unknown", "train_load_exact_progressed", "train_load_exact_held", "train_load_same_family_estimate", "train_load_same_family_low_confidence", "train_load_lb_known", "train_load_bodyweight", "train_end_workout_confirm", "train_load_regression_reduce", "train_load_escalation", "train_load_escalation_modal", "train_load_average_next", "train_increment_barbell_1", "train_increment_barbell_2_5", "train_increment_barbell_5", "train_increment_machine_1", "train_increment_cable_1", "train_increment_exercise_override", "train_productive_below_min", "train_productive_target_zone", "train_productive_soft_cap", "train_productive_over_soft_cap", "train_prep_not_started", "train_prep_completed", "train_prep_skipped", "train_prep_active_workout"],
+  "remainingLegacyProjectionFixtures": ["train_rotation_accepted", "train_load_no_history", "train_load_strength_unknown", "train_load_exact_progressed", "train_load_exact_held", "train_load_same_family_estimate", "train_load_same_family_low_confidence", "train_load_lb_known", "train_load_bodyweight", "train_end_workout_confirm", "train_increment_barbell_1", "train_increment_barbell_2_5", "train_increment_barbell_5", "train_increment_machine_1", "train_increment_cable_1", "train_increment_exercise_override", "train_prep_active_workout"],
+  "reclassifiedToProgressDecision": ["train_load_regression_reduce", "train_load_escalation", "train_load_escalation_modal", "train_load_average_next", "train_productive_below_min", "train_productive_target_zone", "train_productive_soft_cap", "train_productive_over_soft_cap"],
   "sessionLegacyProjectionReachability": "present",
   "nextPhase": "migrate remaining ordinary/load/prep session fixtures before deleting the bridge"
 }

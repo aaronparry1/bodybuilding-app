@@ -239,6 +239,7 @@ export type DesignQaFixtureFamily = "plan_state" | "session_lifecycle" | "progre
 export function designQaFixtureFamily(id: DesignQaFixtureId): DesignQaFixtureFamily {
   if (id === "home_active_workout") return "session_lifecycle";
   if (id === "home_recovery_capacity") return "progress_decision";
+  if (["train_load_regression_reduce", "train_load_escalation", "train_load_escalation_modal", "train_load_average_next", "train_productive_below_min", "train_productive_target_zone", "train_productive_soft_cap", "train_productive_over_soft_cap"].includes(id)) return "progress_decision";
   if (id.startsWith("plan_") || id.startsWith("home_")) return "plan_state";
   if (id.startsWith("train_")) return "session_lifecycle";
   if (id.startsWith("phase1_") || id.startsWith("progress_")) return "progress_decision";
