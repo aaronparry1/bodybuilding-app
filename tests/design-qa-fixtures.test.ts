@@ -52,10 +52,8 @@ describe("Design QA fixtures", () => {
 
     expect(appSettingsStore.get().onboardingCompleted).toBe(true);
     expect(canonicalActivePlanState.getReadModel()).not.toBeNull();
-    const openWorkout = workoutSessionRepository.list().find((session) => !session.completedAt);
-    expect(openWorkout?.name).toBe("Push");
-    expect(openWorkout?.exercises.length).toBeGreaterThan(1);
-    expect(openWorkout?.notes).toContain("Local visual QA only");
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession?.recordedSessionId).toContain(":recorded:");
     expect(getCachedSubscription()).toMatchObject({ status: "trial", provider: "mock", isPremium: true });
   });
 

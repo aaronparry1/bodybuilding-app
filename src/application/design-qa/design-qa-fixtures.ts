@@ -4,16 +4,15 @@ import { seedMockSubscriptionStatus } from "@/application/billing/mock-revenueca
 import { jsonStore } from "@/data/local/json-store";
 import { programmeRepository } from "@/data/local/programme-repository";
 import { sessionPrepRepository } from "@/data/local/session-prep-repository";
-import { workoutSessionRepository } from "@/data/local/workout-session-repository";
 import type { AppEnvironment } from "@/application/runtime/app-environment-core";
 import { isDesignQaModeAvailable } from "@/application/runtime/app-environment-core";
 import { calculateNextSessionStartingLoadFromProductiveSets, resolveStartingLoadRecommendation } from "@/domain/training/load-selection";
-import { replaceExerciseForFutureSessions } from "@/domain/training/recommendation-actions";
-import type { Exercise, SetLog, WorkoutExerciseLog, WorkoutSession } from "@/domain/training/models";
 import { exerciseLibrary } from "@/domain/training/presets";
+import type { WorkoutSession } from "@/domain/training/models";
 import { buildSessionPrepRecord, getSessionPrepRoutine, type SessionPrepRecord } from "@/domain/training/session-prep";
 import { summarizeWorkoutSession } from "@/domain/training/workout-history";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { startCanonicalSession, prescriptionHash } from "@/application/training/canonical-recorded-session-application";
 import { applyCanonicalActiveSessionFixture } from "@/application/design-qa/canonical-session-fixtures";
 import { createCanonicalTrainProjection } from "@/application/design-qa/canonical-train-projection";
 
@@ -208,15 +207,19 @@ export function ensureDesignQaLocalWorkoutReadyState(environment: AppEnvironment
 
   if (getActiveDesignQaFixture()) return;
 
-  if (!canonicalActivePlanState.getReadModel()) {
-    canonicalActivePlanState.create({ planId: "design-qa-canonical-plan", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell", "bodyweight"], units: "kg", exercises: exerciseLibrary });
-  }
+  canonicalActivePlanState.clear();
+  const created = canonicalActivePlanState.create({ planId: "design-qa-canonical-plan", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell", "bodyweight"], units: "kg", exercises: exerciseLibrary });
+  if (created.hydration !== "hydrated" || !created.model) throw new Error(`canonical_visual_setup_plan_failed:${created.error ?? created.hydration}`);
 
-  const sessions = workoutSessionRepository.list();
-  const hasOpenWorkout = sessions.some((session) => !session.completedAt);
-  if (!hasOpenWorkout) {
-    workoutSessionRepository.save(openSession({ id: "qa-web-default-active-workout", name: "Push", exercises: pushExerciseList() }));
+  const plan = canonicalActivePlanState.getReadModel();
+  if (!plan) throw new Error("canonical_visual_setup_plan_unavailable");
+  const planned = plan.plannedSessions[0];
+  if (!planned) throw new Error("canonical_visual_setup_session_unavailable");
+  if (!plan.activeRecordedSession) {
+    const started = startCanonicalSession({ planId: plan.planId, expectedPlanRevision: plan.revision, plannedSessionId: planned.id, expectedPrescriptionHash: prescriptionHash(planned.snapshot), operationId: "design-qa-visual-workout-start", startedAt: "2026-01-01T09:00:00.000Z", provenance: "design-qa-canonical-visual-workout" });
+    if (!["started", "already_started"].includes(started.status)) throw new Error(`canonical_visual_setup_start_failed:${started.reason}`);
   }
+  if (!canonicalActivePlanState.getReadModel()?.activeRecordedSession) throw new Error("canonical_visual_setup_hydration_failed");
 }
 
 /** Family boundary retained while each fixture family is migrated to canonical operations. */
@@ -330,7 +333,7 @@ export function subscribeDesignQaFixture(listener: () => void): () => void {
   return jsonStore.subscribe(activeFixtureKey, listener);
 }
 
-export function isDesignQaFixtureSession(session: Pick<WorkoutSession, "notes" | "syncState" | "userId">): boolean {
+export function isDesignQaFixtureSession(session: WorkoutSession): boolean {
   return session.notes?.includes(designQaFixtureMarker) === true || session.userId === "design-qa-local";
 }
 
@@ -343,77 +346,18 @@ function clearFixtureViewStateOnly() {
 }
 
 
-function saveSessions(sessions: WorkoutSession[]) {
-  jsonStore.set(workoutSessionsKey, sessions);
-}
-
 function saveSessionPrepRecords(records: SessionPrepRecord[]) {
   jsonStore.set(sessionPrepRecordsKey, records);
 }
 
-function openSession({ id, name, exercises }: { id: string; name: string; exercises: WorkoutExerciseLog[] }): WorkoutSession {
-  return {
-    id,
-    userId: "design-qa-local",
-    name,
-    startedAt: todayIso(9),
-    updatedAt: todayIso(9),
-    syncState: "local",
-    notes: `${designQaFixtureMarker} Local visual QA only. Do not sync.`,
-    exercises,
-  };
+function getFixtureDefinition(id: DesignQaFixtureId): DesignQaFixtureDefinition {
+  return designQaFixtures.find((fixture) => fixture.id === id) ?? designQaFixtures[0]!;
 }
 
-function completedSession({ id, name, completedAt, exercises }: { id: string; name: string; completedAt: string; exercises: WorkoutExerciseLog[] }): WorkoutSession {
-  return {
-    ...openSession({ id, name, exercises: exercises.map((exercise) => ({ ...exercise, status: exercise.status === "active" ? "complete" : exercise.status })) }),
-    startedAt: addMinutes(completedAt, -58),
-    completedAt,
-    updatedAt: completedAt,
-  };
-}
-
-function benchExercise(
-  reps: number[],
-  status: WorkoutExerciseLog["status"] = "active",
-  options: { load?: number; loadKnown?: boolean; warmups?: Array<{ load: number; reps: number }>; perSetLoads?: number[]; loadIncrease?: number; notes?: string; unit?: "kg" | "lb" } = {},
-): WorkoutExerciseLog {
-  return exerciseLog(findExercise("ex-bench-press"), { reps, status, load: options.load ?? 100, loadKnown: options.loadKnown, warmups: options.warmups, perSetLoads: options.perSetLoads, loadIncrease: options.loadIncrease, notes: options.notes, unit: options.unit });
-}
-
-function inclineExercise(reps: number[], status: WorkoutExerciseLog["status"] = "active"): WorkoutExerciseLog {
-  return exerciseLog(findExercise("ex-incline-dumbbell-press"), { reps, status, load: 35 });
-}
-
-function lateralRaiseExercise(
-  reps: number[],
-  status: WorkoutExerciseLog["status"] = "active",
-  options: { load?: number; loadIncrease?: number; notes?: string } = {},
-): WorkoutExerciseLog {
-  return exerciseLog(findExercise("ex-dumbbell-lateral-raise"), { reps, status, load: options.load ?? 12, loadIncrease: options.loadIncrease, notes: options.notes });
-}
-
-function cableFlyExercise(reps: number[], status: WorkoutExerciseLog["status"] = "active", options: { load?: number } = {}): WorkoutExerciseLog {
-  return exerciseLog(findExercise("ex-cable-fly"), { reps, status, load: options.load ?? 20 });
-}
-
-function tricepsPushdownExercise(
-  reps: number[],
-  status: WorkoutExerciseLog["status"] = "active",
-  originOrOptions?: WorkoutExerciseLog["origin"] | { load?: number; loadIncrease?: number; origin?: WorkoutExerciseLog["origin"] },
-): WorkoutExerciseLog {
-  const options = typeof originOrOptions === "object" ? originOrOptions : { origin: originOrOptions };
-  return exerciseLog(findExercise("ex-rope-pushdown"), { reps, status, load: options.load ?? 25, loadIncrease: options.loadIncrease, origin: options.origin });
-}
-
-function pushExerciseList(): WorkoutExerciseLog[] {
-  return [
-    benchExercise([], "active"),
-    inclineExercise([], "active"),
-    lateralRaiseExercise([], "active"),
-    cableFlyExercise([], "active"),
-    tricepsPushdownExercise([], "active"),
-  ];
+function todayIso(hour: number, minutes = 0): string {
+  const date = new Date("2026-01-01T00:00:00.000Z");
+  date.setUTCHours(hour, minutes, 0, 0);
+  return date.toISOString();
 }
 
 function prepRecord(workoutName: string, status: "completed" | "skipped"): SessionPrepRecord {
@@ -423,90 +367,4 @@ function prepRecord(workoutName: string, status: "completed" | "skipped"): Sessi
     status,
     now: new Date(status === "completed" ? todayIso(8, 45) : todayIso(8, 50)),
   });
-}
-
-function exerciseLog(
-  exercise: Exercise,
-  options: {
-    reps: number[];
-    status: WorkoutExerciseLog["status"];
-    load: number;
-    loadKnown?: boolean;
-    warmups?: Array<{ load: number; reps: number }>;
-    perSetLoads?: number[];
-    loadIncrease?: number;
-    unit?: "kg" | "lb";
-    origin?: WorkoutExerciseLog["origin"];
-    notes?: string;
-  },
-): WorkoutExerciseLog {
-  const sets = [...warmupSets(options.warmups ?? []), ...workSets(options.reps, options.load, options.perSetLoads)];
-  const settings = {
-    ...exercise.defaultSettings,
-    loadIncrease: options.loadIncrease ?? exercise.defaultSettings.loadIncrease,
-    unit: options.unit ?? exercise.defaultSettings.unit,
-  };
-  const nextLoad = calculateNextSessionStartingLoadFromProductiveSets(sets, settings, options.load);
-  return {
-    id: `qa-log-${exercise.id}-${Math.random().toString(16).slice(2)}`,
-    exerciseId: exercise.id,
-    exerciseName: exercise.name,
-    settings,
-    load: options.load,
-    loadKnown: options.loadKnown ?? true,
-    sets,
-    status: options.status,
-    origin: options.origin ?? "planned",
-    shutdownReason: options.status === "shutdown" ? "Performance dropped below threshold." : undefined,
-    notes: options.notes ?? (sets.length > 0 && nextLoad !== options.load ? `Next session recommendation: ${nextLoad}${exercise.defaultSettings.unit}.` : undefined),
-  };
-}
-
-function warmupSets(sets: Array<{ load: number; reps: number }>): SetLog[] {
-  return sets.map((set, index) => ({
-    id: `qa-warmup-${index + 1}`,
-    setNumber: index + 1,
-    reps: set.reps,
-    load: set.load,
-    loggedAt: todayIso(9, index * 4),
-    type: "warmup",
-  }));
-}
-
-function workSets(reps: number[], load: number, perSetLoads?: number[]): SetLog[] {
-  return reps.map((repCount, index) => ({
-    id: `qa-work-${index + 1}-${load}`,
-    setNumber: index + 1,
-    reps: repCount,
-    load: perSetLoads?.[index] ?? load,
-    loggedAt: todayIso(9, 12 + index * 5),
-    type: "work",
-  }));
-}
-
-function findExercise(id: string): Exercise {
-  return exerciseLibrary.find((exercise) => exercise.id === id) ?? exerciseLibrary[0]!;
-}
-
-function getFixtureDefinition(id: DesignQaFixtureId): DesignQaFixtureDefinition {
-  return designQaFixtures.find((fixture) => fixture.id === id) ?? designQaFixtures[0]!;
-}
-
-function todayIso(hour: number, minutes = 0): string {
-  const date = new Date();
-  date.setHours(hour, minutes, 0, 0);
-  return date.toISOString();
-}
-
-function daysAgoIso(daysAgo: number): string {
-  const date = new Date();
-  date.setDate(date.getDate() - daysAgo);
-  date.setHours(11, 0, 0, 0);
-  return date.toISOString();
-}
-
-function addMinutes(iso: string, minutes: number): string {
-  const date = new Date(iso);
-  date.setMinutes(date.getMinutes() + minutes);
-  return date.toISOString();
 }
