@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "canonical_active_plan_transport_v1",
+  "sourceCommit": "ed4f308",
+  "liveExport": "serializeCanonicalActivePlan(canonicalActivePlanV2Repository)",
+  "liveRestore": "validateCanonicalActivePlan plus canonicalActivePlanV2Repository.saveAtomically",
+  "legacyActivePlan": "migration input only; never installed or subscribed",
+  "subscription": "canonical backup/sync path; no activeTrainingPlanRepository subscription",
+  "conflict": "carrier validation and expected-revision atomic save; no last-write-wins merge",
+  "snapshotPreservation": true,
+  "sessionReconciliation": "ledger restored and carrier references validated before save",
+  "sessionConstructionDuringSync": false,
+  "nextMountedLegacyBlocker": null
+}

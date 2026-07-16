@@ -8,6 +8,7 @@ describe("canonical cloud recorded-session transport boundary", () => {
     expect(source).toContain("canonicalRecordedSessionLedger.exportPlan");
     expect(source).toContain("canonicalRecordedSessionLedger.restorePlan");
     expect(source).not.toContain('from "@/data/local/workout-session-repository"');
+    expect(source).not.toContain('from "@/data/local/active-training-plan-repository"');
     expect(source).not.toContain("localWorkoutRepository.list()");
     expect(source).not.toContain("localWorkoutRepository.save");
   });

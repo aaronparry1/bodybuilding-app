@@ -1,6 +1,5 @@
 import { appSettingsStore, defaultAppSettings, type AppSettings } from "@/application/settings/app-settings";
 import type { SubscriptionState } from "@/application/billing/subscription";
-import { activeTrainingPlanRepository } from "@/data/local/active-training-plan-repository";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { serializeCanonicalActivePlan, validateCanonicalActivePlan } from "@/domain/training/canonical-active-plan-carrier";
@@ -72,7 +71,7 @@ export interface CloudDataSyncDependencies {
   localWorkoutRepository?: unknown;
   localProgrammeRepository?: typeof programmeRepository;
   localExerciseRepository?: typeof customExerciseRepository;
-  localActivePlanRepository?: typeof activeTrainingPlanRepository;
+  localActivePlanRepository?: unknown;
   localTrainingYearRepository?: typeof legacyTrainingYearArchive;
   localRecoveryIgnoreRepository?: typeof recoveryCapacityIgnoreRepository;
   localSettingsStore?: typeof appSettingsStore;
@@ -117,7 +116,7 @@ export function buildCloudUserDataBackup(dependencies: CloudDataSyncDependencies
     version: cloudBackupVersion,
     updatedAt: now(),
     appSettings: settingsStore.get(),
-    activeTrainingPlan: (dependencies.localActivePlanRepository ?? activeTrainingPlanRepository).getOptional(),
+    activeTrainingPlan: null,
     canonicalActivePlan: canonical.status === "saved" ? serializeCanonicalActivePlan(canonical.carrier) : null,
     canonicalActivePlanRevision: canonical.status === "saved" ? canonical.carrier.revision : undefined,
     canonicalRecordedSessions: canonical.status === "saved" ? canonicalRecordedSessionLedger.exportPlan(canonical.carrier.planId) : [],
@@ -162,7 +161,6 @@ export async function restoreCloudDataForUser(
   const client = await resolveClient(dependencies);
   const localProgrammeRepository = dependencies.localProgrammeRepository ?? programmeRepository;
   const localExerciseRepository = dependencies.localExerciseRepository ?? customExerciseRepository;
-  const localActivePlanRepository = dependencies.localActivePlanRepository ?? activeTrainingPlanRepository;
   const localTrainingYearRepository = dependencies.localTrainingYearRepository ?? legacyTrainingYearArchive;
   const localRecoveryIgnoreRepository = dependencies.localRecoveryIgnoreRepository ?? recoveryCapacityIgnoreRepository;
   const localSettingsStore = dependencies.localSettingsStore ?? appSettingsStore;
@@ -223,7 +221,7 @@ export async function restoreCloudDataForUser(
   let restoredSettings = false;
   let restoredActivePlan = false;
   let restoredTrainingYear = false;
-  const shouldRestoreTrainingYear = shouldRestoreSettings(localSettingsStore.get()) || !localActivePlanRepository.getOptional();
+  const shouldRestoreTrainingYear = shouldRestoreSettings(localSettingsStore.get());
   if (isCloudUserDataBackup(cloudSettings)) {
     if (shouldRestoreSettings(localSettingsStore.get())) {
       localSettingsStore.set(cloudSettings.appSettings);
@@ -250,8 +248,8 @@ export async function restoreCloudDataForUser(
           restoredActivePlan = true;
         }
       }
-    } else if (!localActivePlanRepository.getOptional() && cloudSettings.activeTrainingPlan) {
-      // Legacy active plans remain recovery input only; they are not installed as live state.
+    } else if (cloudSettings.activeTrainingPlan) {
+      // Legacy active plans remain migration input only; they are never installed as live state.
       logSyncStage("legacy active plan retained for canonical migration");
     }
     if (cloudSettings.trainingYear && shouldRestoreTrainingYear) {
