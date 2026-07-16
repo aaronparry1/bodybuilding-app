@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "post_switch_defect_remediation_recovery_capacity_v1",
+  "sourceCommit": "bd4b33a",
+  "failure": {
+    "testFile": "tests/recovery-capacity.test.ts",
+    "testName": "resolves peak/taper/event and unknown next lifting contexts conservatively",
+    "expected": "heavy_upper",
+    "actual": "squat_focused",
+    "owner": "resolveNextLiftingContext"
+  },
+  "authorityTrace": ["active plan/session context", "canonical-safe recovery-capacity context projection"],
+  "classification": "stale legacy expectation",
+  "rootCause": "the fallback session-role classification now deterministically selects the first squat-focused role; the test expected an older generic heavy-upper fallback despite no exercise facts",
+  "change": "updated the stale expectation to the current deterministic bounded context; no recovery threshold, policy, or mutation changed",
+  "canonicalDisposition": "context projection only; no recovery action or plan mutation",
+  "numericPolicyChanged": false,
+  "productionSwitchInvariants": { "predicates": "24/24 passing", "productionSwitchCompleted": true, "ordinaryV2Active": false, "d4d2Changed": false, "deploymentAuthorized": false }
+}
