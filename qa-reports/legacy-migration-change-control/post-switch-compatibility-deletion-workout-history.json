@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "post_switch_compatibility_deletion_workout_history_v1",
+  "sourceCommit": "271b4e7",
+  "originalFailure": {
+    "testFile": "tests/workout-history.test.ts",
+    "testName": "returns previous exercise performance excluding the current session",
+    "expected": 100,
+    "actual": 102.5,
+    "classification": "legacy aggregation expectation; canonical exercise history is authoritative"
+  },
+  "canonicalReplacements": ["canonical_recorded_session_history_projection_v1", "canonical_exercise_history_projection_v1"],
+  "migratedAssertions": 3,
+  "legacyCallers": {
+    "mountedProduction": [],
+    "testOnlyOrCompatibility": [
+      "src/domain/training/post-workout-review.ts",
+      "src/data/local/workout-history-repository.ts",
+      "tests/end-to-end-simulator-qa.test.ts",
+      "tests/post-workout-review.test.ts",
+      "tests/workout-session-cloud-repository.test.ts",
+      "tests/design-qa-fixtures.test.ts",
+      "tests/session-prep-capacity.test.ts",
+      "tests/store-snapshots.test.ts"
+    ],
+    "retainedReason": "migration/archive and legacy coaching test coverage still have independent callers"
+  },
+  "deletedSymbols": [],
+  "retainedSymbols": ["summarizeWorkoutSession", "summarizeWorkoutHistory", "filterWorkoutHistory", "workoutHistoryRepository", "workoutSessionRepository"],
+  "callerCounts": { "mountedBefore": 0, "mountedAfter": 0 },
+  "invariants": { "productionSwitchPredicates": "24/24 passing", "productionSwitchCompleted": true, "ordinaryV2Active": false, "d4d2Changed": false, "deploymentAuthorized": false }
+}
