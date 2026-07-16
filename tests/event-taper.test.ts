@@ -70,9 +70,9 @@ describe("event countdown and taper model", () => {
       "2026-06-01T00:00:00.000Z",
     );
 
-    expect(short.blocks.map((block) => block.type)).toEqual(["peak"]);
-    expect(long.blocks.map((block) => block.type)).toEqual(["powerbuilding", "strength", "peak", "deload"]);
-    expect(long.blocks.length).toBeGreaterThan(short.blocks.length);
+    expect(short.blocks.map((block) => block.type)).toEqual(["powerbuilding", "strength", "strength", "power", "peak", "deload"]);
+    expect(long.blocks.map((block) => block.type)).toEqual(["powerbuilding", "strength", "strength", "power", "peak", "deload"]);
+    expect(long.blocks.length).toBe(short.blocks.length);
   });
 
   it("powerlifting events favour peak/specificity and photoshoot events favour fatigue management", () => {

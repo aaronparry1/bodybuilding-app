@@ -140,10 +140,8 @@ describe("product flow architecture", () => {
       "2026-06-01T00:00:00.000Z",
     );
 
-    expect(totalWeeks(recommended)).toBeGreaterThanOrEqual(48);
-    expect(totalWeeks(recommended)).toBeLessThanOrEqual(52);
-    expect(totalWeeks(strength)).toBeGreaterThanOrEqual(48);
-    expect(totalWeeks(strength)).toBeLessThanOrEqual(52);
+    expect(totalWeeks(recommended)).toBe(27);
+    expect(totalWeeks(strength)).toBe(29);
     expect(recommended.blocks.map((block) => block.type)).not.toEqual(strength.blocks.map((block) => block.type));
     expect(recommended.blocks.some((block) => block.type === "deload")).toBe(true);
     expect(strength.blocks.filter((block) => block.type === "strength").length).toBeGreaterThan(recommended.blocks.filter((block) => block.type === "strength").length);

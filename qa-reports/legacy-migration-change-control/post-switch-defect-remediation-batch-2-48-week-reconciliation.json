@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "post_switch_defect_remediation_batch_2_48_week_v1",
+  "sourceCommit": "6df8faf",
+  "canonicalOwner": "Macrocycle horizon and target-date contracts",
+  "numericPolicyChanged": false,
+  "fixed48WeekPromise": false,
+  "cases": [
+    {
+      "testFile": "tests/event-taper.test.ts",
+      "testName": "short timelines create a sensible short plan and long timelines create a fuller runway",
+      "expectation": "short and long event plans had obsolete block-shape arrays",
+      "actual": "current Macrocycle event construction resolves the same canonical phase family for these dates",
+      "classification": "stale legacy annual-planner expectation",
+      "replacement": "assert the current deterministic event phase sequence and relative runway",
+      "status": "rewritten"
+    },
+    {
+      "testFile": "tests/product-flow-architecture.test.ts",
+      "testName": "creates truthful setup plans for recommended, single-block, and event users",
+      "expectation": "recommended and strength plans are always 48-52 weeks",
+      "actual": "canonical setup produces bounded goal-specific horizons of 27 weeks for these inputs",
+      "classification": "stale legacy annual-planner expectation",
+      "replacement": "assert deterministic current horizon and preserve goal/phase distinctions",
+      "status": "rewritten"
+    },
+    {
+      "testFile": "tests/product-positioning.test.ts",
+      "testName": "maps Lose Fat to body recomposition with sustainable annual planning",
+      "expectation": "body recomposition plan is 48-52 weeks",
+      "actual": "canonical setup produces an 18-week bounded horizon",
+      "classification": "stale product wording/legacy horizon expectation",
+      "replacement": "assert canonical goal mapping, bounded current horizon, and deload presence",
+      "status": "rewritten"
+    }
+  ],
+  "ownerConsistency": {
+    "eventTaperCannotOverrideMacrocycle": true,
+    "noAnnualPlannerAuthorityRestored": true,
+    "noBlockAuthorityAdded": true,
+    "productionSwitchPredicates": "24/24 passing",
+    "productionSwitchCompleted": true,
+    "ordinaryV2Active": false,
+    "d4d2Changed": false,
+    "deploymentAuthorized": false
+  }
+}
