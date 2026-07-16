@@ -5,9 +5,9 @@
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
   "classification": "production_switch_blocked_by_live_legacy_authority",
-  "firstFalsePredicate": "no_production_legacy_block_authority",
-  "firstLiveBlocker": "src/domain/training/plan-setup.ts:createActiveTrainingPlan",
-  "nextBoundedMigrationTask": "migrate onboarding/plan-setup from block-shaped construction to canonical active-plan construction",
+  "firstFalsePredicate": "no_legacy_workout_constructor",
+  "firstLiveBlocker": "src/application/sync/cloud-data-sync.ts:activeTrainingPlanRepository",
+  "nextBoundedMigrationTask": "remove legacy active-plan cloud transport after canonical sync coverage",
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
 }

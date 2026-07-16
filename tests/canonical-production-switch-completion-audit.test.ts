@@ -11,7 +11,7 @@ describe("canonical production switch completion audit", () => {
     expect(result.schemaVersion).toBe("canonical_production_switch_evidence_v1");
     expect(result.pipelineReadyForSwitch).toBe(true);
     expect(result.productionSwitchCompleted).toBe(false);
-    expect(result.firstFalsePredicate).toBe("no_production_legacy_block_authority");
+    expect(result.firstFalsePredicate).toBe("no_legacy_workout_constructor");
     expect(result.predicates).toHaveLength(24);
   });
 
@@ -41,6 +41,6 @@ describe("canonical production switch completion audit", () => {
   it("does not hardcode completion in the final artifact", () => {
     const artifact = JSON.parse(readFileSync(resolve(root, "qa-reports/legacy-migration-change-control/canonical-production-switch-final-result.json"), "utf8"));
     expect(artifact.productionSwitchCompleted).toBe(false);
-    expect(artifact.firstFalsePredicate).toBe("no_production_legacy_block_authority");
+    expect(artifact.firstFalsePredicate).toBe("no_legacy_workout_constructor");
   });
 });
