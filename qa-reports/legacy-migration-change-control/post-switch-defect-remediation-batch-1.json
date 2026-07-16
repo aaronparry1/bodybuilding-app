@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "post_switch_defect_remediation_batch_1_v1",
+  "sourceCommit": "fed1614",
+  "productionFilesChanged": [],
+  "baseline": {
+    "passingFiles": 303,
+    "failingFiles": 12,
+    "passingTests": 1954,
+    "failingTests": 14
+  },
+  "selected": [
+    {
+      "testFile": "tests/canonical-progress-dashboard-context-migration.test.ts",
+      "testName": "keeps the deleted legacy dashboard boundary absent",
+      "priorClassification": "stale deleted-file expectation",
+      "obsoleteExpectation": "legacy progress-dashboard.ts is readable and has legacy exports",
+      "canonicalReplacement": "deleted dashboard module remains absent; canonical production-switch result remains certified",
+      "status": "rewritten"
+    },
+    {
+      "testFile": "tests/canonical-train-workout-logger-boundary.test.ts",
+      "testName": "proves the deleted legacy hook remains absent",
+      "priorClassification": "stale deleted-file/source-shape expectation",
+      "obsoleteExpectation": "use-workout-logger.ts exists and imports legacy repositories",
+      "canonicalReplacement": "dead hook has zero executable callers and remains absent; mounted Train is canonical",
+      "status": "rewritten"
+    },
+    {
+      "testFile": "tests/master-architecture.test.ts",
+      "testName": "policy source-shape checks for deleted policy modules",
+      "priorClassification": "stale deleted-file expectation",
+      "obsoleteExpectation": "deleted support/exercise/recovery policy files are present for source inspection",
+      "canonicalReplacement": "architecture checks cover the surviving canonical policy owners only",
+      "status": "rewritten"
+    },
+    {
+      "testFile": "tests/onboarding-final-screen.test.ts",
+      "testName": "uses canonical active-plan creation",
+      "priorClassification": "stale source-shape expectation",
+      "obsoleteExpectation": "onboarding source contains createActiveTrainingPlan({",
+      "canonicalReplacement": "onboarding source calls canonicalActivePlanState.create({",
+      "status": "rewritten"
+    }
+  ],
+  "untouchedKnownFailures": [
+    "qa-reports/v3-shadow-telemetry-review.test.ts",
+    "tests/planned-workout.test.ts",
+    "tests/product-flow-architecture.test.ts",
+    "tests/product-positioning.test.ts",
+    "tests/recovery-capacity.test.ts",
+    "tests/workout-history.test.ts",
+    "tests/load-selection.test.ts"
+  ],
+  "architectureGuards": {
+    "productionSwitchPredicates": "must remain 24/24 passed",
+    "ordinaryV2Active": false,
+    "d4d2Changed": false,
+    "deploymentAuthorized": false
+  }
+}

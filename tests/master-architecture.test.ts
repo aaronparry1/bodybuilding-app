@@ -56,12 +56,6 @@ const policyFiles = [
   "src/domain/training/adaptive-training-state.ts",
   "src/domain/training/adaptation-detection-engine.ts",
   "src/domain/training/exercise-rotation-policy.ts",
-  "src/domain/training/support-function-policy.ts",
-  "src/domain/training/exercise-matching-engine.ts",
-  "src/domain/training/recovery-between-efforts-policy.ts",
-  "src/domain/training/session-density-policy.ts",
-  "src/domain/training/energy-system-development-policy.ts",
-  "src/domain/training/living-athlete-model.ts",
   "src/domain/training/coaching-evidence-engine.ts",
   "src/domain/training/live-workout-coaching-engine.ts",
   "src/domain/training/live-constraint-resolution-engine.ts",
@@ -125,7 +119,6 @@ describe("Adaptive Strength Coach master architecture", () => {
   it("keeps learned-athlete-trait writes behind the Coaching Evidence Engine", () => {
     const filesThatMayCallLivingModelUpdateHelpers = [
       "src/domain/training/coaching-evidence-engine.ts",
-      "src/domain/training/living-athlete-model.ts",
     ];
     const forbiddenDirectLearningWrite = /\b(applyValidatedEvidenceToLearnedCharacteristic|addValidatedCoachingMemory)\s*\(/;
     for (const file of policyFiles.filter((path) => !filesThatMayCallLivingModelUpdateHelpers.includes(path))) {
@@ -145,7 +138,6 @@ describe("Adaptive Strength Coach master architecture", () => {
   it("requires reason-code architecture across locked engine outputs", () => {
     const rationaleBasedFiles = [
       "src/domain/training/adaptive-training-state.ts",
-      "src/domain/training/living-athlete-model.ts",
     ];
     const filesWithReasonCodes = policyFiles.filter((path) => !rationaleBasedFiles.includes(path));
     for (const file of filesWithReasonCodes) {

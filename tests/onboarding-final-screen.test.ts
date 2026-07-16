@@ -46,7 +46,7 @@ describe("onboarding final programme screen", () => {
   it("keeps onboarding completion and generation boundaries stable", () => {
     const source = onboardingSource();
 
-    expect(source).toContain("createActiveTrainingPlan({");
+    expect(source).toContain("canonicalActivePlanState.create({");
     expect(source).toContain("updateSettings({");
     expect(source).toContain("unit,");
     expect(source).not.toContain("generateV2Workout");
