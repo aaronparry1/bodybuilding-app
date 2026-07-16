@@ -3,7 +3,7 @@ import { createAnnualPlan, naturalLifterAnnualPlan } from "@/domain/training/ann
 import { buildHomeDashboardViewModel } from "@/domain/training/home-dashboard";
 import type { ExerciseHistorySummary, WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
 import { createActiveTrainingPlan } from "@/domain/training/plan-setup";
-import { displayWorkoutName } from "@/domain/training/planned-workout";
+import { displayWorkoutName } from "@/domain/training/workout-name";
 import { exerciseLibrary, presetProgrammes } from "@/domain/training/presets";
 import { shouldAdvanceTrainingWeekAfterCompletedSession } from "@/domain/training/training-session-selection";
 

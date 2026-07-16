@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "post_switch_compatibility_deletion_planned_workout_v1",
+  "sourceCommit": "4715634",
+  "deletedFile": "src/domain/training/planned-workout.ts",
+  "exports": ["buildPlannedWorkoutProgramme", "resolveNextTrainableWorkoutName", "currentPlanDayIndex", "workoutTypeForName", "isLegacyPlaceholderWorkoutSession", "displayWorkoutName"],
+  "priorCallers": {
+    "tests/planned-workout.test.ts": "rewritten against canonical Session Construction",
+    "tests/recommendation-actions.test.ts": "legacy programme assertion removed; decision facts retained",
+    "tests/volume-adjustments.test.ts": "rewritten against canonical Mesocycle volume policy",
+    "tests/home-dashboard-view-model.test.ts": "display helper imported from canonical workout-name owner",
+    "tests/restricted-calibration-programme-persistence.test.ts": "deleted-file boundary assertion updated"
+  },
+  "callerCounts": { "before": 5, "after": 0 },
+  "assertionClassification": {
+    "canonical_replaced": 8,
+    "obsolete_legacy_shape": 24,
+    "mechanical_branch_removed": 0,
+    "originalCases": 32,
+    "retainedCanonicalCases": 8
+  },
+  "productionFilesChanged": ["src/domain/training/planned-workout.ts"],
+  "productionChangeReason": "proven-dead test-only compatibility module deleted after zero executable callers",
+  "canonicalOwners": ["Session Construction", "CanonicalLoadPrescription", "canonical_mesocycle_volume_policy_v1", "canonical_session_construction_display_projection_v1"],
+  "invariants": {
+    "productionSwitchPredicates": "24/24 passing",
+    "productionSwitchCompleted": true,
+    "ordinaryV2Active": false,
+    "d4d2Changed": false,
+    "deploymentAuthorized": false
+  }
+}

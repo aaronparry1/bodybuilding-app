@@ -49,10 +49,9 @@ describe("restricted D3 calibration programme persistence", () => {
   });
 
   it("keeps D3 metadata out of runtime construction and adjustment authority", () => {
-    const construction = readFileSync("src/domain/training/planned-workout.ts", "utf8");
+    expect(() => readFileSync("src/domain/training/planned-workout.ts", "utf8")).toThrow();
     const sessionSelection = readFileSync("src/domain/training/training-session-selection.ts", "utf8");
     const adjustment = readFileSync("src/application/training/current-recommended-set-guidance-application-service.ts", "utf8");
-    expect(construction).not.toContain("programmeSpecifications");
     expect(sessionSelection).not.toContain("programmeSpecifications");
     expect(adjustment).not.toContain("programmeSpecifications");
   });
