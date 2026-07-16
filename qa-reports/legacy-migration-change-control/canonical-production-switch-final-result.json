@@ -1,13 +1,13 @@
 {
   "schemaVersion": "canonical_production_switch_final_result_v1",
-  "sourceCommit": "1e5f00d",
+  "sourceCommit": "34d9c7f",
   "evidenceContract": "canonical_production_switch_evidence_v1",
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
   "classification": "production_switch_blocked_by_live_legacy_authority",
   "firstFalsePredicate": "no_legacy_workout_constructor",
-  "firstLiveBlocker": "src/application/sync/cloud-data-sync.ts:workoutSessionRepository",
-  "nextBoundedMigrationTask": "migrate cloud workout transport to canonical recorded-session ledger transport",
+  "firstLiveBlocker": "src/domain/training/current-completion-orchestration.ts:workoutSessionRepository",
+  "nextBoundedMigrationTask": "migrate completion orchestration to canonical recorded-session completion summaries",
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
 }

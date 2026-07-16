@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "canonical_recorded_session_transport_v1",
+  "sourceCommit": "34d9c7f",
+  "liveAuthority": "canonicalRecordedSessionLedger",
+  "legacyWorkoutRepository": "migration/archive input only; never merged into live state",
+  "backupFields": ["session identity", "athlete/account", "plan and cycle lineage", "prescription snapshot/hash", "lifecycle version", "performed event identities", "progress evidence linkage"],
+  "restore": "canonicalRecordedSessionLedger.restorePlan with carrier reference/hash validation",
+  "conflict": "stale versions rejected; same-version divergence rejected; no heuristic merge",
+  "deletion": "no physical canonical deletion; legacy records are not restored",
+  "sessionConstructionDuringImport": false,
+  "activePlanMutationDuringHistorySync": false,
+  "nextBlocker": "src/domain/training/current-completion-orchestration.ts:workoutSessionRepository"
+}

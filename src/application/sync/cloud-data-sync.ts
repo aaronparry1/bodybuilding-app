@@ -8,11 +8,9 @@ import { customExerciseRepository } from "@/data/local/custom-exercise-repositor
 import { programmeRepository } from "@/data/local/programme-repository";
 import { recoveryCapacityIgnoreRepository, type RecoveryCapacityIgnoreRecord } from "@/data/local/recovery-capacity-ignore-repository";
 import { legacyTrainingYearArchive } from "@/application/training/legacy-training-year-archive";
-import { workoutSessionRepository } from "@/data/local/workout-session-repository";
 import { ExerciseCloudRepository } from "@/data/cloud/exercise-cloud-repository";
 import { ProgrammeCloudRepository } from "@/data/cloud/programme-cloud-repository";
 import { UserSettingsCloudRepository } from "@/data/cloud/user-settings-cloud-repository";
-import { WorkoutSessionCloudRepository } from "@/data/cloud/workout-session-cloud-repository";
 import { LocalSyncQueueStore } from "@/data/sync/local-sync-queue-store";
 import { SyncQueue } from "@/data/sync/sync-queue";
 import { WorkoutSyncService } from "@/data/sync/workout-sync-service";
@@ -66,12 +64,12 @@ export interface CloudDataSyncResult {
 export interface CloudDataSyncDependencies {
   client?: AppSupabaseClient | null;
   queue?: SyncQueue;
-  workoutCloudRepository?: Pick<WorkoutSessionCloudRepository, "loadWorkoutHistory"> & Partial<Pick<WorkoutSessionCloudRepository, "saveWorkoutSession">>;
+  workoutCloudRepository?: { loadWorkoutHistory?: (userId: string) => Promise<WorkoutSession[]> };
   programmeCloudRepository?: Pick<ProgrammeCloudRepository, "loadProgrammes"> & Partial<Pick<ProgrammeCloudRepository, "saveProgramme">>;
   exerciseCloudRepository?: Pick<ExerciseCloudRepository, "loadExercises"> & Partial<Pick<ExerciseCloudRepository, "saveCustomExercise">>;
   userSettingsCloudRepository?: Pick<UserSettingsCloudRepository, "loadUserSettingsBlob"> & Partial<Pick<UserSettingsCloudRepository, "saveUserSettingsBlob">>;
   workoutSyncService?: Pick<WorkoutSyncService, "flushQueue">;
-  localWorkoutRepository?: typeof workoutSessionRepository;
+  localWorkoutRepository?: unknown;
   localProgrammeRepository?: typeof programmeRepository;
   localExerciseRepository?: typeof customExerciseRepository;
   localActivePlanRepository?: typeof activeTrainingPlanRepository;
@@ -104,7 +102,7 @@ async function resolveClient(dependencies: CloudDataSyncDependencies): Promise<A
 
 function resolveRepositories(dependencies: CloudDataSyncDependencies, client: AppSupabaseClient) {
   return {
-    workoutCloudRepository: dependencies.workoutCloudRepository ?? new WorkoutSessionCloudRepository(client),
+    workoutCloudRepository: dependencies.workoutCloudRepository,
     programmeCloudRepository: dependencies.programmeCloudRepository ?? new ProgrammeCloudRepository(client),
     exerciseCloudRepository: dependencies.exerciseCloudRepository ?? new ExerciseCloudRepository(client),
     userSettingsCloudRepository: dependencies.userSettingsCloudRepository ?? new UserSettingsCloudRepository(client),
@@ -162,7 +160,6 @@ export async function restoreCloudDataForUser(
   dependencies: CloudDataSyncDependencies = {},
 ): Promise<CloudDataRestoreResult> {
   const client = await resolveClient(dependencies);
-  const localWorkoutRepository = dependencies.localWorkoutRepository ?? workoutSessionRepository;
   const localProgrammeRepository = dependencies.localProgrammeRepository ?? programmeRepository;
   const localExerciseRepository = dependencies.localExerciseRepository ?? customExerciseRepository;
   const localActivePlanRepository = dependencies.localActivePlanRepository ?? activeTrainingPlanRepository;
@@ -188,11 +185,7 @@ export async function restoreCloudDataForUser(
     userSettingsCloudRepository,
   } = resolveRepositories(dependencies, client);
 
-  const [cloudSessions, cloudProgrammes, cloudExercises, cloudSettings] = await Promise.all([
-    workoutCloudRepository.loadWorkoutHistory(userId).catch((error) => {
-      logSyncStage("workout restore skipped", error);
-      return [] as WorkoutSession[];
-    }),
+  const [cloudProgrammes, cloudExercises, cloudSettings] = await Promise.all([
     programmeCloudRepository.loadProgrammes(userId).catch((error) => {
       logSyncStage("programme restore skipped", error);
       return [] as Programme[];
@@ -207,13 +200,9 @@ export async function restoreCloudDataForUser(
     }),
   ]);
 
-  const localSessions = localWorkoutRepository.list();
-  const mergedSessions = mergeWorkoutSessions(localSessions, cloudSessions);
-  for (const session of mergedSessions) {
-    if (!localSessions.some((localSession) => localSession.id === session.id && localSession === session)) {
-      localWorkoutRepository.save(session);
-    }
-  }
+  // Canonical recorded sessions are restored atomically from the versioned
+  // backup envelope below. Legacy workout history is migration input only and
+  // is never installed or merged into live state.
 
   const localProgrammeIds = new Set(localProgrammeRepository.listCustom().map((programme) => programme.id));
   const restorableProgrammes = cloudProgrammes.filter((programme) => programme.isCustom || programme.createdByUserId);
@@ -278,7 +267,7 @@ export async function restoreCloudDataForUser(
   }
 
   return {
-    restoredSessions: Math.max(0, mergedSessions.length - localSessions.length),
+    restoredSessions: 0,
     restoredExercises: restorableExercises.filter((exercise) => !localExerciseIds.has(exercise.id)).length,
     restoredProgrammes: restorableProgrammes.filter((programme) => !localProgrammeIds.has(programme.id)).length,
     restoredSettings,
@@ -292,17 +281,17 @@ export function enqueueLocalDataForAutomaticSync(
   dependencies: CloudDataSyncDependencies = {},
 ): number {
   const queue = dependencies.queue ?? defaultQueue;
-  const localWorkoutRepository = dependencies.localWorkoutRepository ?? workoutSessionRepository;
   const localProgrammeRepository = dependencies.localProgrammeRepository ?? programmeRepository;
   const localExerciseRepository = dependencies.localExerciseRepository ?? customExerciseRepository;
 
-  localWorkoutRepository
-    .list()
-    .filter((session) => !isDesignQaFixtureSessionLike(session))
-    .forEach((session) => {
-      const ownerUserId = session.userId && session.userId !== "guest-local" ? session.userId : userId;
-      queue.enqueueWorkoutSession({ ...session, userId }, ownerUserId);
-    });
+  // Canonical recorded-session envelopes are included in the backup payload
+  // and queued as canonical state; legacy workout records are not re-enqueued.
+  const canonical = canonicalActivePlanV2Repository.get();
+  if (canonical.status === "saved") {
+    for (const record of canonicalRecordedSessionLedger.exportPlan(canonical.carrier.planId)) {
+      queue.enqueue("canonical_recorded_session", record.session.recordedSessionId, record, userId);
+    }
+  }
 
   localExerciseRepository.listCustom().forEach((exercise) => {
     queue.enqueue("custom_exercise", exercise.id, { ...exercise, createdByUserId: exercise.createdByUserId ?? userId }, userId);
