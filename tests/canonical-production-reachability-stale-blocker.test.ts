@@ -17,8 +17,7 @@ describe("production reachability stale-blocker correction", () => {
   });
 
   it("requires the selected blocker to exist and be mounted", () => {
-    const source = readFileSync(resolve(process.cwd(), "src/application/sync/cloud-data-sync.ts"), "utf8");
-    expect(source).toContain("activeTrainingPlanRepository");
-    expect(source).toContain("sync");
+    const source = readFileSync(resolve(process.cwd(), "app/(protected)/history/exercise/[id].tsx"), "utf8");
+    expect(source).toContain("workoutSessionRepository");
   });
 });

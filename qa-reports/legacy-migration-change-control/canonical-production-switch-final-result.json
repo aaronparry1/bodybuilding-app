@@ -1,13 +1,13 @@
 {
   "schemaVersion": "canonical_production_switch_final_result_v1",
-  "sourceCommit": "fe27044",
+  "sourceCommit": "5698484",
   "evidenceContract": "canonical_production_switch_evidence_v1",
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
   "classification": "production_switch_blocked_by_live_legacy_authority",
   "firstFalsePredicate": "no_legacy_workout_constructor",
-  "firstLiveBlocker": "src/features/workout-logging/use-workout-logger.ts:activeTrainingPlanRepository",
-  "nextBoundedMigrationTask": "migrate Train logger active-plan repository reads to canonical Train boundary",
+  "firstLiveBlocker": "app/(protected)/history/exercise/[id].tsx:workoutSessionRepository",
+  "nextBoundedMigrationTask": "migrate exercise history detail to canonical recorded-session history projection",
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
 }

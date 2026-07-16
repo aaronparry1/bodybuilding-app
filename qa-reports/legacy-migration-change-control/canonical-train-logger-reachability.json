@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "canonical_train_logger_reachability_v1",
+  "sourceCommit": "5698484",
+  "mountedTrain": {
+    "route": "app/(protected)/(tabs)/train.tsx",
+    "imports": ["canonicalActivePlanState", "canonical-recorded-session-application", "canonical-recorded-session-ledger"],
+    "commands": ["startCanonicalSession", "restoreCanonicalRecordedSessionFromLedger", "recordCanonicalPerformedWork", "pauseCanonicalSession", "resumeCanonicalSession", "completeCanonicalSession"],
+    "legacyHookImported": false
+  },
+  "useWorkoutLogger": {
+    "declaration": "src/features/workout-logging/use-workout-logger.ts",
+    "executableCallers": [],
+    "classification": "dead legacy code",
+    "repositoryReachability": "none after deletion"
+  },
+  "deleted": ["useWorkoutLogger", "legacy logger helpers and imports exclusive to the hook"],
+  "remainingLegacyHistoryCallers": [
+    "app/(protected)/history/exercise/[id].tsx",
+    "src/application/sync/cloud-data-sync.ts",
+    "src/domain/training/current-completion-orchestration.ts"
+  ],
+  "nextBlocker": {
+    "predicate": "no_legacy_workout_constructor",
+    "file": "app/(protected)/history/exercise/[id].tsx",
+    "symbol": "workoutSessionRepository",
+    "classification": "mounted production projection/transport",
+    "nextTaskKind": "migrate"
+  }
+}
