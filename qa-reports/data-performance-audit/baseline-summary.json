@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "data_performance_audit_baseline_v1",
+  "sourceCommit": "4b285c5",
+  "runtimeMeasurementStatus": "not_executed",
+  "staticEvidence": {
+    "localWebStartupHttpStatus": 200,
+    "automatedSuite": "320 files / 1931 tests passed before this audit",
+    "typecheck": "passed before this audit",
+    "webExport": "passed before this audit"
+  },
+  "testerReport": "interaction pauses after repeated use and exercise swaps",
+  "reproduction": "not measured in an interactive runtime in this phase",
+  "performanceCertification": false,
+  "longLivedAccountCertification": false,
+  "evidenceGap": "No profiler/browser session or synthetic runtime benchmark was available; static scaling risks are recorded separately."
+}

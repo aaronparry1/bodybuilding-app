@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"data_performance_suspected_bottlenecks_v1",
+  "findings":[
+    {"id":"PERF-001","severity":"P1","category":"unbounded_data_read","journey":"history/sync","source":"src/data/cloud/workout-session-cloud-repository.ts:198-220","evidence":"selects every workout session with nested exercises and sets; no limit/cursor","scaling":"O(total sessions + exercises + sets)","runtimeMeasured":false},
+    {"id":"PERF-002","severity":"P1","category":"large_serialisation_cost","journey":"cloud backup/restore","source":"src/application/sync/cloud-data-sync.ts:buildCloudUserDataBackup","evidence":"exports all canonical recorded sessions/events and progress evidence into one backup object","scaling":"O(history + events)","runtimeMeasured":false},
+    {"id":"PERF-003","severity":"P1","category":"main_thread_synchronous_work","journey":"local ledger/history","source":"src/data/local/json-store.ts and src/data/local/canonical-recorded-session-ledger.ts","evidence":"synchronous JSON parse/stringify and full-store Object.values/filter/sort on reads/writes","scaling":"O(serialized store size) per access","runtimeMeasured":false},
+    {"id":"PERF-004","severity":"P2","category":"provider_wide_invalidation","journey":"tab/settings/train","source":"app/(protected)/_layout.tsx and tab screens","evidence":"multiple mounted screens subscribe to the same canonical plan store and increment local refresh state","scaling":"render fan-out per store write","runtimeMeasured":false},
+    {"id":"PERF-005","severity":"P2","category":"third_party_sdk_delay","journey":"auth/billing launch","source":"src/application/billing/subscription-context.tsx","evidence":"identity, offerings and subscription refresh are awaited during provider lifecycle; native-only RevenueCat falls back on web","scaling":"network latency, not history size","runtimeMeasured":false}
+  ]
+}

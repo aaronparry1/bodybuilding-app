@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "data_performance_journey_measurements_v1",
+  "status": "instrumentation_ready_runtime_not_executed",
+  "journeys": ["cold_launch","warm_launch","tabs","home","plan","progress","planned_workout","start_workout","log_set","edit_load","edit_reps","complete_set","swap_open","swap_search","swap_apply","next_exercise","complete_workout","long_history","repeated_swaps"],
+  "measurements": [],
+  "budgets": {"interactionJsTargetMs":16,"interactionJsWarningMs":50,"swapWarmTargetMs":100,"searchTargetMs":100,"tabTargetMs":150,"preparedWorkoutTargetMs":250},
+  "note": "No values are claimed until a development runtime records named spans."
+}

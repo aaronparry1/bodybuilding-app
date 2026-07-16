@@ -1,0 +1,1 @@
+{"schemaVersion":"data_performance_network_counts_v1","status":"static_only","measurements":[],"knownUnboundedReads":["WorkoutSessionCloudRepository.loadWorkoutHistory","ProgrammeCloudRepository.loadProgrammes","canonicalRecordedSessionLedger.list/exportPlan"],"note":"No remote credentials or production calls were used."}
