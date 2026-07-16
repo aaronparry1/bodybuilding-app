@@ -15,13 +15,12 @@ import { sessionPrepRepository } from "@/data/local/session-prep-repository";
 import { workoutSessionRepository } from "@/data/local/workout-session-repository";
 import { LocalSyncQueueStore } from "@/data/sync/local-sync-queue-store";
 import { getInSessionLoadIncreaseSuggestion } from "@/domain/training/load-selection";
-import { buildProgressDashboardViewModel } from "@/domain/training/progress-dashboard";
+import { projectCanonicalProgressDashboard } from "@/domain/training/canonical-progress-dashboard-projection";
 import { buildHomeDashboardViewModel } from "@/domain/training/home-dashboard";
 import { buildProductiveSetGuidance } from "@/domain/training/productive-set-targets";
 import { exerciseLibrary } from "@/domain/training/presets";
 import { createAnnualPlan, naturalLifterAnnualPlan } from "@/domain/training/annual-planner";
-import { summarizeWorkoutSession } from "@/domain/training/workout-history";
-import { summarizeWorkoutHistory } from "@/domain/training/workout-history";
+import { summarizeWorkoutHistory, summarizeWorkoutSession } from "@/domain/training/workout-history";
 import type { DesignQaFixtureId } from "@/application/design-qa/design-qa-fixtures";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
@@ -230,21 +229,19 @@ describe("Design QA fixtures", () => {
 
     for (const fixtureId of expected) {
       applyDesignQaFixture(fixtureId, "development");
-      const history = summarizeWorkoutHistory(workoutSessionRepository.list());
-      const progress = buildProgressDashboardViewModel(history, exerciseLibrary, activeTrainingPlanRepository.getOptional());
-      expect(progress.actionFlow?.type).not.toBe("deload");
-      expect(progress.journeyActions.primary.label).not.toBe("View recovery plan");
+      const plan = canonicalActivePlanState.getReadModel();
+      expect(plan?.planId).toBe(`design-qa:${fixtureId}`);
+      const projection = projectCanonicalProgressDashboard({ contractVersion: "canonical_current_progress_context_v1", planId: plan!.planId, planRevision: plan!.revision, macrocycle: { id: `${plan!.planId}:macro`, route: "build_muscle", strategy: "productive" }, mesocycle: { id: plan!.mesocycle.id, purpose: plan!.mesocycle.purpose, policyId: "canonical_mesocycle_v1" }, microcycle: { id: plan!.microcycle.id, order: plan!.microcycle.sequenceNumber, priority: "normal", rotation: "retain", stress: "normal" }, evidence: { ids: [`${fixtureId}:evidence`], freshness: "fresh", completeness: "complete" }, evaluation: { id: `${fixtureId}:evaluation`, version: "canonical_progress_evaluation_v2", outcome: "review", reasons: ["recovery_policy"] }, recordedProgress: { completedSessions: 0, performedSets: 0, evidencePending: false } });
+      expect(projection.action.allowed).toBe(false);
     }
   });
 
   it("creates Phase 1 low-history fixture without a fake deload action", () => {
     applyDesignQaFixture("phase1_low_history_no_deload", "development");
-    const history = summarizeWorkoutHistory(workoutSessionRepository.list());
-    const progress = buildProgressDashboardViewModel(history, exerciseLibrary, activeTrainingPlanRepository.getOptional());
-
-    expect(progress.hasEnoughHistory).toBe(false);
-    expect(progress.actionFlow).toBeUndefined();
-    expect(progress.recommendationEvidence.confidence).toBe("insufficient_data");
+    const plan = canonicalActivePlanState.getReadModel();
+    const projection = projectCanonicalProgressDashboard({ contractVersion: "canonical_current_progress_context_v1", planId: plan!.planId, planRevision: plan!.revision, macrocycle: { id: `${plan!.planId}:macro`, route: "build_muscle", strategy: "productive" }, mesocycle: { id: plan!.mesocycle.id, purpose: plan!.mesocycle.purpose, policyId: "canonical_mesocycle_v1" }, microcycle: { id: plan!.microcycle.id, order: plan!.microcycle.sequenceNumber, priority: "normal", rotation: "retain", stress: "normal" }, evidence: { ids: ["phase1:low-history"], freshness: "fresh", completeness: "incomplete" }, recordedProgress: { completedSessions: 0, performedSets: 0, evidencePending: false } });
+    expect(projection.status).toBe("insufficient_evidence");
+    expect(projection.action.allowed).toBe(false);
   });
 
   it("creates Phase 1 one-bad-session fixture without lowering the active load", () => {

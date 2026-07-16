@@ -1,0 +1,25 @@
+{
+  "phase": "CANONICAL-DESIGN-QA-DASHBOARD-CONSUMER-MIGRATION",
+  "sourceCommit": "3e4e19f17319e0cbd6540ab87685c7c0935a1012",
+  "file": "tests/design-qa-fixtures.test.ts",
+  "migratedAssertions": [
+    {
+      "test": "keeps Phase 1 fatigue fixtures non-actionable without a persisted current deload",
+      "fixtureIds": ["phase1_deload_mild", "phase1_deload_clear", "phase1_deload_severe"],
+      "legacyDependencies": ["buildProgressDashboardViewModel", "resolveCurrentProgressContext"],
+      "canonicalReplacement": "canonical_progress_dashboard_projection_v1",
+      "preservedSemanticAssertion": "recovery review is non-actionable without a persisted decision"
+    },
+    {
+      "test": "creates Phase 1 low-history fixture without a fake deload action",
+      "fixtureIds": ["phase1_low_history_no_deload"],
+      "legacyDependencies": ["buildProgressDashboardViewModel", "resolveCurrentProgressContext"],
+      "canonicalReplacement": "canonical_progress_dashboard_projection_v1",
+      "preservedSemanticAssertion": "incomplete evidence is explicit and produces no action"
+    }
+  ],
+  "fixturePartition": {"planState": 13, "sessionLifecycle": 30, "progressDecision": 35, "total": 78},
+  "legacyReferencesInFile": 0,
+  "productionLegacySymbolsRetained": true,
+  "externalProductionCallerStatus": "not changed; production symbols remain outside this bounded test migration"
+}
