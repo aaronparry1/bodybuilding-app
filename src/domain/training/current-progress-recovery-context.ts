@@ -1,11 +1,11 @@
-import type { CurrentProgressContext } from "@/domain/training/current-progress-context";
+import type { CanonicalProgressContext } from "@/domain/training/canonical-progress-context";
 
 export type CurrentProgressRecoveryContext =
   | Readonly<{ status: "normal" | "watch" | "recovery_recommended" | "recovery_active"; reason: string; historicalWarning: "none" | "fatigue_pattern_observed" }>
   | Readonly<{ status: "assessment_unavailable" | "compatibility" | "invalid"; reason: string }>;
 
 /** Pure recovery presentation boundary. Persisted current state, never strategic recommendation, is authoritative. */
-export function buildCurrentProgressRecoveryContext(context: CurrentProgressContext, microcycleProgressionState?: string, historicalWarning = false): CurrentProgressRecoveryContext {
+export function buildCurrentProgressRecoveryContext(context: CanonicalProgressContext, microcycleProgressionState?: string, historicalWarning = false): CurrentProgressRecoveryContext {
   if (context.status === "compatibility") return { status: "compatibility", reason: context.reason };
   if (context.status === "invalid") return { status: "invalid", reason: context.reason };
   if (context.status === "blocked" || context.status === "disrupted" || context.status === "insufficient_evidence" || context.status === "insufficient_policy" || context.status === "in_progress" || context.status === "no_current_snapshot" || context.status === "no_current_decision") return { status: "assessment_unavailable", reason: "current_assessment_unavailable" };

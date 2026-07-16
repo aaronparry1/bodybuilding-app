@@ -1,5 +1,5 @@
 import { mesocycleById, type MesocycleId } from "@/domain/training/mesocycle-library";
-import type { CurrentProgressContext } from "@/domain/training/current-progress-context";
+import type { CanonicalProgressContext } from "@/domain/training/canonical-progress-context";
 
 export type CurrentProgressHistoricalObservation = Readonly<{ id: string; kind: "stored_target_attainment" | "exercise_progression" | "completion_consistency"; value: string }>;
 export type CurrentProgressStrategicSummary =
@@ -9,7 +9,7 @@ export type CurrentProgressStrategicSummary =
   | Readonly<{ status: "no_current_snapshot" | "no_current_decision" | "compatibility" | "invalid"; reason: string; historicalObservations: readonly CurrentProgressHistoricalObservation[] }>;
 
 /** Pure, read-only summary: current persisted state is authoritative; history only supports it. */
-export function buildCurrentProgressStrategicSummary(context: CurrentProgressContext, historicalObservations: readonly CurrentProgressHistoricalObservation[] = []): CurrentProgressStrategicSummary {
+export function buildCurrentProgressStrategicSummary(context: CanonicalProgressContext, historicalObservations: readonly CurrentProgressHistoricalObservation[] = []): CurrentProgressStrategicSummary {
   const history = historicalObservations.map((observation) => ({ ...observation }));
   if (context.status === "ready") {
     const purpose = mesocycleById(context.mesocycleId as MesocycleId)?.adaptation;

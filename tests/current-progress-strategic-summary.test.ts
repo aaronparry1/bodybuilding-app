@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { buildCurrentProgressStrategicSummary } from "@/domain/training/current-progress-strategic-summary";
-import type { CurrentProgressContext } from "@/domain/training/current-progress-context";
+import type { CanonicalProgressContext } from "@/domain/training/canonical-progress-context";
 
-const ready = (outcome: "delay" | "continue" | "deload" | "advance" = "continue"): CurrentProgressContext => ({ status: "ready", planId: "plan", mesocycleId: "hypertrophy_base", microcycleNumber: 2, snapshotId: "snapshot", decisionId: "decision", decisionOutcome: outcome, decisionLifecycle: "ready", ...(outcome === "advance" ? { advanceTargetMesocycleId: "hypertrophy_consolidation" } : {}) });
+const ready = (outcome: "delay" | "continue" | "deload" | "advance" = "continue"): CanonicalProgressContext => ({ status: "ready", planId: "plan", mesocycleId: "hypertrophy_base", microcycleNumber: 2, snapshotId: "snapshot", decisionId: "decision", decisionOutcome: outcome, decisionLifecycle: "ready", ...(outcome === "advance" ? { advanceTargetMesocycleId: "hypertrophy_consolidation" } : {}) });
 
 describe("current Progress strategic summary", () => {
   it("projects persisted current decisions without ranking successors", () => {

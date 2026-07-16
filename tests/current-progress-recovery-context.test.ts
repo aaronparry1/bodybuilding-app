@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { buildCurrentProgressRecoveryContext, isCurrentRecoveryPriority } from "@/domain/training/current-progress-recovery-context";
-import type { CurrentProgressContext } from "@/domain/training/current-progress-context";
+import type { CanonicalProgressContext } from "@/domain/training/canonical-progress-context";
 
-const ready = (outcome: "continue" | "deload" = "continue"): CurrentProgressContext => ({ status: "ready", planId: "plan", mesocycleId: "hypertrophy_base", microcycleNumber: 1, snapshotId: "snapshot", decisionId: "decision", decisionOutcome: outcome });
+const ready = (outcome: "continue" | "deload" = "continue"): CanonicalProgressContext => ({ status: "ready", planId: "plan", mesocycleId: "hypertrophy_base", microcycleNumber: 1, snapshotId: "snapshot", decisionId: "decision", decisionOutcome: outcome });
 describe("current Progress recovery context", () => {
   it("prioritises only persisted deload or applied deload microcycle", () => {
     expect(buildCurrentProgressRecoveryContext(ready("deload"))).toMatchObject({ status: "recovery_recommended" });

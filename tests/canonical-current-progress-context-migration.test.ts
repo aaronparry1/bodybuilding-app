@@ -10,9 +10,9 @@ describe("canonical current Progress context migration boundary", () => {
     expect(artifact.nextBoundedTask).toContain("Progress dashboard");
   });
 
-  it("proves the current resolver remains the legacy authority until its consumers migrate", () => {
-    const source = readFileSync(resolve(process.cwd(), "src/domain/training/current-progress-context.ts"), "utf8");
-    expect(source).toContain("activeTrainingPlanRepository");
-    expect(source).toContain("resolveCurrentProgressContext");
+  it("proves the resolver module is removed after canonical consumer migration", () => {
+    expect(() => readFileSync(resolve(process.cwd(), "src/domain/training/current-progress-context.ts"), "utf8")).toThrow();
+    const source = readFileSync(resolve(process.cwd(), "src/domain/training/canonical-progress-context.ts"), "utf8");
+    expect(source).toContain("CanonicalProgressContext");
   });
 });

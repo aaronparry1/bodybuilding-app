@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { buildCurrentProgressRotationContext } from "@/domain/training/current-progress-rotation-context";
-import type { CurrentProgressContext } from "@/domain/training/current-progress-context";
+import type { CanonicalProgressContext } from "@/domain/training/canonical-progress-context";
 
-const ready: CurrentProgressContext = { status: "ready", planId: "plan", mesocycleId: "hypertrophy_base", microcycleNumber: 1, snapshotId: "snapshot", decisionId: "decision", decisionOutcome: "continue" };
+const ready: CanonicalProgressContext = { status: "ready", planId: "plan", mesocycleId: "hypertrophy_base", microcycleNumber: 1, snapshotId: "snapshot", decisionId: "decision", decisionOutcome: "continue" };
 
 describe("current Progress rotation context", () => {
   it("treats immutable observation as supporting only", () => {
