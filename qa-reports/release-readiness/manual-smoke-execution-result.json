@@ -7,6 +7,7 @@
   "executionPolicy": "non-deploying; no build, install, account, or production-data access",
   "availableTargets": { "webBrowser": "not_executed_no_interactive_browser_session", "iosSimulator": "available_but_no_existing_app_binary", "androidEmulator": "not_detected", "iosPhysical": "none_connected", "androidPhysical": "none_connected" },
   "platforms": { "webManualSmokeVerified": false, "iosSimulatorVerified": false, "iosPhysicalVerified": false, "androidEmulatorVerified": false, "androidPhysicalVerified": false },
+  "webServerStartup": "verified; browser journeys not executed",
   "caseTotals": { "passed": 0, "failed": 0, "blocked": 0, "notExecuted": 8 },
   "manualDataSafetyVerified": false,
   "p0Count": 0,

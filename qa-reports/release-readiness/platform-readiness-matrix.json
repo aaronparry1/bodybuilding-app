@@ -6,6 +6,6 @@
     "ios_simulator": { "status": "not_executed", "evidence": [] },
     "android_physical_device": { "status": "not_executed", "evidence": [] },
     "android_emulator": { "status": "not_executed", "evidence": [] },
-    "web": { "status": "not_executed", "evidence": ["web export is automated-only and is not manual smoke evidence"] }
+    "web": { "status": "partially verified", "evidence": ["npm run web served http://localhost:8081/ with HTTP 200; browser journeys not executed"] }
   }
 }

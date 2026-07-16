@@ -1,7 +1,7 @@
 {
   "schemaVersion": "release_manual_smoke_matrix_v1",
-  "sourceCommit": "280e5f1faf96e52054d316fcb529ba48cff06c57",
-  "executionPolicy": "not executed in non-deploying audit",
+  "sourceCommit": "48e7e3c",
+  "executionPolicy": "browser journeys not executed; local web server reachability separately verified",
   "cases": [
     { "id": "onboarding-canonical-plan", "area": "onboarding", "platform": "ios/android/web", "expected": "canonical active plan persisted", "automatedCoverage": "verified", "manualStatus": "not_executed", "severityIfFailed": "P1" },
     { "id": "home-plan-navigation", "area": "home", "platform": "ios/android/web", "expected": "canonical status and navigation identity", "automatedCoverage": "verified", "manualStatus": "not_executed", "severityIfFailed": "P1" },

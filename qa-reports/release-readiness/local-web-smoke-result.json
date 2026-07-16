@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "local_web_smoke_result_v1",
+  "sourceCommit": "48e7e3c",
+  "server": { "command": "npm run web", "status": "started", "url": "http://localhost:8081/", "httpStatus": 200, "shutdown": "completed" },
+  "browser": { "status": "not_executed", "reason": "Browser-control runtime was unavailable in this session; curl startup check is not browser smoke evidence" },
+  "cases": { "startupServerReachability": "verified", "applicationStartup": "not_executed", "onboarding": "not_executed", "home": "not_executed", "train": "not_executed", "extraSession": "not_executed", "progress": "not_executed", "history": "not_executed", "settingsAccessibility": "not_executed" },
+  "webManualSmokeVerified": false,
+  "webCasesPassed": 0,
+  "webCasesFailed": 0,
+  "webCasesBlocked": 0,
+  "p0Count": 0,
+  "p1Count": 0,
+  "readyForNativeSmoke": false,
+  "readyForReleaseCandidateBuild": false,
+  "deploymentAuthorized": false,
+  "consoleErrors": "not_observed_without_browser",
+  "nextTask": "Run the local URL in an available interactive browser and record each journey with synthetic local data."
+}

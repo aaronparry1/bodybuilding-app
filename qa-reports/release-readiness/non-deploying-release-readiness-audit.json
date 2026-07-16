@@ -18,7 +18,7 @@
   "findings": { "p0": [], "p1": [], "p2": ["manual device/simulator execution", "operational release and rollback runbook evidence"], "p3": ["beta placeholder release wording"] },
   "finalStatus": "blocked_before_release_candidate_build",
   "operationalReadiness": "see operational-release-readiness.json",
-  "manualSmokeExecution": "completed_with_no_manual_passes; see manual-smoke-execution-result.json",
+  "manualSmokeExecution": "server startup verified; browser journeys unexecuted; see local-web-smoke-result.json",
   "readyForReleaseCandidateBuild": false,
   "releaseCandidateBuildExecuted": false,
   "deploymentAuthorized": false,
