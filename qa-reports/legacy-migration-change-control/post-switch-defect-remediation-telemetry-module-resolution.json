@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "post_switch_defect_remediation_telemetry_module_resolution_v1",
+  "sourceCommit": "eb7cd82",
+  "originalImport": "@/domain/training/coaching-engine-v3",
+  "moduleLifecycle": "retired/deleted shadow-only QA engine; no tracked replacement is production authority",
+  "occurrences": {
+    "mountedProduction": [],
+    "inactiveObservation": ["src/domain/training/ordinary-v2-shadow-observation.ts", "src/domain/training/ordinary-v2-shadow-config.ts"],
+    "qaArtifact": ["qa-reports/v3-shadow-telemetry-review.test.ts"],
+    "deletedOrStale": ["coaching-engine-v3 import"],
+    "documentationOrString": []
+  },
+  "resolution": "rewritten retired-module boundary test",
+  "canonicalCoverage": ["canonical Progress evidence/evaluation/intervention/decision", "production-switch final evidence", "ordinary-v2 inactivity", "D4D2 isolation"],
+  "telemetryBehaviorChanged": false,
+  "invariants": { "productionSwitchPredicates": "24/24 passing", "productionSwitchCompleted": true, "ordinaryV2Active": false, "d4d2Changed": false, "deploymentAuthorized": false }
+}
