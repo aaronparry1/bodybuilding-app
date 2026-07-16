@@ -1,9 +1,9 @@
 {
   "schemaVersion":"data_performance_profiler_environment_v1",
-  "sourceCommit":"57acc18",
+  "sourceCommit":"5e75a8f",
   "browser":{"attempted":true,"interactiveAvailable":false,"status":"blocked","reason":"No browser-control runtime exposed"},
   "webServer":{"command":"npm run web","started":true,"url":"http://localhost:8081","bundle":"Expo web development bundle","jsEngine":"browser engine not exercised","strictMode":"not verified","devOptimizations":"off"},
-  "ios":{"simulatorsDetected":true,"interactiveRun":false,"selectedSimulator":"iPhone 17 Pro","runtime":"iOS 26.5","xcode":"26.6 (17F113)","buildAttempt":"blocked during CocoaPods install","reason":"No installed development binary"},
+  "ios":{"simulatorsDetected":true,"interactiveRun":false,"selectedSimulator":"iPhone 17 Pro","runtime":"iOS 26.5","xcode":"26.6 (17F113)","buildAttempt":"CocoaPods succeeded; direct xcodebuild blocked in SwiftBuild hang","reason":"No installed development binary"},
   "android":{"emulatorDetected":false,"interactiveRun":false},
   "connectedDevices":[],
   "reactProfiler":false,

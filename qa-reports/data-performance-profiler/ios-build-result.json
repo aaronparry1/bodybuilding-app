@@ -1,15 +1,17 @@
 {
   "schemaVersion":"ios_local_development_build_result_v1",
-  "sourceCommit":"8ab67d6",
+  "sourceCommit":"5e75a8f",
   "simulator":{"name":"iPhone 17 Pro","udid":"06EEA722-8702-40AC-81FC-53E92D205303","runtime":"iOS 26.5","status":"available_shutdown"},
-  "command":"npx expo run:ios --device 06EEA722-8702-40AC-81FC-53E92D205303 --no-bundler",
+  "command":"EXPO_USE_PRECOMPILED_MODULES=0 pod install --project-directory=ios --no-repo-update; xcodebuild -workspace ios/AdaptiveStrengthCoach.xcworkspace -scheme AdaptiveStrengthCoach -configuration Debug -destination id=06EEA722-8702-40AC-81FC-53E92D205303 -derivedDataPath /tmp/AdaptiveStrengthCoachDerivedData build",
   "environment":"development with non-production sentinels",
   "result":"blocked",
-  "blocker":"CocoaPods installation stalled before Xcode compilation; process was stopped after approximately two minutes with no pod completion or build output",
-  "build":"not_started",
+  "blocker":"CocoaPods completed successfully (114 pods), but the first direct Xcode source build remained in SwiftBuild package-loading/compilation for approximately 18 minutes without BUILD SUCCEEDED/FAILED and was stopped. No compiler error was observed.",
+  "pods":"succeeded_non_deployment",
+  "build":"blocked_swiftbuild_hang",
   "install":"not_attempted",
   "launch":"not_attempted",
   "metro":"not_started (--no-bundler)",
   "binaryProduced":false,
+  "buildLog":"/tmp/xcodebuild-ios.log",
   "generatedProductsCommitted":false
 }
