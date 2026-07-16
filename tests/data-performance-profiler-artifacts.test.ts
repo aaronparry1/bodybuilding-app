@@ -15,4 +15,11 @@ describe("data performance profiler evidence", () => {
   it("keeps all fixture sizes explicit", () => {
     expect(read("serialization-profile.json").fixtureSizes).toEqual([0, 100, 500, 2000, 10000]);
   });
+
+  it("does not claim iOS profiling when the local build is blocked", () => {
+    const build = read("ios-build-result.json");
+    expect(build.result).toBe("blocked");
+    expect(build.binaryProduced).toBe(false);
+    expect(build.launch).toBe("not_attempted");
+  });
 });

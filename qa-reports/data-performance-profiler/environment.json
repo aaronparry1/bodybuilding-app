@@ -3,12 +3,15 @@
   "sourceCommit":"57acc18",
   "browser":{"attempted":true,"interactiveAvailable":false,"status":"blocked","reason":"No browser-control runtime exposed"},
   "webServer":{"command":"npm run web","started":true,"url":"http://localhost:8081","bundle":"Expo web development bundle","jsEngine":"browser engine not exercised","strictMode":"not verified","devOptimizations":"off"},
-  "ios":{"simulatorsDetected":true,"interactiveRun":false,"reason":"No installed development binary; no simulator UI session exercised"},
+  "ios":{"simulatorsDetected":true,"interactiveRun":false,"selectedSimulator":"iPhone 17 Pro","runtime":"iOS 26.5","xcode":"26.6 (17F113)","buildAttempt":"blocked during CocoaPods install","reason":"No installed development binary"},
   "android":{"emulatorDetected":false,"interactiveRun":false},
   "connectedDevices":[],
   "reactProfiler":false,
   "browserPerformanceTools":false,
   "nativePerformanceTools":false,
   "networkThrottling":false,
-  "syntheticOnly":true
+  "syntheticOnly":true,
+  "newArchitecture":"enabled by native configuration",
+  "reactStrictMode":"not verified",
+  "developmentBundle":"not launched"
 }
