@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "canonical_plan_setup_caller_inventory_v1",
+  "sourceCommit": "fe27044",
+  "createActiveTrainingPlan": {
+    "mountedCallers": [],
+    "callers": [
+      {"file":"src/application/training/saved-plan-migration.ts","symbol":"migrateSavedPlan","classification":"migration/import compatibility","mounted":false},
+      {"file":"src/domain/training/run-v2-qa-preview.ts","symbol":"buildPreviewActivePlan","classification":"inactive v2 preview","mounted":false},
+      {"file":"tests/*","symbol":"test fixtures","classification":"test-only","mounted":false}
+    ]
+  },
+  "annualPlanner": {
+    "mountedCallers": [],
+    "callers": [
+      {"file":"src/domain/training/plan-setup.ts","symbol":"createActiveTrainingPlan","classification":"non-production compatibility constructor","mounted":false},
+      {"file":"src/domain/training/strategic-coaching.ts","symbol":"coaching projections","classification":"unmounted legacy projection","mounted":false},
+      {"file":"src/domain/training/ad-hoc-workout-generator.ts","symbol":"generated programme helpers","classification":"non-mounted construction/test surface","mounted":false},
+      {"file":"src/domain/training/run-v2-qa-preview.ts","symbol":"preview setup","classification":"inactive v2 preview","mounted":false},
+      {"file":"tests/*","symbol":"fixtures and unit tests","classification":"test-only","mounted":false}
+    ]
+  },
+  "mountedPlanCreation": {"route":"app/(protected)/onboarding.tsx","boundary":"canonicalActivePlanState.create","legacyConstructorImported":false,"legacyRepositoryWritten":false},
+  "plannedWorkoutTestOnlyCallers": ["tests/planned-workout.test.ts","tests/recommendation-actions.test.ts","tests/volume-adjustments.test.ts"],
+  "selectedNextProductionBlocker": {"file":"src/features/workout-logging/use-workout-logger.ts","symbol":"activeTrainingPlanRepository","callerChain":["Train route","useWorkoutLogger","activeTrainingPlanRepository.getOptional/subscribe","legacy plan-shaped logger state"],"classification":"mounted production authority","nextTaskKind":"migrate"}
+}

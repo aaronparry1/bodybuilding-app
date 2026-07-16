@@ -1,13 +1,13 @@
 {
   "schemaVersion": "canonical_production_switch_final_result_v1",
-  "sourceCommit": "335e776",
+  "sourceCommit": "fe27044",
   "evidenceContract": "canonical_production_switch_evidence_v1",
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
   "classification": "production_switch_blocked_by_live_legacy_authority",
   "firstFalsePredicate": "no_legacy_workout_constructor",
-  "firstLiveBlocker": "src/application/sync/cloud-data-sync.ts:activeTrainingPlanRepository",
-  "nextBoundedMigrationTask": "remove legacy active-plan cloud transport after canonical sync coverage",
+  "firstLiveBlocker": "src/features/workout-logging/use-workout-logger.ts:activeTrainingPlanRepository",
+  "nextBoundedMigrationTask": "migrate Train logger active-plan repository reads to canonical Train boundary",
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
 }
