@@ -1,13 +1,13 @@
 {
   "schemaVersion": "canonical_production_reachability_inventory_v1",
-  "sourceCommit": "6041ed8",
+  "sourceCommit": "ae0c787",
   "entrypoints": ["app/(protected)/onboarding.tsx", "app/(protected)/(tabs)/index.tsx", "app/(protected)/(tabs)/programmes.tsx", "app/(protected)/(tabs)/train.tsx", "app/(protected)/(tabs)/analytics.tsx", "app/(protected)/history/[id].tsx", "src/application/sync/cloud-data-sync.ts"],
   "legacyReachability": [
-    {"symbol":"activeTrainingPlanRepository","file":"src/data/local/active-training-plan-repository.ts","classification":"production_legacy_authority","callers":["src/features/workout-logging/use-workout-logger.ts","src/domain/training/current-decision-application.ts"],"capability":"read/write current plan"},
-    {"symbol":"workoutSessionRepository","file":"src/data/local/workout-session-repository.ts","classification":"production_legacy_authority","callers":["src/features/workout-logging/use-workout-logger.ts","app/(protected)/history/[id].tsx","src/domain/training/current-completion-orchestration.ts"],"capability":"read/write workout history"},
+    {"symbol":"activeTrainingPlanRepository","file":"src/data/local/active-training-plan-repository.ts","classification":"mounted production projection/transport","callers":["src/domain/training/current-decision-application.ts","src/application/sync/cloud-data-sync.ts"],"capability":"legacy current-plan read/write outside canonical boundary"},
+    {"symbol":"workoutSessionRepository","file":"src/data/local/workout-session-repository.ts","classification":"mounted production authority","callers":["app/(protected)/history/[id].tsx","src/features/workout-logging/use-workout-logger.ts","src/domain/training/current-completion-orchestration.ts"],"capability":"legacy recorded-session read/write"},
     {"symbol":"annual-planner","file":"src/domain/training/annual-planner.ts","classification":"production_legacy_authority","callers":["src/domain/training/plan-setup.ts","src/domain/training/run-v2-qa-preview.ts"],"capability":"construct blocks and TrainingYear"},
     {"symbol":"legacyTrainingYearArchive","file":"src/application/training/legacy-training-year-archive.ts","classification":"transport_only","callers":["src/application/sync/cloud-data-sync.ts"],"capability":"archive transport; not current authority"}
   ],
   "mountedTrain": {"file":"app/(protected)/(tabs)/train.tsx","classification":"canonical_authority","callerChain":["Train route","canonicalTrainSessionBoundary","canonical recorded-session owners"],"capability":"canonical lifecycle/performance/completion"},
-  "firstLiveBlocker": {"predicate":"no_production_legacy_block_authority","file":"src/domain/training/plan-setup.ts","symbol":"createActiveTrainingPlan","callerChain":["active plan repository","plan-setup","annual-planner"],"capability":"constructs block-shaped plan authority","canonicalReplacement":"canonical active-plan construction"}
+  "firstLiveBlocker": {"predicate":"no_legacy_workout_history_authority","file":"app/(protected)/history/[id].tsx","symbol":"workoutSessionRepository.save","callerChain":["History route","history/[id] action","workoutSessionRepository.save","legacy WorkoutSession persistence"],"capability":"mutates legacy recorded-session history","canonicalReplacement":"canonical recorded-session ledger/history projection","nextTask":"migrate history route writes to canonical recorded-session commands"}
 }
