@@ -7,15 +7,15 @@ const root = resolve(process.cwd());
 describe("canonical production reachability refresh", () => {
   it("records the current mounted legacy surfaces and one bounded next target", () => {
     const inventory = JSON.parse(readFileSync(resolve(root, "qa-reports/legacy-migration-change-control/canonical-production-reachability-refresh.json"), "utf8"));
-    expect(inventory.sourceCommit).toBe("ae0c787");
+    expect(inventory.sourceCommit).toBe("335e776");
     expect(inventory.productionSwitchCompleted).toBe(false);
-    expect(inventory.selectedNextTarget.file).toBe("app/(protected)/history/[id].tsx");
-    expect(inventory.selectedNextTarget.symbol).toBe("workoutSessionRepository.save");
+    expect(inventory.selectedNextTarget.file).toBe("src/domain/training/plan-setup.ts");
+    expect(inventory.selectedNextTarget.symbol).toBe("createActiveTrainingPlan");
   });
 
   it("keeps the selected History route on legacy persistence until migration", () => {
     const source = readFileSync(resolve(root, "app/(protected)/history/[id].tsx"), "utf8");
-    expect(source).toContain("workoutSessionRepository.save");
-    expect(source).not.toContain("canonicalActivePlanState.applyProgressDecision");
+    expect(source).not.toContain("workoutSessionRepository");
+    expect(source).toContain("projectCanonicalTrainSession");
   });
 });

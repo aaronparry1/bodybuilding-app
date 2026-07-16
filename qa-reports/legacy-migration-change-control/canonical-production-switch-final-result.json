@@ -1,13 +1,13 @@
 {
   "schemaVersion": "canonical_production_switch_final_result_v1",
-  "sourceCommit": "ae0c787",
+  "sourceCommit": "335e776",
   "evidenceContract": "canonical_production_switch_evidence_v1",
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
   "classification": "production_switch_blocked_by_live_legacy_authority",
   "firstFalsePredicate": "no_production_legacy_block_authority",
-  "firstLiveBlocker": "app/(protected)/history/[id].tsx:workoutSessionRepository.save",
-  "nextBoundedMigrationTask": "migrate History/[id] legacy recorded-session writes to canonical ledger commands",
+  "firstLiveBlocker": "src/domain/training/plan-setup.ts:createActiveTrainingPlan",
+  "nextBoundedMigrationTask": "migrate onboarding/plan-setup from block-shaped construction to canonical active-plan construction",
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
 }
