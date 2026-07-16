@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "existing_release_workflow_discovery_v1",
+  "sourceCommit": "8c199b8d8867954e6b0ab36d84d34230321be5",
+  "repository": { "branch": "main", "trackedChanges": [], "approvedUntrackedUntouched": true, "lockfile": "package-lock.json", "packageManager": "npm" },
+  "metadata": { "appVersion": "1.0.10", "iosBuildNumber": "34", "androidVersionCode": 1, "iosBundleIdentifier": "com.aaronparry.adaptivestrengthcoach", "androidPackage": "com.aaronparry.adaptivestrengthcoach", "easProjectId": "present in app config; value not secret", "runtimeVersion": "not configured", "expoUpdatesDependency": "absent" },
+  "historicalEvidence": { "likelyWorkflow": "EAS Build with internal preview and production profiles, followed by App Store/TestFlight and Play internal/production submission", "confidence": "high_for_configured_workflow; prior execution not independently proven", "iosStoreEvidence": "tracked website says iPhone app live", "androidStoreEvidence": "tracked website says Google Play release in progress", "priorReleaseCommits": ["f51de92 test: preflight ordinary v2 shadow internal release", "ac424fc refactor: store current readiness snapshots"], "easSubmitConfig": "present", "ciWorkflow": "no tracked GitHub workflow found" },
+  "profiles": { "development": { "purpose": "internal development client", "distribution": "internal", "developmentClient": true }, "preview": { "purpose": "staging internal test", "distribution": "internal", "ordinaryShadow": "enabled by profile only" }, "production": { "purpose": "store build", "distribution": "store/default", "channel": "production", "ordinaryShadow": "disabled" } },
+  "localTools": { "node": "available v23.9.0", "npm": "available v10.9.2", "expo": "installed through repository", "easCli": "not installed locally; scripts use npx eas-cli@latest but not run", "xcodeTools": "xcrun available", "iosSimulator": "installed shutdown iPhone 17 Pro", "androidSdk": "adb available; no connected devices reported", "physicalDevices": "none reported" },
+  "expoGo": { "sufficient": false, "reason": "RevenueCat native QA requires a native build; docs say Expo Go/web use mock billing" },
+  "commandsNotExecuted": {
+    "startWeb": "npm run web",
+    "startDevClient": "npm run start:dev-client",
+    "localIos": "npm run ios",
+    "localAndroid": "npm run android",
+    "easDevIos": "npm run eas:build:dev:ios",
+    "easDevAndroid": "npm run eas:build:dev:android",
+    "easPreviewIos": "npm run eas:build:staging:ios",
+    "easPreviewAndroid": "npm run eas:build:staging:android",
+    "easProductionIos": "npm run eas:build:production:ios",
+    "easProductionAndroid": "npm run eas:build:production:android",
+    "easSubmitPreview": "npx eas-cli@latest submit --platform ios --profile preview (not executed)",
+    "easSubmitProductionIos": "npx eas-cli@latest submit --platform ios --profile production (not executed)",
+    "easSubmitProductionAndroid": "npx eas-cli@latest submit --platform android --profile production (not executed)"
+  },
+  "safety": { "safeReversible": ["npm run web", "npm run start:dev-client", "npm run typecheck", "npm test", "npm run export:web"], "externalUploadOrStoreChange": ["all eas build commands", "all eas submit commands"], "requiresExplicitAuthorization": ["native build", "EAS submit", "TestFlight upload", "Play internal testing upload", "production rollout"] },
+  "unknownsRequiringOwner": ["which Apple/Google accounts own existing listings", "whether prior releases were actually EAS or local native builds", "current EAS authentication/credentials", "non-production cloud account and endpoint", "whether production store metadata/build numbers have advanced outside this repository"],
+  "deploymentAuthorized": false
+}
