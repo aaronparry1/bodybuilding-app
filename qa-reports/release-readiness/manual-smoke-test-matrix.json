@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "release_manual_smoke_matrix_v1",
+  "sourceCommit": "280e5f1faf96e52054d316fcb529ba48cff06c57",
+  "executionPolicy": "not executed in non-deploying audit",
+  "cases": [
+    { "id": "onboarding-canonical-plan", "area": "onboarding", "platform": "ios/android/web", "expected": "canonical active plan persisted", "automatedCoverage": "verified", "manualStatus": "not_executed", "severityIfFailed": "P1" },
+    { "id": "home-plan-navigation", "area": "home", "platform": "ios/android/web", "expected": "canonical status and navigation identity", "automatedCoverage": "verified", "manualStatus": "not_executed", "severityIfFailed": "P1" },
+    { "id": "train-ledger-lifecycle", "area": "train", "platform": "ios/android", "expected": "start, performed work, pause/resume, completion and restore are ledger-backed", "automatedCoverage": "verified", "manualStatus": "not_executed", "severityIfFailed": "P0" },
+    { "id": "extra-session-history", "area": "extra-session", "platform": "ios/android", "expected": "extra provenance retained without scheduled advancement", "automatedCoverage": "verified", "manualStatus": "not_executed", "severityIfFailed": "P1" },
+    { "id": "progress-review-only", "area": "progress", "platform": "ios/android/web", "expected": "unsupported interventions remain review-only", "automatedCoverage": "verified", "manualStatus": "not_executed", "severityIfFailed": "P1" },
+    { "id": "history-projections", "area": "history", "platform": "ios/android/web", "expected": "canonical list/detail/exercise projections", "automatedCoverage": "verified", "manualStatus": "not_executed", "severityIfFailed": "P1" },
+    { "id": "cloud-account-boundary", "area": "cloud", "platform": "ios/android", "expected": "account-scoped atomic restore and conflict rejection", "automatedCoverage": "verified", "manualStatus": "not_executed", "severityIfFailed": "P0" },
+    { "id": "settings-accessibility", "area": "settings", "platform": "ios/android/web", "expected": "units, labels, scaling and offline errors remain safe", "automatedCoverage": "partial", "manualStatus": "not_executed", "severityIfFailed": "P2" }
+  ]
+}

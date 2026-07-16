@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "non_deploying_release_readiness_audit_v1",
+  "sourceCommit": "280e5f1faf96e52054d316fcb529ba48cff06c57",
+  "branch": "main",
+  "workingTree": { "trackedChanges": [], "stagedChanges": [], "approvedUntrackedPreserved": true, "quarantineUntouched": true, "mergeState": "clean" },
+  "automatedVerification": {
+    "npm test": { "status": "passed", "result": "316 files / 1924 tests" },
+    "npm run typecheck": { "status": "passed" },
+    "npx expo config --type public": { "status": "passed" },
+    "npm run export:web": { "status": "passed" },
+    "lint": { "status": "not_configured" },
+    "formatCheck": { "status": "not_configured" },
+    "dependencyAudit": { "status": "not_run", "reason": "network audit would be non-local and dependency mutation is prohibited" }
+  },
+  "architecture": { "productionPredicates": "24/24 passing", "pipelineReadyForSwitch": true, "productionSwitchCompleted": true, "mountedLegacyBlockers": [], "ordinaryV2": "inactive", "d4d2": "unchanged" },
+  "platformReadiness": "see platform-readiness-matrix.json",
+  "dataSafety": "automated_only_no_data_loss_signal",
+  "findings": { "p0": [], "p1": [], "p2": ["manual device/simulator execution", "operational release and rollback runbook evidence"], "p3": ["beta placeholder release wording"] },
+  "finalStatus": "ready_for_manual_smoke",
+  "releaseCandidateBuildExecuted": false,
+  "deploymentAuthorized": false,
+  "deploymentExecuted": false,
+  "rolloutExecuted": false,
+  "storeSubmissionExecuted": false,
+  "nextBoundedTask": "execute the manual smoke matrix on authorized iOS/Android devices and complete the release-owner/rollback/incident runbook before any candidate build"
+}

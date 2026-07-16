@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "release_configuration_inventory_v1",
+  "sourceCommit": "280e5f1faf96e52054d316fcb529ba48cff06c57",
+  "package": { "version": "1.0.0", "lockfile": "package-lock.json", "expo": "~56.0.8", "nodeExpectation": "Expo 56 toolchain; Node 23.9.0 observed" },
+  "app": { "version": "1.0.10", "iosBuildNumber": "34", "androidVersionCode": 1, "iosBundleIdentifier": "com.aaronparry.adaptivestrengthcoach", "androidPackage": "com.aaronparry.adaptivestrengthcoach", "scheme": "ironlogic", "easProjectIdPresent": true },
+  "profiles": { "preview": { "distribution": "internal", "observation": "ordinary shadow enabled by profile only", "authority": "production_only" }, "production": { "channel": "production", "observation": "disabled", "authority": "production_only" } },
+  "environmentVariables": { "declaredNamesOnly": ["APP_ENV", "APP_VERSION", "APP_IOS_BUILD_NUMBER", "APP_ANDROID_VERSION_CODE", "EXPO_PUBLIC_SUPABASE_URL", "EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "EXPO_PUBLIC_SUPABASE_ANON_KEY", "EXPO_PUBLIC_REVENUECAT_TEST_API_KEY", "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY", "EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY", "EXPO_PUBLIC_ORDINARY_V2_SHADOW_OBSERVATION"], "secretValuesPrinted": false },
+  "runtimeUpdates": { "expoUpdatesInstalled": false, "runtimeVersion": "absent", "updateUrls": "absent" },
+  "permissionsAndPrivacy": { "iosEncryptionDeclaration": false, "associatedDomains": true, "privacyPolicyUrlConfigured": true, "termsUrlConfigured": true },
+  "warnings": ["release notes mention beta placeholders for RevenueCat/Apple Watch/live billing", "physical device credentials and store submission were not audited/executed"]
+}

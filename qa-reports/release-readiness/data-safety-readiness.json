@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "release_data_safety_readiness_v1",
+  "sourceCommit": "280e5f1faf96e52054d316fcb529ba48cff06c57",
+  "automatedCoverage": {
+    "canonicalPlanCreationPersistence": "verified",
+    "startupHydrationRestore": "verified",
+    "cloudPlanAndRecordedSessionRoundTrip": "verified",
+    "staleConflictingRevisionRejection": "verified",
+    "malformedPayloadRejection": "verified",
+    "legacyMigrationIsolation": "verified",
+    "historicalV2V3Preservation": "verified",
+    "immutablePrescriptionHashes": "verified",
+    "extraSessionProvenance": "verified",
+    "accountBoundaryValidation": "verified",
+    "partialRestoreProtection": "verified"
+  },
+  "manualCoverage": "not_executed",
+  "result": "automated_only_no_data_loss_signal"
+}
