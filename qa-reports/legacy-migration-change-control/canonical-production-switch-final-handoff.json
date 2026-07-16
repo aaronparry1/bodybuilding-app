@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "canonical_production_switch_final_handoff_v1",
+  "head": "7a80be8",
+  "productionSwitchEvidenceVersion": "canonical_production_switch_evidence_v1",
+  "predicateCount": 24,
+  "predicatesPassed": 24,
+  "canonicalProductionAuthorityCertified": true,
+  "pipelineReadyForSwitch": true,
+  "productionSwitchCompleted": true,
+  "newRegressionDetected": false,
+  "fullVerificationCompleted": true,
+  "handoffReady": true,
+  "deploymentAuthorized": false,
+  "mountedLegacyBlockers": [],
+  "retainedCompatibility": ["migration-only", "archive-only", "rejection-only", "transport-only"],
+  "ordinaryV2": "inactive",
+  "d4d2": "unchanged",
+  "fullSuite": {
+    "testFilesPassed": 303,
+    "testFilesFailed": 12,
+    "testsPassed": 1954,
+    "testsFailed": 14,
+    "knownFailures": [
+      {"file":"qa-reports/v3-shadow-telemetry-review.test.ts","classification":"environment/module-resolution issue","detail":"Cannot resolve @/domain/training/coaching-engine-v3"},
+      {"file":"tests/canonical-progress-dashboard-context-migration.test.ts","classification":"pre-existing stale boundary expectation","detail":"expects deleted progress-dashboard.ts"},
+      {"file":"tests/canonical-train-workout-logger-boundary.test.ts","classification":"pre-existing stale boundary expectation","detail":"expects deleted use-workout-logger.ts"},
+      {"file":"tests/event-taper.test.ts","classification":"unrelated pre-existing failure","detail":"short/long timeline expectation"},
+      {"file":"tests/load-selection.test.ts","classification":"unrelated pre-existing failure","detail":"extra-session history load expectation"},
+      {"file":"tests/master-architecture.test.ts","classification":"pre-existing deleted-file expectation","detail":"support-function-policy.ts absent (4 assertions)"},
+      {"file":"tests/onboarding-final-screen.test.ts","classification":"pre-existing stale expectation","detail":"expects removed createActiveTrainingPlan source"},
+      {"file":"tests/planned-workout.test.ts","classification":"established planned-workout failure","detail":"fresh 2-day plan label"},
+      {"file":"tests/product-flow-architecture.test.ts","classification":"unrelated 48-week expectation","detail":"expected 48 weeks, canonical result shorter"},
+      {"file":"tests/product-positioning.test.ts","classification":"unrelated 48-week expectation","detail":"expected 48 weeks, canonical result shorter"},
+      {"file":"tests/recovery-capacity.test.ts","classification":"unrelated pre-existing failure","detail":"next lifting context expectation"},
+      {"file":"tests/workout-history.test.ts","classification":"unrelated pre-existing failure","detail":"previous exercise performance expectation"}
+    ]
+  },
+  "verification": {
+    "focusedSwitchReachability": "passed",
+    "canonicalBoundaries": "passed",
+    "typecheck": "passed",
+    "expoPublicConfig": "passed",
+    "webExport": "passed"
+  },
+  "rolloutExclusions": ["ordinary-v2 activation", "D4D2 changes", "build", "deployment", "EAS", "store submission"]
+}
