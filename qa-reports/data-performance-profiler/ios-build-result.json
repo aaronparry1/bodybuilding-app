@@ -5,13 +5,14 @@
   "command":"EXPO_USE_PRECOMPILED_MODULES=0 pod install --project-directory=ios --no-repo-update; xcodebuild -workspace ios/AdaptiveStrengthCoach.xcworkspace -scheme AdaptiveStrengthCoach -configuration Debug -destination id=06EEA722-8702-40AC-81FC-53E92D205303 -derivedDataPath /tmp/AdaptiveStrengthCoachDerivedData build",
   "environment":"development with non-production sentinels",
   "result":"blocked",
-  "blocker":"CocoaPods completed successfully (114 pods), but the first direct Xcode source build remained in SwiftBuild package-loading/compilation for approximately 18 minutes without BUILD SUCCEEDED/FAILED and was stopped. No compiler error was observed.",
+  "blocker":"CocoaPods completed successfully (114 pods). Three raw Xcode comparisons (normal, incremental Swift compilation, and -jobs 4) advanced through React/Fabric targets but each entered an idle SwiftBuild state without BUILD SUCCEEDED/FAILED or compiler error and was stopped.",
   "pods":"succeeded_non_deployment",
-  "build":"blocked_swiftbuild_hang",
+  "build":"blocked_reproducible_swiftbuild_idle_state",
   "install":"not_attempted",
   "launch":"not_attempted",
   "metro":"not_started (--no-bundler)",
   "binaryProduced":false,
-  "buildLog":"/tmp/xcodebuild-ios.log",
+  "buildLog":"qa-reports/data-performance-profiler/ios-xcodebuild-full.log",
+  "diagnosis":"reproducible abnormal first native build; exact cause unresolved between SwiftBuild scheduling/resource pressure and Xcode 26.6/Expo SDK 56 interaction",
   "generatedProductsCommitted":false
 }
