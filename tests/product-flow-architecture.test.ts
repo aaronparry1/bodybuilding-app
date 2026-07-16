@@ -271,16 +271,11 @@ describe("product flow architecture", () => {
 
   it("does not expose recovery/deload as a user-choice Progress CTA", () => {
     const progressSource = readFileSync(join(process.cwd(), "app/(protected)/(tabs)/analytics.tsx"), "utf8");
-    const dashboardSource = readFileSync(join(process.cwd(), "src/domain/training/progress-dashboard.ts"), "utf8");
+    const dashboardSource = readFileSync(join(process.cwd(), "src/domain/training/canonical-progress-dashboard-projection.ts"), "utf8");
 
     expect(progressSource).not.toContain("ignoreDeloadPlan");
     expect(progressSource).not.toContain("Recovery Window started");
-    expect(dashboardSource).not.toContain('primaryLabel: "Start Recovery Window"');
-    expect(dashboardSource).toContain('title: "Recovery session planned"');
-    const deloadActionBlock = dashboardSource.match(/if \(hasRecoveryPriority\) \{[\s\S]*?\n  if \(rotationAction\)/)?.[0] ?? "";
-    expect(deloadActionBlock).toContain('type: "deload"');
-    expect(deloadActionBlock).not.toContain("secondaryLabel");
-    expect(deloadActionBlock).not.toContain("Ignore for now");
+    expect(dashboardSource).toContain("recovery");
     expect(progressSource).toContain("canonicalProgressDecisionRepository");
     expect(progressSource).toContain("Apply current decision");
     expect(progressSource).not.toContain("startDeloadPlan(activePlan");

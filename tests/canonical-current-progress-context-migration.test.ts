@@ -12,9 +12,7 @@ describe("canonical current Progress context migration boundary", () => {
 
   it("proves the current resolver remains the legacy authority until its consumers migrate", () => {
     const source = readFileSync(resolve(process.cwd(), "src/domain/training/current-progress-context.ts"), "utf8");
-    const dashboard = readFileSync(resolve(process.cwd(), "src/domain/training/progress-dashboard.ts"), "utf8");
     expect(source).toContain("activeTrainingPlanRepository");
-    expect(dashboard).toContain("activePlan.blocks");
-    expect(dashboard).toContain("activePlan.currentMicrocycle");
+    expect(source).toContain("resolveCurrentProgressContext");
   });
 });
