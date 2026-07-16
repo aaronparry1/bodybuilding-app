@@ -25,6 +25,7 @@
 		5AD8145835D889255D256EAD /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = AdaptiveStrengthCoach/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = AdaptiveStrengthCoach/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		CA120F19134A60ED26F001EE /* Pods-AdaptiveStrengthCoach.debugprofiling.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdaptiveStrengthCoach.debugprofiling.xcconfig"; path = "Target Support Files/Pods-AdaptiveStrengthCoach/Pods-AdaptiveStrengthCoach.debugprofiling.xcconfig"; sourceTree = "<group>"; };
 		DFBA70371A8C5AD6BEDFCEB8 /* Pods-AdaptiveStrengthCoach.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdaptiveStrengthCoach.release.xcconfig"; path = "Target Support Files/Pods-AdaptiveStrengthCoach/Pods-AdaptiveStrengthCoach.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F04D8F18D340995CB604B967 /* libPods-AdaptiveStrengthCoach.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AdaptiveStrengthCoach.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,6 +111,7 @@
 			children = (
 				2193BC5891240EDD408C101F /* Pods-AdaptiveStrengthCoach.debug.xcconfig */,
 				DFBA70371A8C5AD6BEDFCEB8 /* Pods-AdaptiveStrengthCoach.release.xcconfig */,
+				CA120F19134A60ED26F001EE /* Pods-AdaptiveStrengthCoach.debugprofiling.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
@@ -349,9 +351,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2193BC5891240EDD408C101F /* Pods-AdaptiveStrengthCoach.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				APP_BUNDLE_IDENTIFIER_SCHEME = com.aaronparry.adaptivestrengthcoach;
 				APP_URL_SCHEME = ironlogic;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AdaptiveStrengthCoach/AdaptiveStrengthCoach.entitlements;
 				CURRENT_PROJECT_VERSION = 34;
@@ -387,9 +389,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DFBA70371A8C5AD6BEDFCEB8 /* Pods-AdaptiveStrengthCoach.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				APP_BUNDLE_IDENTIFIER_SCHEME = com.aaronparry.adaptivestrengthcoach;
 				APP_URL_SCHEME = ironlogic;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AdaptiveStrengthCoach/AdaptiveStrengthCoach.entitlements;
 				CURRENT_PROJECT_VERSION = 34;
@@ -414,33 +416,6 @@
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
-		};
-		DQA00000000000000000001 /* DebugProfiling */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2193BC5891240EDD408C101F /* Pods-AdaptiveStrengthCoach.debug.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				APP_BUNDLE_IDENTIFIER_SCHEME = com.aaronparry.adaptivestrengthcoach.profiling;
-				APP_URL_SCHEME = ironlogic-profiling;
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = AdaptiveStrengthCoach/AdaptiveStrengthCoach.entitlements;
-				CURRENT_PROJECT_VERSION = 34;
-				INFOPLIST_FILE = AdaptiveStrengthCoach/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Adaptive Strength QA";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
-				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
-				MARKETING_VERSION = 1.0.10;
-				OTHER_LDFLAGS = ("$(inherited)", "-ObjC");
-				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.aaronparry.adaptivestrengthcoach.profiling;
-				PRODUCT_NAME = AdaptiveStrengthCoachProfiling;
-				SWIFT_OBJC_BRIDGING_HEADER = "AdaptiveStrengthCoach/AdaptiveStrengthCoach-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = DebugProfiling;
 		};
 		83CBBA201A601CBA00E9B192 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -574,21 +549,63 @@
 			};
 			name = Release;
 		};
+		DQA00000000000000000001 /* DebugProfiling */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA120F19134A60ED26F001EE /* Pods-AdaptiveStrengthCoach.debugprofiling.xcconfig */;
+			buildSettings = {
+				APP_BUNDLE_IDENTIFIER_SCHEME = com.aaronparry.adaptivestrengthcoach.profiling;
+				APP_URL_SCHEME = "ironlogic-profiling";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = AdaptiveStrengthCoach/AdaptiveStrengthCoach.entitlements;
+				CURRENT_PROJECT_VERSION = 34;
+				INFOPLIST_FILE = AdaptiveStrengthCoach/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Adaptive Strength QA";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.10;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = com.aaronparry.adaptivestrengthcoach.profiling;
+				PRODUCT_NAME = AdaptiveStrengthCoachProfiling;
+				SWIFT_OBJC_BRIDGING_HEADER = "AdaptiveStrengthCoach/AdaptiveStrengthCoach-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = DebugProfiling;
+		};
 		DQA00000000000000000002 /* DebugProfiling */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_TESTABILITY = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
-				LD_RUNPATH_SEARCH_PATHS = ("/usr/lib/swift", "$(inherited)");
-				OTHER_CFLAGS = ("$(inherited)", "-DRCT_REMOVE_LEGACY_ARCH=1");
-				OTHER_CPLUSPLUSFLAGS = ("$(inherited)", "-DRCT_REMOVE_LEGACY_ARCH=1");
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DRCT_REMOVE_LEGACY_ARCH=1",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-DRCT_REMOVE_LEGACY_ARCH=1",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";

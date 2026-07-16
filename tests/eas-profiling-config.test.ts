@@ -23,7 +23,7 @@ describe("EAS profiling build isolation", () => {
     expect(project).toContain("name = DebugProfiling;");
     expect(project).toContain("PRODUCT_BUNDLE_IDENTIFIER = com.aaronparry.adaptivestrengthcoach.profiling;");
     expect(project).toContain("PRODUCT_BUNDLE_IDENTIFIER = com.aaronparry.adaptivestrengthcoach;");
-    expect(project).toContain("APP_URL_SCHEME = ironlogic-profiling;");
+    expect(project).toMatch(/APP_URL_SCHEME = [\"]?ironlogic-profiling[\"]?;/);
     expect(scheme).toContain('buildConfiguration = "DebugProfiling"');
     expect(eas.build["profiling-development"].ios.scheme).toBe("AdaptiveStrengthCoachProfiling");
     expect(eas.build["profiling-development"].ios.buildConfiguration).toBe("DebugProfiling");

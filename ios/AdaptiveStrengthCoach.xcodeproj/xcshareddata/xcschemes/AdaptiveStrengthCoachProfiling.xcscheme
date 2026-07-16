@@ -36,5 +36,5 @@
       </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction buildConfiguration = "DebugProfiling"/>
-   <ArchiveAction buildConfiguration = "Release" revealArchiveInOrganizer = "YES"/>
+   <ArchiveAction buildConfiguration = "DebugProfiling" revealArchiveInOrganizer = "YES"/>
 </Scheme>
