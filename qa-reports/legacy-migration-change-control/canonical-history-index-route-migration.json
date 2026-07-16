@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "canonical_history_index_route_migration_v1",
+  "sourceCommit": "abcdaeb",
+  "route": "app/(protected)/history/index.tsx",
+  "legacyReadsRemoved": ["workoutHistoryRepository", "workoutSessionRepository", "summarizeWorkoutHistory", "filterWorkoutHistory"],
+  "canonicalProjection": "canonical_recorded_session_history_projection_v1",
+  "rules": ["completed or historical sessions only", "performed events only", "warm-ups excluded", "scheduled/extra classification from canonical role", "deterministic date/id ordering", "bounded exercise/date filters", "malformed entries fail closed"],
+  "routeMutation": "read_only",
+  "detailNavigation": "canonical recordedSessionId",
+  "remainingRepositoryCallers": ["tests/store-snapshots.test.ts", "src/data/local/workout-history-repository.ts"],
+  "nextBlocker": "src/application/sync/cloud-data-sync.ts:activeTrainingPlanRepository"
+}

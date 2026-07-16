@@ -7,10 +7,10 @@ const root = resolve(process.cwd());
 describe("canonical production reachability refresh", () => {
   it("records the current mounted legacy surfaces and one bounded next target", () => {
     const inventory = JSON.parse(readFileSync(resolve(root, "qa-reports/legacy-migration-change-control/canonical-production-reachability-refresh.json"), "utf8"));
-    expect(inventory.sourceCommit).toBe("ec1ac10");
+    expect(inventory.sourceCommit).toBe("abcdaeb");
     expect(inventory.productionSwitchCompleted).toBe(false);
-    expect(inventory.selectedNextTarget.file).toBe("app/(protected)/history/index.tsx");
-    expect(inventory.selectedNextTarget.symbol).toBe("workoutHistoryRepository");
+    expect(inventory.selectedNextTarget.file).toBe("src/application/sync/cloud-data-sync.ts");
+    expect(inventory.selectedNextTarget.symbol).toBe("activeTrainingPlanRepository");
   });
 
   it("keeps the selected History route on legacy persistence until migration", () => {

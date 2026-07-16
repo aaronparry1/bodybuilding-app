@@ -1,126 +1,22 @@
 import { Link } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
+import { projectCanonicalRecordedSessionHistory } from "@/domain/training/canonical-recorded-session-history-projection";
 import { useSubscription } from "@/application/billing/subscription-context";
-import { customExerciseRepository } from "@/data/local/custom-exercise-repository";
-import { programmeRepository } from "@/data/local/programme-repository";
-import { workoutHistoryRepository } from "@/data/local/workout-history-repository";
-import { filterWorkoutHistory, summarizeWorkoutHistory } from "@/domain/training/workout-history";
 import { AppInput, AppScreen, EmptyActionState, HeroPanel, LockedFeatureCard, RowItem } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
-
 export default function WorkoutHistoryScreen() {
-  const [sessions, setSessions] = useState(() => workoutHistoryRepository.listCompletedSessions());
   const [exerciseQuery, setExerciseQuery] = useState("");
-  const [programmeId, setProgrammeId] = useState<string | undefined>();
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [, refresh] = useState(0);
   const { entitlement } = useSubscription();
-  const exercises = customExerciseRepository.listAll();
-  const programmes = programmeRepository.listAll();
-
-  useEffect(
-    () =>
-      workoutHistoryRepository.subscribe(() => {
-        setSessions(workoutHistoryRepository.listCompletedSessions());
-      }),
-    [],
-  );
-
-  const selectedExercise = exercises.find((exercise) => exercise.name.toLowerCase().includes(exerciseQuery.toLowerCase()));
-  const summaries = useMemo(
-    () =>
-      filterWorkoutHistory(summarizeWorkoutHistory(sessions), {
-        exerciseId: exerciseQuery ? selectedExercise?.id ?? "__none__" : undefined,
-        programmeId,
-        fromDate: fromDate || undefined,
-        toDate: toDate || undefined,
-      }),
-    [exerciseQuery, fromDate, programmeId, selectedExercise?.id, sessions, toDate],
-  );
+  useEffect(() => { canonicalActivePlanState.hydrate(); return canonicalActivePlanState.subscribe(() => refresh((value) => value + 1)); }, []);
+  const plan = canonicalActivePlanState.getReadModel();
+  const result = plan ? projectCanonicalRecordedSessionHistory({ athleteId: plan.planId, planId: plan.planId, sessions: canonicalRecordedSessionLedger.exportPlan(plan.planId), exerciseQuery, fromDate, toDate }) : { status: "unavailable" as const, reason: "canonical_plan_unavailable" };
   const historyEntitlement = entitlement("unlimited_history", { historyDaysRequested: fromDate ? 365 : 30 });
-
-  return (
-    <AppScreen>
-      <HeroPanel eyebrow="History" title="Training memory" subtitle="Completed sessions and the details behind your progress." />
-
-      <AppInput value={exerciseQuery} onChangeText={setExerciseQuery} label="Exercise filter" placeholder="Bench, row, squat..." />
-      <View style={{ flexDirection: "row", gap: spacing.sm }}>
-        <View style={{ flex: 1 }}>
-          <AppInput value={fromDate} onChangeText={setFromDate} label="From" placeholder="YYYY-MM-DD" />
-        </View>
-        <View style={{ flex: 1 }}>
-          <AppInput value={toDate} onChangeText={setToDate} label="To" placeholder="YYYY-MM-DD" />
-        </View>
-      </View>
-
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
-        <Chip label="All programmes" active={!programmeId} onPress={() => setProgrammeId(undefined)} />
-        {programmes.map((programme) => (
-          <Chip key={programme.id} label={programme.name} active={programmeId === programme.id} onPress={() => setProgrammeId(programme.id)} />
-        ))}
-      </ScrollView>
-
-      {!historyEntitlement.allowed ? (
-        <Link href="/(protected)/paywall" asChild>
-          <Pressable>
-            <LockedFeatureCard title="Unlimited history is Pro" message="Free history covers 30 days. Upgrade when your logbook starts needing a warehouse." />
-          </Pressable>
-        </Link>
-      ) : null}
-
-      <View style={{ gap: spacing.md }}>
-        {summaries.length === 0 ? (
-          <EmptyActionState title="No completed workouts yet" message="Finish a session and the receipts show up here." />
-        ) : (
-          summaries.map((summary, index) => (
-            <Link key={summary.sessionId} href={`/(protected)/history/${summary.sessionId}`} asChild>
-              <Pressable>
-                <RowItem
-                  title={summary.sessionName}
-                  subtitle={`${new Date(summary.completedAt).toLocaleDateString()} · ${summary.durationMinutes} min`}
-                  meta={`${summary.progressionHighlights.length} wins`}
-                  index={index}
-                >
-                  <View style={{ flexDirection: "row", gap: spacing.md }}>
-                    <Mini label="Exercises" value={`${summary.exercisesCompleted}`} />
-                    <Mini label="Sets" value={`${summary.setsCompleted}`} />
-                    <Mini label="Reps" value={`${summary.repsCompleted}`} />
-                  </View>
-                </RowItem>
-              </Pressable>
-            </Link>
-          ))
-        )}
-      </View>
-    </AppScreen>
-  );
+  return <AppScreen><HeroPanel eyebrow="History" title="Training memory" subtitle="Completed canonical sessions and the details behind your progress." /><AppInput value={exerciseQuery} onChangeText={setExerciseQuery} label="Exercise filter" placeholder="Bench, row, squat..." /><View style={{ flexDirection: "row", gap: spacing.sm }}><View style={{ flex: 1 }}><AppInput value={fromDate} onChangeText={setFromDate} label="From" placeholder="YYYY-MM-DD" /></View><View style={{ flex: 1 }}><AppInput value={toDate} onChangeText={setToDate} label="To" placeholder="YYYY-MM-DD" /></View></View>{!historyEntitlement.allowed ? <Link href="/(protected)/paywall" asChild><Pressable><LockedFeatureCard title="Unlimited history is Pro" message="Free history covers 30 days." /></Pressable></Link> : null}<View style={{ gap: spacing.md }}>{result.status !== "ready" ? <EmptyActionState title="History unavailable" message={result.reason} /> : result.entries.length === 0 ? <EmptyActionState title="No completed workouts yet" message="Finish a canonical session and the receipts show up here." /> : result.entries.map((summary, index) => <Link key={summary.recordedSessionId} href={"/(protected)/history/" + summary.recordedSessionId} asChild><Pressable><RowItem title={summary.role} subtitle={new Date(summary.completedAt).toLocaleDateString()} meta={summary.classification} index={index}><View style={{ flexDirection: "row", gap: spacing.md }}><Mini label="Exercises" value={String(summary.exercisesCompleted)} /><Mini label="Sets" value={String(summary.workSets)} /><Mini label="Reps" value={String(summary.reps)} /></View></RowItem></Pressable></Link>)}</View></AppScreen>;
 }
-
-function Chip({ label, active, onPress }: { label: string; active: boolean; onPress(): void }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        borderRadius: radius.pill,
-        borderCurve: "continuous",
-        borderWidth: 1,
-        borderColor: active ? colors.accent : colors.line,
-        backgroundColor: active ? colors.accentSoft : colors.surfaceMuted,
-        paddingHorizontal: spacing.md,
-        paddingVertical: 9,
-      }}
-    >
-      <Text style={{ color: active ? colors.accent : colors.textMuted, fontWeight: "800" }}>{label}</Text>
-    </Pressable>
-  );
-}
-
-function Mini({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={{ flex: 1, gap: spacing.xs }}>
-      <Text selectable style={{ ...type.label, color: colors.textSubtle }}>{label}</Text>
-      <Text selectable style={{ color: colors.text, fontSize: 15, fontWeight: "900" }}>{value}</Text>
-    </View>
-  );
-}
+function Mini({ label, value }: { label: string; value: string }) { return <View style={{ flex: 1, gap: spacing.xs }}><Text selectable style={{ ...type.label, color: colors.textSubtle }}>{label}</Text><Text selectable style={{ color: colors.text, fontSize: 15, fontWeight: "900" }}>{value}</Text></View>; }

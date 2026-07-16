@@ -1,13 +1,13 @@
 {
   "schemaVersion": "canonical_production_switch_final_result_v1",
-  "sourceCommit": "ec1ac10",
+  "sourceCommit": "abcdaeb",
   "evidenceContract": "canonical_production_switch_evidence_v1",
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
   "classification": "production_switch_blocked_by_live_legacy_authority",
   "firstFalsePredicate": "no_legacy_workout_constructor",
-  "firstLiveBlocker": "app/(protected)/history/index.tsx:workoutHistoryRepository",
-  "nextBoundedMigrationTask": "migrate history index to canonical recorded-session projections",
+  "firstLiveBlocker": "src/application/sync/cloud-data-sync.ts:activeTrainingPlanRepository",
+  "nextBoundedMigrationTask": "remove legacy active-plan transport from live cloud sync",
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
 }
