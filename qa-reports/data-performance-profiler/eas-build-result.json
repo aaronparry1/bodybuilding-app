@@ -1,6 +1,6 @@
 {
   "schemaVersion": "eas_profiling_build_result_v1",
-  "sourceCommit": "876deea",
+  "sourceCommit": "4d8a797",
   "profile": "profiling-development",
   "platform": "ios",
   "command": "npx eas-cli@latest build --platform ios --profile profiling-development --non-interactive",
@@ -8,9 +8,11 @@
   "result": "blocked_before_upload",
   "buildId": null,
   "artifact": null,
-  "blocker": "EAS detected that expo-dev-client is not installed; no build was queued or uploaded.",
+  "blocker": "EAS loaded the profiling sentinels but could not find suitable iOS credentials for internal distribution in non-interactive mode. No build was queued or uploaded.",
+  "secondaryBlocker": "Because the repository contains a committed ios project, EAS ignored the profile bundle identifier and would use the native project's current identifier; a distinct profiling identifier requires an explicit native-project/configuration decision before a safe build.",
+  "environmentResolution": "development environment had no remote plain-text or sensitive variables; all listed variables came from the profiling-development profile",
   "productionSubmission": false,
-  "deviceRegistration": "not_reached",
+  "deviceRegistration": "not_reached; credentials setup failed first",
   "installation": "not_attempted",
   "launch": "not_attempted",
   "profiling": "not_attempted"
