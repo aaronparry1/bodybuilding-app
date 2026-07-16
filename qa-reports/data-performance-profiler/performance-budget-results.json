@@ -1,0 +1,6 @@
+{
+  "schemaVersion":"data_performance_budget_results_v1",
+  "status":"not_certified",
+  "budgets":[{"name":"interaction JS","targetMs":16,"result":"unmeasured"},{"name":"swap warm open","targetMs":100,"result":"unmeasured"},{"name":"search","targetMs":100,"result":"unmeasured"},{"name":"swap apply","targetMs":100,"result":"unmeasured"},{"name":"tab transition","targetMs":150,"result":"unmeasured"},{"name":"prepared workout open","targetMs":250,"result":"unmeasured"},{"name":"repeated-use stability","result":"unmeasured"},{"name":"history-size stability","result":"unmeasured"}],
+  "longLivedAccountCertified":false
+}

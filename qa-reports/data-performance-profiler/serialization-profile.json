@@ -1,0 +1,1 @@
+{"schemaVersion":"data_performance_serialization_profile_v1","status":"blocked_no_runtime_fixture_run","fixtureSizes":[0,100,500,2000,10000],"measurements":[],"callSites":["src/data/local/json-store.ts","src/data/local/canonical-recorded-session-ledger.ts","src/application/sync/cloud-data-sync.ts"],"note":"No wall-clock values claimed without controlled runtime execution."}

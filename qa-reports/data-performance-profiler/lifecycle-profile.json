@@ -1,0 +1,1 @@
+{"schemaVersion":"data_performance_lifecycle_profile_v1","status":"blocked_no_interactive_runtime","loops":[10,25,50,100],"listenerMeasurements":[],"subscriptionMeasurements":[],"timerMeasurements":[],"heapMeasurements":[],"leakClassification":"insufficient_evidence"}
