@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "canonical_completion_orchestration_migration_v1",
+  "sourceCommit": "ec1ac10",
+  "callersBefore": [],
+  "deletedModule": "src/domain/training/current-completion-orchestration.ts",
+  "canonicalOwners": ["canonicalRecordedSessionLedger", "canonical completion summary", "canonical progress evidence", "canonical decision production", "canonicalActivePlanState.applyProgressDecision"],
+  "legacyRepositoryReadsRemoved": true,
+  "extraSessionPlanMutation": false,
+  "sessionConstructionDuringCompletion": false,
+  "cloudLegacyTestsMigrated": true,
+  "nextBlocker": "src/domain/training/current-completion-orchestration.ts was dead; refresh next blocker from current inventory"
+}

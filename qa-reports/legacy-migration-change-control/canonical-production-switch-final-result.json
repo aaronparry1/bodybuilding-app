@@ -1,13 +1,13 @@
 {
   "schemaVersion": "canonical_production_switch_final_result_v1",
-  "sourceCommit": "34d9c7f",
+  "sourceCommit": "ec1ac10",
   "evidenceContract": "canonical_production_switch_evidence_v1",
   "pipelineReadyForSwitch": true,
   "productionSwitchCompleted": false,
   "classification": "production_switch_blocked_by_live_legacy_authority",
   "firstFalsePredicate": "no_legacy_workout_constructor",
-  "firstLiveBlocker": "src/domain/training/current-completion-orchestration.ts:workoutSessionRepository",
-  "nextBoundedMigrationTask": "migrate completion orchestration to canonical recorded-session completion summaries",
+  "firstLiveBlocker": "app/(protected)/history/index.tsx:workoutHistoryRepository",
+  "nextBoundedMigrationTask": "migrate history index to canonical recorded-session projections",
   "ordinaryV2Authority": "inactive",
   "d4d2": "unchanged"
 }

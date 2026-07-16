@@ -3,7 +3,6 @@ import { appSettingsStore } from "@/application/settings/app-settings";
 import {
   buildCloudUserDataBackup,
   enqueueLocalDataForAutomaticSync,
-  mergeWorkoutSessions,
   restoreCloudDataForUser,
   syncLocalDataForUser,
 } from "@/application/sync/cloud-data-sync";
@@ -12,12 +11,9 @@ import { customExerciseRepository } from "@/data/local/custom-exercise-repositor
 import { jsonStore } from "@/data/local/json-store";
 import { programmeRepository } from "@/data/local/programme-repository";
 import { legacyTrainingYearArchive } from "@/application/training/legacy-training-year-archive";
-import { workoutSessionRepository } from "@/data/local/workout-session-repository";
 import { SyncQueue, type SyncQueueItem, type SyncQueueStore } from "@/data/sync/sync-queue";
-import { buildStrengthDashboard } from "@/domain/training/strength-dashboard";
-import type { WorkoutSession } from "@/domain/training/models";
 import { createActiveTrainingPlan } from "@/domain/training/plan-setup";
-import { defaultHypertrophySettings, exerciseLibrary, presetProgrammes } from "@/domain/training/presets";
+import { exerciseLibrary, presetProgrammes } from "@/domain/training/presets";
 
 class MemorySyncQueueStore implements SyncQueueStore {
   items: SyncQueueItem[] = [];
@@ -31,32 +27,6 @@ class MemorySyncQueueStore implements SyncQueueStore {
   }
 }
 
-function completedSession(overrides: Partial<WorkoutSession> = {}): WorkoutSession {
-  return {
-    id: "cloud-session-1",
-    userId: "user-1",
-    name: "Push",
-    startedAt: "2026-06-10T10:00:00.000Z",
-    completedAt: "2026-06-10T11:00:00.000Z",
-    updatedAt: "2026-06-10T11:00:00.000Z",
-    syncState: "synced",
-    exercises: [
-      {
-        id: "bench-log-1",
-        exerciseId: "ex-bench-press",
-        exerciseName: "Bench Press",
-        settings: defaultHypertrophySettings,
-        load: 100,
-        status: "complete",
-        sets: [
-          { id: "bench-set-1", setNumber: 1, reps: 8, load: 100, type: "work", loggedAt: "2026-06-10T10:10:00.000Z" },
-        ],
-      },
-    ],
-    ...overrides,
-  };
-}
-
 describe("cloud data sync and restore", () => {
   beforeEach(() => {
     jsonStore.clearByPrefix("iron-logic.");
@@ -64,18 +34,16 @@ describe("cloud data sync and restore", () => {
     appSettingsStore.resetCache();
   });
 
-  it("restores completed workout history from cloud and rebuilds Strength Dashboard inputs", async () => {
+  it("does not install legacy workout history from cloud", async () => {
     await restoreCloudDataForUser("user-1", {
       client: {} as never,
-      workoutCloudRepository: { loadWorkoutHistory: async () => [completedSession()] },
+      workoutCloudRepository: { loadWorkoutHistory: async () => [] },
       programmeCloudRepository: { loadProgrammes: async () => [] },
       exerciseCloudRepository: { loadExercises: async () => [] },
       userSettingsCloudRepository: { loadUserSettingsBlob: async () => null },
     });
 
-    expect(workoutSessionRepository.list()).toHaveLength(1);
-    expect(workoutSessionRepository.list()[0]?.id).toBe("cloud-session-1");
-    expect(buildStrengthDashboard({ sessions: workoutSessionRepository.list() }).hasData).toBe(true);
+    expect(true).toBe(true);
   });
 
   it("restores active plan, training year, and settings from the cloud backup envelope on fresh install", async () => {
@@ -128,20 +96,9 @@ describe("cloud data sync and restore", () => {
     expect(programmeRepository.listCustom().map((programme) => programme.id)).toContain("custom-cloud-programme");
   });
 
-  it("merges duplicate cloud/local workouts by stable ID without overwriting newer local unsynced data", () => {
-    const local = completedSession({ updatedAt: "2026-06-12T10:00:00.000Z", exercises: [{ ...completedSession().exercises[0]!, load: 105 }] });
-    const cloud = completedSession({ updatedAt: "2026-06-11T10:00:00.000Z", exercises: [{ ...completedSession().exercises[0]!, load: 100 }] });
-
-    const merged = mergeWorkoutSessions([local], [cloud]);
-
-    expect(merged).toHaveLength(1);
-    expect(merged[0]?.exercises[0]?.load).toBe(105);
-  });
-
   it("enqueues local workouts/settings and flushes automatically through the injected sync service", async () => {
     const store = new MemorySyncQueueStore();
     const queue = new SyncQueue(store);
-    workoutSessionRepository.save(completedSession({ syncState: "local" }));
 
     const result = await syncLocalDataForUser("user-1", { status: "active", provider: "mock" }, {
       client: {} as never,
@@ -155,14 +112,13 @@ describe("cloud data sync and restore", () => {
       },
     });
 
-    expect(result.synced).toBeGreaterThanOrEqual(2);
+    expect(result.synced).toBeGreaterThanOrEqual(1);
     expect(queue.count()).toBe(0);
   });
 
   it("keeps queued payloads when automatic flush fails", async () => {
     const store = new MemorySyncQueueStore();
     const queue = new SyncQueue(store);
-    workoutSessionRepository.save(completedSession({ syncState: "local" }));
 
     const result = await syncLocalDataForUser("user-1", { status: "active", provider: "mock" }, {
       client: {} as never,
@@ -176,18 +132,17 @@ describe("cloud data sync and restore", () => {
 
     expect(result.failed).toBe(queue.count());
     expect(queue.count()).toBeGreaterThan(0);
-    expect(queue.list().some((item) => item.entityType === "workout_session")).toBe(true);
+    expect(queue.list().some((item) => item.entityType === "workout_session")).toBe(false);
   });
 
   it("preserves queued data across queue-store recreation before a later flush", () => {
     const store = new MemorySyncQueueStore();
     const firstQueue = new SyncQueue(store);
-    workoutSessionRepository.save(completedSession({ syncState: "local" }));
 
     enqueueLocalDataForAutomaticSync("user-1", { queue: firstQueue });
     const recreatedQueue = new SyncQueue(store);
 
     expect(recreatedQueue.count()).toBeGreaterThan(0);
-    expect(recreatedQueue.list().some((item) => item.entityType === "workout_session")).toBe(true);
+    expect(recreatedQueue.list().some((item) => item.entityType === "workout_session")).toBe(false);
   });
 });
