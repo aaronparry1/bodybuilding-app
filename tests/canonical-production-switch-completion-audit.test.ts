@@ -22,7 +22,7 @@ describe("canonical production switch completion audit", () => {
 
   it("proves the first blocker is a real Train/history caller, not Design-QA", () => {
     const source = readFileSync(resolve(root, "app/(protected)/history/exercise/[id].tsx"), "utf8");
-    expect(source).toContain("workoutSessionRepository");
+    expect(source).toContain("projectCanonicalExerciseHistory");
     const fixtureSource = readFileSync(resolve(root, "src/application/design-qa/design-qa-fixtures.ts"), "utf8");
     expect(fixtureSource).toContain("canonicalActivePlanState");
     expect(fixtureSource).not.toContain("applyDesignQaFixtureMatrix");
