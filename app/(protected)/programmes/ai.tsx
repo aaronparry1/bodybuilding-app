@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
-import { constructCanonicalExtraSession } from "@/application/training/canonical-extra-session";
+import { constructCanonicalExtraSession, startCanonicalExtraSession } from "@/application/training/canonical-extra-session";
 import { AppScreen, HeroPanel, PrimaryButton, SectionList, SecondaryButton } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
 
@@ -20,7 +20,9 @@ export default function AIWorkoutScreen() {
       setMessage(constructed?.reason ?? "canonical_plan_unavailable");
       return;
     }
-    setMessage("Extra sessions require the canonical ledger start/link command before they can open in Train.");
+    const started = startCanonicalExtraSession({ ...constructed, requestId: `extra:${focus}`, focus, availableMinutes: 45, occurredAt: new Date().toISOString(), expectedPlanRevision: plan!.revision, prescriptionSnapshot: constructed.prescriptionSnapshot, role: constructed.role, startedAt: new Date().toISOString(), provenance: "extra-session-route" });
+    if (started.status === "linked_and_started" || started.status === "idempotent") router.replace("/(protected)/(tabs)/train");
+    else setMessage(started.reason);
   };
 
   return (

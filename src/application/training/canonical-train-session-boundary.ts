@@ -34,7 +34,8 @@ export function projectCanonicalTrainSession(planId: string, recordedSessionId: 
   const session = aggregate.session;
   if (session.planId !== planId || hasLegacyFields(session) || session.prescriptionHash !== JSON.stringify(session.prescriptionSnapshot)) return { status: "rejected", reason: "canonical_session_integrity_mismatch" };
   const reference = loaded.carrier.recordedSessionReferences?.find((item) => item.sessionId === recordedSessionId);
-  if (!reference || reference.status !== session.status || reference.revision > loaded.carrier.revision) return { status: "rejected", reason: "carrier_reconciliation_required" };
+  const isExtraSession = session.role.startsWith("extra:");
+  if ((!reference && !isExtraSession) || (reference && (reference.status !== session.status || reference.revision > loaded.carrier.revision))) return { status: "rejected", reason: "carrier_reconciliation_required" };
   const snapshot = session.prescriptionSnapshot as Record<string, unknown>;
   const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
   if (slots.some((slot) => typeof slot.id !== "string" || typeof slot.exerciseId !== "string") || hasLegacyFields(snapshot)) return { status: "rejected", reason: "invalid_prescription_snapshot" };
