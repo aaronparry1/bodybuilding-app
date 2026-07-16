@@ -1,1 +1,1 @@
-{"schemaVersion":"canonical_production_reachability_refresh_v9","sourceCommit":"ed4f308","selectedNextTarget":null,"mountedLegacyBlockers":[],"productionSwitchCompleted":false,"firstFalsePredicate":"no_legacy_recommendation_mutation","pipelineReadyForSwitch":true}
+{"schemaVersion":"canonical_production_reachability_refresh_v10","sourceCommit":"4b0cdb3","selectedNextTarget":null,"mountedLegacyBlockers":[],"productionSwitchCompleted":true,"firstFalsePredicate":null,"pipelineReadyForSwitch":true}

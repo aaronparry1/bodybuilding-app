@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "canonical_production_switch_final_predicate_evidence_v1",
+  "sourceCommit": "4b0cdb3",
+  "predicateCount": 24,
+  "allPredicatesPassed": true,
+  "pipelineReadyForSwitch": true,
+  "productionSwitchCompleted": true,
+  "classification": "canonical_architecture_is_production_source_of_truth",
+  "firstFalsePredicate": null,
+  "mountedLegacyBlockers": [],
+  "retainedCompatibility": ["migration_only", "archive_only", "rejection_only", "transport_only"],
+  "ordinaryV2Authority": "inactive",
+  "d4d2": "unchanged",
+  "buildDeploymentRollout": "not performed"
+}

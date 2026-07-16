@@ -16,8 +16,9 @@ describe("production reachability stale-blocker correction", () => {
     expect(source).not.toContain("applyCurrentMesocycleDecision");
   });
 
-  it("requires the selected blocker to exist and be mounted", () => {
-    const source = readFileSync(resolve(process.cwd(), "app/(protected)/history/exercise/[id].tsx"), "utf8");
-    expect(source).toContain("workoutSessionRepository");
+  it("does not preserve a blocker after all mounted legacy paths are removed", () => {
+    const artifact = JSON.parse(readFileSync(resolve(process.cwd(), "qa-reports/legacy-migration-change-control/canonical-production-reachability-refresh.json"), "utf8"));
+    expect(artifact.mountedLegacyBlockers).toEqual([]);
+    expect(artifact.productionSwitchCompleted).toBe(true);
   });
 });
