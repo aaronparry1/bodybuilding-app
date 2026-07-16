@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "eas_profiling_build_result_v1",
+  "sourceCommit": "876deea",
+  "profile": "profiling-development",
+  "platform": "ios",
+  "command": "npx eas-cli@latest build --platform ios --profile profiling-development --non-interactive",
+  "easCli": "21.0.1",
+  "result": "blocked_before_upload",
+  "buildId": null,
+  "artifact": null,
+  "blocker": "EAS detected that expo-dev-client is not installed; no build was queued or uploaded.",
+  "productionSubmission": false,
+  "deviceRegistration": "not_reached",
+  "installation": "not_attempted",
+  "launch": "not_attempted",
+  "profiling": "not_attempted"
+}

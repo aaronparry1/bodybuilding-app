@@ -26,6 +26,30 @@
         "buildType": "apk"
       }
     },
+    "profiling-development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "profiling-development",
+      "env": {
+        "APP_ENV": "development",
+        "APP_NAME": "Adaptive Strength Coach Profiling",
+        "APP_SCHEME": "ironlogic-profiling",
+        "APP_IOS_BUNDLE_IDENTIFIER": "com.aaronparry.adaptivestrengthcoach.profiling",
+        "APP_ANDROID_PACKAGE": "com.aaronparry.adaptivestrengthcoach.profiling",
+        "EXPO_PUBLIC_DESIGN_QA_MODE": "1",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://invalid.local",
+        "EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "profiling-disabled",
+        "EXPO_PUBLIC_REVENUECAT_TEST_API_KEY": "profiling-disabled",
+        "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "profiling-disabled",
+        "EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY": "profiling-disabled",
+        "EXPO_PUBLIC_ASC_COACHING_ENGINE_V3": "true",
+        "EXPO_PUBLIC_ASC_V3_ACTIVE_WORKOUT": "true",
+        "EXPO_PUBLIC_ASC_V3_QUALITY_GATE_STRICT": "true"
+      },
+      "ios": {
+        "resourceClass": "m-medium"
+      }
+    },
     "preview": {
       "distribution": "internal",
       "autoIncrement": true,
