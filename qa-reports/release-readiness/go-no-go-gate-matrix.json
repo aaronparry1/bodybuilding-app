@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "release_go_no_go_gate_matrix_v1",
+  "sourceCommit": "23048e16a076e44e3d72f6375dcf8324579087ce",
+  "gates": [
+    { "id": "canonical-production-certification", "required": true, "status": "passed", "evidence": "24/24 predicates", "owner": "engineering_approver", "waiver": "not_eligible" },
+    { "id": "automated-verification", "required": true, "status": "passed", "evidence": "318 files / 1928 tests / typecheck / Expo / web export", "owner": "engineering_approver", "waiver": "not_eligible" },
+    { "id": "manual-web-smoke", "required": true, "status": "blocked", "evidence": "manual smoke result: not executed", "owner": "qa_manual_smoke_approver", "waiver": "requires explicit go/no-go authority" },
+    { "id": "native-device-smoke", "required": true, "status": "blocked", "evidence": "no binary/devices", "owner": "qa_manual_smoke_approver", "waiver": "requires explicit go/no-go authority" },
+    { "id": "manual-data-safety", "required": true, "status": "blocked", "evidence": "no disposable cloud account", "owner": "data_safety_approver", "waiver": "not recommended" },
+    { "id": "security-config", "required": true, "status": "passed_with_p3_note", "evidence": "read-only audit", "owner": "engineering_approver", "waiver": "go/no-go authority" },
+    { "id": "rollback-readiness", "required": true, "status": "documented_not_executed", "evidence": "rollback-plan.json", "owner": "rollback_executor", "waiver": "not eligible until assigned" },
+    { "id": "monitoring-readiness", "required": true, "status": "blocked", "evidence": "tracked signals inventory", "owner": "release_owner", "waiver": "requires explicit approval" },
+    { "id": "operational-roles", "required": true, "status": "blocked", "evidence": "roles unassigned", "owner": "go_no_go_authority", "waiver": "not eligible" },
+    { "id": "deployment-authorization", "required": true, "status": "not_authorized", "evidence": "task prohibition", "owner": "go_no_go_authority", "waiver": "none" }
+  ],
+  "readyForReleaseCandidateBuild": false
+}

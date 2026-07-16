@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "release_role_matrix_v1",
+  "sourceCommit": "23048e16a076e44e3d72f6375dcf8324579087ce",
+  "roles": [
+    { "role": "release_owner", "responsibilities": ["coordinate gates", "maintain decision record"], "assignment": "unassigned", "authorization": "cannot authorize deployment alone" },
+    { "role": "engineering_approver", "responsibilities": ["verify canonical predicates", "approve code readiness"], "assignment": "unassigned", "authorization": "may approve technical gate only" },
+    { "role": "qa_manual_smoke_approver", "responsibilities": ["witness manual matrix", "verify evidence"], "assignment": "unassigned", "authorization": "may approve QA gate only" },
+    { "role": "data_safety_approver", "responsibilities": ["approve restore/sync evidence"], "assignment": "unassigned", "authorization": "may approve data-safety gate only" },
+    { "role": "incident_commander", "responsibilities": ["coordinate P0/P1 response"], "assignment": "unassigned", "authorization": "may declare incident" },
+    { "role": "rollback_executor", "responsibilities": ["execute approved rollback"], "assignment": "unassigned", "authorization": "requires go/no-go authority" },
+    { "role": "communications_support_owner", "responsibilities": ["support and release communication"], "assignment": "unassigned", "authorization": "no deployment authority" },
+    { "role": "go_no_go_authority", "responsibilities": ["final release decision"], "assignment": "unassigned", "authorization": "sole final authorization; currently unavailable" }
+  ],
+  "assignedAndVerified": false
+}

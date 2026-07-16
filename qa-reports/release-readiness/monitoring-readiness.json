@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "release_monitoring_readiness_v1",
+  "sourceCommit": "23048e16a076e44e3d72f6375dcf8324579087ce",
+  "signals": [
+    { "signal": "startup/hydration failure", "status": "locally logged/test-covered", "owner": "unassigned", "preRelease": true },
+    { "signal": "cloud sync/restore failure", "status": "test-covered", "owner": "unassigned", "preRelease": true },
+    { "signal": "ledger conflict/snapshot mismatch", "status": "test-covered", "owner": "unassigned", "preRelease": true },
+    { "signal": "account mismatch rejection", "status": "test-covered", "owner": "unassigned", "preRelease": true },
+    { "signal": "crash reporting", "status": "externally configured but unverified", "owner": "unassigned", "preRelease": true },
+    { "signal": "ordinary-v2 shadow telemetry", "status": "disabled", "owner": "none", "preRelease": false }
+  ],
+  "monitoringReady": false,
+  "privacy": "preserve account/session minimization; no telemetry activation in this task"
+}

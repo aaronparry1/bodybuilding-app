@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "release_staged_rollout_plan_v1",
+  "sourceCommit": "23048e16a076e44e3d72f6375dcf8324579087ce",
+  "status": "proposed_requires_approval",
+  "stages": [
+    { "stage": "internal_development", "entry": "automated gates and assigned owner", "exit": "manual smoke passes", "rollout": "requires_approval" },
+    { "stage": "internal_distribution", "entry": "device and data-safety gates", "exit": "no P0/P1 and monitoring evidence", "rollout": "requires_approval" },
+    { "stage": "limited_cohort", "entry": "go/no-go approval", "exit": "observation window and rollback readiness", "rollout": "requires_approval" },
+    { "stage": "wider_availability", "entry": "cohort evidence", "exit": "support and incident readiness", "rollout": "requires_approval" }
+  ],
+  "datesOrPercentages": "not specified",
+  "executed": false
+}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "release_incident_response_plan_v1",
+  "sourceCommit": "23048e16a076e44e3d72f6375dcf8324579087ce",
+  "severity": { "P0": "data loss, security, corrupt authority, unrecoverable crash", "P1": "critical journey or canonical invariant", "P2": "significant workaround defect", "P3": "minor/documentation" },
+  "workflow": ["detect", "contain", "preserve privacy-safe evidence", "assign incident commander", "communicate proposed cadence", "remediate or rollback", "validate", "post-incident review"],
+  "acknowledgementTargets": "proposed_requires_owner_approval",
+  "externalPaging": "not evidenced",
+  "requiredRoles": "unassigned",
+  "dataIncidentCases": ["carrier corruption", "snapshot/hash mismatch", "recorded-session loss", "cross-account rejection", "sync conflict", "partial restore", "duplicate operation", "extra-session anomaly"]
+}

@@ -17,6 +17,7 @@
   "dataSafety": "automated_only_no_data_loss_signal",
   "findings": { "p0": [], "p1": [], "p2": ["manual device/simulator execution", "operational release and rollback runbook evidence"], "p3": ["beta placeholder release wording"] },
   "finalStatus": "blocked_before_release_candidate_build",
+  "operationalReadiness": "see operational-release-readiness.json",
   "manualSmokeExecution": "completed_with_no_manual_passes; see manual-smoke-execution-result.json",
   "readyForReleaseCandidateBuild": false,
   "releaseCandidateBuildExecuted": false,

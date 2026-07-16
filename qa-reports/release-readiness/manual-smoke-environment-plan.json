@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "release_manual_smoke_environment_plan_v1",
+  "sourceCommit": "23048e16a076e44e3d72f6375dcf8324579087ce",
+  "requirements": [
+    { "item": "interactive web session", "mode": "possible_without_build", "status": "unavailable" },
+    { "item": "iOS development binary/simulator", "mode": "requires_local_development_build", "status": "unavailable" },
+    { "item": "Android emulator/device", "mode": "requires_local_development_build", "status": "unavailable" },
+    { "item": "physical devices", "mode": "requires_user-confirmed execution", "status": "unavailable" },
+    { "item": "disposable non-production account/endpoint", "mode": "requires_explicit_user_confirmation", "status": "unconfirmed" },
+    { "item": "synthetic dataset and cleanup", "mode": "requires_manual owner", "status": "planned" }
+  ],
+  "ready": false,
+  "buildAuthorized": false
+}

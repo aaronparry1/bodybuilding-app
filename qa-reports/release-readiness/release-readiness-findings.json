@@ -8,6 +8,6 @@
     { "id": "P3-placeholder-beta-notes", "severity": "P3", "status": "open", "description": "App configuration contains beta placeholder wording for RevenueCat/Apple Watch/live billing review notes." }
   ],
   "blockingBeforeManualSmoke": ["P2-manual-device-validation"],
-  "blockingBeforeReleaseCandidateBuild": ["P2-manual-device-validation", "P2-operational-release-process", "P2-disposable-cloud-environment"],
+  "blockingBeforeReleaseCandidateBuild": ["P2-manual-device-validation", "P2-operational-release-process", "P2-disposable-cloud-environment", "P2-unassigned-release-roles"],
   "security": { "probableCommittedSecrets": false, "status": "no probable committed secret detected by read-only scan" }
 }

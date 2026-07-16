@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "release_rollback_plan_v1",
+  "sourceCommit": "23048e16a076e44e3d72f6375dcf8324579087ce",
+  "status": "documented_not_executed",
+  "triggers": ["P0 data loss/security", "P1 canonical invariant or critical journey failure", "account isolation failure", "snapshot/hash corruption"],
+  "sequence": ["contain exposure", "preserve logs and canonical snapshots", "disable release exposure through approved distribution controls", "validate sync and revision integrity", "communicate status", "choose forward fix or rollback", "verify recovery"],
+  "constraints": ["never restore legacy authority", "never enable ordinary-v2 authority", "never dual-read/write", "never mutate historical snapshots"],
+  "limitations": ["app distribution rollback may not be immediate", "server/config rollback requires separately approved operators"],
+  "executorAssignment": "unassigned"
+}
