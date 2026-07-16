@@ -1,6 +1,6 @@
 # Native profiling identity plan
 
-The committed iOS project is authoritative for EAS, so profile environment bundle identifiers were previously ignored. The minimum strategy is a third target configuration, `DebugProfiling`, plus the shared `AdaptiveStrengthCoachProfiling` scheme. It reuses the existing target, Pods, entitlements, and sources; it changes only bundle identifier, product name, display name, and URL-scheme variables for profiling.
+The committed iOS project is authoritative for EAS, so profile environment bundle identifiers were previously ignored. The minimum strategy is a third target configuration, `DebugProfiling`, plus the shared `AdaptiveStrengthCoachProfiling` scheme. The EAS profile explicitly selects both the scheme and `DebugProfiling` configuration. It reuses the existing target, Pods, entitlements, and sources; it changes only bundle identifier, product name, display name, and URL-scheme variables for profiling.
 
 Production `Debug` and `Release` continue to resolve `com.aaronparry.adaptivestrengthcoach`, `AdaptiveStrengthCoach`, and `ironlogic`. Profiling resolves `com.aaronparry.adaptivestrengthcoach.profiling`, `AdaptiveStrengthCoachProfiling`, `Adaptive Strength QA`, and `ironlogic-profiling`. No production entitlements, associated domains, push settings, credentials, or submission profiles were changed.
 

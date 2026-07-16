@@ -48,7 +48,8 @@
       },
       "ios": {
         "resourceClass": "m-medium",
-        "scheme": "AdaptiveStrengthCoachProfiling"
+        "scheme": "AdaptiveStrengthCoachProfiling",
+        "buildConfiguration": "DebugProfiling"
       }
     },
     "preview": {

@@ -26,6 +26,7 @@ describe("EAS profiling build isolation", () => {
     expect(project).toContain("APP_URL_SCHEME = ironlogic-profiling;");
     expect(scheme).toContain('buildConfiguration = "DebugProfiling"');
     expect(eas.build["profiling-development"].ios.scheme).toBe("AdaptiveStrengthCoachProfiling");
+    expect(eas.build["profiling-development"].ios.buildConfiguration).toBe("DebugProfiling");
     expect(eas.build.production.ios?.scheme).toBeUndefined();
   });
 });
