@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "manual_smoke_execution_result_v1",
+  "sourceCommit": "b78fbee1646b1252af8fcef589febc2cf1456f7a",
+  "manualSmokeExecutionStarted": true,
+  "manualSmokeExecutionCompleted": true,
+  "executor": "Codex",
+  "executionPolicy": "non-deploying; no build, install, account, or production-data access",
+  "availableTargets": { "webBrowser": "not_executed_no_interactive_browser_session", "iosSimulator": "available_but_no_existing_app_binary", "androidEmulator": "not_detected", "iosPhysical": "none_connected", "androidPhysical": "none_connected" },
+  "platforms": { "webManualSmokeVerified": false, "iosSimulatorVerified": false, "iosPhysicalVerified": false, "androidEmulatorVerified": false, "androidPhysicalVerified": false },
+  "caseTotals": { "passed": 0, "failed": 0, "blocked": 0, "notExecuted": 8 },
+  "manualDataSafetyVerified": false,
+  "p0Count": 0,
+  "p1Count": 0,
+  "p2Count": 3,
+  "p3Count": 1,
+  "readyForReleaseCandidateBuild": false,
+  "deploymentAuthorized": false,
+  "cases": [
+    { "id": "onboarding-canonical-plan", "platform": "web/ios/android", "status": "not_executed", "reason": "No interactive app session was available; automated tests are not manual evidence." },
+    { "id": "home-plan-navigation", "platform": "web/ios/android", "status": "not_executed", "reason": "No interactive app session was available." },
+    { "id": "train-ledger-lifecycle", "platform": "ios/android", "status": "not_executed", "reason": "No installed development binary; native build prohibited." },
+    { "id": "extra-session-history", "platform": "ios/android", "status": "not_executed", "reason": "No installed development binary." },
+    { "id": "progress-review-only", "platform": "web/ios/android", "status": "not_executed", "reason": "No interactive app session was available." },
+    { "id": "history-projections", "platform": "web/ios/android", "status": "not_executed", "reason": "No interactive app session was available." },
+    { "id": "cloud-account-boundary", "platform": "ios/android", "status": "blocked", "reason": "No disposable non-production cloud account was confirmed; production data access is prohibited." },
+    { "id": "settings-accessibility", "platform": "web/ios/android", "status": "not_executed", "reason": "No interactive app session was available." }
+  ],
+  "nextTask": "User-guided smoke execution on an explicitly approved disposable environment, beginning with web or an existing simulator binary; physical-device approval remains separate."
+}

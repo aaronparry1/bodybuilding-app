@@ -3,10 +3,11 @@
   "sourceCommit": "280e5f1faf96e52054d316fcb529ba48cff06c57",
   "findings": [
     { "id": "P2-manual-device-validation", "severity": "P2", "status": "open", "description": "Physical-device and simulator smoke execution was not performed in this audit." },
+    { "id": "P2-disposable-cloud-environment", "severity": "P2", "status": "blocked", "description": "No disposable non-production cloud account was confirmed for manual account/data-safety tests." },
     { "id": "P2-operational-release-process", "severity": "P2", "status": "open", "description": "Release owner, incident-response, rollback runbook, staged rollout, and support sign-off are not evidenced in tracked artifacts." },
     { "id": "P3-placeholder-beta-notes", "severity": "P3", "status": "open", "description": "App configuration contains beta placeholder wording for RevenueCat/Apple Watch/live billing review notes." }
   ],
-  "blockingBeforeManualSmoke": [],
-  "blockingBeforeReleaseCandidateBuild": ["P2-manual-device-validation", "P2-operational-release-process"],
+  "blockingBeforeManualSmoke": ["P2-manual-device-validation"],
+  "blockingBeforeReleaseCandidateBuild": ["P2-manual-device-validation", "P2-operational-release-process", "P2-disposable-cloud-environment"],
   "security": { "probableCommittedSecrets": false, "status": "no probable committed secret detected by read-only scan" }
 }

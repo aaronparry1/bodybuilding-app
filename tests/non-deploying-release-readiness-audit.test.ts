@@ -13,7 +13,7 @@ describe("non-deploying release readiness evidence", () => {
     expect(audit.sourceCommit).toBe("280e5f1faf96e52054d316fcb529ba48cff06c57");
     expect(audit.architecture.productionPredicates).toBe("24/24 passing");
     expect(audit.architecture.productionSwitchCompleted).toBe(true);
-    expect(audit.finalStatus).toBe("ready_for_manual_smoke");
+    expect(audit.finalStatus).toBe("blocked_before_release_candidate_build");
     expect(audit.releaseCandidateBuildExecuted).toBe(false);
     expect(audit.deploymentAuthorized).toBe(false);
     expect(audit.deploymentExecuted).toBe(false);
@@ -21,7 +21,7 @@ describe("non-deploying release readiness evidence", () => {
     expect(audit.storeSubmissionExecuted).toBe(false);
     expect(smoke.cases.every((test: { manualStatus: string }) => test.manualStatus !== "passed")).toBe(true);
     expect(Object.values(platforms.platforms).some((platform: any) => platform.status === "verified" && platform.evidence.length === 0)).toBe(false);
-    expect(safety.manualCoverage).toBe("not_executed");
+    expect(safety.manualCoverage).toBe("blocked_cloud_and_not_executed_local");
   });
 
   it("preserves canonical authority and inactive ordinary-v2 controls", () => {

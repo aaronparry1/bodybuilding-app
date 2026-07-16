@@ -6,6 +6,6 @@
     "ios_simulator": { "status": "not_executed", "evidence": [] },
     "android_physical_device": { "status": "not_executed", "evidence": [] },
     "android_emulator": { "status": "not_executed", "evidence": [] },
-    "web": { "status": "verified", "evidence": ["npm run export:web", "full Vitest suite"] }
+    "web": { "status": "not_executed", "evidence": ["web export is automated-only and is not manual smoke evidence"] }
   }
 }
