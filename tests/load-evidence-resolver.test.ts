@@ -15,7 +15,7 @@ describe("canonical load evidence", () => {
   it("returns no record for a swapped exercise with no own history", () => {
     expect(resolveCanonicalLoadEvidence([summary("bench", "2026-07-03", 100)], "row")).toBeNull();
   });
-  it("returns the same answer regardless of planned or extra session kind", () => {
-    expect(resolveCanonicalLoadEvidence([summary("extra", "2026-07-03", 70, 3, "extra_full")], "bench")?.load).toBe(72.5);
+  it("excludes extra-session history from planned-load evidence", () => {
+    expect(resolveCanonicalLoadEvidence([summary("extra", "2026-07-03", 70, 3, "extra_full")], "bench")).toBeNull();
   });
 });

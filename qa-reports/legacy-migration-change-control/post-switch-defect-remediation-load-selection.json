@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "post_switch_defect_remediation_load_selection_v1",
+  "sourceCommit": "49dda3a",
+  "failure": {
+    "testFile": "tests/load-selection.test.ts",
+    "testName": "ignores extra-session history when selecting planned starting load",
+    "expected": 100,
+    "actual": 95,
+    "owner": "resolveCanonicalLoadEvidence"
+  },
+  "authorityTrace": [
+    "performed WorkoutHistorySummary entries",
+    "resolveCanonicalLoadEvidence",
+    "resolveStartingLoadRecommendation",
+    "Session Construction starting-load input"
+  ],
+  "fixtureIssue": "extra_full history was incorrectly admitted as planned-load evidence",
+  "classification": "canonical resolver defect",
+  "change": "canonical load evidence now accepts only planned or unclassified historical sessions for planned starting-load resolution",
+  "canonicalState": "established evidence from the latest matching planned session",
+  "numericPolicyChanged": false,
+  "productionSwitchInvariants": { "predicates": "24/24 passing", "productionSwitchCompleted": true, "ordinaryV2Active": false, "d4d2Changed": false, "deploymentAuthorized": false }
+}

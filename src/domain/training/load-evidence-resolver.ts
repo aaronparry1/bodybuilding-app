@@ -2,7 +2,7 @@ import type { WorkoutHistorySummary } from "@/domain/training/models";
 
 export function resolveCanonicalLoadEvidence(history: WorkoutHistorySummary[], exerciseId: string) {
   const entries = history
-    .filter((session) => Boolean(session.completedAt) && !session.cardioLog)
+    .filter((session) => Boolean(session.completedAt) && !session.cardioLog && (session.sessionKind === undefined || session.sessionKind === "planned"))
     .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
     .flatMap((session) => session.exerciseSummaries.map((entry) => ({ session, entry })))
     .filter(({ entry }) => entry.exerciseId === exerciseId && entry.setsCompleted > 0)
