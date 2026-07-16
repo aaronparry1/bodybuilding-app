@@ -1,5 +1,4 @@
 import type { WorkoutSession } from "@/domain/training/models";
-import { isLegacyPlaceholderWorkoutSession } from "@/domain/training/planned-workout";
 
 export interface WorkoutStartTarget {
   name: string;
@@ -18,6 +17,10 @@ export interface WorkoutConflictCopy {
 
 export function getLatestOpenSession(sessions: WorkoutSession[]): WorkoutSession | null {
   return sessions.find((candidate) => !candidate.completedAt && !isLegacyPlaceholderWorkoutSession(candidate)) ?? null;
+}
+
+function isLegacyPlaceholderWorkoutSession(session: WorkoutSession): boolean {
+  return session.name === "Push Priority" && session.exercises.length === 2 && !session.programmeId && !session.templateId && session.exercises.every((exercise) => exercise.sets.length === 0);
 }
 
 export function workoutHasLoggedSets(session: WorkoutSession): boolean {

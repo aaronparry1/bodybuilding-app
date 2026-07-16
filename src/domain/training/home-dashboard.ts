@@ -1,7 +1,7 @@
 import type { TrainingYear } from "@/domain/training/annual-models";
 import { readCanonicalSessionRoles } from "@/application/training/canonical-training-architecture";
 import type { Exercise, Programme, WorkoutHistorySummary, WorkoutSession } from "@/domain/training/models";
-import { displayWorkoutName } from "@/domain/training/planned-workout";
+import { displayWorkoutName } from "@/domain/training/workout-name";
 import { resolveEventTaper } from "@/domain/training/event-taper";
 import { classifyFatigue } from "@/domain/training/fatigue-classifier";
 import { buildStrategicCoachingViewModel } from "@/domain/training/strategic-coaching-presenter";

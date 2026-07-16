@@ -7,7 +7,6 @@ import type { Exercise, CardioSessionKind, WorkoutHistorySummary } from "@/domai
 import type { WorkoutSession } from "@/domain/training/models";
 import { analyzePersonalisedVolume } from "@/domain/training/personalised-volume";
 import { sessionRolesForPlan, type ActiveTrainingPlan } from "@/domain/training/plan-setup";
-import { buildPlannedWorkoutProgramme } from "@/domain/training/planned-workout";
 import { resolveRecoveryCapacity } from "@/domain/training/recovery-capacity";
 import { resolveRecoveryCapacityTiming, type RecoveryCapacityTimingGuidance } from "@/domain/training/recovery-capacity-timing";
 import { startOfWeek, resolveRecommendedSessionIndex } from "@/domain/training/training-session-selection";
@@ -219,19 +218,15 @@ function contextFromNextPlannedWorkout({
   date: Date;
 }): LiftingContext {
   if (!activePlan || exercises.length === 0) return "unknown";
-  const programme = buildPlannedWorkoutProgramme({
-    activePlan,
-    exercises,
-    currentBlock,
-    date,
-    history,
-  });
-  const slots = programme?.days[0]?.exerciseSlots ?? [];
-  if (slots.length === 0) return "unknown";
-  const workoutExercises = slots
-    .map((slot) => exercises.find((exercise) => exercise.id === slot.exerciseId))
-    .filter((exercise): exercise is Exercise => Boolean(exercise));
-  return contextFromExercises(workoutExercises, programme?.name);
+  // Planned-session construction is owned by Session Construction. This
+  // domain projection must not rebuild a legacy Programme; callers without a
+  // canonical snapshot remain explicitly unknown and fail closed.
+  void activePlan;
+  void currentBlock;
+  void exercises;
+  void history;
+  void date;
+  return "unknown";
 }
 
 function contextFromExercises(exercises: Exercise[], name?: string): LiftingContext {

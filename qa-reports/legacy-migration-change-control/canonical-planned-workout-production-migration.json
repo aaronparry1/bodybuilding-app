@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "canonical_planned_workout_production_migration_v1",
+  "sourceCommit": "bb51b86",
+  "module": "src/domain/training/planned-workout.ts",
+  "exports": [
+    "displayWorkoutName",
+    "buildPlannedWorkoutProgramme",
+    "resolveNextTrainableWorkoutName",
+    "currentPlanDayIndex",
+    "workoutTypeForName",
+    "isLegacyPlaceholderWorkoutSession"
+  ],
+  "mountedProductionCallersBefore": [
+    {"file":"src/domain/training/home-dashboard.ts","symbol":"buildHomeDashboardViewModel","dependency":"displayWorkoutName","migration":"direct canonical workout-name projection"},
+    {"file":"src/domain/training/recovery-capacity-delivery.ts","symbol":"contextFromNextPlannedWorkout","dependency":"buildPlannedWorkoutProgramme","migration":"removed legacy programme reconstruction; canonical snapshot unavailable is explicit unknown"},
+    {"file":"src/features/workout-logging/use-workout-logger.ts","symbol":"module imports","dependency":"unused build/next-name exports","migration":"removed unused imports; workout type now comes from canonical workout-name utility"},
+    {"file":"src/domain/training/active-workout.ts","symbol":"getLatestOpenSession","dependency":"isLegacyPlaceholderWorkoutSession","migration":"local predicate retained for legacy repository filtering; no planned-workout import"}
+  ],
+  "mountedProductionCallersAfter": [],
+  "canonicalBoundary": {
+    "projection": "canonical_session_construction_display_projection_v1",
+    "construction": "canonical Session Construction snapshots",
+    "lifecycle": "canonical Train ledger boundary"
+  },
+  "testOnlyCallersRetained": ["tests/planned-workout.test.ts","tests/recommendation-actions.test.ts","tests/volume-adjustments.test.ts"],
+  "moduleDeletion": "blocked_test_only_legacy_exports_remain",
+  "productionLegacyReachability": "zero",
+  "nextBoundedTarget": "src/domain/training/plan-setup.ts:createActiveTrainingPlan",
+  "productionSwitchCompleted": false
+}

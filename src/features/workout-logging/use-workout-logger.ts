@@ -30,7 +30,7 @@ import { buildProductiveSetGuidance } from "@/domain/training/productive-set-tar
 import { resolveSetPrescription } from "@/domain/training/set-prescription";
 import { resolveTrainingGapAdjustment } from "@/domain/training/training-gap-adjustment";
 import { exerciseLibrary } from "@/domain/training/presets";
-import { buildPlannedWorkoutProgramme, resolveNextTrainableWorkoutName, workoutTypeForName } from "@/domain/training/planned-workout";
+import { workoutTypeForName } from "@/domain/training/workout-name";
 import { resolveRecommendedSessionIndex } from "@/domain/training/training-session-selection";
 import { type ActiveTrainingPlan, type TrainingSetupGoal } from "@/domain/training/plan-setup";
 import { orchestrateCompletedPlannedWorkout } from "@/domain/training/current-completion-orchestration";

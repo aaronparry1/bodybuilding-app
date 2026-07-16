@@ -1,8 +1,9 @@
 {
   "schemaVersion": "canonical_production_reachability_inventory_v1",
-  "sourceCommit": "ae0c787",
+  "sourceCommit": "bb51b86",
   "entrypoints": ["app/(protected)/onboarding.tsx", "app/(protected)/(tabs)/index.tsx", "app/(protected)/(tabs)/programmes.tsx", "app/(protected)/(tabs)/train.tsx", "app/(protected)/(tabs)/analytics.tsx", "app/(protected)/history/[id].tsx", "src/application/sync/cloud-data-sync.ts"],
   "legacyReachability": [
+    {"symbol":"planned-workout.ts","file":"src/domain/training/planned-workout.ts","classification":"test_only_legacy","callers":["tests/planned-workout.test.ts","tests/recommendation-actions.test.ts","tests/volume-adjustments.test.ts"],"capability":"legacy fixture/programme helpers; zero mounted production callers"},
     {"symbol":"activeTrainingPlanRepository","file":"src/data/local/active-training-plan-repository.ts","classification":"mounted production projection/transport","callers":["src/domain/training/current-decision-application.ts","src/application/sync/cloud-data-sync.ts"],"capability":"legacy current-plan read/write outside canonical boundary"},
     {"symbol":"workoutSessionRepository","file":"src/data/local/workout-session-repository.ts","classification":"mounted production authority","callers":["app/(protected)/history/[id].tsx","src/features/workout-logging/use-workout-logger.ts","src/domain/training/current-completion-orchestration.ts"],"capability":"legacy recorded-session read/write"},
     {"symbol":"annual-planner","file":"src/domain/training/annual-planner.ts","classification":"production_legacy_authority","callers":["src/domain/training/plan-setup.ts","src/domain/training/run-v2-qa-preview.ts"],"capability":"construct blocks and TrainingYear"},
