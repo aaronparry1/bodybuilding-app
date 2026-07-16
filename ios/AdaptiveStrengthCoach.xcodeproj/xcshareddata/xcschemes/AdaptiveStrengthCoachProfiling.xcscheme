@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Scheme
+    PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<Scheme
+   LastUpgradeVersion = "2660"
+   version = "1.7">
+   <BuildAction parallelizeBuildables = "YES" buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry buildForTesting = "YES" buildForRunning = "YES" buildForProfiling = "YES" buildForArchiving = "YES" buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "13B07F931A680F5B00A75B9A"
+               BuildableName = "AdaptiveStrengthCoachProfiling.app"
+               BlueprintName = "AdaptiveStrengthCoach"
+               ReferencedContainer = "container:AdaptiveStrengthCoach.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction buildConfiguration = "DebugProfiling" shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables/>
+   </TestAction>
+   <LaunchAction buildConfiguration = "DebugProfiling" selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB" launchStyle = "0" useCustomWorkingDirectory = "NO" ignoresPersistentStateOnLaunch = "NO" debugDocumentVersioning = "YES" allowLocationSimulation = "YES">
+      <BuildableProductRunnable runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "13B07F931A680F5B00A75B9A"
+            BuildableName = "AdaptiveStrengthCoachProfiling.app"
+            BlueprintName = "AdaptiveStrengthCoach"
+            ReferencedContainer = "container:AdaptiveStrengthCoach.xcodeproj"/>
+      </BuildableProductRunnable>
+   </LaunchAction>
+   <ProfileAction buildConfiguration = "DebugProfiling" shouldUseLaunchSchemeArgsEnv = "YES" savedToolIdentifier = "" useCustomWorkingDirectory = "NO" debugDocumentVersioning = "YES">
+      <BuildableProductRunnable runnableDebuggingMode = "0">
+         <BuildableReference BuildableIdentifier = "primary" BlueprintIdentifier = "13B07F931A680F5B00A75B9A" BuildableName = "AdaptiveStrengthCoachProfiling.app" BlueprintName = "AdaptiveStrengthCoach" ReferencedContainer = "container:AdaptiveStrengthCoach.xcodeproj"/>
+      </BuildableProductRunnable>
+   </ProfileAction>
+   <AnalyzeAction buildConfiguration = "DebugProfiling"/>
+   <ArchiveAction buildConfiguration = "Release" revealArchiveInOrganizer = "YES"/>
+</Scheme>

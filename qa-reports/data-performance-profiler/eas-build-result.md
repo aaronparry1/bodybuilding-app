@@ -6,7 +6,7 @@ The isolated command was:
 
 EAS CLI 21.0.1 was authenticated. EAS resolved the `development` environment with no remote plain-text or sensitive variables and loaded the profiling profile's explicit sentinels. The command then failed before upload or queueing because no suitable iOS credentials were available for internal distribution in non-interactive mode.
 
-The repository's committed native iOS project also caused EAS to ignore the profile's bundle identifier and use the identifier in `ios/AdaptiveStrengthCoach.xcodeproj`. A distinct profiling identifier therefore needs an explicit native-project/configuration decision before another build attempt.
+The native project now contains the dedicated `AdaptiveStrengthCoachProfiling` scheme and `DebugProfiling` configuration, resolving to `com.aaronparry.adaptivestrengthcoach.profiling` and `Adaptive Strength QA`. The earlier EAS native-identifier blocker is addressed in source; credentials for this new bundle still need to be created or confirmed.
 
 No EAS build ID, artifact, device registration, installation, launch, or profiling session exists. No TestFlight, App Store, production service, or submission operation occurred.
 

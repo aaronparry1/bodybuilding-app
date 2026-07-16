@@ -10,9 +10,15 @@
   "artifact": null,
   "blocker": "EAS loaded the profiling sentinels but could not find suitable iOS credentials for internal distribution in non-interactive mode. No build was queued or uploaded.",
   "secondaryBlocker": "Because the repository contains a committed ios project, EAS ignored the profile bundle identifier and would use the native project's current identifier; a distinct profiling identifier requires an explicit native-project/configuration decision before a safe build.",
+  "nativeIdentity": {
+    "scheme": "AdaptiveStrengthCoachProfiling",
+    "configuration": "DebugProfiling",
+    "bundleIdentifier": "com.aaronparry.adaptivestrengthcoach.profiling",
+    "displayName": "Adaptive Strength QA"
+  },
   "environmentResolution": "development environment had no remote plain-text or sensitive variables; all listed variables came from the profiling-development profile",
   "productionSubmission": false,
-  "deviceRegistration": "not_reached; credentials setup failed first",
+  "deviceRegistration": "one enabled iPhone record exists on the Apple team; authorised test-device identity was not confirmed and no new registration was attempted",
   "installation": "not_attempted",
   "launch": "not_attempted",
   "profiling": "not_attempted"

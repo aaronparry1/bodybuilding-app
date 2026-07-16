@@ -27,8 +27,8 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>ironlogic</string>
-				<string>com.aaronparry.adaptivestrengthcoach</string>
+				<string>$(APP_URL_SCHEME)</string>
+				<string>$(APP_BUNDLE_IDENTIFIER_SCHEME)</string>
 			</array>
 		</dict>
 	</array>

@@ -47,7 +47,8 @@
         "EXPO_PUBLIC_ASC_V3_QUALITY_GATE_STRICT": "true"
       },
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "m-medium",
+        "scheme": "AdaptiveStrengthCoachProfiling"
       }
     },
     "preview": {

@@ -15,4 +15,17 @@ describe("EAS profiling build isolation", () => {
     expect(profile.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY).toBe("profiling-disabled");
     expect(eas.submit?.["profiling-development"]).toBeUndefined();
   });
+
+  it("keeps production native identity separate from profiling identity", () => {
+    const eas = JSON.parse(readFileSync("eas.json", "utf8")) as any;
+    const project = readFileSync("ios/AdaptiveStrengthCoach.xcodeproj/project.pbxproj", "utf8");
+    const scheme = readFileSync("ios/AdaptiveStrengthCoach.xcodeproj/xcshareddata/xcschemes/AdaptiveStrengthCoachProfiling.xcscheme", "utf8");
+    expect(project).toContain("name = DebugProfiling;");
+    expect(project).toContain("PRODUCT_BUNDLE_IDENTIFIER = com.aaronparry.adaptivestrengthcoach.profiling;");
+    expect(project).toContain("PRODUCT_BUNDLE_IDENTIFIER = com.aaronparry.adaptivestrengthcoach;");
+    expect(project).toContain("APP_URL_SCHEME = ironlogic-profiling;");
+    expect(scheme).toContain('buildConfiguration = "DebugProfiling"');
+    expect(eas.build["profiling-development"].ios.scheme).toBe("AdaptiveStrengthCoachProfiling");
+    expect(eas.build.production.ios?.scheme).toBeUndefined();
+  });
 });

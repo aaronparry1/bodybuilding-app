@@ -1,6 +1,6 @@
 {
   "schemaVersion":"ios_profiling_isolation_v1",
-  "sourceCommit":"876deea",
+  "sourceCommit":"474410c",
   "commandEnvironment":"APP_ENV=development with service variables overridden by non-production sentinels",
   "supabase":{"variableNames":["EXPO_PUBLIC_SUPABASE_URL","EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY"],"classification":"invalid local sentinel; optional auth disabled/offline","productionAccess":"not permitted"},
   "revenueCat":{"variableNames":["EXPO_PUBLIC_REVENUECAT_TEST_API_KEY","EXPO_PUBLIC_REVENUECAT_IOS_API_KEY","EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY"],"classification":"local sentinel; no purchase or entitlement action invoked","productionAccess":"not permitted"},
@@ -8,5 +8,6 @@
   "push":"not configured in profiling command",
   "authentication":"no real account used; synthetic/local Design QA mode requested",
   "secrets":"values intentionally omitted",
-  "safeToLaunch":"EAS profile resolves only non-production sentinels; build stopped before upload because expo-dev-client is absent"
+  "nativeIdentity":{"scheme":"AdaptiveStrengthCoachProfiling","configuration":"DebugProfiling","bundleIdentifier":"com.aaronparry.adaptivestrengthcoach.profiling"},
+  "safeToLaunch":"EAS profile and native profiling configuration resolve only non-production sentinels; runtime was not launched"
 }
