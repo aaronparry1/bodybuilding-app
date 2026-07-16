@@ -1,7 +1,7 @@
 {
   "cli": {
     "version": ">= 16.0.1",
-    "appVersionSource": "local"
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -78,6 +78,7 @@
       "autoIncrement": false,
       "env": {
         "APP_ENV": "production",
+        "APP_VERSION": "1.0.11",
         "APP_NAME": "Adaptive Strength Coach",
         "APP_SCHEME": "ironlogic",
         "APP_IOS_BUNDLE_IDENTIFIER": "com.aaronparry.adaptivestrengthcoach",
