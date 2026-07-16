@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "canonical_exercise_history_route_migration_v1",
+  "sourceCommit": "d58ee4d",
+  "route": "app/(protected)/history/exercise/[id].tsx",
+  "legacyReadsRemoved": ["workoutSessionRepository", "WorkoutSession", "WorkoutExerciseLog", "getExerciseHistory"],
+  "canonicalProjection": "canonical_exercise_history_projection_v1",
+  "inputs": ["canonical recorded-session ledger export", "validated performance events", "exercise catalogue metadata", "canonical plan identity"],
+  "rules": ["completed or historical sessions only", "warm-ups excluded from work-set totals", "performed facts only", "deterministic completedAt/recordedSessionId ordering", "malformed legacy-shaped input rejected", "missing metadata unavailable"],
+  "routeMutations": [],
+  "sessionConstructionCalls": [],
+  "nextBlocker": "src/application/sync/cloud-data-sync.ts:workoutSessionRepository",
+  "productionSwitchCompleted": false
+}
