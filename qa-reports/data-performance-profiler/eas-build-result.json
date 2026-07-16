@@ -1,6 +1,6 @@
 {
   "schemaVersion": "eas_profiling_build_result_v1",
-  "sourceCommit": "4d8a797",
+  "sourceCommit": "1e88341",
   "profile": "profiling-development",
   "platform": "ios",
   "command": "npx eas-cli@latest build --platform ios --profile profiling-development --non-interactive",
@@ -9,7 +9,7 @@
   "buildId": null,
   "artifact": null,
   "blocker": "EAS loaded the profiling sentinels but could not find suitable iOS credentials for internal distribution in non-interactive mode. No build was queued or uploaded.",
-  "secondaryBlocker": "Because the repository contains a committed ios project, EAS ignored the profile bundle identifier and would use the native project's current identifier; a distinct profiling identifier requires an explicit native-project/configuration decision before a safe build.",
+  "secondaryBlocker": "EAS still reports app.config ios.bundleIdentifier as ignored because ios is committed; the selected profiling scheme now supplies the distinct native identity. Credential setup remains the blocking stage.",
   "nativeIdentity": {
     "scheme": "AdaptiveStrengthCoachProfiling",
     "configuration": "DebugProfiling",
