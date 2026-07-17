@@ -24,3 +24,15 @@ export function trainingGoalDisplayName(goal: string): string {
   const labels: Record<string, string> = { build_muscle: "Build muscle", build_strength: "Build strength", build_muscle_and_strength: "Build muscle and strength", athletic_performance: "Athletic performance", hypertrophy: "Build muscle", strength_hypertrophy: "Build muscle and strength" };
   return labels[goal] ?? "Training programme";
 }
+
+export function mesocyclePurposeDisplayName(purpose: string): string {
+  const labels: Record<string, string> = {
+    hypertrophy: "Muscle-building phase",
+    hypertrophy_base: "Muscle-building phase",
+    strength: "Strength phase",
+    strength_development: "Strength development phase",
+    peaking: "Performance phase",
+    deload: "Recovery phase",
+  };
+  return labels[purpose] ?? "Current training phase";
+}

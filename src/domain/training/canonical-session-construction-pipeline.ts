@@ -65,10 +65,13 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
   if (!slotPlan) return { status: "blocked", reason: "no_valid_lane" };
   const slots: Array<CanonicalSessionSnapshotV3["slots"][number]> = [];
   for (const slot of slotPlan) {
-    const exercise = input.athlete.exercises
+    const preferredPatterns = movementPatternsForSessionRole(input.microcycle.sessionRole, slot.role);
+    const roleExercises = input.athlete.exercises
       .filter((candidate) => candidate.roles.includes(slot.role))
-      .filter((candidate) => matchExerciseToMesocyclePolicy(factualExerciseMetadata(candidate), input.mesocycle.policy, slot.role, input.athlete.equipment).status !== "ineligible")
-      .sort((a, b) => a.id.localeCompare(b.id))[0];
+      .filter((candidate) => matchExerciseToMesocyclePolicy(factualExerciseMetadata(candidate), input.mesocycle.policy, slot.role, input.athlete.equipment).status !== "ineligible");
+    const preferredExercises = roleExercises.filter((candidate) => preferredPatterns.length === 0 || preferredPatterns.includes(candidate.movementPattern));
+    const eligibleExercises = preferredPatterns.length > 0 && preferredExercises.length > 0 ? preferredExercises : roleExercises;
+    const exercise = eligibleExercises.slice().sort((a, b) => a.id.localeCompare(b.id))[0];
     if (!exercise) return { status: "blocked", reason: "no_suitable_exercise" };
     const hasEstablishedLoad = Number.isFinite(input.progress.establishedLoads?.[exercise.id]);
     const lane = slot.laneCandidates.find((candidate) => resolveCanonicalTargetEnvelope(input.mesocycle.policy, slot.constructionRole, candidate, hasEstablishedLoad, slot.methods[0]).status === "resolved");
@@ -86,4 +89,13 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
   }
   const snapshot: CanonicalSessionSnapshotV3 = { schemaVersion: "canonical_session_snapshot_v3", sessionId: blueprint.sessionId, operationalIdentity: input.operational.identity, role: blueprint.role, planSessionIndex: input.microcycle.planSessionIndex, slots, provenance: { inputVersion: input.schemaVersion, policyVersion: input.mesocycle.policy.schemaVersion, constructionVersion: input.operational.constructionVersion, evidenceVersion: input.progress.evidenceVersion } };
   return { status: "constructed", blueprint, slotPlan, snapshot };
+}
+
+function movementPatternsForSessionRole(sessionRole: string, exerciseRole: ExerciseRole): readonly import("@/domain/training/models").MovementPattern[] {
+  if (exerciseRole !== "primary_compound") return [];
+  const role = sessionRole.toLowerCase();
+  if (role.includes("bench") || role.includes("upper")) return ["horizontal_push", "vertical_push"];
+  if (role.includes("squat") || role.includes("lower") || role.includes("leg")) return ["squat", "lunge", "hip_thrust"];
+  if (role.includes("deadlift") || role.includes("back")) return ["hinge", "horizontal_pull", "vertical_pull"];
+  return [];
 }

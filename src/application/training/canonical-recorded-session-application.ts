@@ -46,6 +46,8 @@ export function completeCanonicalSession(command: CanonicalRecordedLifecycleComm
   if (aggregate.session.version !== command.expectedLedgerVersion) return { status: "rejected", reason: "stale_ledger_version" };
   if (aggregate.session.status === "completed") return { status: "idempotent", reason: "completion_already_applied", ledgerVersion: aggregate.session.version };
   if (!["started", "paused"].includes(aggregate.session.status)) return { status: "rejected", reason: "completion_not_allowed_in_current_status" };
+  const performanceEvents = aggregate.events.filter((event) => event.type === "performance");
+  if (!performanceEvents.length) return { status: "rejected", reason: "completion_requires_performed_work" };
   const summary = deriveCanonicalCompletionSummary(aggregate.session, aggregate.events);
   const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, { eventId: `${command.recordedSessionId}:completed:${command.operationId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "completed", occurredAt: command.occurredAt, operationId: command.operationId, payload: { summary } });
   if (appended.status !== "saved") return { status: "rejected", reason: appended.reason ?? "completion_conflict" };

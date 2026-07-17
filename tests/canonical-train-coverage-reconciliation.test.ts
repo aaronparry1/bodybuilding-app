@@ -33,8 +33,15 @@ describe("canonical Train coverage reconciliation", () => {
 
   it("keeps completion evidence pending when the canonical plan carrier is unavailable", () => {
     start();
-    const result = completeCanonicalSession({ planId: "missing", expectedPlanRevision: 1, recordedSessionId: session.recordedSessionId, expectedLedgerVersion: 1, operationId: "complete", occurredAt: "2026-01-01T00:04:00.000Z", provenance: "canonical_train" });
+    expect(recordCanonicalPerformedWork({ planId: "plan-1", expectedPlanRevision: 1, recordedSessionId: session.recordedSessionId, expectedLedgerVersion: 1, operationId: "set-before-complete", occurredAt: "2026-01-01T00:03:30.000Z", provenance: "canonical_train", slotId: "slot-1", exerciseId: "exercise-1", setId: "set-before-complete", setOrder: 1, reps: 8, load: 60, unit: "kg", completion: "complete" }).status).toBe("applied");
+    const result = completeCanonicalSession({ planId: "missing", expectedPlanRevision: 1, recordedSessionId: session.recordedSessionId, expectedLedgerVersion: 2, operationId: "complete", occurredAt: "2026-01-01T00:04:00.000Z", provenance: "canonical_train" });
     expect(result.reason).toBe("session_completed");
+  });
+
+  it("does not complete an untouched session", () => {
+    start();
+    const result = completeCanonicalSession({ planId: "missing", expectedPlanRevision: 1, recordedSessionId: session.recordedSessionId, expectedLedgerVersion: 1, operationId: "complete-empty", occurredAt: "2026-01-01T00:04:00.000Z", provenance: "canonical_train" });
+    expect(result).toMatchObject({ status: "rejected", reason: "completion_requires_performed_work" });
   });
 
   it("keeps canonical snapshot fields free of legacy prescription authority", () => {

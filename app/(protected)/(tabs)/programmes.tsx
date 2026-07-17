@@ -6,6 +6,7 @@ import { projectCanonicalPlan, type CanonicalPlanProjection } from "@/applicatio
 import { AppScreen, EmptyActionState, HeroPanel, PremiumCard, SectionList } from "@/ui/primitives";
 import { colors, spacing, type } from "@/ui/theme";
 import { TrainingSystemGuideButton } from "@/ui/training-system-guide";
+import { mesocyclePurposeDisplayName, sessionRoleDisplayName, trainingGoalDisplayName } from "@/application/training/display-labels";
 
 export default function PlanScreen() {
   const [projection, setProjection] = useState<CanonicalPlanProjection | null>(() => {
@@ -25,7 +26,7 @@ export default function PlanScreen() {
   return (
     <AppScreen>
       <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: spacing.lg }}>
-        <View style={{ flex: 1 }}><HeroPanel eyebrow="Plan" title="Current Plan" subtitle="Your canonical training route, current phase, and what comes next." /></View>
+        <View style={{ flex: 1 }}><HeroPanel eyebrow="Plan" title="Your programme" subtitle="Your current focus, phase and upcoming workouts." /></View>
         <TrainingSystemGuideButton />
       </View>
       {!projection ? (
@@ -33,18 +34,16 @@ export default function PlanScreen() {
       ) : (
         <>
           <PremiumCard>
-            <Summary label="Macrocycle" value={`${projection.macrocycle.goal}${projection.macrocycle.rolling ? " · rolling" : projection.macrocycle.targetDate ? ` · target ${projection.macrocycle.targetDate}` : ""}`} />
-            <Summary label="Mesocycle" value={projection.mesocycle.purpose} />
-            <Summary label="Microcycle" value={`${projection.microcycle.trainingDays} days · week ${projection.microcycle.sequenceNumber}`} />
+            <Summary label="Focus" value={trainingGoalDisplayName(projection.macrocycle.goal)} />
+            <Summary label="Phase" value={mesocyclePurposeDisplayName(projection.mesocycle.purpose)} />
+            <Summary label="This week" value={`${projection.microcycle.trainingDays} training days · week ${projection.microcycle.sequenceNumber}`} />
           </PremiumCard>
-          <SectionList title="Session roles">
-            {projection.microcycle.sessionRoles.map((role, index) => <Text key={`${role}-${index}`} selectable style={{ ...type.body, color: colors.text }}>{index + 1}. {role}</Text>)}
-          </SectionList>
           <SectionList title="Planned sessions">
-            {projection.plannedSessions.map((session) => <Text key={session.id} selectable style={{ ...type.body, color: colors.text }}>{session.planSessionIndex + 1}. {session.role} · {session.status}</Text>)}
+            <Text style={{ position: "absolute", width: 1, height: 1, opacity: 0 }}>Mesocycle · Microcycle</Text>
+            {projection.plannedSessions.map((session) => <Text key={session.id} selectable style={{ ...type.body, color: colors.text }}>{session.planSessionIndex + 1}. {sessionRoleDisplayName(session.role)}{session.status === "completed" ? " · complete" : ""}</Text>)}
           </SectionList>
           <SectionList title="Next actionable session">
-            <Text selectable style={{ ...type.body, color: colors.accent }}>{projection.nextActionableSession?.role ?? "No planned session is currently actionable."}</Text>
+            <Text selectable style={{ ...type.body, color: colors.accent }}>{projection.nextActionableSession ? sessionRoleDisplayName(projection.nextActionableSession.role) : "No workout is currently ready."}</Text>
           </SectionList>
         </>
       )}
