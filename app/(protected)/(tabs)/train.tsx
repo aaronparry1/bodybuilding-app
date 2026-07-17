@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { loadPlannedSession } from "@/application/training/canonical-active-plan-application";
 import {
@@ -16,6 +16,7 @@ import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-
 import { useSubscription } from "@/application/billing/subscription-context";
 import { AppScreen, PrimaryButton, SecondaryButton } from "@/ui/primitives";
 import { colors, spacing, type } from "@/ui/theme";
+import { exerciseDisplayName, loadingModeDisplayName, methodDisplayName, sessionRoleDisplayName } from "@/application/training/display-labels";
 
 type RouteParams = Readonly<{ planId?: string; planRevision?: string; plannedSessionId?: string; recordedSessionId?: string; action?: string; lifecycle?: string }>;
 
@@ -30,6 +31,7 @@ export default function TrainScreen() {
   const plan = canonicalActivePlanState.getReadModel();
   const route = useMemo(() => ({ planId: String(params.planId ?? ""), revision: Number(params.planRevision), plannedSessionId: params.plannedSessionId ? String(params.plannedSessionId) : undefined, recordedSessionId: params.recordedSessionId ? String(params.recordedSessionId) : undefined, action: String(params.action ?? params.lifecycle ?? "open") }), [params]);
   const [message, setMessage] = useState<string | null>(null);
+  const [setValues, setSetValues] = useState<Record<string, { reps: string; load: string }>>({});
   const [recordedId, setRecordedId] = useState(route.recordedSessionId);
   const aggregate = recordedId ? canonicalRecordedSessionLedger.get(recordedId) : { status: "not_found" as const };
   const snapshot = aggregate.status === "found" ? aggregate.session.prescriptionSnapshot : route.plannedSessionId ? loadPlannedSession(route.plannedSessionId)?.prescriptionSnapshot : null;
@@ -68,7 +70,11 @@ export default function TrainScreen() {
 
   const recordSet = (slot: Record<string, unknown>, index: number) => {
     if (!plan || aggregate.status !== "found") return;
-    const result = recordCanonicalPerformedWork({ planId: plan.planId, expectedPlanRevision: plan.revision, recordedSessionId: aggregate.session.recordedSessionId, expectedLedgerVersion: aggregate.session.version, operationId: operationId(`set:${String(slot.id)}:${index}`), occurredAt: new Date().toISOString(), provenance: "canonical_train", slotId: String(slot.id), exerciseId: String(slot.exerciseId), setId: `${String(slot.id)}:set:${index}`, setOrder: index, reps: 0, load: 0, unit: "unknown", completion: "partial" });
+    const values = setValues[`${String(slot.id)}:${index}`] ?? { reps: "", load: "" };
+    const reps = Number(values.reps);
+    const load = Number(values.load);
+    if (!Number.isInteger(reps) || reps < 1 || !Number.isFinite(load) || load < 0) { setMessage("Enter the reps and load completed for this set."); return; }
+    const result = recordCanonicalPerformedWork({ planId: plan.planId, expectedPlanRevision: plan.revision, recordedSessionId: aggregate.session.recordedSessionId, expectedLedgerVersion: aggregate.session.version, operationId: operationId(`set:${String(slot.id)}:${index}`), occurredAt: new Date().toISOString(), provenance: "canonical_train", slotId: String(slot.id), exerciseId: String(slot.exerciseId), setId: `${String(slot.id)}:set:${index}`, setOrder: index, reps, load, unit: "kg", completion: "complete" });
     setMessage(result.reason);
     canonicalActivePlanState.refresh();
   };
@@ -76,7 +82,8 @@ export default function TrainScreen() {
   if (!plan) return <AppScreen><Text style={{ color: colors.text }}>Your canonical training plan is not ready.</Text><SecondaryButton label="Return to Home" onPress={() => router.replace("/(protected)/(tabs)")} /></AppScreen>;
   if (!recordedId && route.plannedSessionId) return <AppScreen><Text style={{ color: colors.text, ...type.section }}>Planned session</Text><Text style={{ color: colors.textMuted }}>Open the exact canonical prescription for this session.</Text><PrimaryButton label="Start session" onPress={openPlanned} /><SecondaryButton label="Return to Home" onPress={() => router.replace("/(protected)/(tabs)")} />{message ? <Text style={{ color: colors.textMuted }}>{message}</Text> : null}</AppScreen>;
   if (aggregate.status !== "found" || !snapshot) return <AppScreen><Text style={{ color: colors.text }}>This session could not be restored safely.</Text><SecondaryButton label="Return to Home" onPress={() => router.replace("/(protected)/(tabs)")} />{message ? <Text style={{ color: colors.textMuted }}>{message}</Text> : null}</AppScreen>;
-  return <AppScreen><View style={{ gap: spacing.md }}><Text style={{ color: colors.text, ...type.section }}>Canonical session</Text><Text style={{ color: colors.textMuted }}>{aggregate.session.role} · {aggregate.session.status}</Text>{slots.map((slot, index) => <View key={String(slot.id)} style={{ gap: spacing.xs }}><Text style={{ color: colors.text }}>{String(slot.exerciseId)}</Text><Text style={{ color: colors.textMuted }}>{String(slot.method)} · {String(slot.loadingMode)}</Text><PrimaryButton label={`Record set ${index + 1}`} onPress={() => recordSet(slot, index + 1)} disabled={aggregate.session.status === "completed"} /></View>)}<PrimaryButton label={aggregate.session.status === "paused" ? "Resume session" : "Pause session"} onPress={pauseResume} disabled={aggregate.session.status === "completed"} /><PrimaryButton label="Complete session" onPress={complete} disabled={aggregate.session.status === "completed"} /><SecondaryButton label="Restore session" onPress={restoreRecorded} />{message ? <Text style={{ color: colors.textMuted }}>{message}</Text> : null}</View></AppScreen>;
+  const performanceEvents = aggregate.events.filter((event) => event.type === "performance");
+  return <AppScreen><View style={{ gap: spacing.md }}><Text style={{ color: colors.text, ...type.section }}>{sessionRoleDisplayName(aggregate.session.role)}</Text><Text style={{ color: colors.textMuted }}>{aggregate.session.status === "paused" ? "Workout paused" : "Workout in progress"}</Text>{slots.map((slot) => { const requiredSets = Math.max(1, Number((slot.settings as Record<string, unknown> | undefined)?.requiredSets ?? 1)); return <View key={String(slot.id)} style={{ gap: spacing.xs }}><Text style={{ color: colors.text, fontSize: 18, fontWeight: "800" }}>{exerciseDisplayName(String(slot.exerciseId))}</Text><Text style={{ color: colors.textMuted }}>{methodDisplayName(String(slot.method))} · {loadingModeDisplayName(String(slot.loadingMode))}</Text>{Array.from({ length: requiredSets }, (_, setIndex) => { const setNumber = setIndex + 1; const key = `${String(slot.id)}:${setNumber}`; const values = setValues[key] ?? { reps: "", load: "" }; const done = performanceEvents.some((event) => String((event.payload as Record<string, unknown>).setId) === `${String(slot.id)}:set:${setNumber}`); return <View key={key} style={{ gap: spacing.xs }}><Text style={{ color: colors.textMuted }}>Set {setNumber}{done ? " · recorded" : ""}</Text><View style={{ flexDirection: "row", gap: spacing.sm }}><TextInput accessibilityLabel={`Reps for set ${setNumber}`} placeholder="Reps" keyboardType="number-pad" value={values.reps} onChangeText={(reps) => setSetValues((current) => ({ ...current, [key]: { ...values, reps } }))} style={{ flex: 1, color: colors.text, borderColor: colors.line, borderWidth: 1, borderRadius: 8, padding: 10 }} /><TextInput accessibilityLabel={`Load for set ${setNumber}`} placeholder="Load (kg)" keyboardType="decimal-pad" value={values.load} onChangeText={(load) => setSetValues((current) => ({ ...current, [key]: { ...values, load } }))} style={{ flex: 1, color: colors.text, borderColor: colors.line, borderWidth: 1, borderRadius: 8, padding: 10 }} /></View><PrimaryButton label={done ? "Set recorded" : `Record set ${setNumber}`} onPress={() => recordSet(slot, setNumber)} disabled={done || aggregate.session.status === "completed"} /></View>; })}</View>; })}<SecondaryButton label={aggregate.session.status === "paused" ? "Resume workout" : "Pause workout"} onPress={pauseResume} disabled={aggregate.session.status === "completed"} /><PrimaryButton label="Finish workout" onPress={complete} disabled={aggregate.session.status === "completed" || performanceEvents.length === 0} />{message ? <Text style={{ color: colors.textMuted }}>{message}</Text> : null}</View></AppScreen>;
 }
 
 export { recordCanonicalPerformedWork };
