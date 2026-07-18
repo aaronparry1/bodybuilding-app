@@ -65,7 +65,7 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
     const sets = Array.from({ length: requiredSets }, (_, offset) => {
       const setNumber = offset + 1;
       const event = actual.find((candidate) => number(object(candidate.payload).setOrder, 0) === setNumber);
-      const target = `${min} reps`;
+      const target = `${number(slot.targetReps, min)} reps`;
       const loadLabel = prescribedLoad === null ? (loadState === "calibration_required" ? "Calibration · choose load" : loadingModeDisplayName(loadState)) : `${prescribedLoad} kg`;
       return { id: `${String(slot.id)}:set:${setNumber}`, number: setNumber, target, prescribedLoad, loadLabel, unit: "kg" as const, previous: null, restSeconds, actualReps: event ? numberOrNull(object(event.payload).reps) : null, actualLoad: event ? numberOrNull(object(event.payload).load) : null, state: event ? "completed" as const : performance.length === 0 && setNumber === 1 && index === 0 ? "current" as const : "upcoming" as const };
     });

@@ -21,7 +21,7 @@ export type CanonicalSessionConstructionInput = Readonly<{
 
 export type SessionBlueprint = Readonly<{ sessionId: string; role: string; purpose: string; slots: readonly Readonly<{ role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; index: number; reason: string }>[]; strengthAnchorRequired: boolean; specialState: string }>;
 export type PlannedSessionSlot = Readonly<{ id: string; index: number; role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; laneCandidates: readonly TrainingLane[]; preferredLane: TrainingLane; methods: readonly PrescriptionMethodFamily[]; reason: string }>;
-type CanonicalSessionSnapshotBase = Readonly<{ sessionId: string; operationalIdentity: string; role: string; planSessionIndex: number; slots: readonly Readonly<{ id: string; index: number; exerciseId: string; lane: TrainingLane; method: PrescriptionMethodFamily; settings: ProgressionSettings; rest: CanonicalRestInstruction; progression: CanonicalProgressionRule; stopRule: CanonicalStopRule; loadingMode: string; prescribedLoad?: number; substitutionConstraints: readonly string[]; reason: string }>[]; provenance: Readonly<{ inputVersion: string; policyVersion: string; constructionVersion: string; evidenceVersion: string }> }>;
+type CanonicalSessionSnapshotBase = Readonly<{ sessionId: string; operationalIdentity: string; role: string; planSessionIndex: number; slots: readonly Readonly<{ id: string; index: number; exerciseId: string; lane: TrainingLane; method: PrescriptionMethodFamily; settings: ProgressionSettings; targetReps: number; rest: CanonicalRestInstruction; progression: CanonicalProgressionRule; stopRule: CanonicalStopRule; loadingMode: string; prescribedLoad?: number; substitutionConstraints: readonly string[]; reason: string }>[]; provenance: Readonly<{ inputVersion: string; policyVersion: string; constructionVersion: string; evidenceVersion: string }> }>;
 export type CanonicalSessionSnapshotV2 = CanonicalSessionSnapshotBase & Readonly<{ schemaVersion: "canonical_session_snapshot_v2" }>;
 export type CanonicalSessionSnapshotV3 = Omit<CanonicalSessionSnapshotBase, "slots"> & Readonly<{ schemaVersion: "canonical_session_snapshot_v3"; slots: readonly (CanonicalSessionSnapshotBase["slots"][number] & Readonly<{ loadPrescription: CanonicalLoadPrescription }>)[] }>;
 export type CanonicalSessionSnapshot = CanonicalSessionSnapshotV2 | CanonicalSessionSnapshotV3;
@@ -40,7 +40,28 @@ export function buildSessionBlueprint(input: CanonicalSessionConstructionInput):
     ? [{ role: "recovery" as const, constructionRole: "accessory" as const, muscles: [primaryMuscle], index: 0, reason: "recovery capacity" }]
     : role.includes("primary") || role.includes("strength")
       ? [{ role: "primary_compound" as const, constructionRole: "primary" as const, muscles: [primaryMuscle], index: 0, reason: "primary strength anchor" }, { role: "secondary_compound" as const, constructionRole: "secondary" as const, muscles: [primaryMuscle], index: 1, reason: "secondary support" }]
-      : [{ role: "primary_compound" as const, constructionRole: "primary" as const, muscles: [primaryMuscle], index: 0, reason: "primary session anchor" }, { role: "accessory" as const, constructionRole: "accessory" as const, muscles: [primaryMuscle], index: 1, reason: "productive accessory" }, { role: "isolation" as const, constructionRole: "accessory" as const, muscles: [primaryMuscle], index: 2, reason: "local fatigue allocation" }];
+      : role.includes("bench")
+        ? [
+          { role: "primary_compound" as const, constructionRole: "primary" as const, muscles: ["chest"] as MuscleGroup[], index: 0, reason: "bench strength anchor" },
+          { role: "secondary_compound" as const, constructionRole: "secondary" as const, muscles: ["chest", "shoulders"] as MuscleGroup[], index: 1, reason: "pressing hypertrophy support" },
+          { role: "accessory" as const, constructionRole: "accessory" as const, muscles: ["triceps", "shoulders"] as MuscleGroup[], index: 2, reason: "upper pressing support" },
+          { role: "isolation" as const, constructionRole: "accessory" as const, muscles: ["triceps"] as MuscleGroup[], index: 3, reason: "triceps support" },
+        ]
+        : role.includes("squat") || role.includes("lower")
+          ? [
+            { role: "primary_compound" as const, constructionRole: "primary" as const, muscles: ["quads"] as MuscleGroup[], index: 0, reason: "squat strength anchor" },
+            { role: "secondary_compound" as const, constructionRole: "secondary" as const, muscles: ["quads", "glutes"] as MuscleGroup[], index: 1, reason: "lower-body support" },
+            { role: "accessory" as const, constructionRole: "accessory" as const, muscles: ["hamstrings", "glutes"] as MuscleGroup[], index: 2, reason: "posterior-chain support" },
+            { role: "isolation" as const, constructionRole: "accessory" as const, muscles: ["calves", "abs"] as MuscleGroup[], index: 3, reason: "lower-body completion" },
+          ]
+          : role.includes("deadlift") || role.includes("back")
+            ? [
+              { role: "primary_compound" as const, constructionRole: "primary" as const, muscles: ["back", "hamstrings"] as MuscleGroup[], index: 0, reason: "hinge/pull anchor" },
+              { role: "secondary_compound" as const, constructionRole: "secondary" as const, muscles: ["back"] as MuscleGroup[], index: 1, reason: "back volume support" },
+              { role: "accessory" as const, constructionRole: "accessory" as const, muscles: ["hamstrings", "glutes"] as MuscleGroup[], index: 2, reason: "posterior-chain support" },
+              { role: "isolation" as const, constructionRole: "accessory" as const, muscles: ["biceps"] as MuscleGroup[], index: 3, reason: "pulling support" },
+            ]
+            : [{ role: "primary_compound" as const, constructionRole: "primary" as const, muscles: [primaryMuscle], index: 0, reason: "primary session anchor" }, { role: "accessory" as const, constructionRole: "accessory" as const, muscles: [primaryMuscle], index: 1, reason: "productive accessory" }, { role: "isolation" as const, constructionRole: "accessory" as const, muscles: [primaryMuscle], index: 2, reason: "local fatigue allocation" }];
   return slots.length ? { sessionId: resolveCanonicalSessionIdentity(input), role: input.microcycle.sessionRole, purpose: input.macrocycle.goal, slots, strengthAnchorRequired: slots.some((slot) => slot.role === "primary_compound"), specialState } : null;
 }
 
@@ -68,6 +89,7 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
     const preferredPatterns = movementPatternsForSessionRole(input.microcycle.sessionRole, slot.role);
     const roleExercises = input.athlete.exercises
       .filter((candidate) => candidate.roles.includes(slot.role))
+      .filter((candidate) => slot.muscles.length === 0 || candidate.primaryMuscles.some((muscle) => slot.muscles.includes(muscle)))
       .filter((candidate) => matchExerciseToMesocyclePolicy(factualExerciseMetadata(candidate), input.mesocycle.policy, slot.role, input.athlete.equipment).status !== "ineligible");
     const preferredExercises = roleExercises.filter((candidate) => preferredPatterns.length === 0 || preferredPatterns.includes(candidate.movementPattern));
     const eligibleExercises = preferredPatterns.length > 0 && preferredExercises.length > 0 ? preferredExercises : roleExercises;
@@ -85,7 +107,8 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
     const progression = resolveCanonicalProgression(input.mesocycle.policy, lane, method, input.operational.revision);
     const stopRule = resolveCanonicalStopRule(input.mesocycle.policy, lane, slot.role, target.envelope.minReps);
     const loadPrescription = resolveCanonicalLoadPrescription({ exercise, equipment: input.athlete.equipment, lane, loadingMode: target.envelope.loadingMode, establishedLoad: input.progress.establishedLoads?.[exercise.id], evidence: input.progress.loadEvidence?.[exercise.id], increment: exercise.defaultLoadJump || 1, calibrationSupported: true });
-    slots.push({ id: slot.id, index: slot.index, exerciseId: exercise.id, lane, method, settings, rest, progression, stopRule, loadingMode: target.envelope.loadingMode, prescribedLoad: input.progress.establishedLoads?.[exercise.id], substitutionConstraints: [...input.athlete.limitations], reason: slot.reason, loadPrescription } as CanonicalSessionSnapshotV3["slots"][number]);
+    const targetReps = Math.max(1, Math.round((target.envelope.minReps + target.envelope.maxReps) / 2));
+    slots.push({ id: slot.id, index: slot.index, exerciseId: exercise.id, lane, method, settings, targetReps, rest, progression, stopRule, loadingMode: target.envelope.loadingMode, prescribedLoad: input.progress.establishedLoads?.[exercise.id], substitutionConstraints: [...input.athlete.limitations], reason: slot.reason, loadPrescription } as CanonicalSessionSnapshotV3["slots"][number]);
   }
   const snapshot: CanonicalSessionSnapshotV3 = { schemaVersion: "canonical_session_snapshot_v3", sessionId: blueprint.sessionId, operationalIdentity: input.operational.identity, role: blueprint.role, planSessionIndex: input.microcycle.planSessionIndex, slots, provenance: { inputVersion: input.schemaVersion, policyVersion: input.mesocycle.policy.schemaVersion, constructionVersion: input.operational.constructionVersion, evidenceVersion: input.progress.evidenceVersion } };
   return { status: "constructed", blueprint, slotPlan, snapshot };
