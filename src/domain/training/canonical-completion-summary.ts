@@ -1,7 +1,8 @@
 import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/domain/training/canonical-recorded-session-ledger";
+import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 export type CanonicalCompletionSummary = Readonly<{ schemaVersion: "canonical_completion_summary_v1"; summaryId: string; recordedSessionId: string; prescribedSlots: number; performedSets: number; performedReps: number; performedLoad: number; completedSlots: readonly string[]; partialSlots: readonly string[]; skippedSlots: readonly string[]; substitutions: readonly string[]; eventVersion: number; completion: "complete" | "partial" | "missed" }>;
 export function deriveCanonicalCompletionSummary(session: CanonicalRecordedSession, events: readonly CanonicalRecordedSessionEvent[]): CanonicalCompletionSummary {
-  const performances = events.filter((event) => event.type === "performance");
+  const performances = effectiveCanonicalPerformedWork(events);
   const slots = Array.isArray((session.prescriptionSnapshot as Record<string, unknown>).slots) ? ((session.prescriptionSnapshot as Record<string, unknown>).slots as Array<Record<string, unknown>>) : [];
   const completed = [...new Set(performances.filter((event) => event.payload.completion === "complete").map((event) => String(event.payload.slotId)))].sort();
   const partial = [...new Set(performances.filter((event) => event.payload.completion === "partial").map((event) => String(event.payload.slotId)))].sort();

@@ -8,6 +8,16 @@ export const canonicalRecordedSessionLedger = {
   get(recordedSessionId: string) { const value = jsonStore.get<Store>(key, {})[recordedSessionId]; return value ? { status: "found" as const, session: value.session, events: [...value.events] } : { status: "not_found" as const }; },
   list(planId: string) { return Object.values(jsonStore.get<Store>(key, {})).filter((value) => value.session.planId === planId).map((value) => value.session).sort((a, b) => a.recordedSessionId.localeCompare(b.recordedSessionId)); },
   exportPlan(planId: string) { return Object.values(jsonStore.get<Store>(key, {})).filter((value) => value.session.planId === planId).sort((a, b) => a.session.recordedSessionId.localeCompare(b.session.recordedSessionId)).map((value) => ({ session: value.session, events: value.events.slice() })); },
+  deleteActive(recordedSessionId: string, expectedVersion: number) {
+    const store = jsonStore.get<Store>(key, {});
+    const aggregate = store[recordedSessionId];
+    if (!aggregate) return { status: "not_found" as const };
+    if (aggregate.session.version !== expectedVersion) return { status: "stale" as const, reason: "aggregate_version_mismatch" };
+    if (!["pending", "started", "paused"].includes(aggregate.session.status)) return { status: "rejected" as const, reason: "historical_session_cannot_be_deleted" };
+    const { [recordedSessionId]: _removed, ...remaining } = store;
+    jsonStore.set(key, remaining);
+    return { status: "deleted" as const };
+  },
   restorePlan(records: readonly { session: CanonicalRecordedSession; events: readonly CanonicalRecordedSessionEvent[] }[]) {
     const store = jsonStore.get<Store>(key, {});
     const next = { ...store };

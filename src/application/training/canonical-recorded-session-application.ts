@@ -4,7 +4,9 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
 import { reconcileCanonicalRecordedReference } from "@/application/training/canonical-recorded-reference-reconciliation";
-import { startCanonicalRestTimer } from "@/application/training/canonical-rest-timer";
+import { pauseCanonicalRestTimer, resumeCanonicalRestTimer, startCanonicalRestTimer } from "@/application/training/canonical-rest-timer";
+import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
+import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 
 export type CanonicalStartSessionCommand = Readonly<{ planId: string; expectedPlanRevision: number; plannedSessionId: string; expectedPrescriptionHash: string; operationId: string; startedAt: string; provenance: string }>;
 export type CanonicalStartSessionResult = Readonly<{ status: "started" | "already_started" | "rejected" | "retryable"; reason: string; recordedSessionId?: string; planRevision?: number }>;
@@ -39,20 +41,29 @@ export function startCanonicalSession(command: CanonicalStartSessionCommand): Ca
 export type CanonicalRecordedLifecycleCommand = Readonly<{ planId: string; expectedPlanRevision: number; recordedSessionId: string; expectedLedgerVersion: number; operationId: string; occurredAt: string; provenance: string }>;
 export type CanonicalRecordedLifecycleResult = Readonly<{ status: "applied" | "idempotent" | "rejected" | "retryable"; reason: string; planRevision?: number; ledgerVersion?: number; nextInstruction?: string }>;
 
-export function pauseCanonicalSession(command: CanonicalRecordedLifecycleCommand): CanonicalRecordedLifecycleResult { return updateRecordedStatus(command, "paused", "pause"); }
-export function resumeCanonicalSession(command: CanonicalRecordedLifecycleCommand): CanonicalRecordedLifecycleResult { return updateRecordedStatus(command, "started", "resumed"); }
+export function pauseCanonicalSession(command: CanonicalRecordedLifecycleCommand): CanonicalRecordedLifecycleResult {
+  const result = updateRecordedStatus(command, "paused", "pause");
+  if (result.status === "applied" || result.status === "idempotent") pauseCanonicalRestTimer(command.recordedSessionId);
+  return result;
+}
+export function resumeCanonicalSession(command: CanonicalRecordedLifecycleCommand): CanonicalRecordedLifecycleResult {
+  const result = updateRecordedStatus(command, "started", "resumed");
+  if (result.status === "applied" || result.status === "idempotent") resumeCanonicalRestTimer(command.recordedSessionId);
+  return result;
+}
 export function completeCanonicalSession(command: CanonicalRecordedLifecycleCommand): CanonicalRecordedLifecycleResult {
   const aggregate = canonicalRecordedSessionLedger.get(command.recordedSessionId);
   if (aggregate.status !== "found") return { status: "rejected", reason: "recorded_session_not_found" };
   if (aggregate.session.version !== command.expectedLedgerVersion) return { status: "rejected", reason: "stale_ledger_version" };
   if (aggregate.session.status === "completed") return { status: "idempotent", reason: "completion_already_applied", ledgerVersion: aggregate.session.version };
   if (!["started", "paused"].includes(aggregate.session.status)) return { status: "rejected", reason: "completion_not_allowed_in_current_status" };
-  const performanceEvents = aggregate.events.filter((event) => event.type === "performance");
+  const performanceEvents = effectiveCanonicalPerformedWork(aggregate.events);
   if (!performanceEvents.length) return { status: "rejected", reason: "completion_requires_performed_work" };
   const summary = deriveCanonicalCompletionSummary(aggregate.session, aggregate.events);
   const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, { eventId: `${command.recordedSessionId}:completed:${command.operationId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "completed", occurredAt: command.occurredAt, operationId: command.operationId, payload: { summary } });
   if (appended.status !== "saved") return { status: "rejected", reason: appended.reason ?? "completion_conflict" };
   const evidence = canonicalProgressEvidenceRepository.record({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:completion-evidence:${appended.session!.version}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}`, kind: "completion", observations: { completion: summary.completion, performedSets: summary.performedSets, performedReps: summary.performedReps, performedLoad: summary.performedLoad }, evidenceVersion: "progress_v1" });
+  canonicalRestTimerRepository.clear(command.recordedSessionId);
   canonicalActivePlanState.hydrate();
   return { status: evidence.status === "saved" || evidence.status === "duplicate" ? "applied" : "retryable", reason: evidence.status === "saved" || evidence.status === "duplicate" ? "session_completed" : "completed_with_evidence_pending", ledgerVersion: appended.session!.version };
 }
@@ -68,13 +79,21 @@ export function recordCanonicalPerformedWork(command: CanonicalPerformedWorkComm
   const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
   const slot = slots.find((candidate) => candidate.id === command.slotId && candidate.exerciseId === command.exerciseId);
   if (!slot) return { status: "rejected", reason: "performed_slot_not_in_prescription" };
-  const event = { eventId: `${command.recordedSessionId}:performance:${command.setId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "performance" as const, occurredAt: command.occurredAt, operationId: command.operationId, payload: { setId: command.setId, slotId: command.slotId, exerciseId: command.exerciseId, setOrder: command.setOrder, reps: command.reps, load: command.load, unit: command.unit, effort: command.effort, substitutionId: command.substitutionId, completion: command.completion, provenance: command.provenance } };
+  const existingSet = effectiveCanonicalPerformedWork(aggregate.events).find((event) => String(event.payload.setId) === command.setId);
+  if (existingSet) {
+    const equivalent = Number(existingSet.payload.reps) === command.reps
+      && Number(existingSet.payload.load) === command.load
+      && String(existingSet.payload.unit) === command.unit
+      && String(existingSet.payload.completion) === command.completion;
+    return { status: equivalent ? "idempotent" : "rejected", reason: equivalent ? "performed_work_already_recorded" : "performed_set_conflict", ledgerVersion: aggregate.session.version };
+  }
+  const instruction = nextSetInstruction(aggregate.session.prescriptionSnapshot, command.slotId, command.setOrder, command.reps, command.load, command.provenance);
+  const event = { eventId: `${command.recordedSessionId}:performance:${command.setId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "performance" as const, occurredAt: command.occurredAt, operationId: command.operationId, payload: { setId: command.setId, slotId: command.slotId, exerciseId: command.exerciseId, setOrder: command.setOrder, reps: command.reps, load: command.load, unit: command.unit, effort: command.effort, substitutionId: command.substitutionId, completion: command.completion, provenance: command.provenance, nextInstruction: instruction } };
   const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, event);
   if (appended.status === "stale") return { status: "rejected", reason: "stale_ledger_version" };
   if (appended.status !== "saved") return { status: "rejected", reason: appended.reason ?? "performed_work_conflict" };
-  const evidence = canonicalProgressEvidenceRepository.record({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:evidence:${command.setId}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, slotId: command.slotId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}`, kind: "performance", observations: { reps: command.reps, load: command.load, completion: command.completion, ...(command.effort === undefined ? {} : { effort: command.effort }) }, evidenceVersion: "progress_v1" });
+  const evidence = canonicalProgressEvidenceRepository.record({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:evidence:${command.setId}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, slotId: command.slotId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}`, kind: "performance", observations: { exerciseId: command.exerciseId, loadingMode: canonicalSlotLoadingMode(slot), reps: command.reps, load: command.load, unit: command.unit, completion: command.completion, ...(command.effort === undefined ? {} : { effort: command.effort }) }, evidenceVersion: "progress_v1" });
   canonicalActivePlanState.hydrate();
-  const instruction = nextSetInstruction(aggregate.session.prescriptionSnapshot, command.slotId, command.setOrder, command.reps, command.load, command.provenance);
   if (evidence.status === "saved" || evidence.status === "duplicate") startCanonicalRestTimer({ workoutId: aggregate.session.recordedSessionId, setId: command.setId, durationSeconds: Number(((slot.rest as Record<string, unknown> | undefined)?.seconds ?? 90)) });
   return { status: evidence.status === "saved" || evidence.status === "duplicate" ? "applied" : "retryable", reason: evidence.status === "saved" || evidence.status === "duplicate" ? "performed_work_recorded" : "progress_evidence_pending", ledgerVersion: appended.session!.version, nextInstruction: instruction };
 }
@@ -89,7 +108,50 @@ export function editCanonicalPerformedWork(command: CanonicalEditPerformedWorkCo
   if (!original) return { status: "rejected", reason: "performed_set_not_found" };
   const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, { eventId: `${command.recordedSessionId}:repair:${command.operationId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "repair", occurredAt: command.occurredAt, operationId: command.operationId, payload: { ...command, editedSetId: command.setId, replacesEventId: original.eventId } });
   if (appended.status !== "saved") return { status: "rejected", reason: "performed_work_edit_conflict" };
-  return { status: "applied", reason: "performed_work_edited", ledgerVersion: appended.session!.version, nextInstruction: nextSetInstruction(aggregate.session.prescriptionSnapshot, command.slotId, command.setOrder, command.reps, command.load, command.provenance) };
+  const snapshot = aggregate.session.prescriptionSnapshot as Record<string, unknown>;
+  const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
+  const slot = slots.find((candidate) => String(candidate.id) === command.slotId);
+  const evidence = canonicalProgressEvidenceRepository.replace({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:evidence:${command.setId}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, slotId: command.slotId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}:repair`, kind: "performance", observations: { exerciseId: command.exerciseId, loadingMode: canonicalSlotLoadingMode(slot), reps: command.reps, load: command.load, unit: command.unit, completion: command.completion, ...(command.effort === undefined ? {} : { effort: command.effort }) }, evidenceVersion: "progress_v1" });
+  canonicalActivePlanState.hydrate();
+  return { status: evidence.status === "saved" ? "applied" : "retryable", reason: evidence.status === "saved" ? "performed_work_edited" : "performed_work_edited_with_evidence_pending", ledgerVersion: appended.session!.version, nextInstruction: nextSetInstruction(aggregate.session.prescriptionSnapshot, command.slotId, command.setOrder, command.reps, command.load, command.provenance) };
+}
+
+export type CanonicalDiscardSessionCommand = CanonicalRecordedLifecycleCommand;
+export function discardCanonicalSessionAttempt(command: CanonicalDiscardSessionCommand): CanonicalRecordedLifecycleResult {
+  const loaded = canonicalActivePlanV2Repository.get();
+  if (loaded.status !== "saved") return { status: "rejected", reason: "canonical_plan_unavailable" };
+  if (loaded.carrier.planId !== command.planId || loaded.carrier.revision !== command.expectedPlanRevision) return { status: "rejected", reason: "stale_plan_revision" };
+  const aggregate = canonicalRecordedSessionLedger.get(command.recordedSessionId);
+  if (aggregate.status !== "found") {
+    const restored = loaded.carrier.plannedSessions.some((session) => session.id === command.recordedSessionId.replace(`${command.planId}:recorded:`, ""));
+    return restored ? { status: "idempotent", reason: "discard_already_applied", planRevision: loaded.carrier.revision } : { status: "rejected", reason: "recorded_session_not_found" };
+  }
+  if (aggregate.session.version !== command.expectedLedgerVersion) return { status: "rejected", reason: "stale_ledger_version" };
+  if (!["pending", "started", "paused"].includes(aggregate.session.status)) return { status: "rejected", reason: "completed_history_cannot_be_discarded" };
+  const reference = loaded.carrier.recordedSessionReferences?.find((item) => item.sessionId === command.recordedSessionId);
+  const snapshot = aggregate.session.prescriptionSnapshot as Record<string, unknown>;
+  const planSessionIndex = Number(snapshot.planSessionIndex);
+  if (!Number.isInteger(planSessionIndex) || planSessionIndex < 0 || aggregate.session.prescriptionHash !== prescriptionHash(snapshot)) return { status: "rejected", reason: "discard_prescription_integrity_mismatch" };
+  const alreadyRestored = loaded.carrier.plannedSessions.some((session) => session.id === aggregate.session.plannedSessionId);
+  if (!reference && !alreadyRestored) return { status: "rejected", reason: "recorded_session_linkage_missing" };
+  const nextRevision = loaded.carrier.revision + 1;
+  const restoredPlanned = { id: aggregate.session.plannedSessionId, microcycleId: aggregate.session.microcycleId, planSessionIndex, role: aggregate.session.role, kind: "planned" as const, status: "planned" as const, constructionVersion: aggregate.session.provenance.constructionVersion ?? "canonical_plan_v3", revision: aggregate.session.startRevision, prescriptionSnapshot: aggregate.session.prescriptionSnapshot };
+  const next = {
+    ...loaded.carrier,
+    revision: nextRevision,
+    updatedAt: command.occurredAt,
+    plannedSessions: (alreadyRestored ? loaded.carrier.plannedSessions : [...loaded.carrier.plannedSessions, restoredPlanned]).slice().sort((left, right) => left.planSessionIndex - right.planSessionIndex),
+    recordedSessionReferences: (loaded.carrier.recordedSessionReferences ?? []).filter((item) => item.sessionId !== command.recordedSessionId),
+    progress: { ...loaded.carrier.progress, revision: nextRevision },
+  };
+  const saved = canonicalActivePlanV2Repository.saveAtomically(next, loaded.carrier.revision);
+  if (saved.status !== "saved") return { status: "retryable", reason: "discard_carrier_update_pending" };
+  const deleted = canonicalRecordedSessionLedger.deleteActive(command.recordedSessionId, command.expectedLedgerVersion);
+  if (deleted.status !== "deleted" && deleted.status !== "not_found") return { status: "retryable", reason: deleted.reason ?? "discard_ledger_cleanup_pending", planRevision: nextRevision };
+  canonicalProgressEvidenceRepository.removeSession(command.planId, command.recordedSessionId);
+  canonicalRestTimerRepository.clear(command.recordedSessionId);
+  canonicalActivePlanState.hydrate();
+  return { status: "applied", reason: "session_attempt_discarded", planRevision: nextRevision };
 }
 
 function nextSetInstruction(snapshot: Readonly<Record<string, unknown>>, slotId: string, setOrder: number, reps: number, load: number, _provenance: string): string {
@@ -101,6 +163,15 @@ function nextSetInstruction(snapshot: Readonly<Record<string, unknown>>, slotId:
   if (setOrder < required) return `Rest ${rest} sec, then repeat ${load} kg × ${reps}`;
   const next = slots.find((candidate) => Number(((candidate.settings as Record<string, unknown> | undefined)?.requiredSets ?? 1)) > 0 && String(candidate.id) !== slotId);
   return next ? `Rest ${rest} sec, then move to the next exercise` : `Rest ${rest} sec, then finish when ready`;
+}
+
+function canonicalSlotLoadingMode(slot: Record<string, unknown> | undefined): string {
+  if (!slot) return "unavailable";
+  const prescription = slot.loadPrescription;
+  const prescribedMode = prescription && typeof prescription === "object"
+    ? (prescription as Record<string, unknown>).loadingMode
+    : undefined;
+  return String(prescribedMode ?? slot.loadingMode ?? "unavailable");
 }
 
 export function restoreCanonicalRecordedSessionFromLedger(planId: string, recordedSessionId: string) {

@@ -2,7 +2,8 @@ import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-p
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
-import { completeCanonicalSession, pauseCanonicalSession, recordCanonicalPerformedWork, resumeCanonicalSession, restoreCanonicalRecordedSessionFromLedger, startCanonicalSession, type CanonicalPerformedWorkCommand, type CanonicalRecordedLifecycleCommand, type CanonicalStartSessionCommand } from "@/application/training/canonical-recorded-session-application";
+import { completeCanonicalSession, discardCanonicalSessionAttempt, editCanonicalPerformedWork, pauseCanonicalSession, recordCanonicalPerformedWork, resumeCanonicalSession, restoreCanonicalRecordedSessionFromLedger, startCanonicalSession, type CanonicalPerformedWorkCommand, type CanonicalRecordedLifecycleCommand, type CanonicalStartSessionCommand } from "@/application/training/canonical-recorded-session-application";
+import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 
 export const CANONICAL_TRAIN_SESSION_PROJECTION_VERSION = "canonical_train_session_projection_v1" as const;
 
@@ -39,7 +40,7 @@ export function projectCanonicalTrainSession(planId: string, recordedSessionId: 
   const snapshot = session.prescriptionSnapshot as Record<string, unknown>;
   const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
   if (slots.some((slot) => typeof slot.id !== "string" || typeof slot.exerciseId !== "string") || hasLegacyFields(snapshot)) return { status: "rejected", reason: "invalid_prescription_snapshot" };
-  const events = aggregate.events.filter((event) => event.type === "performance");
+  const events = effectiveCanonicalPerformedWork(aggregate.events);
   const slotProjections = slots.slice().sort((a, b) => Number(a.index) - Number(b.index)).map((slot) => {
     const performed: readonly Readonly<Record<string, unknown>>[] = events.filter((event) => String((event.payload as Record<string, unknown>).slotId) === slot.id).map((event) => ({ ...(event.payload as Record<string, unknown>), eventId: event.eventId }));
     const substitutionIds = performed.flatMap((event) => event.substitutionId ? [String(event.substitutionId)] : []);
@@ -55,7 +56,9 @@ export const canonicalTrainCommands = {
   start: (command: CanonicalStartSessionCommand) => startCanonicalSession(command),
   restore: (planId: string, recordedSessionId: string) => restoreCanonicalRecordedSessionFromLedger(planId, recordedSessionId),
   performedWork: (command: CanonicalPerformedWorkCommand) => recordCanonicalPerformedWork(command),
+  editPerformedWork: (command: CanonicalPerformedWorkCommand) => editCanonicalPerformedWork(command),
   pause: (command: CanonicalRecordedLifecycleCommand) => pauseCanonicalSession(command),
   resume: (command: CanonicalRecordedLifecycleCommand) => resumeCanonicalSession(command),
   complete: (command: CanonicalRecordedLifecycleCommand) => completeCanonicalSession(command),
+  discard: (command: CanonicalRecordedLifecycleCommand) => discardCanonicalSessionAttempt(command),
 };

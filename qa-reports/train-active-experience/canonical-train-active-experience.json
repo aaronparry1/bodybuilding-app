@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "canonical_train_active_experience_evidence_v1",
+  "sourceHead": "17a9d68",
+  "renderEnvironment": {
+    "platform": "Expo web",
+    "native": false,
+    "mode": "development Design-QA",
+    "primaryViewport": {
+      "width": 390,
+      "height": 844
+    },
+    "narrowViewport": {
+      "width": 320,
+      "height": 568,
+      "documentScrollWidth": 320,
+      "horizontalOverflow": false
+    },
+    "consoleErrors": 0,
+    "consoleWarnings": 0
+  },
+  "programmePreconditions": {
+    "purposefulRepeatRemainsAvailable": true,
+    "repeatAuthority": "goal_phase_lift_exposure_or_progression",
+    "fiveDayVerticalPressAbsence": "phase_specific_deliberate_allocation",
+    "unservedRequiredVerticalPressSlot": false
+  },
+  "canonicalOwners": [
+    "canonical_active_plan_state",
+    "canonical_session_snapshot_v3",
+    "canonical_recorded_session_ledger_v1",
+    "canonical_progress_evidence_v1",
+    "canonical_rest_timer_v1"
+  ],
+  "captures": [
+    {
+      "state": "workout_preview",
+      "file": "visuals/01-workout-preview.png",
+      "sha256": "210afc7018e0f05c94897eb109762f103226210d53059812edff79e793ebf5e8"
+    },
+    {
+      "state": "first_exposure_calibration",
+      "file": "visuals/02-first-exposure-calibration.png",
+      "sha256": "296e9e97428ebbd40e4409738395bb6854ebc991644392082d8da2534603c5bc"
+    },
+    {
+      "state": "active_prescribed_workout_and_finish_disabled",
+      "file": "visuals/03-active-prescribed-workout.png",
+      "sha256": "ba883c748b2117430e0a09221be685a716f1cc908ad018a21c865f1e8ac8e351"
+    },
+    {
+      "state": "rest_timer_with_current_completed_upcoming_sets",
+      "file": "visuals/04-rest-completed-upcoming.png",
+      "sha256": "31d6818d0e44c49638d17dd3761797a3ed7276139712d2d9bda2c2218478363b"
+    },
+    {
+      "state": "completed_set_editing",
+      "file": "visuals/05-completed-set-editing.png",
+      "sha256": "d6e9fde85d53c16d7b5979c1a92ba74fbbae455731d0e989404cddc793ab270c"
+    },
+    {
+      "state": "close_pause_discard_menu",
+      "file": "visuals/06-close-pause-discard-menu.png",
+      "sha256": "3964f88cf5b31c54749f18313c4ac2acad0ad9e80bb2efc34c983e5d7169babb"
+    },
+    {
+      "state": "workout_complete",
+      "file": "visuals/07-workout-complete.png",
+      "sha256": "e028ba3a5d19a51146bc25c602ca2d47fe184eeada4d401ddc1b31d793280a0f"
+    },
+    {
+      "state": "narrowest_phone_preview",
+      "file": "visuals/08-narrowest-phone-preview.png",
+      "sha256": "a262186dbd7c16b58f6e6a4ee85291a01bb3cec3c4a78014f485e934f5f44811"
+    }
+  ],
+  "lifecycleSemantics": {
+    "previewMutatesLifecycle": false,
+    "startRequiresExplicitAction": true,
+    "pausePersistsValidWork": true,
+    "pausePersistsRestTimer": true,
+    "discardDeletesOnlyActiveAttempt": true,
+    "discardPreservesCompletedHistory": true,
+    "completionIsIdempotent": true
+  },
+  "verification": {
+    "baseline": {
+      "testFiles": 336,
+      "tests": 1993
+    },
+    "focused": {
+      "testFilesPassed": 18,
+      "testsPassed": 54,
+      "testsFailed": 0
+    },
+    "fullSuite": {
+      "testFilesPassed": 339,
+      "testsPassed": 2007,
+      "testsFailed": 0,
+      "testFileDelta": 3,
+      "testDelta": 14
+    },
+    "typecheck": "passed",
+    "lintScriptConfigured": false,
+    "expoPublicConfig": "passed",
+    "webExport": "passed"
+  },
+  "externalBuildOrUploadPerformed": false
+}

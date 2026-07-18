@@ -16,8 +16,8 @@ export function validateCanonicalRecordedSession(value: unknown): { status: "val
 
 export function allowedRecordedSessionTransition(from: CanonicalRecordedSessionStatus, event: CanonicalRecordedSessionEvent["type"]): boolean {
   if (from === "pending") return event === "started" || event === "repair";
-  if (from === "started") return ["paused", "performance", "completed"].includes(event);
-  if (from === "paused") return ["resumed", "performance", "completed"].includes(event);
+  if (from === "started") return ["paused", "performance", "completed", "repair"].includes(event);
+  if (from === "paused") return ["resumed", "performance", "completed", "repair"].includes(event);
   if (from === "completed") return event === "historical";
   return event === "repair";
 }

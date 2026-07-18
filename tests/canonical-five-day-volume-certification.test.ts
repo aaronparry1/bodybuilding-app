@@ -157,4 +157,17 @@ describe("canonical five-day microcycle certification", () => {
   it("generates byte-equivalent prescriptions for identical inputs", () => {
     expect(JSON.stringify(construct())).toBe(JSON.stringify(construct()));
   });
+
+  it("treats this fixture's absent vertical press as a phase-specific certified result, not an unserved universal slot", () => {
+    const result = construct();
+    if (result.status !== "constructed") throw new Error(result.reason);
+    const snapshots = result.carrier.plannedSessions.map((session) => session.prescriptionSnapshot as CanonicalSessionSnapshotV3);
+    const verticalPresses = snapshots.flatMap((session) => session.slots).filter((slot) => exerciseLibrary.find((exercise) => exercise.id === slot.exerciseId)?.movementPattern === "vertical_push");
+    const allocation = allocateCanonicalMicrocycleVolume({ macrocycleGoal: "build_muscle_and_strength", mesocycleId: result.carrier.mesocycle.id, mesocyclePurpose: result.carrier.mesocycle.output.adaptation, microcyclePriority: result.carrier.microcycle.output.priority, microcycleSequence: result.carrier.microcycle.output.sequenceNumber, experience: "intermediate", frequency: 5, split: "let_app_choose", equipment: fullEquipment, recoveryRestricted: false, establishedLoadExerciseIds: [], sessionRoles: result.carrier.microcycle.output.sessionRoles });
+    const certification = certifyCanonicalConstructedMicrocycle({ allocation, sessions: snapshots, exercises: exerciseLibrary });
+    expect(verticalPresses).toHaveLength(0);
+    expect(certification.status).toBe("passed");
+    expect(certification.meaningfulSecondaryStimulusSets.anterior_delts).toBeGreaterThanOrEqual(6);
+    expect(allocation.slots.some((slot) => slot.movementPatterns.includes("vertical_push"))).toBe(false);
+  });
 });

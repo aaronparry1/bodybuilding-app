@@ -51,7 +51,7 @@ export default function MainTabsLayout() {
       }}
     >
       <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="train" options={{ title: "Train" }} />
+      <Tabs.Screen name="train" options={{ title: "Train", headerShown: false }} />
       <Tabs.Screen name="programmes" options={{ title: "Plan" }} />
       <Tabs.Screen name="analytics" options={{ title: "Progress" }} />
       <Tabs.Screen name="library" options={{ title: "Library" }} />

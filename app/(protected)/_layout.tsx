@@ -74,6 +74,7 @@ export default function ProtectedLayout() {
         <Stack.Screen name="analytics/muscles" options={{ title: "Muscle Analytics" }} />
         <Stack.Screen name="paywall" options={{ title: "Adaptive Strength Coach Premium" }} />
         <Stack.Screen name="session-prep" options={{ title: "Session Prep" }} />
+        <Stack.Screen name="completion-summary" options={{ title: "Workout complete", headerBackVisible: false }} />
         <Stack.Screen name="capacity-focus" options={{ title: "Low Back Capacity" }} />
         <Stack.Screen name="onboarding" options={{ title: "Welcome" }} />
         <Stack.Screen name="settings" options={{ title: "Settings" }} />
