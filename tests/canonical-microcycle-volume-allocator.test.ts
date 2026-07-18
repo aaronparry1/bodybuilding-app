@@ -32,15 +32,15 @@ describe("canonical microcycle volume allocator", () => {
     expect(result.policyId).toBe(canonicalMicrocycleVolumePolicy.policyId);
     expect(result.certification.failures).toEqual([]);
     expect(result.certification.status).toBe("passed");
-    expect(result.directSetTargets).toEqual({ chest: { min: 6, max: 16 }, back: { min: 6, max: 16 }, quads: { min: 6, max: 16 }, hamstrings: { min: 6, max: 16 }, glutes: { min: 6, max: 16 }, shoulders: { min: 4, max: 14 }, triceps: { min: 4, max: 14 }, biceps: { min: 4, max: 14 }, calves: { min: 4, max: 14 }, abs: { min: 2, max: 6 } });
-    expect(result.directSets).toEqual({ chest: 10, shoulders: 5, triceps: 4, quads: 8.5, glutes: 6.5, hamstrings: 6, calves: 4, back: 9, biceps: 4, abs: 2 });
-    expect(result.indirectContributions).toEqual({ convention: "not_quantified_without_explicit_policy", sets: {} });
-    expect(result.primaryLiftExposures).toEqual({ bench: 1, squat: 1, deadlift: 1 });
-    expect(result.movementPatternExposures).toEqual({ horizontal_push: 3, vertical_push: 1, isolation: 9, squat: 3, hinge: 1, horizontal_pull: 2, vertical_pull: 1, hip_thrust: 1, core: 1 });
-    expect(result.sessionWorkingSets).toEqual([12, 11, 12, 12, 12]);
+    expect(result.directSetTargets).toEqual({ chest: { min: 6, max: 16 }, lats: { min: 3, max: 13 }, upper_back: { min: 5, max: 15 }, lateral_delts: { min: 3, max: 9 }, rear_delts: { min: 2, max: 8 }, triceps: { min: 4, max: 14 }, biceps: { min: 4, max: 14 }, quadriceps: { min: 6, max: 16 }, hamstrings_knee_flexion: { min: 4, max: 14 }, hip_extension: { min: 5, max: 15 }, calves: { min: 4, max: 14 }, core: { min: 2, max: 8 } });
+    expect(result.directSets).toEqual({ chest: 10, lateral_delts: 4, triceps: 4, quadriceps: 10, hamstrings_knee_flexion: 4, calves: 4, hip_extension: 6, upper_back: 6, lats: 3, biceps: 4, rear_delts: 2, core: 2 });
+    expect(result.indirectContributions).toEqual({ convention: "certified_from_selected_exercise_metadata", sets: {} });
+    expect(result.primaryLiftExposures).toEqual({ bench: { primary: 1, secondaryVariation: 1 }, squat: { primary: 1, secondaryVariation: 0 }, deadlift: { primary: 1, secondaryVariation: 0 } });
+    expect(result.movementPatternExposures).toEqual({ horizontal_push: 3, isolation: 11, squat: 3, lunge: 2, hinge: 1, horizontal_pull: 2, vertical_pull: 1, hip_thrust: 1, core: 1 });
+    expect(result.sessionWorkingSets).toEqual([11, 11, 11, 14, 12]);
     expect(result.totalWorkingSets).toBe(59);
-    expect(result.estimatedSessionMinutes).toEqual([44, 41, 44, 44, 44]);
-    expect(result.fatigue).toEqual({ perSession: [26, 22, 23, 18, 18], weeklyUnits: 107, overlapFlags: [] });
+    expect(result.estimatedSessionMinutes).toEqual([41, 41, 41, 50, 44]);
+    expect(result.fatigue).toEqual({ perSession: [22, 22, 23, 20, 18], weeklyUnits: 105, overlapFlags: [] });
   });
 
   it("allocates less work to a beginner while retaining every authorised contribution", () => {
@@ -48,10 +48,10 @@ describe("canonical microcycle volume allocator", () => {
     const intermediate = allocate("intermediate");
 
     expect(beginner.certification.status).toBe("passed");
-    expect(beginner.totalWorkingSets).toBe(49);
-    expect(beginner.sessionWorkingSets).toEqual([9, 9, 10, 10, 11]);
+    expect(beginner.totalWorkingSets).toBe(50);
+    expect(beginner.sessionWorkingSets).toEqual([9, 9, 9, 12, 11]);
     expect(beginner.totalWorkingSets).toBeLessThan(intermediate.totalWorkingSets);
-    expect(beginner.directSets).toEqual({ chest: 7, shoulders: 4, triceps: 4, quads: 6, glutes: 5.5, hamstrings: 5.5, calves: 4, back: 7, biceps: 4, abs: 2 });
+    expect(beginner.directSets).toEqual({ chest: 7, lateral_delts: 4, triceps: 4, quadriceps: 7, hamstrings_knee_flexion: 4, calves: 4, hip_extension: 5, upper_back: 4, lats: 3, biceps: 4, rear_delts: 2, core: 2 });
   });
 
   it("is deterministic for deep-equivalent inputs", () => {
@@ -76,6 +76,40 @@ describe("canonical microcycle volume allocator", () => {
       });
       expect(result.status, `${macrocycleGoal}/${daysPerWeek}`).toBe("constructed");
       if (result.status === "constructed") expect(result.carrier.plannedSessions).toHaveLength(daysPerWeek);
+    }
+  });
+
+  it.each([
+    ["build_muscle", "beginner", 3, "full_body"],
+    ["build_muscle", "intermediate", 3, "push_pull_legs"],
+    ["build_muscle", "intermediate", 4, "upper_lower"],
+    ["build_strength", "advanced", 4, "bench_squat_deadlift"],
+    ["build_muscle_and_strength", "beginner", 5, "let_app_choose"],
+    ["build_muscle_and_strength", "advanced", 5, "let_app_choose"],
+    ["athletic_performance", "intermediate", 2, "full_body"],
+    ["athletic_performance", "intermediate", 6, "upper_lower"],
+    ["get_leaner", "intermediate", 3, "full_body"],
+    ["get_leaner", "intermediate", 5, "push_pull_legs"],
+  ] as const)("retains goal/frequency/split-specific construction for %s %s %s-day %s", (macrocycleGoal, experienceLevel, daysPerWeek, preferredSplit) => {
+    const result = constructCanonicalActivePlanFromCanonicalInputs({
+      planId: `quality-matrix-${macrocycleGoal}-${experienceLevel}-${daysPerWeek}-${preferredSplit}`,
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      goal: macrocycleGoal === "get_leaner" ? "body_recomposition" : macrocycleGoal === "build_muscle" ? "hypertrophy" : "strength_hypertrophy",
+      macrocycleGoal,
+      experienceLevel,
+      daysPerWeek,
+      preferredSplit,
+      equipment: fullEquipment,
+      units: "kg",
+      exercises: exerciseLibrary,
+      history: [],
+    });
+    expect(result.status, result.status === "constructed" ? undefined : result.reason).toBe("constructed");
+    if (result.status === "constructed") {
+      expect(result.carrier.plannedSessions).toHaveLength(daysPerWeek);
+      expect(result.carrier.microcycle.output.split).toBe(preferredSplit);
+      expect(result.carrier.constraints.experienceLevel).toBe(experienceLevel);
     }
   });
 

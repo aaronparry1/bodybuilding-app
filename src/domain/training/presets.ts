@@ -1,5 +1,6 @@
 import type {
   BlockCompatibility,
+  CanonicalStimulusRegion,
   Equipment,
   Exercise,
   ExerciseFamily,
@@ -7,6 +8,7 @@ import type {
   ExerciseKind,
   ExerciseMeasurementType,
   ExerciseRole,
+  ExerciseSelectionProfile,
   ExerciseSuitability,
   ExerciseTier,
   JointStressEstimate,
@@ -41,6 +43,13 @@ type ExerciseSeed = {
   fatigueCost?: ExerciseFatigueCost;
   jointStress?: JointStressEstimate;
   suitability?: ExerciseSuitability[];
+  stability?: "low" | "moderate" | "high";
+  skillDemand?: "low" | "moderate" | "high";
+  loadability?: "low" | "moderate" | "high";
+  selectionProfile?: ExerciseSelectionProfile;
+  hypertrophyBias?: "lengthened" | "neutral" | "shortened";
+  stimulusProfile?: Readonly<{ direct: CanonicalStimulusRegion[]; meaningfulSecondary?: CanonicalStimulusRegion[] }>;
+  primaryLift?: "bench" | "squat" | "deadlift";
   repRange?: { min: number; max: number };
   measurementType?: ExerciseMeasurementType;
   durationIncreaseSeconds?: number;
@@ -84,6 +93,13 @@ function createExercise(seed: ExerciseSeed): Exercise {
     fatigueCost,
     jointStress,
     suitability,
+    stability: seed.stability ?? inferStability(seed, role),
+    skillDemand: seed.skillDemand ?? inferSkillDemand(seed, role),
+    loadability: seed.loadability ?? inferLoadability(seed),
+    selectionProfile: seed.selectionProfile ?? inferSelectionProfile(seed),
+    hypertrophyBias: seed.hypertrophyBias,
+    stimulusProfile: inferStimulusProfile(seed),
+    primaryLift: seed.primaryLift,
     isBeginnerFriendly: seed.beginner ?? suitability.includes("beginner"),
     isAdvanced: seed.advanced ?? !suitability.includes("beginner"),
     notes: seed.notes,
@@ -92,7 +108,7 @@ function createExercise(seed: ExerciseSeed): Exercise {
     mesocycleEligibility: inferMesocycleEligibility(seed),
     sessionRoleEligibility: inferSessionRoleEligibility(seed),
     setMethodEligibility: inferSetMethodEligibility(seed),
-    competitionLift: isCompetitionLift(seed),
+    competitionLift: Boolean(seed.primaryLift),
     swapTags: seed.swapTags ?? [seed.category, seed.movementPattern, seed.kind, role, family, tier, ...seed.equipment],
     createdByUserId: null,
     isCustom: false,
@@ -109,7 +125,55 @@ function inferMacrocycleEngines(seed: ExerciseSeed) { return seed.movementPatter
 function inferMesocycleEligibility(seed: ExerciseSeed) { return seed.suitableBlocks ?? ["hypertrophy", "powerbuilding", "strength_hypertrophy", "strength", "power", "peak", "deload"]; }
 function inferSessionRoleEligibility(seed: ExerciseSeed) { return [seed.movementPattern, seed.category]; }
 function inferSetMethodEligibility(seed: ExerciseSeed) { return seed.kind === "barbell" && (seed.movementPattern === "squat" || seed.movementPattern === "hinge" || seed.movementPattern.includes("push")) ? ["exact_straight_sets", "top_set_backoffs", "five_three_one", "eight_across"] : ["exact_straight_sets", "controlled_performance_set"]; }
-function isCompetitionLift(seed: ExerciseSeed) { return /barbell (back squat|bench press|deadlift)/i.test(seed.id); }
+function inferStability(seed: ExerciseSeed, role: ExerciseRole): "low" | "moderate" | "high" {
+  if (seed.kind === "machine" || seed.kind === "cable") return "high";
+  if (role === "primary_compound" && seed.kind === "barbell") return "moderate";
+  if (seed.kind === "dumbbell" || seed.kind === "smith") return "moderate";
+  return "high";
+}
+
+function inferSkillDemand(seed: ExerciseSeed, role: ExerciseRole): "low" | "moderate" | "high" {
+  if (seed.advanced || role === "power") return "high";
+  if (role === "primary_compound") return "moderate";
+  return "low";
+}
+
+function inferLoadability(seed: ExerciseSeed): "low" | "moderate" | "high" {
+  if (seed.kind === "barbell" || seed.kind === "machine" || seed.kind === "smith") return "high";
+  if (seed.kind === "dumbbell" || seed.kind === "cable") return "moderate";
+  return "low";
+}
+
+function inferSelectionProfile(seed: ExerciseSeed): ExerciseSelectionProfile {
+  const blocks = seed.suitableBlocks ?? [];
+  if (blocks.length > 0 && blocks.every((block) => block === "strength" || block === "power" || block === "peak")) return "strength_specialist";
+  if (seed.stability === "high" || seed.kind === "machine" || seed.kind === "cable") return "stable_hypertrophy";
+  return "general";
+}
+
+function inferStimulusProfile(seed: ExerciseSeed): NonNullable<Exercise["stimulusProfile"]> {
+  if (seed.stimulusProfile) return { direct: [...seed.stimulusProfile.direct], meaningfulSecondary: [...(seed.stimulusProfile.meaningfulSecondary ?? [])] };
+  const direct: CanonicalStimulusRegion[] = [];
+  const secondary: CanonicalStimulusRegion[] = [];
+  if (seed.primaryMuscles.includes("chest")) direct.push("chest");
+  if (seed.primaryMuscles.includes("back")) direct.push(seed.movementPattern === "vertical_pull" ? "lats" : "upper_back");
+  if (seed.primaryMuscles.includes("quads")) direct.push("quadriceps");
+  if (seed.primaryMuscles.includes("hamstrings")) direct.push(seed.movementPattern === "isolation" ? "hamstrings_knee_flexion" : "hip_extension");
+  if (seed.primaryMuscles.includes("glutes") && (seed.movementPattern === "hinge" || seed.movementPattern === "hip_thrust")) direct.push("hip_extension");
+  if (seed.primaryMuscles.includes("triceps")) direct.push("triceps");
+  if (seed.primaryMuscles.includes("biceps")) direct.push("biceps");
+  if (seed.primaryMuscles.includes("calves")) direct.push("calves");
+  if (seed.primaryMuscles.includes("abs")) direct.push("core");
+  if (seed.primaryMuscles.includes("rear_delts")) direct.push("rear_delts");
+  if (seed.movementPattern === "vertical_push") direct.push("anterior_delts");
+  if (seed.secondaryMuscles?.includes("triceps")) secondary.push("triceps");
+  if (seed.secondaryMuscles?.includes("biceps")) secondary.push("biceps");
+  if (seed.secondaryMuscles?.includes("rear_delts")) secondary.push("rear_delts");
+  if (seed.secondaryMuscles?.includes("shoulders") && seed.movementPattern === "horizontal_push") secondary.push("anterior_delts");
+  if (seed.secondaryMuscles?.includes("back") && seed.movementPattern !== "vertical_pull") secondary.push("upper_back");
+  if (seed.secondaryMuscles?.includes("hamstrings") || seed.secondaryMuscles?.includes("glutes")) secondary.push("hip_extension");
+  return { direct: [...new Set(direct)], meaningfulSecondary: [...new Set(secondary)] };
+}
 
 function inferPrimaryExerciseRole(seed: ExerciseSeed): ExerciseRole {
   if (seed.role) return seed.role;
@@ -195,6 +259,8 @@ const baseExerciseLibrary: Exercise[] = [
     equipment: ["barbell"],
     movementPattern: "horizontal_push",
     kind: "barbell",
+    primaryLift: "bench",
+    stimulusProfile: { direct: ["chest"], meaningfulSecondary: ["triceps", "anterior_delts"] },
     beginner: true,
     notes: ["Pin shoulder blades back.", "Touch consistently. No trampoline reps."],
   }),
@@ -207,6 +273,9 @@ const baseExerciseLibrary: Exercise[] = [
     equipment: ["dumbbell"],
     movementPattern: "horizontal_push",
     kind: "dumbbell",
+    selectionProfile: "stable_hypertrophy",
+    hypertrophyBias: "lengthened",
+    stimulusProfile: { direct: ["chest"], meaningfulSecondary: ["anterior_delts", "triceps"] },
     beginner: true,
     notes: ["Keep elbows slightly tucked.", "Control the stretch before pressing."],
   }),
@@ -232,10 +301,12 @@ const baseExerciseLibrary: Exercise[] = [
     movementPattern: "vertical_pull",
     kind: "bodyweight",
     role: "primary_compound",
+    roles: ["primary_compound", "secondary_compound"],
     family: "vertical_pull",
     tier: "A",
     loadJump: 0,
     advanced: true,
+    stimulusProfile: { direct: ["lats"], meaningfulSecondary: ["biceps"] },
     notes: ["Start from a dead hang.", "Drive elbows down, chest up."],
   }),
   createExercise({
@@ -270,6 +341,9 @@ const baseExerciseLibrary: Exercise[] = [
     equipment: ["cable", "machine"],
     movementPattern: "vertical_pull",
     kind: "cable",
+    role: "secondary_compound",
+    selectionProfile: "stable_hypertrophy",
+    stimulusProfile: { direct: ["lats"], meaningfulSecondary: ["biceps"] },
     beginner: true,
     notes: ["Pull to upper chest.", "Let the lats stretch without losing the ribs."],
   }),
@@ -282,6 +356,8 @@ const baseExerciseLibrary: Exercise[] = [
     equipment: ["machine", "dumbbell"],
     movementPattern: "horizontal_pull",
     kind: "machine",
+    selectionProfile: "stable_hypertrophy",
+    stimulusProfile: { direct: ["upper_back"], meaningfulSecondary: ["biceps", "rear_delts"] },
     beginner: true,
     swapTags: ["chest-supported row", "chest supported row", "supported row", "horizontal_pull"],
     notes: ["Keep chest glued to the pad.", "Pull elbows back, not shoulders into ears."],
@@ -305,6 +381,7 @@ const baseExerciseLibrary: Exercise[] = [
     equipment: ["cable"],
     movementPattern: "isolation",
     kind: "cable",
+    stimulusProfile: { direct: ["lateral_delts"] },
     repRange: { min: 12, max: 20 },
     notes: ["Lead with elbows.", "Stop when traps try to steal the set."],
   }),
@@ -317,6 +394,7 @@ const baseExerciseLibrary: Exercise[] = [
     equipment: ["machine"],
     movementPattern: "isolation",
     kind: "machine",
+    stimulusProfile: { direct: ["rear_delts"], meaningfulSecondary: ["upper_back"] },
     repRange: { min: 12, max: 20 },
     beginner: true,
     notes: ["Reach wide, not back.", "Pause where the rear delts actually have a job."],
@@ -425,6 +503,8 @@ const baseExerciseLibrary: Exercise[] = [
     movementPattern: "isolation",
     kind: "machine",
     beginner: true,
+    selectionProfile: "stable_hypertrophy",
+    stimulusProfile: { direct: ["hamstrings_knee_flexion"] },
     notes: ["Keep hips pinned.", "Pause in the shortened position."],
   }),
   createExercise({
@@ -436,6 +516,7 @@ const baseExerciseLibrary: Exercise[] = [
     equipment: ["barbell"],
     movementPattern: "hip_thrust",
     kind: "barbell",
+    stimulusProfile: { direct: ["hip_extension"] },
     loadJump: 5,
     swapTags: ["hip thrust", "barbell hip thrust", "glute bridge", "barbell glute bridge"],
     notes: ["Posterior pelvic tilt at lockout.", "Own the pause. No bounce house reps."],
@@ -461,6 +542,7 @@ const baseExerciseLibrary: Exercise[] = [
     kind: "machine",
     repRange: { min: 8, max: 15 },
     beginner: true,
+    stimulusProfile: { direct: ["calves"] },
     notes: ["Deep stretch, hard top pause.", "No ankle twitching crimes."],
   }),
   createExercise({
@@ -472,6 +554,7 @@ const baseExerciseLibrary: Exercise[] = [
     movementPattern: "isolation",
     kind: "machine",
     repRange: { min: 10, max: 20 },
+    stimulusProfile: { direct: ["calves"] },
     notes: ["Pause at the bottom.", "Let the soleus cook."],
   }),
   createExercise({
@@ -740,6 +823,7 @@ const baseExerciseLibrary: Exercise[] = [
     kind: "dumbbell",
     repRange: { min: 12, max: 25 },
     beginner: true,
+    stimulusProfile: { direct: ["lateral_delts"] },
     notes: ["Lead with elbows.", "Small weights, large honesty."],
   }),
   createExercise({
@@ -752,6 +836,7 @@ const baseExerciseLibrary: Exercise[] = [
     kind: "machine",
     repRange: { min: 12, max: 25 },
     beginner: true,
+    stimulusProfile: { direct: ["lateral_delts"] },
     notes: ["Pad just above elbow.", "Keep traps unemployed."],
   }),
   createExercise({
@@ -764,6 +849,7 @@ const baseExerciseLibrary: Exercise[] = [
     movementPattern: "isolation",
     kind: "cable",
     repRange: { min: 12, max: 25 },
+    stimulusProfile: { direct: ["rear_delts"], meaningfulSecondary: ["upper_back"] },
     notes: ["Pull wide.", "Pause when rear delts are actually doing something."],
   }),
   createExercise({
@@ -783,6 +869,7 @@ const baseExerciseLibrary: Exercise[] = [
     jointStress: "low",
     repRange: { min: 12, max: 25 },
     beginner: true,
+    stimulusProfile: { direct: ["rear_delts"], meaningfulSecondary: ["upper_back"] },
     swapTags: ["face pull", "rope face pull", "cable face pull", "rear delt", "rear_delt_corrective", "upper back"],
     notes: ["Pull rope toward eyes.", "Rotate thumbs back."],
   }),
@@ -795,8 +882,10 @@ const baseExerciseLibrary: Exercise[] = [
     equipment: ["barbell"],
     movementPattern: "squat",
     kind: "barbell",
+    primaryLift: "squat",
+    stimulusProfile: { direct: ["quadriceps"], meaningfulSecondary: ["hip_extension"] },
     loadJump: 5,
-    advanced: true,
+    beginner: true,
     notes: ["Brace hard.", "Depth you can own."],
   }),
   createExercise({
@@ -923,6 +1012,8 @@ const baseExerciseLibrary: Exercise[] = [
     kind: "machine",
     repRange: { min: 8, max: 15 },
     beginner: true,
+    selectionProfile: "stable_hypertrophy",
+    stimulusProfile: { direct: ["hamstrings_knee_flexion"] },
     notes: ["Hips down.", "Curl through the full range."],
   }),
   createExercise({
@@ -1505,7 +1596,9 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     family: "hip_hinge",
     tier: "A",
     loadJump: 5,
-    advanced: true,
+    beginner: true,
+    primaryLift: "deadlift",
+    stimulusProfile: { direct: ["hip_extension"], meaningfulSecondary: ["upper_back", "quadriceps"] },
     suitableBlocks: ["powerbuilding", "strength", "peak"],
     notes: ["Brace before the pull.", "Push the floor away and keep the bar close."],
   },
@@ -1772,6 +1865,10 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     loadJump: 5,
     advanced: true,
     suitableBlocks: ["strength"],
+    selectionProfile: "strength_specialist",
+    stability: "low",
+    skillDemand: "high",
+    stimulusProfile: { direct: ["quadriceps"], meaningfulSecondary: ["hip_extension", "core"] },
     notes: ["Start from pins.", "Brace before every rep and own the first inch."],
   },
   {
@@ -2181,6 +2278,7 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     tier: "C",
     repRange: { min: 10, max: 20 },
     beginner: true,
+    stimulusProfile: { direct: ["anterior_delts"] },
     notes: ["Raise to shoulder height.", "Control the lower."],
   },
   {
@@ -2196,6 +2294,7 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     tier: "C",
     repRange: { min: 10, max: 20 },
     beginner: true,
+    stimulusProfile: { direct: ["anterior_delts"] },
     notes: ["Keep cable tension steady.", "Raise smoothly without swinging."],
   },
   {
@@ -2210,6 +2309,7 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     family: "shoulder_isolation",
     tier: "C",
     repRange: { min: 10, max: 20 },
+    stimulusProfile: { direct: ["lateral_delts"] },
     notes: ["Lean just enough to line up the raise.", "Own the top without shrugging."],
   },
   {
@@ -2317,11 +2417,14 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     movementPattern: "isolation",
     kind: "bodyweight",
     role: "accessory",
+    roles: ["accessory", "isolation"],
     family: "hamstring_isolation",
     tier: "B",
     repRange: { min: 3, max: 8 },
     advanced: true,
     fatigueCost: "moderate",
+    selectionProfile: "technique_variation",
+    stimulusProfile: { direct: ["hamstrings_knee_flexion"], meaningfulSecondary: ["hip_extension"] },
     notes: ["Control the descent.", "Use assistance before reps turn ugly."],
   },
   {
@@ -2333,6 +2436,7 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     movementPattern: "isolation",
     kind: "machine",
     role: "accessory",
+    roles: ["accessory", "isolation"],
     family: "hamstring_isolation",
     tier: "B",
     repRange: { min: 6, max: 12 },
@@ -2521,6 +2625,8 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     tier: "B",
     loadJump: 5,
     beginner: true,
+    selectionProfile: "stable_hypertrophy",
+    stimulusProfile: { direct: ["hip_extension"] },
     notes: ["Lock ribs down.", "Pause at full hip extension."],
   },
   {
@@ -2568,6 +2674,8 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     family: "vertical_pull",
     tier: "B",
     beginner: true,
+    selectionProfile: "stable_hypertrophy",
+    stimulusProfile: { direct: ["lats"], meaningfulSecondary: ["biceps"] },
     notes: ["Pull elbows down.", "Keep ribs stacked."],
   },
   {
@@ -2819,12 +2927,13 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     primaryMuscles: ["back"],
     secondaryMuscles: ["chest", "triceps"],
     equipment: ["dumbbell"],
-    movementPattern: "vertical_pull",
+    movementPattern: "isolation",
     kind: "dumbbell",
     role: "accessory",
-    family: "vertical_pull",
+    family: "other",
     tier: "C",
     repRange: { min: 10, max: 15 },
+    stimulusProfile: { direct: ["lats"], meaningfulSecondary: ["chest", "triceps"] },
     notes: ["Keep ribs down.", "Move through the shoulders, not the elbows."],
   },
   {
@@ -2855,6 +2964,8 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     family: "horizontal_press",
     tier: "B",
     loadJump: 5,
+    selectionProfile: "technique_variation",
+    stimulusProfile: { direct: ["chest"], meaningfulSecondary: ["triceps", "anterior_delts"] },
     notes: ["Settle shoulders first.", "Keep the bar path consistent."],
   },
   {
@@ -2995,6 +3106,7 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     tier: "C",
     repRange: { min: 12, max: 25 },
     beginner: true,
+    stimulusProfile: { direct: ["lateral_delts"] },
     notes: ["Set pad at elbow height.", "Raise smoothly and hold."],
   },
   {
@@ -3014,6 +3126,7 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     beginner: true,
     fatigueCost: "low",
     jointStress: "low",
+    stimulusProfile: { direct: ["rear_delts"], meaningfulSecondary: ["upper_back"] },
     swapTags: ["rear delt fly machine", "machine rear delt fly", "reverse pec deck", "rear_delt_corrective"],
     notes: ["Reach wide.", "Let rear delts, not traps, finish the rep."],
   },
@@ -3031,6 +3144,7 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     family: "rear_delt_corrective",
     tier: "C",
     repRange: { min: 12, max: 25 },
+    stimulusProfile: { direct: ["rear_delts"], meaningfulSecondary: ["upper_back"] },
     notes: ["Soft elbows.", "Pull wide, not high."],
   },
   {
@@ -3048,6 +3162,7 @@ const expandedExerciseSeeds: ExerciseSeed[] = [
     tier: "C",
     repRange: { min: 12, max: 25 },
     beginner: true,
+    stimulusProfile: { direct: ["rear_delts"], meaningfulSecondary: ["upper_back"] },
     notes: ["Chest pinned.", "Pause wide."],
   },
   {

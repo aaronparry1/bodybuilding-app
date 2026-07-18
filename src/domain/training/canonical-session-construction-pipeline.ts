@@ -8,7 +8,10 @@ import { withSetPrescription } from "@/domain/training/set-prescription";
 import { resolveCanonicalProgression, resolveCanonicalRest, resolveCanonicalStopRule, type CanonicalProgressionRule, type CanonicalRestInstruction, type CanonicalStopRule } from "@/domain/training/canonical-prescription-components";
 import { resolveCanonicalLoadPrescription } from "@/domain/training/canonical-load-resolution";
 import { validateCanonicalLoadPrescription, type CanonicalLoadEvidence, type CanonicalLoadPrescription } from "@/domain/training/canonical-load-prescription";
+import { withCanonicalCalibrationProtocol } from "@/domain/training/canonical-load-prescription";
 import { isStrictCanonicalAllocation, type CanonicalMicrocycleVolumeAllocation } from "@/domain/training/canonical-microcycle-volume-allocator";
+import { assessCanonicalExerciseRoleSuitability, type CanonicalExerciseRoleSuitabilityResult } from "@/domain/training/canonical-exercise-role-suitability";
+import { resolveCanonicalExactTarget } from "@/domain/training/canonical-exact-target-policy";
 
 export type CanonicalSessionConstructionInput = Readonly<{
   schemaVersion: "canonical_session_construction_input_v1";
@@ -19,11 +22,12 @@ export type CanonicalSessionConstructionInput = Readonly<{
   progress: Readonly<{ evidenceVersion: string; readiness?: "ready" | "restricted"; recoveryConstraint?: string; history: readonly WorkoutHistorySummary[]; establishedLoads?: Readonly<Record<string, number>>; loadEvidence?: Readonly<Record<string, CanonicalLoadEvidence>>; calibration?: Readonly<Record<string, { confidence: "low" | "moderate" | "high"; fresh: boolean }>>; fatigueEvidence?: readonly string[] }>;
   operational: Readonly<{ constructionVersion: string; seed: string; identity: string; revision: string }>;
   allocation?: CanonicalMicrocycleVolumeAllocation;
+  selectionContext?: Readonly<{ weeklyExerciseUsage: Readonly<Record<string, number>> }>;
 }>;
 
 export type SessionBlueprint = Readonly<{ sessionId: string; role: string; purpose: string; slots: readonly Readonly<{ role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; index: number; reason: string }>[]; strengthAnchorRequired: boolean; specialState: string }>;
 export type PlannedSessionSlot = Readonly<{ id: string; index: number; role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; laneCandidates: readonly TrainingLane[]; preferredLane: TrainingLane; methods: readonly PrescriptionMethodFamily[]; reason: string }>;
-type CanonicalSessionSnapshotBase = Readonly<{ sessionId: string; operationalIdentity: string; role: string; planSessionIndex: number; slots: readonly Readonly<{ id: string; index: number; exerciseId: string; lane: TrainingLane; method: PrescriptionMethodFamily; settings: ProgressionSettings; targetReps: number; rest: CanonicalRestInstruction; progression: CanonicalProgressionRule; stopRule: CanonicalStopRule; loadingMode: string; prescribedLoad?: number; substitutionConstraints: readonly string[]; reason: string }>[]; provenance: Readonly<{ inputVersion: string; policyVersion: string; constructionVersion: string; evidenceVersion: string }> }>;
+type CanonicalSessionSnapshotBase = Readonly<{ sessionId: string; operationalIdentity: string; role: string; planSessionIndex: number; slots: readonly Readonly<{ id: string; index: number; exerciseId: string; lane: TrainingLane; method: PrescriptionMethodFamily; settings: ProgressionSettings; targetReps: number; exactTargets?: readonly number[]; rest: CanonicalRestInstruction; progression: CanonicalProgressionRule; stopRule: CanonicalStopRule; loadingMode: string; prescribedLoad?: number; substitutionConstraints: readonly string[]; reason: string; selection?: Pick<CanonicalExerciseRoleSuitabilityResult, "policyId" | "suitability" | "reasons" | "repeatReason"> }>[]; provenance: Readonly<{ inputVersion: string; policyVersion: string; constructionVersion: string; evidenceVersion: string }> }>;
 export type CanonicalSessionSnapshotV2 = CanonicalSessionSnapshotBase & Readonly<{ schemaVersion: "canonical_session_snapshot_v2" }>;
 export type CanonicalSessionSnapshotV3 = Omit<CanonicalSessionSnapshotBase, "slots"> & Readonly<{ schemaVersion: "canonical_session_snapshot_v3"; slots: readonly (CanonicalSessionSnapshotBase["slots"][number] & Readonly<{ loadPrescription: CanonicalLoadPrescription }>)[] }>;
 export type CanonicalSessionSnapshot = CanonicalSessionSnapshotV2 | CanonicalSessionSnapshotV3;
@@ -89,22 +93,24 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
   if (!slotPlan) return { status: "blocked", reason: "no_valid_lane" };
   const slots: Array<CanonicalSessionSnapshotV3["slots"][number]> = [];
   const usedExerciseIds = new Set<string>();
+  let sessionHighFatigueSets = 0;
   for (const slot of slotPlan) {
     const allocatedSlot = input.allocation?.slots.find((candidate) => candidate.sessionIndex === input.microcycle.planSessionIndex && candidate.order === slot.index);
     const preferredPatterns = allocatedSlot?.movementPatterns ?? movementPatternsForSlot(input.microcycle.sessionRole, slot);
     const allRoleExercises = input.athlete.exercises
       .filter((candidate) => candidate.roles.includes(slot.role))
       .filter((candidate) => matchExerciseToMesocyclePolicy(factualExerciseMetadata(candidate), input.mesocycle.policy, slot.role, input.athlete.equipment).status !== "ineligible");
-    const unusedRoleExercises = allRoleExercises.filter((candidate) => !usedExerciseIds.has(candidate.id));
-    if (isStrictCanonicalAllocation(input.allocation) && unusedRoleExercises.length === 0) return { status: "blocked", reason: "no_suitable_exercise" };
-    const reuseSafePool = unusedRoleExercises.length > 0 ? unusedRoleExercises : allRoleExercises;
-    const muscleCompatible = reuseSafePool.filter((candidate) => slot.muscles.length === 0 || candidate.primaryMuscles.some((muscle) => slot.muscles.includes(muscle)));
-    if (isStrictCanonicalAllocation(input.allocation) && muscleCompatible.length === 0) return { status: "blocked", reason: "no_suitable_exercise" };
-    const roleAndMusclePool = muscleCompatible.length > 0 ? muscleCompatible : reuseSafePool;
-    const preferredExercises = roleAndMusclePool.filter((candidate) => preferredPatterns.length === 0 || preferredPatterns.includes(candidate.movementPattern));
-    if (isStrictCanonicalAllocation(input.allocation) && preferredExercises.length === 0) return { status: "blocked", reason: "no_suitable_exercise" };
-    const eligibleExercises = preferredExercises.length > 0 ? preferredExercises : roleAndMusclePool;
-    const exercise = eligibleExercises.slice().sort((a, b) => exerciseCompatibilityScore(b, slot, preferredPatterns, allocatedSlot?.primaryLift) - exerciseCompatibilityScore(a, slot, preferredPatterns, allocatedSlot?.primaryLift) || a.id.localeCompare(b.id))[0];
+    const strictAllocation = isStrictCanonicalAllocation(input.allocation);
+    const qualityAwareAllocation = Boolean(allocatedSlot && allRoleExercises.some((candidate) => candidate.stimulusProfile));
+    const ranked = allocatedSlot && qualityAwareAllocation ? allRoleExercises.map((exercise) => ({
+      exercise,
+      result: assessCanonicalExerciseRoleSuitability({ exercise, slot: allocatedSlot, macrocycleGoal: input.macrocycle.goal, mesocycleId: input.mesocycle.id, experience: input.athlete.experienceLevel, sessionExerciseIds: [...usedExerciseIds], weeklyExerciseUsage: input.selectionContext?.weeklyExerciseUsage ?? {}, sessionHighFatigueSets, recoveryRestricted: input.allocation?.recoveryRestricted }),
+    })).filter((candidate) => candidate.result.suitability !== "unsuitable") : [];
+    const selected = ranked.sort((a, b) => b.result.score - a.result.score || a.exercise.id.localeCompare(b.exercise.id))[0];
+    const unusedLegacyExercises = allRoleExercises.filter((candidate) => !usedExerciseIds.has(candidate.id));
+    const legacyPool = unusedLegacyExercises.length ? unusedLegacyExercises : allRoleExercises;
+    const legacyExercise = !strictAllocation && !selected ? legacyPool.slice().sort((a, b) => exerciseCompatibilityScore(b, slot, preferredPatterns) - exerciseCompatibilityScore(a, slot, preferredPatterns) || a.id.localeCompare(b.id))[0] : undefined;
+    const exercise = selected?.exercise ?? legacyExercise;
     if (!exercise) return { status: "blocked", reason: "no_suitable_exercise" };
     usedExerciseIds.add(exercise.id);
     const hasEstablishedLoad = Number.isFinite(input.progress.establishedLoads?.[exercise.id]);
@@ -113,16 +119,21 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
     const target = resolveCanonicalTargetEnvelope(input.mesocycle.policy, slot.constructionRole, lane, hasEstablishedLoad, slot.methods[0]);
     if (target.status === "blocked") return { status: "blocked", reason: target.reason === "established_load_required" ? target.reason : "no_valid_method" };
     const allocatedSets = allocatedSlot?.workingSets;
-    const settings = withSetPrescription({ ...exercise.defaultSettings, repRange: { min: target.envelope.minReps, max: target.envelope.maxReps }, trainingLane: lane, unit: input.athlete.units, requiredWorkSets: allocatedSets ?? exercise.defaultSettings.requiredWorkSets }, { exerciseRole: slot.role, exerciseFamily: exercise.family, primaryMuscles: exercise.primaryMuscles }, { requiredSets: allocatedSets, recommendedMinSets: allocatedSets, recommendedMaxSets: allocatedSets, source: "generated" });
-    if (!settings.requiredSets || settings.repRange.min < 1 || settings.repRange.max < settings.repRange.min) return { status: "blocked", reason: "incomplete_prescription" };
     const method = slot.methods[0]!;
-    const rest = resolveCanonicalRest(input.mesocycle.policy, lane, method, slot.role);
+    const exactResolution = allocatedSlot && selected ? resolveCanonicalExactTarget({ exercise, slot: allocatedSlot, envelope: target.envelope, policy: input.mesocycle.policy, lane, method, experience: input.athlete.experienceLevel }) : undefined;
+    if (exactResolution?.status === "blocked") return { status: "blocked", reason: "no_valid_method" };
+    const exact = exactResolution?.status === "resolved" ? exactResolution : undefined;
+    const targetReps = exact?.targets[0] ?? Math.max(1, Math.round((target.envelope.minReps + target.envelope.maxReps) / 2));
+    const settings = withSetPrescription({ ...exercise.defaultSettings, repRange: { min: targetReps, max: targetReps }, trainingLane: lane, unit: input.athlete.units, requiredWorkSets: allocatedSets ?? exercise.defaultSettings.requiredWorkSets }, { exerciseRole: slot.role, exerciseFamily: exercise.family, primaryMuscles: exercise.primaryMuscles }, { requiredSets: allocatedSets, recommendedMinSets: allocatedSets, recommendedMaxSets: allocatedSets, source: "generated" });
+    if (!settings.requiredSets || settings.repRange.min < 1 || settings.repRange.max < settings.repRange.min) return { status: "blocked", reason: "incomplete_prescription" };
+    const baseRest = resolveCanonicalRest(input.mesocycle.policy, lane, method, slot.role);
+    const rest = exact ? { ...baseRest, seconds: exact.restSeconds, reason: `canonical_exact_target_rest:${exact.policyId}`, provenance: [...baseRest.provenance, exact.policyId] } : baseRest;
     const progression = resolveCanonicalProgression(input.mesocycle.policy, lane, method, input.operational.revision);
     const stopRule = resolveCanonicalStopRule(input.mesocycle.policy, lane, slot.role, target.envelope.minReps);
-    const loadPrescription = resolveCanonicalLoadPrescription({ exercise, equipment: input.athlete.equipment, lane, loadingMode: target.envelope.loadingMode, establishedLoad: input.progress.establishedLoads?.[exercise.id], evidence: input.progress.loadEvidence?.[exercise.id], increment: exercise.defaultLoadJump || 1, calibrationSupported: true });
+    const loadPrescription = withCanonicalCalibrationProtocol(resolveCanonicalLoadPrescription({ exercise, equipment: input.athlete.equipment, lane, loadingMode: target.envelope.loadingMode, establishedLoad: input.progress.establishedLoads?.[exercise.id], evidence: input.progress.loadEvidence?.[exercise.id], increment: exercise.defaultLoadJump || 1, calibrationSupported: true }), targetReps, settings.requiredSets ?? settings.requiredWorkSets);
     if (validateCanonicalLoadPrescription(loadPrescription).status !== "valid") return { status: "blocked", reason: "incomplete_prescription" };
-    const targetReps = Math.max(1, Math.round((target.envelope.minReps + target.envelope.maxReps) / 2));
-    slots.push({ id: slot.id, index: slot.index, exerciseId: exercise.id, lane, method, settings, targetReps, rest, progression, stopRule, loadingMode: target.envelope.loadingMode, prescribedLoad: input.progress.establishedLoads?.[exercise.id], substitutionConstraints: [...input.athlete.limitations], reason: slot.reason, loadPrescription } as CanonicalSessionSnapshotV3["slots"][number]);
+    slots.push({ id: slot.id, index: slot.index, exerciseId: exercise.id, lane, method, settings, targetReps, exactTargets: exact?.targets, rest, progression, stopRule, loadingMode: target.envelope.loadingMode, prescribedLoad: input.progress.establishedLoads?.[exercise.id], substitutionConstraints: [...input.athlete.limitations], reason: slot.reason, selection: selected ? { policyId: selected.result.policyId, suitability: selected.result.suitability, reasons: selected.result.reasons, repeatReason: selected.result.repeatReason } : undefined, loadPrescription } as CanonicalSessionSnapshotV3["slots"][number]);
+    if (exercise.fatigueCost === "high") sessionHighFatigueSets += settings.requiredSets ?? settings.requiredWorkSets;
   }
   const snapshot: CanonicalSessionSnapshotV3 = { schemaVersion: "canonical_session_snapshot_v3", sessionId: blueprint.sessionId, operationalIdentity: input.operational.identity, role: blueprint.role, planSessionIndex: input.microcycle.planSessionIndex, slots, provenance: { inputVersion: input.schemaVersion, policyVersion: input.mesocycle.policy.schemaVersion, constructionVersion: input.operational.constructionVersion, evidenceVersion: input.progress.evidenceVersion } };
   return { status: "constructed", blueprint, slotPlan, snapshot };
@@ -142,10 +153,8 @@ function movementPatternsForSlot(sessionRole: string, slot: PlannedSessionSlot):
   return [];
 }
 
-function exerciseCompatibilityScore(exercise: Exercise, slot: PlannedSessionSlot, preferredPatterns: readonly import("@/domain/training/models").MovementPattern[], primaryLift?: "bench" | "squat" | "deadlift"): number {
+function exerciseCompatibilityScore(exercise: Exercise, slot: PlannedSessionSlot, preferredPatterns: readonly import("@/domain/training/models").MovementPattern[]): number {
   let score = 0;
-  const canonicalLiftId = primaryLift === "bench" ? "ex-bench-press" : primaryLift === "squat" ? "ex-barbell-back-squat" : primaryLift === "deadlift" ? "ex-deadlift" : undefined;
-  if (canonicalLiftId === exercise.id) score += 100;
   if (exercise.primaryMuscles.length === slot.muscles.length && exercise.primaryMuscles.every((muscle) => slot.muscles.includes(muscle))) score += 30;
   score += exercise.primaryMuscles.filter((muscle) => slot.muscles.includes(muscle)).length * 10;
   if (exercise.roles[0] === slot.role) score += 5;

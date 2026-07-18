@@ -8,6 +8,7 @@ describe("canonical session role allocation", () => {
     expect(source).toContain('role.includes("squat")');
     expect(source).toContain('role.includes("deadlift")');
     expect(source).toContain("targetReps");
-    expect(source).toContain("candidate.primaryMuscles.some");
+    expect(source).toContain("assessCanonicalExerciseRoleSuitability");
+    expect(source).toContain("resolveCanonicalExactTarget");
   });
 });

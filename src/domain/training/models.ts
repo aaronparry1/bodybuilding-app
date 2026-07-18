@@ -111,6 +111,23 @@ export type JointStressEstimate = "low" | "moderate" | "high";
 
 export type ExerciseSuitability = "beginner" | "intermediate" | "advanced";
 
+export type CanonicalStimulusRegion =
+  | "chest"
+  | "lats"
+  | "upper_back"
+  | "anterior_delts"
+  | "lateral_delts"
+  | "rear_delts"
+  | "triceps"
+  | "biceps"
+  | "quadriceps"
+  | "hamstrings_knee_flexion"
+  | "hip_extension"
+  | "calves"
+  | "core";
+
+export type ExerciseSelectionProfile = "general" | "stable_hypertrophy" | "technique_variation" | "strength_specialist";
+
 export type TrainingLane =
   | "hypertrophy"
   | "hypertrophy_strength"
@@ -166,6 +183,17 @@ export interface Exercise {
   fatigueCost: ExerciseFatigueCost;
   jointStress: JointStressEstimate;
   suitability: ExerciseSuitability[];
+  /** Factual selection metadata. These fields describe the exercise; they do not prescribe a programme. */
+  stability?: "low" | "moderate" | "high";
+  skillDemand?: "low" | "moderate" | "high";
+  loadability?: "low" | "moderate" | "high";
+  selectionProfile?: ExerciseSelectionProfile;
+  hypertrophyBias?: "lengthened" | "neutral" | "shortened";
+  stimulusProfile?: Readonly<{
+    direct: CanonicalStimulusRegion[];
+    meaningfulSecondary: CanonicalStimulusRegion[];
+  }>;
+  primaryLift?: "bench" | "squat" | "deadlift";
   isBeginnerFriendly: boolean;
   isAdvanced: boolean;
   notes: string[];

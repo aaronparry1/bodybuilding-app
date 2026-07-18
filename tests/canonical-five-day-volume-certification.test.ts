@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { constructCanonicalActivePlanFromCanonicalInputs } from "@/application/training/canonical-active-plan-construction";
 import { allocateCanonicalMicrocycleVolume } from "@/domain/training/canonical-microcycle-volume-allocator";
+import { canonicalMicrocycleVolumePolicy } from "@/domain/training/canonical-microcycle-volume-allocator";
+import { certifyCanonicalConstructedMicrocycle } from "@/domain/training/canonical-constructed-microcycle-certification";
 import { validateCanonicalLoadPrescription, type CanonicalLoadEvidence } from "@/domain/training/canonical-load-prescription";
 import type { CanonicalSessionSnapshotV3 } from "@/domain/training/canonical-session-construction-pipeline";
 import { exerciseLibrary } from "@/domain/training/presets";
@@ -62,39 +64,51 @@ function report(): string {
     establishedLoadExerciseIds: [],
     sessionRoles: result.carrier.microcycle.output.sessionRoles,
   });
+  const snapshots = result.carrier.plannedSessions.map((session) => session.prescriptionSnapshot as CanonicalSessionSnapshotV3);
+  const certification = certifyCanonicalConstructedMicrocycle({ allocation, sessions: snapshots, exercises: exerciseLibrary });
+  const actualMovementExposures = snapshots.flatMap((snapshot) => snapshot.slots).reduce<Record<string, number>>((counts, slot) => {
+    const movement = exerciseLibrary.find((exercise) => exercise.id === slot.exerciseId)!.movementPattern;
+    counts[movement] = (counts[movement] ?? 0) + 1;
+    return counts;
+  }, {});
   const lines = [
     "# Canonical five-day microcycle certification",
     "",
-    "- Schema: `canonical_five_day_microcycle_certification_v1`",
+    "- Schema: `canonical_five_day_microcycle_certification_v2`",
     "- Profile: Build muscle and strength · intermediate · 5 days · let app choose",
     `- Equipment: ${fullEquipment.join(", ")}`,
-    "- Accounting: Direct working sets are divided equally across the allocator's explicit direct target muscles. Secondary exercise muscles are listed but are not converted into set equivalents.",
-    "- Supported indirect contribution: none quantified without an explicit canonical policy.",
+    `- Accounting: ${canonicalMicrocycleVolumePolicy.accountingConvention}`,
+    "- Calibration: warm-up/ramp attempts occur before working sets and are excluded from working volume; completed working-set evidence is retained and reused while fresh and compatible.",
     "",
     "## Week",
     "",
     `- Direct-set target bands: ${Object.entries(allocation.directSetTargets).map(([muscle, bounds]) => `${muscle} ${bounds!.min}-${bounds!.max}`).join(" · ")}`,
-    `- Direct sets: ${Object.entries(allocation.directSets).map(([muscle, sets]) => `${muscle} ${sets}`).join(" · ")}`,
-    `- Movement exposures: ${Object.entries(allocation.movementPatternExposures).map(([pattern, count]) => `${pattern} ${count}`).join(" · ")}`,
-    `- Primary lifts: bench ${allocation.primaryLiftExposures.bench} · squat ${allocation.primaryLiftExposures.squat} · deadlift ${allocation.primaryLiftExposures.deadlift}`,
+    `- Actual direct stimulus sets: ${Object.entries(certification.directStimulusSets).map(([region, sets]) => `${region} ${sets}`).join(" · ")}`,
+    `- Meaningful secondary stimulus sets (reported separately): ${Object.entries(certification.meaningfulSecondaryStimulusSets).map(([region, sets]) => `${region} ${sets}`).join(" · ")}`,
+    `- Actual movement exposures: ${Object.entries(actualMovementExposures).map(([pattern, count]) => `${pattern} ${count}`).join(" · ")}`,
+    `- Lift exposures: bench primary ${allocation.primaryLiftExposures.bench.primary}, secondary variation ${allocation.primaryLiftExposures.bench.secondaryVariation} · squat primary ${allocation.primaryLiftExposures.squat.primary}, secondary variation ${allocation.primaryLiftExposures.squat.secondaryVariation} · deadlift primary ${allocation.primaryLiftExposures.deadlift.primary}, secondary variation ${allocation.primaryLiftExposures.deadlift.secondaryVariation}`,
     `- Session working sets: ${allocation.sessionWorkingSets.join(" / ")} (total ${allocation.totalWorkingSets})`,
     `- Estimated minutes: ${allocation.estimatedSessionMinutes.join(" / ")}`,
     `- Fatigue units: ${allocation.fatigue.perSession.join(" / ")} (total ${allocation.fatigue.weeklyUnits}); overlap flags: ${allocation.fatigue.overlapFlags.length ? allocation.fatigue.overlapFlags.join(", ") : "none"}`,
+    `- Selected-exercise fatigue units: ${certification.fatigueUnits.perSession.join(" / ")} (total ${certification.fatigueUnits.weekly})`,
+    `- Repeated exercises: ${certification.repeatedExercises.length ? certification.repeatedExercises.map((entry) => `${entry.exerciseId} ×${entry.count} (${entry.reason})`).join(" · ") : "none; variation filled the required weekly patterns without sacrificing stable week-to-week prescriptions"}`,
     `- Certification checks: ${allocation.certification.checks.join(" · ")}`,
     `- Certification failures: ${allocation.certification.failures.length ? allocation.certification.failures.join(" · ") : "none"}`,
     "",
   ];
   result.carrier.plannedSessions.forEach((session, sessionIndex) => {
-    lines.push(`## ${sessionIndex + 1}. ${session.role}`, "", `Purpose: ${result.carrier.mesocycle.output.adaptation}. Estimated duration: ${allocation.estimatedSessionMinutes[sessionIndex]} minutes.`, "", "| # | Exercise | Slot / compatibility | Movement | Primary / secondary | Sets | Exact targets | Load | Rest | Est. min | Fatigue |", "|---:|---|---|---|---|---:|---|---|---:|---:|---|");
+    lines.push(`## ${sessionIndex + 1}. ${session.role}`, "", `Purpose: ${result.carrier.mesocycle.output.adaptation}. Estimated duration: ${allocation.estimatedSessionMinutes[sessionIndex]} minutes.`, "", "| # | Exercise | Slot purpose | Classification | Suitability | Repeat reason | Direct / meaningful secondary | Sets | Exact targets | Load/calibration | Rest | Fatigue |", "|---:|---|---|---|---|---|---|---:|---|---|---:|---|");
     snapshotSlots(session).forEach((prescription, slotIndex) => {
       const exercise = exerciseLibrary.find((candidate) => candidate.id === prescription.exerciseId)!;
       const allocated = allocation.slots.find((candidate) => candidate.sessionIndex === sessionIndex && candidate.order === slotIndex)!;
-      const targets = Array.from({ length: prescription.settings.requiredSets ?? 0 }, () => `${prescription.targetReps} reps`).join(" / ");
-      lines.push(`| ${slotIndex + 1} | ${exercise.name} (\`${exercise.id}\`) | ${allocated.purpose}; ${exercise.movementPattern} serves ${allocated.muscles.join("+")} | ${exercise.movementPattern} | ${exercise.primaryMuscles.join(", ")} / ${exercise.secondaryMuscles.join(", ") || "none"} | ${prescription.settings.requiredSets} | ${targets} | ${prescription.loadPrescription.state} | ${prescription.rest.seconds}s | ${(prescription.settings.requiredSets ?? 0) * 3} | ${exercise.fatigueCost} |`);
+      const targets = (prescription.exactTargets ?? Array.from({ length: prescription.settings.requiredSets ?? 0 }, () => prescription.targetReps)).map((target) => `${target} reps`).join(" / ");
+      const profile = exercise.stimulusProfile!;
+      const load = prescription.loadPrescription.state === "calibration_required" ? `calibration_required; pre-work ramp to ${prescription.loadPrescription.protocol?.targetReps ?? prescription.targetReps} reps; retain evidence` : prescription.loadPrescription.state;
+      lines.push(`| ${slotIndex + 1} | ${exercise.name} (\`${exercise.id}\`) | ${allocated.purpose} | ${exercise.movementPattern}; ${exercise.family}; ${exercise.selectionProfile ?? "general"} | ${prescription.selection?.suitability ?? "not_recorded"} | ${prescription.selection?.repeatReason ?? "not_recorded"} | ${profile.direct.join(", ")} / ${profile.meaningfulSecondary.join(", ") || "none"} | ${prescription.settings.requiredSets} | ${targets} | ${load} | ${prescription.rest.seconds}s | ${exercise.fatigueCost} |`);
     });
     lines.push("");
   });
-  lines.push(`Final status: **${allocation.certification.status.toUpperCase()}**`, "");
+  lines.push(`Constructed-week checks: ${certification.checks.join(" · ")}`, "", `Final status: **${allocation.certification.status === "passed" && certification.status === "passed" ? "PASSED" : "FAILED"}**`, "");
   return lines.join("\n");
 }
 
@@ -108,7 +122,7 @@ describe("canonical five-day microcycle certification", () => {
     const result = construct();
     expect(result.status).toBe("constructed");
     if (result.status !== "constructed") return;
-    expect(result.carrier.plannedSessions.map((session) => snapshotSlots(session).length)).toEqual([4, 4, 4, 5, 5]);
+    expect(result.carrier.plannedSessions.map((session) => snapshotSlots(session).length)).toEqual([4, 4, 4, 6, 5]);
     for (const session of result.carrier.plannedSessions) {
       const slots = snapshotSlots(session);
       const exerciseIds = slots.map((slot) => slot.exerciseId);
@@ -122,7 +136,12 @@ describe("canonical five-day microcycle certification", () => {
       }
     }
     expect(result.carrier.plannedSessions.flatMap(snapshotSlots).filter((slot) => slot.loadPrescription.state === "calibration_required").length).toBeGreaterThan(0);
-    expect(result.carrier.plannedSessions.flatMap(snapshotSlots).some((slot) => slot.loadPrescription.state === "bodyweight")).toBe(true);
+    const calibration = result.carrier.plannedSessions.flatMap(snapshotSlots).find((slot) => slot.loadPrescription.state === "calibration_required")?.loadPrescription;
+    expect(calibration?.state).toBe("calibration_required");
+    if (calibration?.state === "calibration_required") {
+      expect(calibration.protocol?.warmupAndRampExcludedFromWorkingVolume).toBe(true);
+      expect(calibration.protocol?.evidenceRetention.reuseWhileFreshAndCompatible).toBe(true);
+    }
   });
 
   it("uses retained canonical evidence for established squat, bench and deadlift loads", () => {
