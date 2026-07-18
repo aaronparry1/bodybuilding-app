@@ -1,57 +1,36 @@
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
-import { projectCanonicalPlan, type CanonicalPlanProjection } from "@/application/training/canonical-plan-projections";
-import { AppScreen, EmptyActionState, HeroPanel, PremiumCard, SectionList } from "@/ui/primitives";
-import { colors, spacing, type } from "@/ui/theme";
+import type { CanonicalPlanPresentationAction } from "@/application/training/canonical-plan-presentation";
+import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/runtime/app-environment";
+import { useAppSettings } from "@/application/settings/app-settings";
+import { PlanDashboard } from "@/ui/plan-dashboard";
+import { useCanonicalPlanPresentation } from "@/ui/canonical-training-presentation-hooks";
+import { AppScreen } from "@/ui/primitives";
 import { TrainingSystemGuideButton } from "@/ui/training-system-guide";
-import { mesocyclePurposeDisplayName, sessionRoleDisplayName, trainingGoalDisplayName } from "@/application/training/display-labels";
 
-export default function PlanScreen() {
-  const [projection, setProjection] = useState<CanonicalPlanProjection | null>(() => {
-    const model = canonicalActivePlanState.getReadModel();
-    return model ? projectCanonicalPlan(model) : null;
-  });
+type PlanPreview = "generating" | "recoverable_error" | "storage_error" | "empty";
 
-  useEffect(() => {
-    const unsubscribe = canonicalActivePlanState.subscribe(() => {
-      const model = canonicalActivePlanState.getReadModel();
-      setProjection(model ? projectCanonicalPlan(model) : null);
-    });
-    canonicalActivePlanState.hydrate();
-    return unsubscribe;
-  }, []);
-
-  return (
-    <AppScreen>
-      <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: spacing.lg }}>
-        <View style={{ flex: 1 }}><HeroPanel eyebrow="Plan" title="Your programme" subtitle="Your current focus, phase and upcoming workouts." /></View>
-        <TrainingSystemGuideButton />
-      </View>
-      {!projection ? (
-        <EmptyActionState title="Set up your training plan" message="Plan is waiting for a canonical active plan." actionLabel="Set up your training plan" onPress={() => router.push("/(protected)/onboarding")} />
-      ) : (
-        <>
-          <PremiumCard>
-            <Summary label="Focus" value={trainingGoalDisplayName(projection.macrocycle.goal)} />
-            <Summary label="Phase" value={mesocyclePurposeDisplayName(projection.mesocycle.purpose)} />
-            <Summary label="This week" value={`${projection.microcycle.trainingDays} training days · week ${projection.microcycle.sequenceNumber}`} />
-          </PremiumCard>
-          <SectionList title="Planned sessions">
-            <Text style={{ position: "absolute", width: 1, height: 1, opacity: 0 }}>Mesocycle · Microcycle</Text>
-            {projection.plannedSessions.map((session) => <Text key={session.id} selectable style={{ ...type.body, color: colors.text }}>{session.planSessionIndex + 1}. {sessionRoleDisplayName(session.role)}{session.status === "completed" ? " · complete" : ""}</Text>)}
-          </SectionList>
-          {projection.activeSession ? <SectionList title="Active workout"><Text selectable style={{ ...type.body, color: colors.accent }}>{sessionRoleDisplayName(projection.activeSession.role)} · in progress</Text><Text style={{ ...type.body, color: colors.textMuted }}>Resume this workout from Train.</Text></SectionList> : null}
-          <SectionList title="Next actionable session">
-            <Text selectable style={{ ...type.body, color: colors.accent }}>{projection.nextActionableSession ? sessionRoleDisplayName(projection.nextActionableSession.role) : "No workout is currently ready."}</Text>
-          </SectionList>
-        </>
-      )}
-    </AppScreen>
-  );
+function qaPreview(value: string | undefined): PlanPreview | undefined {
+  if (!isDesignQaModeAvailable(getAppEnvironment()) || !isDesignQaModeRequested()) return undefined;
+  return ["generating", "recoverable_error", "storage_error", "empty"].includes(value ?? "") ? value as PlanPreview : undefined;
 }
 
-function Summary({ label, value }: { label: string; value: string }) {
-  return <View style={{ flexDirection: "row", justifyContent: "space-between", gap: spacing.lg }}><Text selectable style={{ ...type.label, color: colors.textSubtle }}>{label}</Text><Text selectable style={{ color: colors.text, fontWeight: "900", flex: 1, textAlign: "right" }}>{value}</Text></View>;
+export default function PlanScreen() {
+  const { settings } = useAppSettings();
+  const { qaPlanPreview } = useLocalSearchParams<{ qaPlanPreview?: string }>();
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const projection = useCanonicalPlanPresentation({ displayUnit: settings.unit, previewStatus: qaPreview(qaPlanPreview) });
+  const onAction = (action: CanonicalPlanPresentationAction) => {
+    if (action.type === "retry") { canonicalActivePlanState.refresh(); return; }
+    if (action.type === "setup_plan") { router.push("/(protected)/onboarding"); return; }
+    if (!action.planId || action.planRevision === undefined || !action.sessionId) return;
+    if (action.type === "open_planned_session") {
+      router.push({ pathname: "/(protected)/(tabs)/train", params: { planId: action.planId, planRevision: String(action.planRevision), plannedSessionId: action.sessionId, lifecycle: "start" } });
+      return;
+    }
+    router.push({ pathname: "/(protected)/(tabs)/train", params: { planId: action.planId, planRevision: String(action.planRevision), recordedSessionId: action.sessionId, lifecycle: "resume" } });
+  };
+
+  return <AppScreen><PlanDashboard projection={projection} selectedSessionId={selectedSessionId} onSelectSession={setSelectedSessionId} onAction={onAction} guideAction={<TrainingSystemGuideButton />} /></AppScreen>;
 }

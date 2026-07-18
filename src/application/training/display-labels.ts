@@ -27,12 +27,23 @@ export function trainingGoalDisplayName(goal: string): string {
 
 export function mesocyclePurposeDisplayName(purpose: string): string {
   const labels: Record<string, string> = {
+    powerbuilding_foundation: "Foundation phase",
+    powerbuilding_hypertrophy: "Muscle-building phase",
+    powerbuilding_strength: "Strength development phase",
+    powerbuilding_intensification: "Heavy practice phase",
+    powerbuilding_realisation: "Performance phase",
+    powerbuilding_transition: "Recovery phase",
     hypertrophy: "Muscle-building phase",
     hypertrophy_base: "Muscle-building phase",
+    hypertrophy_volume: "Volume development phase",
+    hypertrophy_specialisation: "Specialisation phase",
+    hypertrophy_consolidation: "Consolidation phase",
+    hypertrophy_transition: "Recovery phase",
     strength: "Strength phase",
     strength_development: "Strength development phase",
     peaking: "Performance phase",
     deload: "Recovery phase",
+    "Establish repeatable squat, bench and deadlift": "Foundation phase",
   };
-  return labels[purpose] ?? "Current training phase";
+  return labels[purpose] ?? "Training development phase";
 }

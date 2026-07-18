@@ -8,6 +8,7 @@ import {
   startCanonicalSession,
 } from "@/application/training/canonical-recorded-session-application";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
+import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
 import { exerciseLibrary } from "@/domain/training/presets";
@@ -24,6 +25,8 @@ export const canonicalFiveDayFixtureProfile = {
 } as const;
 
 export type CanonicalHomeVisualState = "planned" | "active" | "paused" | "completed" | "rest_day";
+export type CanonicalPlanVisualState = "planned" | "active" | "partial_week" | "phase_completed";
+export type CanonicalProgressVisualState = "zero" | "one_completed" | "insufficient_trend" | "established" | "genuine_pr";
 
 export function canonicalFiveDayFixtureInput(planId: string) {
   return {
@@ -77,6 +80,147 @@ export function applyCanonicalHomeVisualState(
   }
   if (state === "completed") completeActiveSession(planId, active.recordedSessionId, active.planRevision, work.ledgerVersion, now, "first");
   return requireModel(planId, state);
+}
+
+/** Canonical Plan visual states composed through real plan and recorded-session owners. */
+export function applyCanonicalPlanVisualState(
+  state: CanonicalPlanVisualState,
+  options: Readonly<{ planId?: string; now?: string }> = {},
+) {
+  const planId = options.planId ?? `design-qa:plan-${state}`;
+  const now = options.now ?? "2026-07-18T10:00:00.000Z";
+  if (state === "planned" || state === "active") return applyCanonicalHomeVisualState(state, { planId, now });
+  resetCanonicalHomeVisualState();
+  const created = canonicalActivePlanState.create(canonicalFiveDayFixtureInput(planId));
+  if (created.hydration !== "hydrated" || !created.model) throw new Error(`canonical_plan_visual_plan_failed:${created.error ?? created.hydration}`);
+  if (state === "phase_completed") return applyCompletedWeekHistory(planId, now);
+  const completionCount = 1;
+  for (let index = 0; index < completionCount; index += 1) {
+    const completedAt = offsetIso(now, index * 3_600_000);
+    const active = startFirstPlannedSession(planId, completedAt);
+    const work = recordPrescribedWork(planId, active, true);
+    completeActiveSession(planId, active.recordedSessionId, active.planRevision, work.ledgerVersion, completedAt, `visual-${index + 1}`);
+  }
+  return requireModel(planId, state);
+}
+
+function applyCompletedWeekHistory(planId: string, now: string) {
+  const repositoryPlan = canonicalActivePlanV2Repository.get();
+  if (repositoryPlan.status !== "saved") throw new Error("canonical_plan_visual_carrier_unavailable");
+  const references = repositoryPlan.carrier.plannedSessions.map((planned, index) => {
+    const recordedSessionId = `${planId}:completed:${index + 1}`;
+    const startedAt = offsetIso(now, index * 3_600_000 - 45 * 60_000);
+    const created = canonicalRecordedSessionLedger.create({
+      schemaVersion: "canonical_recorded_session_v1", recordedSessionId, plannedSessionId: planned.id, planId,
+      startRevision: repositoryPlan.carrier.revision, macrocycleId: repositoryPlan.carrier.macrocycle.id,
+      mesocycleId: repositoryPlan.carrier.mesocycle.id, microcycleId: repositoryPlan.carrier.microcycle.id,
+      role: planned.role, prescriptionSnapshot: planned.prescriptionSnapshot, prescriptionHash: prescriptionHash(planned.prescriptionSnapshot),
+      provenance: { source: "design_qa_plan_visual", constructionVersion: planned.constructionVersion },
+      athleteId: repositoryPlan.carrier.constructionInputs?.athleteId ?? "local-athlete", version: 0, status: "pending", createdAt: startedAt,
+    }, `${recordedSessionId}:create`);
+    if (created.status !== "saved") throw new Error(`canonical_plan_visual_create_failed:${created.status}`);
+    const started = canonicalRecordedSessionLedger.append(recordedSessionId, { eventId: `${recordedSessionId}:started`, aggregateId: recordedSessionId, expectedVersion: 0, type: "started", occurredAt: startedAt, operationId: `${recordedSessionId}:start`, payload: {} });
+    if (started.status !== "saved") throw new Error(`canonical_plan_visual_start_failed:${started.status}`);
+    const work = recordPrescribedWork(planId, { recordedSessionId, planRevision: repositoryPlan.carrier.revision }, true);
+    completeActiveSession(planId, recordedSessionId, repositoryPlan.carrier.revision, work.ledgerVersion, offsetIso(now, index * 3_600_000), `week-${index + 1}`);
+    const aggregate = canonicalRecordedSessionLedger.get(recordedSessionId);
+    if (aggregate.status !== "found" || aggregate.session.status !== "completed") throw new Error("canonical_plan_visual_completion_unavailable");
+    return { sessionId: recordedSessionId, planId, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId, microcycleId: aggregate.session.microcycleId, revision: aggregate.session.version, status: "completed" as const, recordReference: `canonical-recorded-session:${recordedSessionId}` };
+  });
+  const nextRevision = repositoryPlan.carrier.revision + 1;
+  const saved = canonicalActivePlanV2Repository.saveAtomically({ ...repositoryPlan.carrier, revision: nextRevision, updatedAt: now, plannedSessions: [], recordedSessionReferences: references, progress: { ...repositoryPlan.carrier.progress, revision: nextRevision } }, repositoryPlan.carrier.revision);
+  if (saved.status !== "saved") throw new Error(`canonical_plan_visual_reference_failed:${saved.status}`);
+  return canonicalActivePlanState.hydrate().model ?? (() => { throw new Error("canonical_plan_visual_hydration_failed"); })();
+}
+
+/**
+ * Progress visuals use ledger/evidence facts. Comparable history is created from one immutable
+ * Session Construction snapshot so exercise and loading-mode comparisons remain valid.
+ */
+export function applyCanonicalProgressVisualState(
+  state: CanonicalProgressVisualState,
+  options: Readonly<{ planId?: string }> = {},
+) {
+  const planId = options.planId ?? `design-qa:progress-${state}`;
+  if (state === "zero") return applyCanonicalHomeVisualState("planned", { planId });
+  if (state === "one_completed") return applyCanonicalHomeVisualState("completed", { planId, now: "2026-07-18T10:00:00.000Z" });
+  const exposures = state === "insufficient_trend" ? 2 : 3;
+  return applyComparableProgressHistory(planId, exposures, state === "established" ? 0 : 2.5);
+}
+
+function applyComparableProgressHistory(planId: string, exposures: number, loadStepKg: number) {
+  resetCanonicalHomeVisualState();
+  const created = canonicalActivePlanState.create(canonicalFiveDayFixtureInput(planId));
+  if (created.hydration !== "hydrated" || !created.model) throw new Error(`canonical_progress_visual_plan_failed:${created.error ?? created.hydration}`);
+  const repositoryPlan = canonicalActivePlanV2Repository.get();
+  if (repositoryPlan.status !== "saved") throw new Error("canonical_progress_visual_carrier_unavailable");
+  const planned = repositoryPlan.carrier.plannedSessions[0];
+  if (!planned) throw new Error("canonical_progress_visual_snapshot_unavailable");
+  const snapshot = planned.prescriptionSnapshot;
+  const firstSlot = Array.isArray(snapshot.slots) ? (snapshot.slots as Array<Record<string, unknown>>)[0] : undefined;
+  if (!firstSlot) throw new Error("canonical_progress_visual_slot_unavailable");
+  const settings = (firstSlot.settings ?? {}) as Record<string, unknown>;
+  const exactTargets = Array.isArray(firstSlot.exactTargets) ? firstSlot.exactTargets.map(Number) : [];
+  const requiredSets = Number(settings.requiredWorkSets ?? settings.requiredSets ?? 0);
+  const references = [];
+
+  for (let index = 0; index < exposures; index += 1) {
+    const recordedSessionId = `${planId}:comparison:${index + 1}`;
+    const startedAt = new Date(Date.UTC(2026, 6, 4 + index * 6, 9, 0, 0)).toISOString();
+    const createdLedger = canonicalRecordedSessionLedger.create({
+      schemaVersion: "canonical_recorded_session_v1",
+      recordedSessionId,
+      plannedSessionId: planned.id,
+      planId,
+      startRevision: repositoryPlan.carrier.revision,
+      macrocycleId: repositoryPlan.carrier.macrocycle.id,
+      mesocycleId: repositoryPlan.carrier.mesocycle.id,
+      microcycleId: repositoryPlan.carrier.microcycle.id,
+      role: planned.role,
+      prescriptionSnapshot: snapshot,
+      prescriptionHash: prescriptionHash(snapshot),
+      provenance: { source: "design_qa_progress_visual", constructionVersion: planned.constructionVersion },
+      athleteId: repositoryPlan.carrier.constructionInputs?.athleteId ?? "local-athlete",
+      version: 0,
+      status: "pending",
+      createdAt: startedAt,
+    }, `${recordedSessionId}:create`);
+    if (createdLedger.status !== "saved") throw new Error(`canonical_progress_visual_create_failed:${createdLedger.status}`);
+    const started = canonicalRecordedSessionLedger.append(recordedSessionId, { eventId: `${recordedSessionId}:started`, aggregateId: recordedSessionId, expectedVersion: 0, type: "started", occurredAt: startedAt, operationId: `${recordedSessionId}:start`, payload: {} });
+    if (started.status !== "saved") throw new Error(`canonical_progress_visual_start_failed:${started.status}`);
+    let ledgerVersion = started.session!.version;
+    for (let setIndex = 0; setIndex < requiredSets; setIndex += 1) {
+      const work = recordCanonicalPerformedWork({
+        planId,
+        expectedPlanRevision: repositoryPlan.carrier.revision,
+        recordedSessionId,
+        expectedLedgerVersion: ledgerVersion,
+        operationId: `${recordedSessionId}:work:${setIndex + 1}`,
+        occurredAt: offsetIso(startedAt, (setIndex + 1) * 60_000),
+        provenance: "design_qa_progress_visual",
+        slotId: String(firstSlot.id),
+        exerciseId: String(firstSlot.exerciseId),
+        setId: `${String(firstSlot.id)}:comparison:${index + 1}:${setIndex + 1}`,
+        setOrder: setIndex + 1,
+        reps: exactTargets[setIndex] ?? Number(firstSlot.targetReps ?? 6),
+        load: 60 + index * loadStepKg,
+        unit: "kg",
+        completion: "complete",
+      });
+      if (work.status !== "applied" || work.ledgerVersion === undefined) throw new Error(`canonical_progress_visual_work_failed:${work.reason}`);
+      ledgerVersion = work.ledgerVersion;
+    }
+    const completedAt = offsetIso(startedAt, 45 * 60_000);
+    completeActiveSession(planId, recordedSessionId, repositoryPlan.carrier.revision, ledgerVersion, completedAt, `comparison-${index + 1}`);
+    const aggregate = canonicalRecordedSessionLedger.get(recordedSessionId);
+    if (aggregate.status !== "found" || aggregate.session.status !== "completed") throw new Error("canonical_progress_visual_completion_unavailable");
+    references.push({ sessionId: recordedSessionId, planId, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId, microcycleId: aggregate.session.microcycleId, revision: aggregate.session.version, status: "completed" as const, recordReference: `canonical-recorded-session:${recordedSessionId}` });
+  }
+
+  const nextRevision = repositoryPlan.carrier.revision + 1;
+  const saved = canonicalActivePlanV2Repository.saveAtomically({ ...repositoryPlan.carrier, revision: nextRevision, updatedAt: "2026-07-18T10:00:00.000Z", recordedSessionReferences: references, progress: { ...repositoryPlan.carrier.progress, revision: nextRevision } }, repositoryPlan.carrier.revision);
+  if (saved.status !== "saved") throw new Error(`canonical_progress_visual_reference_failed:${saved.status}`);
+  return canonicalActivePlanState.hydrate().model ?? (() => { throw new Error("canonical_progress_visual_hydration_failed"); })();
 }
 
 function resetCanonicalHomeVisualState(): void {
@@ -165,7 +309,7 @@ function completeActiveSession(planId: string, recordedSessionId: string, planRe
   }
 }
 
-function requireModel(planId: string, state: CanonicalHomeVisualState) {
+function requireModel(planId: string, state: CanonicalHomeVisualState | CanonicalPlanVisualState | CanonicalProgressVisualState) {
   const current = canonicalActivePlanState.getState();
   const model = current.model;
   if (!model || model.planId !== planId) throw new Error(`canonical_home_visual_hydration_failed:${state}:${current.hydration}:${current.error ?? "unknown"}`);

@@ -15,7 +15,10 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import { startCanonicalSession, prescriptionHash } from "@/application/training/canonical-recorded-session-application";
 import { applyCanonicalActiveSessionFixture } from "@/application/design-qa/canonical-session-fixtures";
 import { createCanonicalTrainProjection } from "@/application/design-qa/canonical-train-projection";
-import { applyCanonicalHomeVisualState, canonicalFiveDayFixtureInput, type CanonicalHomeVisualState } from "@/application/design-qa/canonical-five-day-plan-fixture";
+import { applyCanonicalHomeVisualState, applyCanonicalPlanVisualState, applyCanonicalProgressVisualState, canonicalFiveDayFixtureInput, type CanonicalHomeVisualState, type CanonicalPlanVisualState, type CanonicalProgressVisualState } from "@/application/design-qa/canonical-five-day-plan-fixture";
+import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
+import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
+import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
 
 export type DesignQaFixtureId =
   | "progress_low"
@@ -263,6 +266,24 @@ export function applyCanonicalHomeVisualPreview(state: CanonicalHomeVisualState,
   return activeFixture;
 }
 
+export function applyCanonicalPlanVisualPreview(state: CanonicalPlanVisualState, environment: AppEnvironment = "development"): void {
+  if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
+  clearFixtureViewStateOnly();
+  appSettingsStore.patch({ onboardingCompleted: true });
+  cacheSubscription(seedMockSubscriptionStatus("trial"));
+  applyCanonicalPlanVisualState(state, { planId: `design-qa:plan-preview-${state}` });
+  jsonStore.set(activeFixtureKey, { id: "plan_recommended", label: `Certified Plan: ${state.replace("_", " ")}`, appliedAt: new Date().toISOString() } satisfies ActiveDesignQaFixture);
+}
+
+export function applyCanonicalProgressVisualPreview(state: CanonicalProgressVisualState, environment: AppEnvironment = "development"): void {
+  if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
+  clearFixtureViewStateOnly();
+  appSettingsStore.patch({ onboardingCompleted: true });
+  cacheSubscription(seedMockSubscriptionStatus("trial"));
+  applyCanonicalProgressVisualState(state, { planId: `design-qa:progress-preview-${state}` });
+  jsonStore.set(activeFixtureKey, { id: "progress_recent_clean", label: `Certified Progress: ${state.replace("_", " ")}`, appliedAt: new Date().toISOString() } satisfies ActiveDesignQaFixture);
+}
+
 function applyPlanStateFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
   if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
   clearFixtureViewStateOnly();
@@ -363,6 +384,9 @@ export function isDesignQaFixtureSession(session: WorkoutSession): boolean {
 function clearFixtureViewStateOnly() {
   programmeRepository.clearSelectedProgrammeDay();
   canonicalActivePlanState.clear();
+  canonicalRecordedSessionLedger.clear();
+  canonicalProgressEvidenceRepository.clear();
+  canonicalRestTimerRepository.clear();
   jsonStore.remove(activeFixtureKey);
   jsonStore.set(workoutSessionsKey, []);
   jsonStore.set(sessionPrepRecordsKey, []);

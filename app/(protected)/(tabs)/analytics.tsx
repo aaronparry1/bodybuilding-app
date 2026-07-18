@@ -1,37 +1,37 @@
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
 import { usePremiumAccess, PremiumRequiredScreen } from "@/application/billing/premium-access";
+import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/runtime/app-environment";
+import { useAppSettings } from "@/application/settings/app-settings";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
-import { projectCanonicalProgress } from "@/application/training/canonical-progress-projection";
-import { evaluateCanonicalProgress } from "@/domain/training/canonical-progress-evaluator";
-import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
-import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
-import { AppScreen, PrimaryButton, SecondaryButton } from "@/ui/primitives";
-import { colors, spacing, type } from "@/ui/theme";
-import { mesocyclePurposeDisplayName, sessionRoleDisplayName, trainingGoalDisplayName } from "@/application/training/display-labels";
+import type { CanonicalProgressPresentationAction } from "@/application/training/canonical-progress-presentation";
+import { ProgressDashboard } from "@/ui/progress-dashboard";
+import { useCanonicalProgressPresentation } from "@/ui/canonical-training-presentation-hooks";
+import { AppScreen } from "@/ui/primitives";
+
+type ProgressPreview = "recoverable_error" | "storage_error" | "empty";
+
+function qaPreview(value: string | undefined): ProgressPreview | undefined {
+  if (!isDesignQaModeAvailable(getAppEnvironment()) || !isDesignQaModeRequested()) return undefined;
+  return ["recoverable_error", "storage_error", "empty"].includes(value ?? "") ? value as ProgressPreview : undefined;
+}
 
 export default function ProgressScreen() {
   const premium = usePremiumAccess();
-  if (!premium) return <PremiumRequiredScreen title="Unlock your progress dashboard" message="Start a 14-day free trial to unlock canonical Progress evidence and decisions." />;
+  if (!premium) return <PremiumRequiredScreen title="Unlock your progress dashboard" message="Start a 14-day free trial to see consistency, completed training and supported improvements." />;
   return <CanonicalProgressContent />;
 }
 
 function CanonicalProgressContent() {
-  const [, refresh] = useState(0);
-  useEffect(() => { canonicalActivePlanState.hydrate(); return canonicalActivePlanState.subscribe(() => refresh((value) => value + 1)); }, []);
-  const state = canonicalActivePlanState.getState();
-  const plan = state.model;
-  const evidence = plan ? canonicalProgressEvidenceRepository.list(plan.planId, plan.microcycle.id) : [];
-  const evaluation = plan ? evaluateCanonicalProgress({ plan, evidence }) : null;
-  const decision = plan ? canonicalProgressDecisionRepository.current(plan.planId, plan.mesocycle.id)[0] ?? null : null;
-  const progress = projectCanonicalProgress({ status: state.hydration === "empty" ? "empty" : state.hydration === "error" ? "error" : state.hydration === "hydrated" ? "ready" : "hydrating", plan, evidence, evaluation, decision });
-  const applyDecision = () => {
-    if (!plan || !decision || !evaluation) return;
-    canonicalActivePlanState.applyProgressDecision({ planId: plan.planId, expectedPlanRevision: plan.revision, macrocycleId: plan.macrocycle.goal, mesocycleId: decision.mesocycleId, microcycleId: decision.microcycleId, decisionId: decision.decisionId, evaluationId: evaluation.evaluationId, expectedEvidenceIds: decision.evidenceIds });
+  const { settings } = useAppSettings();
+  const { qaProgressPreview } = useLocalSearchParams<{ qaProgressPreview?: string }>();
+  const projection = useCanonicalProgressPresentation({ displayUnit: settings.unit, previewStatus: qaPreview(qaProgressPreview) });
+  const onAction = (action: CanonicalProgressPresentationAction) => {
+    if (action.type === "retry") { canonicalActivePlanState.refresh(); return; }
+    if (action.type === "setup_plan") { router.push("/(protected)/onboarding"); return; }
+    if (action.type === "open_history" && action.sessionId) { router.push(`/(protected)/history/${action.sessionId}`); return; }
+    if (action.type === "open_planned_session" && action.sessionId && action.planId && action.planRevision !== undefined) {
+      router.push({ pathname: "/(protected)/(tabs)/train", params: { planId: action.planId, planRevision: String(action.planRevision), plannedSessionId: action.sessionId, lifecycle: "start" } });
+    }
   };
-  if (progress.status === "hydrating") return <AppScreen><Text style={{ color: colors.text }}>Loading Progress…</Text></AppScreen>;
-  if (progress.status === "empty") return <AppScreen><Text style={{ color: colors.text, ...type.section }}>Progress</Text><Text style={{ color: colors.textMuted }}>Complete a workout to see your progress here.</Text><PrimaryButton label="Set up training" onPress={() => router.push("/(protected)/onboarding")} /></AppScreen>;
-  if (!progress.evidenceCount && !progress.recentSessions.length) return <AppScreen><View style={{ gap: spacing.md }}><Text style={{ color: colors.text, ...type.hero }}>Progress</Text><Text style={{ color: colors.textMuted }}>Your progress will appear here after you complete your first workout.</Text><PrimaryButton label="View next workout" onPress={() => router.push("/(protected)/(tabs)/train")} /></View></AppScreen>;
-  return <AppScreen><View style={{ gap: spacing.md }}><Text style={{ color: colors.text, ...type.hero }}>Progress</Text><Text style={{ color: colors.textMuted }}>Your training progress at a glance.</Text><View style={{ gap: spacing.xs }}><Text style={{ color: colors.text, ...type.section }}>{progress.status === "review_required" ? "Review recommended" : progress.status === "insufficient_evidence" ? "Keep training" : "On track"}</Text><Text style={{ color: colors.textMuted }}>{progress.status === "review_required" ? "A review is available based on your recent training evidence." : progress.status === "insufficient_evidence" ? "Keep training to build enough evidence for a recommendation." : "Your recent training is on track."}</Text></View><View style={{ gap: spacing.xs }}><Text style={{ color: colors.text }}>Focus: {trainingGoalDisplayName(progress.macrocycle)}</Text><Text style={{ color: colors.text }}>Phase: {mesocyclePurposeDisplayName(progress.mesocycle)}</Text></View>{progress.decision ? <View style={{ gap: spacing.xs }}><Text style={{ color: colors.text }}>A coaching review is available</Text><Text style={{ color: colors.textMuted }}>Review this recommendation before making a training change.</Text><PrimaryButton label="Review recommendation" accessibilityLabel="Apply current decision" onPress={applyDecision} /></View> : null}{progress.recentSessions.slice(0, 5).map((session) => <SecondaryButton key={session.id} label={`${sessionRoleDisplayName(session.role)} · ${session.performedSets} sets`} onPress={() => router.push(`/(protected)/history/${session.id}`)} />)}</View></AppScreen>;
+  return <AppScreen><ProgressDashboard projection={projection} onAction={onAction} /></AppScreen>;
 }

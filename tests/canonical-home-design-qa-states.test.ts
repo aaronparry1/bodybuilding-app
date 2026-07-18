@@ -31,7 +31,7 @@ describe("canonical Home Design-QA states", () => {
 
   it("represents completion today without consuming the next prescription", () => {
     applyDesignQaFixture("home_completed_today");
-    const home = readCanonicalHomeProjection();
+    const home = readCanonicalHomeProjection({ now: Date.parse("2026-07-18T12:00:00.000Z") });
     expect(home.primary?.kind).toBe("completed_today");
     expect(home.progress.historicalCount).toBe(1);
     expect(home.primary?.detail).toContain("11 working sets");

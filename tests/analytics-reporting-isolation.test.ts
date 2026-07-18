@@ -2,13 +2,16 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const analyticsScreen = readFileSync("app/(protected)/(tabs)/analytics.tsx", "utf8");
+const progressPresentation = readFileSync("src/application/training/canonical-progress-presentation.ts", "utf8");
 const advancedReporting = readFileSync("src/domain/training/advanced-reporting.ts", "utf8");
 
 describe("Analytics and reporting isolation", () => {
   it("keeps Analytics read-only with respect to plan and training-year authority", () => {
     expect(analyticsScreen).toContain("canonicalActivePlanState");
-    expect(analyticsScreen).toContain("canonicalProgressEvidenceRepository");
-    expect(analyticsScreen).toContain("canonicalProgressDecisionRepository");
+    expect(analyticsScreen).toContain("useCanonicalProgressPresentation");
+    expect(analyticsScreen).not.toMatch(/canonicalProgressEvidenceRepository|canonicalProgressDecisionRepository|evaluateCanonicalProgress/);
+    expect(progressPresentation).toContain("canonicalProgressEvidenceRepository");
+    expect(progressPresentation).toContain("canonicalProgressDecisionRepository");
     expect(analyticsScreen).not.toContain("trainingYearRepository");
     expect(analyticsScreen).not.toContain("startDeloadTrainingYear");
     expect(analyticsScreen).not.toContain("startDeloadPlan(");

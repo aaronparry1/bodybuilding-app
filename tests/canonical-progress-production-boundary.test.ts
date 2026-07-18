@@ -3,13 +3,15 @@ import { describe, expect, it } from "vitest";
 import { projectCanonicalProgress } from "@/application/training/canonical-progress-projection";
 
 const source = readFileSync("app/(protected)/(tabs)/analytics.tsx", "utf8");
+const presentationSource = readFileSync("src/application/training/canonical-progress-presentation.ts", "utf8");
 
 describe("canonical Progress production boundary", () => {
-  it("projects canonical evidence and decisions without mutation authority", () => {
-    expect(source).toContain("canonicalProgressEvidenceRepository");
-    expect(source).toContain("canonicalProgressDecisionRepository");
-    expect(source).toContain("evaluateCanonicalProgress");
-    expect(source).toContain("projectCanonicalProgress");
+  it("uses the athlete presentation boundary while keeping repositories and evaluation out of the screen", () => {
+    expect(source).toContain("useCanonicalProgressPresentation");
+    expect(source).toContain("ProgressDashboard");
+    expect(source).not.toMatch(/canonicalProgressEvidenceRepository|canonicalProgressDecisionRepository|evaluateCanonicalProgress|projectCanonicalProgress|applyProgressDecision/);
+    expect(presentationSource).toContain("canonicalProgressEvidenceRepository");
+    expect(presentationSource).toContain("canonicalProgressDecisionRepository");
     expect(source).not.toMatch(/activeTrainingPlanRepository|workoutHistoryRepository|summarizeWorkoutHistory|currentBlock|activeBlockId|TrainingYear|annual-planner|volumeAdjustment|applyRecommendation/);
   });
 

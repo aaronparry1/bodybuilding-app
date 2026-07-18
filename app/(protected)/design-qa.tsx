@@ -5,6 +5,8 @@ import { getAppEnvironment, isV2CoachingQaRequested } from "@/application/runtim
 import {
   applyDesignQaFixture,
   applyCanonicalHomeVisualPreview,
+  applyCanonicalPlanVisualPreview,
+  applyCanonicalProgressVisualPreview,
   clearDesignQaFixtures,
   designQaFixtures,
   getActiveDesignQaFixture,
@@ -66,6 +68,26 @@ export default function DesignQaScreen() {
     }
   };
 
+  const previewCanonicalPlan = (state: "planned" | "active" | "partial_week" | "phase_completed") => {
+    try {
+      setError(null);
+      applyCanonicalPlanVisualPreview(state, environment);
+      router.replace("/(protected)/(tabs)/programmes");
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : "Unable to apply canonical Plan preview.");
+    }
+  };
+
+  const previewCanonicalProgress = (state: "zero" | "one_completed" | "insufficient_trend" | "established" | "genuine_pr") => {
+    try {
+      setError(null);
+      applyCanonicalProgressVisualPreview(state, environment);
+      router.replace("/(protected)/(tabs)/analytics");
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : "Unable to apply canonical Progress preview.");
+    }
+  };
+
   return (
     <AppScreen>
       <View style={{ gap: spacing.sm }}>
@@ -113,6 +135,28 @@ export default function DesignQaScreen() {
         <SecondaryButton label="Preview certified completed Home" onPress={() => previewCanonicalHome("completed")} />
         <SecondaryButton label="Preview certified rest Home" onPress={() => previewCanonicalHome("rest_day")} />
         <SecondaryButton label="Preview Home storage error" onPress={() => router.replace({ pathname: "/(protected)/(tabs)", params: { qaHomePreview: "storage_error" } })} />
+      </PremiumCard>
+
+      <PremiumCard tone="quiet">
+        <Text selectable style={{ color: colors.text, fontSize: 20, lineHeight: 25, fontWeight: "900" }}>Plan athlete states</Text>
+        <Text selectable style={{ ...type.body, color: colors.textMuted }}>Certified five-day schedule plus real canonical lifecycle history.</Text>
+        <SecondaryButton label="Plan · session 1 next" onPress={() => previewCanonicalPlan("planned")} />
+        <SecondaryButton label="Plan · session 1 active" onPress={() => previewCanonicalPlan("active")} />
+        <SecondaryButton label="Plan · partially completed week" onPress={() => previewCanonicalPlan("partial_week")} />
+        <SecondaryButton label="Plan · phase completed" onPress={() => previewCanonicalPlan("phase_completed")} />
+        <SecondaryButton label="Plan · recoverable issue" onPress={() => router.replace({ pathname: "/(protected)/(tabs)/programmes", params: { qaPlanPreview: "recoverable_error" } })} />
+        <SecondaryButton label="Plan · no plan" onPress={() => { clearFixtures(); router.replace({ pathname: "/(protected)/(tabs)/programmes", params: { qaPlanPreview: "empty" } }); }} />
+      </PremiumCard>
+
+      <PremiumCard tone="quiet">
+        <Text selectable style={{ color: colors.text, fontSize: 20, lineHeight: 25, fontWeight: "900" }}>Progress athlete states</Text>
+        <Text selectable style={{ ...type.body, color: colors.textMuted }}>Performed-work-only history from the canonical ledger and immutable snapshots.</Text>
+        <SecondaryButton label="Progress · zero history" onPress={() => previewCanonicalProgress("zero")} />
+        <SecondaryButton label="Progress · one completed workout" onPress={() => previewCanonicalProgress("one_completed")} />
+        <SecondaryButton label="Progress · insufficient trend" onPress={() => previewCanonicalProgress("insufficient_trend")} />
+        <SecondaryButton label="Progress · established history" onPress={() => previewCanonicalProgress("established")} />
+        <SecondaryButton label="Progress · genuine PR" onPress={() => previewCanonicalProgress("genuine_pr")} />
+        <SecondaryButton label="Progress · recoverable issue" onPress={() => router.replace({ pathname: "/(protected)/(tabs)/analytics", params: { qaProgressPreview: "recoverable_error" } })} />
       </PremiumCard>
 
       {Object.entries(fixturesByArea).map(([area, fixtures]) => (

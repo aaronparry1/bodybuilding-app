@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "canonical_plan_progress_visual_certification_v1",
+  "baseCommit": "5d5dd4e977efb38095d86e3ec5dc5771aed9077b",
+  "designQaOnly": true,
+  "productionMutationPerformed": false,
+  "productionQaChromeEnabled": false,
+  "viewports": [
+    { "width": 390, "height": 844 },
+    { "width": 375, "height": 812 },
+    { "width": 320, "height": 568 }
+  ],
+  "canonicalFixture": {
+    "source": "canonical_five_day_microcycle_certification_v2",
+    "planProfile": "Build muscle and strength · intermediate · 5 days · let app choose",
+    "nextSession": "Bench and hypertrophy",
+    "orderedSessions": ["Bench and hypertrophy", "Squat and hypertrophy", "Deadlift and back", "Upper support", "Lower support"],
+    "weeklyWorkingSets": [11, 11, 11, 14, 12],
+    "weeklyWorkingSetTotal": 59,
+    "planIdentities": {
+      "next": "design-qa:plan-preview-planned",
+      "active": "design-qa:plan-preview-active",
+      "partial": "design-qa:plan-preview-partial_week",
+      "complete": "design-qa:plan-preview-phase_completed"
+    },
+    "progressIdentities": {
+      "zero": "design-qa:progress-preview-zero",
+      "oneCompleted": "design-qa:progress-preview-one_completed",
+      "insufficientTrend": "design-qa:progress-preview-insufficient_trend",
+      "established": "design-qa:progress-preview-established",
+      "genuinePr": "design-qa:progress-preview-genuine_pr"
+    },
+    "visualFixtureAlignment": "passed"
+  },
+  "progressEvidenceRules": {
+    "performedWorkOnly": true,
+    "completedSessionsOnly": true,
+    "minimumCompletedSessionsForStatus": 3,
+    "minimumComparableObservationsForTrend": 3,
+    "comparableKey": "exercise identity plus loading mode",
+    "warmupsExcluded": true,
+    "incompleteSetsExcluded": true,
+    "assistedLoadsExcludedFromPrs": true,
+    "unitConversionIsDisplayOnly": true,
+    "missingEvidenceFailsClosed": true
+  },
+  "states": [
+    { "id": "plan_session_next", "source": "canonical_active_plan_and_immutable_snapshot", "viewport": "390x844", "width": 390, "height": 844, "screenshot": "screenshots/plan-session-next-390x844.png", "sha256": "421c217460d2a80af3a69145a6918a6b4aa567a0fa4e9d7725e01b1231c31bb0", "result": "passed", "assertions": ["ordered_schedule", "next_identity", "primary_start_action", "exact_snapshot_summary", "no_qa_chrome"] },
+    { "id": "plan_session_active", "source": "canonical_recorded_session_projection", "viewport": "390x844", "width": 390, "height": 844, "screenshot": "screenshots/plan-session-active-390x844.png", "sha256": "83faa7f9a9b57cfe81dbef87c47a91946a410658f7e2f114e2342832696d40cf", "result": "passed", "assertions": ["active_position_preserved", "resume_action", "next_session_preserved", "no_qa_chrome"] },
+    { "id": "plan_partial_week", "source": "canonical_completion_and_remaining_plan", "viewport": "375x812", "width": 375, "height": 812, "screenshot": "screenshots/plan-partial-week-375x812.png", "sha256": "f093367d375b0464108eedd543187a0e08752de740a721eb2452e1e12f111e05", "result": "passed", "assertions": ["completed_status", "next_status", "full_schedule_retained", "train_identity_agreement"] },
+    { "id": "plan_phase_completed", "source": "canonical_ledger_completion_for_all_planned_snapshots", "viewport": "390x844", "width": 390, "height": 844, "screenshot": "screenshots/plan-phase-completed-390x844.png", "sha256": "2e4b2dab7dd8f0e98066afd74b3f4080fade39be738d101aba8f72e6af44c691", "result": "passed", "assertions": ["five_completed_sessions", "no_invented_successor", "reviewed_direction_copy", "reload_safe_fixture"] },
+    { "id": "plan_recoverable_error", "source": "development_only_typed_plan_error_projection", "viewport": "320x568", "width": 320, "height": 568, "screenshot": "screenshots/plan-recoverable-error-320x568.png", "sha256": "caacd4cc885508324b5741ec3fb1715d27131a69a53d945b839cc7f4a6047ee3", "result": "passed", "assertions": ["customer_safe_copy", "retry_action", "no_raw_identifier", "no_horizontal_overflow"] },
+    { "id": "plan_no_plan", "source": "canonical_active_plan_missing", "viewport": "320x568", "width": 320, "height": 568, "screenshot": "screenshots/plan-no-plan-320x568.png", "sha256": "eaf7b25d6fefda38994c7e23b268136ef19d80aa7770b14f7dddc5245fe30a9a", "result": "passed", "assertions": ["setup_action", "no_stale_schedule", "no_raw_identifier", "no_horizontal_overflow"] },
+    { "id": "progress_zero_history", "source": "canonical_plan_without_completed_ledger_work", "viewport": "390x844", "width": 390, "height": 844, "screenshot": "screenshots/progress-zero-history-390x844.png", "sha256": "c878fc3fbde2fb1cf4aa799f5c05e7ff91d371021fea54bb496370f983d5e28a", "result": "passed", "assertions": ["started_work_excluded", "no_fake_metric", "next_workout_action", "performed_work_rule_explained"] },
+    { "id": "progress_one_completed", "source": "one_canonical_completed_recorded_session", "viewport": "375x812", "width": 375, "height": 812, "screenshot": "screenshots/progress-one-completed-375x812.png", "sha256": "1c82c9252f430ae7f4b94ed4a0ce9815e66279d4318be23d048e6396d78228e5", "result": "passed", "assertions": ["early_state", "no_status_verdict", "no_trend", "recent_training_visible"] },
+    { "id": "progress_established", "source": "three_comparable_completed_ledger_sessions", "viewport": "390x844", "width": 390, "height": 844, "screenshot": "screenshots/progress-established-390x844.png", "sha256": "1aa265503b3b8c9fdf9c4e93a34ff5b0bccea204df0ae453f263d0aa19a3a588", "result": "passed", "assertions": ["three_session_threshold", "training_consistency_status", "stable_trend_wording", "no_invented_pr"] },
+    { "id": "progress_genuine_pr", "source": "three_comparable_completed_sessions_with_increasing_performed_load", "viewport": "390x844", "width": 390, "height": 844, "screenshot": "screenshots/progress-genuine-pr-390x844.png", "sha256": "29a87e61bc3ddc64b0c244823fe97f9100593475d0cefc4bdb30475ae20cb111", "result": "passed", "assertions": ["genuine_load_pr", "previous_and_current_values", "trend_from_performed_work", "immutable_kg_preserved"] },
+    { "id": "progress_insufficient_trend", "source": "two_comparable_completed_ledger_sessions", "viewport": "320x568", "width": 320, "height": 568, "screenshot": "screenshots/progress-insufficient-trend-320x568.png", "sha256": "29f6c138ef64fd902e974272ccc914c2e1a49aee25f0e6a1e7223b0834eeeb5f", "result": "passed", "assertions": ["no_status_verdict", "no_trend_chart", "performed_improvement_may_remain_visible", "no_horizontal_overflow"] },
+    { "id": "progress_recoverable_error", "source": "development_only_typed_progress_error_projection", "viewport": "320x568", "width": 320, "height": 568, "screenshot": "screenshots/progress-recoverable-error-320x568.png", "sha256": "182f2827d171a196b9afa7de32ee95ff7f5d3077be21938bfef566c16f09781d", "result": "passed", "assertions": ["customer_safe_copy", "retry_action", "no_evaluator_copy", "no_horizontal_overflow"] }
+  ],
+  "responsiveFindings": {
+    "primaryActionsVisibleWhereRequired": true,
+    "horizontalOverflowObserved": false,
+    "clippedPrimaryTextObserved": false,
+    "bottomNavigationObscuresPrimaryAction": false,
+    "narrowWidthUsable": true,
+    "qaChromeObserved": false,
+    "rawArchitectureIdentifiersObserved": false
+  },
+  "accessibilityFindings": {
+    "iconStatusAlsoUsesText": true,
+    "trendHasTextSummary": true,
+    "primaryActionsMeetMinimumTouchHeight": true,
+    "rawColorAloneDoesNotConveySessionStatus": true,
+    "textScalingIsNotDisabled": true
+  },
+  "verification": {
+    "focusedFilesPassed": 19,
+    "focusedTestsPassed": 185,
+    "fullSuiteFilesPassed": 347,
+    "fullSuiteTestsPassed": 2051,
+    "failedTests": 0,
+    "skippedTests": 0,
+    "typecheck": "passed",
+    "productionExpoConfig": "passed_design_qa_disabled",
+    "productionWebExport": "passed",
+    "nativeBuildOrUpload": "not_performed"
+  }
+}

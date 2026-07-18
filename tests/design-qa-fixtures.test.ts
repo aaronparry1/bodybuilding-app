@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  applyCanonicalPlanVisualPreview,
   applyDesignQaFixture,
   clearDesignQaFixtures,
   designQaFixtures,
@@ -65,6 +66,26 @@ describe("Design QA fixtures", () => {
     expect(activeTrainingPlanRepository.getOptional()).toBeNull();
     expect(workoutSessionRepository.list()).toEqual([]);
     expect(getCachedSubscription()).toMatchObject({ status: "trial", provider: "mock", isPremium: true });
+  });
+
+  it("does not replace an existing canonical visual state on Design QA reload", () => {
+    applyCanonicalPlanVisualPreview("phase_completed", "development");
+    const before = canonicalActivePlanState.getReadModel();
+
+    ensureDesignQaLocalWorkoutReadyState("development");
+
+    const after = canonicalActivePlanState.getReadModel();
+    expect(after?.planId).toBe(before?.planId);
+    expect(after?.plannedSessions).toHaveLength(0);
+    expect(after?.activeRecordedSession).toBeNull();
+  });
+
+  it("can seed a fresh workout after clearing completed visual facts", () => {
+    applyCanonicalPlanVisualPreview("phase_completed", "development");
+    clearDesignQaFixtures("development");
+
+    expect(() => ensureDesignQaLocalWorkoutReadyState("development")).not.toThrow();
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
   });
 
   it("clears active fixture state and fixture sessions", () => {

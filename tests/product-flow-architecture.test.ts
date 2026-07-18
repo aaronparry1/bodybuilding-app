@@ -270,13 +270,13 @@ describe("product flow architecture", () => {
 
   it("does not expose recovery/deload as a user-choice Progress CTA", () => {
     const progressSource = readFileSync(join(process.cwd(), "app/(protected)/(tabs)/analytics.tsx"), "utf8");
-    const dashboardSource = readFileSync(join(process.cwd(), "src/domain/training/canonical-progress-dashboard-projection.ts"), "utf8");
+    const presentationSource = readFileSync(join(process.cwd(), "src/application/training/canonical-progress-presentation.ts"), "utf8");
 
     expect(progressSource).not.toContain("ignoreDeloadPlan");
     expect(progressSource).not.toContain("Recovery Window started");
-    expect(dashboardSource).toContain("recovery");
-    expect(progressSource).toContain("canonicalProgressDecisionRepository");
-    expect(progressSource).toContain("Apply current decision");
+    expect(presentationSource).toContain("review_only");
+    expect(progressSource).toContain("useCanonicalProgressPresentation");
+    expect(progressSource).not.toContain("applyProgressDecision");
     expect(progressSource).not.toContain("startDeloadPlan(activePlan");
   });
 
@@ -311,11 +311,13 @@ describe("product flow architecture", () => {
 
   it("presents the Plan roadmap as coached stages instead of a flat learn-heavy list", () => {
     const source = readFileSync(join(process.cwd(), "app/(protected)/(tabs)/programmes.tsx"), "utf8");
+    const dashboard = readFileSync(join(process.cwd(), "src/ui/plan-dashboard.tsx"), "utf8");
 
-    expect(source).toContain("projectCanonicalPlan");
-    expect(source).toContain("Mesocycle");
-    expect(source).toContain("Microcycle");
-    expect(source).toContain("Planned sessions");
+    expect(source).toContain("useCanonicalPlanPresentation");
+    expect(source).toContain("PlanDashboard");
+    expect(dashboard).toContain("Programme direction");
+    expect(dashboard).toContain("Reviewed, not guaranteed");
+    expect(`${source}\n${dashboard}`).not.toMatch(/Mesocycle|Microcycle|Next actionable session/);
     expect(source).not.toContain(">Learn<");
     expect(source).not.toContain("Learn\n      </Text>");
   });
