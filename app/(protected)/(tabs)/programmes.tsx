@@ -42,6 +42,7 @@ export default function PlanScreen() {
             <Text style={{ position: "absolute", width: 1, height: 1, opacity: 0 }}>Mesocycle · Microcycle</Text>
             {projection.plannedSessions.map((session) => <Text key={session.id} selectable style={{ ...type.body, color: colors.text }}>{session.planSessionIndex + 1}. {sessionRoleDisplayName(session.role)}{session.status === "completed" ? " · complete" : ""}</Text>)}
           </SectionList>
+          {projection.activeSession ? <SectionList title="Active workout"><Text selectable style={{ ...type.body, color: colors.accent }}>{sessionRoleDisplayName(projection.activeSession.role)} · in progress</Text><Text style={{ ...type.body, color: colors.textMuted }}>Resume this workout from Train.</Text></SectionList> : null}
           <SectionList title="Next actionable session">
             <Text selectable style={{ ...type.body, color: colors.accent }}>{projection.nextActionableSession ? sessionRoleDisplayName(projection.nextActionableSession.role) : "No workout is currently ready."}</Text>
           </SectionList>

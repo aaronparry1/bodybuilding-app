@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Tabs, useSegments } from "expo-router";
 import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -29,9 +29,12 @@ type TabBarProps = {
 };
 
 export default function MainTabsLayout() {
+  const segments = useSegments();
+  const workoutRoute = segments.includes("train");
+  // The regular route is intentionally expressed as tabBar={(props) => <PremiumTabBar ...>;
   return (
     <Tabs
-      tabBar={(props) => <PremiumTabBar {...(props as TabBarProps)} />}
+      tabBar={(props) => workoutRoute ? null : <PremiumTabBar {...(props as TabBarProps)} />}
       screenOptions={{
         headerStyle: { backgroundColor: colors.background },
         headerTintColor: colors.text,

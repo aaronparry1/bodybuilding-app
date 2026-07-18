@@ -15,15 +15,10 @@ export default function ProtectedLayout() {
   const { settings } = useAppSettings();
   const segments = useSegments();
   const [activeFixture, setActiveFixture] = useState(() => getActiveDesignQaFixture());
-  const [hasActivePlan, setHasActivePlan] = useState(() => Boolean(canonicalActivePlanState.getReadModel()));
   const isOnboardingRoute = segments.includes("onboarding");
 
   useEffect(() => subscribeDesignQaFixture(() => setActiveFixture(getActiveDesignQaFixture())), []);
-  useEffect(() => {
-    const unsubscribe = canonicalActivePlanState.subscribe(() => setHasActivePlan(Boolean(canonicalActivePlanState.getReadModel())));
-    canonicalActivePlanState.hydrate();
-    return unsubscribe;
-  }, []);
+  useEffect(() => { canonicalActivePlanState.hydrate(); }, []);
 
   if (isLoading) {
     return (
@@ -34,7 +29,9 @@ export default function ProtectedLayout() {
   }
 
   if (!user && !isOfflineMode) return <Redirect href="/(auth)" />;
-  if (!settings.onboardingCompleted && !hasActivePlan && !isOnboardingRoute) return <Redirect href="/(protected)/onboarding" />;
+  // The protected tabs are never a substitute for onboarding. A stale carrier from an
+  // interrupted setup may exist, but it must not make the old plan visible or startable.
+  if (!settings.onboardingCompleted && !isOnboardingRoute && !activeFixture) return <Redirect href="/(protected)/onboarding" />;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
