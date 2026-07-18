@@ -7,7 +7,7 @@ import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-
 import type { CanonicalProgressEvidence } from "@/domain/training/canonical-progress-evidence";
 import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/domain/training/canonical-recorded-session-ledger";
 
-export const CANONICAL_HOME_PROJECTION_VERSION = "canonical_home_projection_v2" as const;
+export const CANONICAL_HOME_PROJECTION_VERSION = "canonical_home_projection_v3" as const;
 
 export type CanonicalHomeStatus = "hydrating" | "ready" | "empty" | "recorded_history_recovery_required" | "storage_error";
 export type CanonicalHomeAction = Readonly<{
@@ -42,7 +42,7 @@ export type CanonicalHomePrimary = Readonly<{
 export type CanonicalHomeProjection = Readonly<{
   contractVersion: typeof CANONICAL_HOME_PROJECTION_VERSION;
   status: CanonicalHomeStatus;
-  greeting: Readonly<{ eyebrow: string; title: string; subtitle: string }>;
+  greeting: Readonly<{ title: string; subtitle: string }>;
   planId?: string;
   revision?: number;
   primary?: CanonicalHomePrimary;
@@ -57,6 +57,7 @@ export type CanonicalHomeProjection = Readonly<{
     historicalCount: number;
     completedThisMicrocycle: number;
     evidenceStatus: "current" | "not_yet_available";
+    reviewAvailable: boolean;
     headline: string;
   }>;
   recent?: Readonly<{ title: string; detail: string; completedAt?: string }>;
@@ -113,7 +114,6 @@ export function projectCanonicalHome(input: Readonly<{
   }
 
   const model = input.model;
-  const progressAction: CanonicalHomeAction = { type: "open_progress", planId: model.planId, planRevision: model.revision };
   const plannedSession = model.nextSession ? model.plannedSessions.find((candidate) => candidate.id === model.nextSession?.id) : undefined;
   const plannedWorkout = plannedSession ? projectCanonicalWorkoutPresentation({ session: null, snapshot: plannedSession.snapshot, evidence: input.evidence, displayUnit: input.displayUnit }) : null;
   const activeWorkout = input.activeAggregate ? projectCanonicalWorkoutPresentation({ session: input.activeAggregate.session, snapshot: input.activeAggregate.session.prescriptionSnapshot, events: input.activeAggregate.events, evidence: input.evidence, displayUnit: input.displayUnit, now: input.now }) : null;
@@ -122,15 +122,17 @@ export function projectCanonicalHome(input: Readonly<{
   const completedToday = latest?.completedAt ? sameLocalDay(Date.parse(latest.completedAt), input.now ?? Date.now()) : false;
   const completedThisMicrocycle = historical.filter((session) => session.microcycleId === model.microcycle.id).length;
   const evidenceStatus = (input.evidence?.length ?? 0) > 0 ? "current" as const : "not_yet_available" as const;
+  const reviewAvailable = historical.length > 0;
+  const progressAction: CanonicalHomeAction = { type: "open_progress", planId: model.planId, planRevision: model.revision };
   const actions: CanonicalHomeAction[] = [];
   let primary: CanonicalHomePrimary;
 
   if (input.activeAggregateStatus === "missing") {
     return {
-      ...base("recorded_history_recovery_required", "Your workout needs attention", "The plan is safe, but the active workout record needs to be restored.", [progressAction]),
+      ...base("recorded_history_recovery_required", "Your workout needs attention", "The plan is safe, but the active workout record needs to be restored.", reviewAvailable ? [progressAction] : []),
       planId: model.planId,
       revision: model.revision,
-      progress: progressSummary(historical.length, completedThisMicrocycle, evidenceStatus),
+      progress: progressSummary(historical.length, completedThisMicrocycle, evidenceStatus, reviewAvailable),
       attention: { tone: "warning", title: "Workout recovery required", detail: "Open Train to retry the canonical recorded-session restoration." },
     };
   }
@@ -138,39 +140,40 @@ export function projectCanonicalHome(input: Readonly<{
   if (activeWorkout && model.activeRecordedSession) {
     const action: CanonicalHomeAction = { type: "resume_recorded_session", planId: model.planId, planRevision: model.revision, sessionId: model.activeRecordedSession.recordedSessionId };
     actions.push(action);
-    primary = { kind: "active", eyebrow: activeWorkout.lifecycle === "paused" ? "Workout paused" : "Workout in progress", title: activeWorkout.title, detail: `${activeWorkout.completedSets} of ${activeWorkout.totalSets} working sets complete`, ctaLabel: activeWorkout.lifecycle === "paused" ? "Resume workout" : "Continue workout", action, workout: summarizeWorkout(activeWorkout) };
+    primary = { kind: "active", eyebrow: activeWorkout.lifecycle === "paused" ? "Workout paused" : "Workout in progress", title: activeWorkout.title, detail: `${activeWorkout.completedSets} of ${activeWorkout.totalSets} working sets complete`, ctaLabel: activeWorkout.lifecycle === "paused" ? "Resume workout" : "Continue workout", action, workout: summarizeWorkout(activeWorkout, input.activeAggregate!.session.role) };
   } else if (completedToday && latest) {
     const action = plannedSession ? plannedAction(model, plannedSession.id) : undefined;
     if (action) actions.push(action);
     const duration = completedDurationMinutes(latest);
-    primary = { kind: "completed_today", eyebrow: "Training complete", title: "Today’s workout is done", detail: `${sessionRoleDisplayName(latest.role)} · ${latest.performedSets} working sets${duration ? ` · ${duration} min` : ""}`, ...(action ? { ctaLabel: "Preview next workout", action } : {}), ...(plannedWorkout ? { workout: summarizeWorkout(plannedWorkout) } : {}) };
+    primary = { kind: "completed_today", eyebrow: "Training complete", title: "Today’s workout is done", detail: `${sessionRoleDisplayName(latest.role)} · ${latest.performedSets} working sets${duration ? ` · ${duration} min` : ""}`, ...(action ? { ctaLabel: "Preview next workout", action } : {}), ...(plannedWorkout ? { workout: summarizeWorkout(plannedWorkout, plannedSession?.role) } : {}) };
   } else if (plannedSession && plannedWorkout) {
     const action = plannedAction(model, plannedSession.id);
     actions.push(action);
-    primary = { kind: "planned", eyebrow: "Up next", title: plannedWorkout.title, detail: plannedWorkout.purpose, ctaLabel: "Start workout", action, workout: summarizeWorkout(plannedWorkout) };
+    primary = { kind: "planned", eyebrow: "Up next", title: plannedWorkout.title, detail: sessionPurposeCopy(plannedSession.role, plannedWorkout.title), ctaLabel: "Start workout", action, workout: summarizeWorkout(plannedWorkout, plannedSession.role) };
   } else {
-    primary = { kind: "rest_day", eyebrow: "Recovery day", title: "No workout due", detail: "Your current microcycle has no remaining planned session. Recover and review Progress when you’re ready." };
+    primary = { kind: "rest_day", eyebrow: "Recovery day", title: "No workout due", detail: "Recover well today and be ready for your next session." };
   }
-  actions.push(progressAction);
+  if (reviewAvailable) actions.push(progressAction);
 
   const activeSnapshot = input.activeAggregate?.session.prescriptionSnapshot;
   const activeIndex = activeSnapshot && typeof activeSnapshot.planSessionIndex === "number" ? activeSnapshot.planSessionIndex : null;
   const nextIndex = plannedSession?.planSessionIndex ?? null;
   const position = activeIndex ?? nextIndex;
-  const sessionPosition = position === null ? "Week complete" : `Session ${position + 1} of ${model.microcycle.trainingDays}`;
+  const sessionPosition = position === null
+    ? completedThisMicrocycle >= model.microcycle.trainingDays ? "Week complete" : "No session due"
+    : `Session ${position + 1} of ${model.microcycle.trainingDays}`;
   const completionLabel = `${Math.min(completedThisMicrocycle, model.microcycle.trainingDays)} of ${model.microcycle.trainingDays} sessions completed`;
 
   return {
     contractVersion: CANONICAL_HOME_PROJECTION_VERSION,
     status: "ready",
-    greeting: { eyebrow: "Adaptive Strength Coach", title: "Today", subtitle: activeWorkout ? "Pick up exactly where you left off." : completedToday ? "Your work is saved. Here’s what comes next." : "Your next action, programme position, and recent work." },
+    greeting: { title: "Today", subtitle: activeWorkout ? "Your session is ready to continue." : completedToday ? "Your work is saved." : primary.kind === "rest_day" ? "Make today support the next session." : "Your next session is ready." },
     planId: model.planId,
     revision: model.revision,
     primary,
     programme: { goal: trainingGoalDisplayName(model.macrocycle.goal), phase: mesocyclePurposeDisplayName(model.mesocycle.purpose), microcycle: `Week ${model.microcycle.sequenceNumber}`, sessionPosition, completionLabel },
-    progress: progressSummary(historical.length, completedThisMicrocycle, evidenceStatus),
+    progress: progressSummary(historical.length, completedThisMicrocycle, evidenceStatus, reviewAvailable),
     ...(latest ? { recent: { title: sessionRoleDisplayName(latest.role), detail: `${latest.performedSets} sets · ${latest.performedReps} reps`, ...(latest.completedAt ? { completedAt: latest.completedAt } : {}) } } : {}),
-    ...(evidenceStatus === "not_yet_available" ? { attention: { tone: "info" as const, title: "Progress starts with completed work", detail: "Complete a workout to unlock evidence-based progress and recovery guidance.", action: progressAction } } : {}),
     actions,
   };
 }
@@ -179,12 +182,22 @@ function plannedAction(model: CanonicalActivePlanReadModel, sessionId: string): 
   return { type: "open_planned_session", planId: model.planId, planRevision: model.revision, sessionId };
 }
 
-function summarizeWorkout(workout: WorkoutPresentation): CanonicalHomeWorkoutSummary {
-  return { title: workout.title, purpose: workout.purpose, lifecycle: workout.lifecycle, exerciseCount: workout.exercises.length, workingSetCount: workout.totalSets, completedSetCount: workout.completedSets, progressPercent: workout.progressPercent, estimatedDurationMinutes: workout.estimatedDurationMinutes, exercisePreview: workout.exercises.slice(0, 3).map((exercise) => exercise.name) };
+function summarizeWorkout(workout: WorkoutPresentation, role?: string): CanonicalHomeWorkoutSummary {
+  return { title: workout.title, purpose: sessionPurposeCopy(role, workout.title), lifecycle: workout.lifecycle, exerciseCount: workout.exercises.length, workingSetCount: workout.totalSets, completedSetCount: workout.completedSets, progressPercent: workout.progressPercent, estimatedDurationMinutes: workout.estimatedDurationMinutes, exercisePreview: workout.exercises.slice(0, 2).map((exercise) => exercise.name) };
 }
 
-function progressSummary(historicalCount: number, completedThisMicrocycle: number, evidenceStatus: "current" | "not_yet_available"): CanonicalHomeProjection["progress"] {
-  return { historicalCount, completedThisMicrocycle, evidenceStatus, headline: historicalCount ? `${historicalCount} completed workout${historicalCount === 1 ? "" : "s"} recorded` : "Your first completed workout will appear here" };
+function progressSummary(historicalCount: number, completedThisMicrocycle: number, evidenceStatus: "current" | "not_yet_available", reviewAvailable: boolean): CanonicalHomeProjection["progress"] {
+  return { historicalCount, completedThisMicrocycle, evidenceStatus, reviewAvailable, headline: historicalCount ? `${historicalCount} completed workout${historicalCount === 1 ? "" : "s"} recorded` : "Complete your first session to begin your training record." };
+}
+
+function sessionPurposeCopy(role: string | undefined, title: string): string {
+  const normalized = (role ?? "").toLowerCase();
+  if (normalized.includes("bench")) return "Build your bench, then finish with focused upper-body work.";
+  if (normalized.includes("squat")) return "Build your squat, then add focused leg work.";
+  if (normalized.includes("deadlift")) return "Build your deadlift, then finish with focused back work.";
+  if (normalized.includes("upper")) return "Build upper-body volume with focused support work.";
+  if (normalized.includes("lower")) return "Build lower-body volume with focused support work.";
+  return `Focus on ${title.toLowerCase()} and complete the prescribed work.`;
 }
 
 function sameLocalDay(left: number, right: number): boolean {
@@ -201,5 +214,5 @@ function completedDurationMinutes(session: Readonly<{ startedAt?: string; comple
 }
 
 function base(status: CanonicalHomeStatus, title: string, subtitle: string, actions: readonly CanonicalHomeAction[]): CanonicalHomeProjection {
-  return { contractVersion: CANONICAL_HOME_PROJECTION_VERSION, status, greeting: { eyebrow: "Adaptive Strength Coach", title, subtitle }, progress: { historicalCount: 0, completedThisMicrocycle: 0, evidenceStatus: "not_yet_available", headline: "Your first completed workout will appear here" }, actions };
+  return { contractVersion: CANONICAL_HOME_PROJECTION_VERSION, status, greeting: { title, subtitle }, progress: { historicalCount: 0, completedThisMicrocycle: 0, evidenceStatus: "not_yet_available", reviewAvailable: false, headline: "Complete your first session to begin your training record." }, actions };
 }

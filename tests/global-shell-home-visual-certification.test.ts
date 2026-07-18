@@ -26,6 +26,8 @@ type VisualArtifact = {
   }>;
   responsiveFindings: Record<string, boolean>;
   trainLifecycleFindings: Record<string, boolean>;
+  canonicalFixture: { nextSession: string; totalExercises: number; totalWorkingSets: number; weeklyWorkingSetTotal: number; visualFixtureAlignment: string };
+  greyCaptureBlock: { classification: string; productDefectFound: boolean; correctedActiveCapture: string };
 };
 
 function readArtifact(): VisualArtifact {
@@ -42,11 +44,12 @@ describe("global shell and Home visual certification", () => {
       { width: 320, height: 568 },
     ]);
     expect(artifact.states.map((state) => state.id)).toEqual([
-      "planned_zero_history",
+      "planned_next_workout",
       "active_workout",
-      "active_paused_workout",
+      "paused_workout",
       "completed_today",
       "rest_day",
+      "zero_history",
       "recoverable_storage_error",
       "no_plan",
     ]);
@@ -78,7 +81,12 @@ describe("global shell and Home visual certification", () => {
       bottomNavigationObscuresContent: false,
       compactSettingsActionAccessible: true,
       narrowWidthUsable: true,
+      qaChromeObserved: false,
+      greyOverlayObserved: false,
+      staleThreeExerciseFixtureObserved: false,
     });
     expect(Object.values(artifact.trainLifecycleFindings).every(Boolean)).toBe(true);
+    expect(artifact.canonicalFixture).toMatchObject({ nextSession: "Bench and hypertrophy", totalExercises: 4, totalWorkingSets: 11, weeklyWorkingSetTotal: 59, visualFixtureAlignment: "passed" });
+    expect(artifact.greyCaptureBlock).toMatchObject({ classification: "screenshot_capture_failure", productDefectFound: false, correctedActiveCapture: "screenshots/home-active-390x844.png" });
   });
 });

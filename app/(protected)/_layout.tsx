@@ -1,4 +1,4 @@
-import { Redirect, useSegments } from "expo-router";
+import { Redirect, useGlobalSearchParams, useSegments } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -7,6 +7,7 @@ import { useAuth } from "@/application/auth/auth-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { getActiveDesignQaFixture, subscribeDesignQaFixture } from "@/application/design-qa/design-qa-fixtures";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/runtime/app-environment";
 import { colors, spacing } from "@/ui/theme";
 
 export default function ProtectedLayout() {
@@ -14,8 +15,10 @@ export default function ProtectedLayout() {
   const { user, isLoading, isOfflineMode } = useAuth();
   const { settings } = useAppSettings();
   const segments = useSegments();
+  const { qaChrome } = useGlobalSearchParams<{ qaChrome?: string }>();
   const [activeFixture, setActiveFixture] = useState(() => getActiveDesignQaFixture());
   const isOnboardingRoute = segments.includes("onboarding");
+  const showDesignQaChrome = Boolean(activeFixture) && qaChrome === "1" && isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested();
 
   useEffect(() => subscribeDesignQaFixture(() => setActiveFixture(getActiveDesignQaFixture())), []);
   useEffect(() => { canonicalActivePlanState.hydrate(); }, []);
@@ -35,7 +38,7 @@ export default function ProtectedLayout() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {activeFixture ? (
+      {showDesignQaChrome ? (
         <View
           style={{
             backgroundColor: colors.accentSoft,
@@ -47,7 +50,7 @@ export default function ProtectedLayout() {
           }}
         >
           <Text selectable adjustsFontSizeToFit minimumFontScale={0.82} numberOfLines={1} style={{ color: colors.accent, fontSize: 12, lineHeight: 16, fontWeight: "900", textAlign: "center" }}>
-            Design QA fixture active: {activeFixture.label}
+            Design QA fixture active: {activeFixture?.label}
           </Text>
         </View>
       ) : null}

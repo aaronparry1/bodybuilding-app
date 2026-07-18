@@ -20,7 +20,7 @@ export const colors = {
   dangerSoft: "#241314",
   blue: "#9ab8ff",
   blueSoft: "#121a2d",
-  focus: "#8ee8ff",
+  focus: "#d8b56d",
   scrim: "rgba(3, 5, 8, 0.72)",
 };
 

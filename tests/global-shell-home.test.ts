@@ -28,8 +28,9 @@ describe("global application shell and Home boundary", () => {
     expect(home).toContain("projectCanonicalHome");
     expect(home).toContain("HomeDashboard");
     expect(home).not.toMatch(/startCanonicalSession|pauseCanonicalSession|resumeCanonicalSession|completeCanonicalSession|discardCanonicalSessionAttempt|recordCanonicalPerformedWork/);
-    for (const owner of ["HomeGreeting", "HomeNextAction", "HomeProgrammePosition", "HomeProgressSnapshot", "HomeAttention", "HomeRecentWork"]) expect(homeUi).toContain(`function ${owner}`);
-    expect(home).toContain('isDesignQaModeAvailable(getAppEnvironment()) && qaPreview === "storage_error"');
+    for (const owner of ["HomeGreeting", "HomeNextAction", "HomeProgrammePosition", "HomeZeroHistory", "HomeProgressSnapshot", "HomeAttention", "HomeRecentWork"]) expect(homeUi).toContain(`function ${owner}`);
+    expect(home).toContain("isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested()");
+    expect(homeUi).not.toContain("projection.greeting.eyebrow");
   });
 
   it("keeps protected navigation behind completed onboarding", () => {

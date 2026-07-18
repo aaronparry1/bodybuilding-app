@@ -4,6 +4,7 @@ import { Text, View } from "react-native";
 import { getAppEnvironment, isV2CoachingQaRequested } from "@/application/runtime/app-environment";
 import {
   applyDesignQaFixture,
+  applyCanonicalHomeVisualPreview,
   clearDesignQaFixtures,
   designQaFixtures,
   getActiveDesignQaFixture,
@@ -55,6 +56,16 @@ export default function DesignQaScreen() {
     }
   };
 
+  const previewCanonicalHome = (state: "planned" | "active" | "paused" | "completed" | "rest_day") => {
+    try {
+      setError(null);
+      applyCanonicalHomeVisualPreview(state, environment);
+      router.replace({ pathname: "/(protected)/(tabs)", params: state === "rest_day" ? { qaHomePreview: "rest_day" } : {} });
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : "Unable to apply canonical Home preview.");
+    }
+  };
+
   return (
     <AppScreen>
       <View style={{ gap: spacing.sm }}>
@@ -95,8 +106,12 @@ export default function DesignQaScreen() {
 
       <PremiumCard tone="quiet">
         <Text selectable style={{ color: colors.text, fontSize: 20, lineHeight: 25, fontWeight: "900" }}>Home visual states</Text>
-        <Text selectable style={{ ...type.body, color: colors.textMuted }}>Presentation-only checks. These do not alter the canonical plan or recorded-session ledger.</Text>
-        <SecondaryButton label="Preview Home rest day" onPress={() => router.replace({ pathname: "/(protected)/(tabs)", params: { qaHomePreview: "rest_day" } })} />
+        <Text selectable style={{ ...type.body, color: colors.textMuted }}>Current five-day allocator output, exercised through canonical plan and ledger owners.</Text>
+        <SecondaryButton label="Preview certified planned Home" onPress={() => previewCanonicalHome("planned")} />
+        <SecondaryButton label="Preview certified active Home" onPress={() => previewCanonicalHome("active")} />
+        <SecondaryButton label="Preview certified paused Home" onPress={() => previewCanonicalHome("paused")} />
+        <SecondaryButton label="Preview certified completed Home" onPress={() => previewCanonicalHome("completed")} />
+        <SecondaryButton label="Preview certified rest Home" onPress={() => previewCanonicalHome("rest_day")} />
         <SecondaryButton label="Preview Home storage error" onPress={() => router.replace({ pathname: "/(protected)/(tabs)", params: { qaHomePreview: "storage_error" } })} />
       </PremiumCard>
 

@@ -4,13 +4,14 @@ import { ScrollView } from "react-native";
 import { canonicalActivePlanState, type CanonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { projectCanonicalHome, readCanonicalHomeProjection, type CanonicalHomeAction, type CanonicalHomeProjection } from "@/application/training/canonical-home-projection";
 import { useAppSettings } from "@/application/settings/app-settings";
-import { getAppEnvironment, isDesignQaModeAvailable } from "@/application/runtime/app-environment";
+import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/runtime/app-environment";
 import { HomeDashboard } from "@/ui/home-dashboard";
 import { AppScreen } from "@/ui/primitives";
 
 function readHome(state: CanonicalActivePlanState, displayUnit: "kg" | "lb", qaPreview?: string): CanonicalHomeProjection {
-  if (isDesignQaModeAvailable(getAppEnvironment()) && qaPreview === "storage_error") return projectCanonicalHome({ status: "error", model: null });
-  if (isDesignQaModeAvailable(getAppEnvironment()) && qaPreview === "rest_day" && state.model) return projectCanonicalHome({ status: "ready", model: { ...state.model, plannedSessions: [], nextSession: null }, now: 0 });
+  const qaPreviewAvailable = isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested();
+  if (qaPreviewAvailable && qaPreview === "storage_error") return projectCanonicalHome({ status: "error", model: null });
+  if (qaPreviewAvailable && qaPreview === "rest_day" && state.model) return projectCanonicalHome({ status: "ready", model: { ...state.model, plannedSessions: [], nextSession: null }, now: 0 });
   if (state.hydration === "empty") return projectCanonicalHome({ status: "empty", model: null });
   if (state.hydration === "error") return projectCanonicalHome({ status: "error", model: null });
   if (!state.model) return projectCanonicalHome({ status: "hydrating", model: null });

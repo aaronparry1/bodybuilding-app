@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { constructCanonicalActivePlanFromCanonicalInputs } from "@/application/training/canonical-active-plan-construction";
+import { canonicalFiveDayFixtureInput, canonicalFiveDayFixtureProfile, constructCanonicalFiveDayFixture } from "@/application/design-qa/canonical-five-day-plan-fixture";
 import { allocateCanonicalMicrocycleVolume } from "@/domain/training/canonical-microcycle-volume-allocator";
 import { canonicalMicrocycleVolumePolicy } from "@/domain/training/canonical-microcycle-volume-allocator";
 import { certifyCanonicalConstructedMicrocycle } from "@/domain/training/canonical-constructed-microcycle-certification";
@@ -9,8 +10,7 @@ import type { CanonicalSessionSnapshotV3 } from "@/domain/training/canonical-ses
 import { exerciseLibrary } from "@/domain/training/presets";
 
 const artifactPath = new URL("../qa-reports/data-performance-audit/canonical-five-day-microcycle-certification.md", import.meta.url);
-const fullEquipment = ["barbell", "dumbbell", "machine", "cable", "bodyweight"] as const;
-const fixed = { createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" } as const;
+const fullEquipment = canonicalFiveDayFixtureProfile.equipment;
 
 function snapshotSlots(session: Readonly<{ prescriptionSnapshot: Readonly<Record<string, unknown>> }>): CanonicalSessionSnapshotV3["slots"] {
   return (session.prescriptionSnapshot as CanonicalSessionSnapshotV3).slots;
@@ -30,18 +30,9 @@ function construct(established = false) {
     freshnessVersion: 1,
     calibrationStatus: "established",
   } satisfies CanonicalLoadEvidence])) : undefined;
+  if (!established) return constructCanonicalFiveDayFixture();
   return constructCanonicalActivePlanFromCanonicalInputs({
-    planId: established ? "canonical-five-day-established" : "canonical-five-day-certification",
-    ...fixed,
-    goal: "strength_hypertrophy",
-    macrocycleGoal: "build_muscle_and_strength",
-    experienceLevel: "intermediate",
-    daysPerWeek: 5,
-    preferredSplit: "let_app_choose",
-    equipment: fullEquipment,
-    units: "kg",
-    exercises: exerciseLibrary,
-    history: [],
+    ...canonicalFiveDayFixtureInput("canonical-five-day-established"),
     establishedLoads,
     loadEvidence,
   });

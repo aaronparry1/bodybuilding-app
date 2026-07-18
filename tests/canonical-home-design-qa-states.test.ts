@@ -18,6 +18,8 @@ describe("canonical Home Design-QA states", () => {
     expect(home.primary?.kind).toBe("planned");
     expect(home.progress.historicalCount).toBe(0);
     expect(home.progress.evidenceStatus).toBe("not_yet_available");
+    expect(home.progress.reviewAvailable).toBe(false);
+    expect(home.actions.some((action) => action.type === "open_progress")).toBe(false);
   });
 
   it("represents the active workout from recorded ledger facts", () => {
@@ -32,6 +34,7 @@ describe("canonical Home Design-QA states", () => {
     const home = readCanonicalHomeProjection();
     expect(home.primary?.kind).toBe("completed_today");
     expect(home.progress.historicalCount).toBe(1);
+    expect(home.primary?.detail).toContain("11 working sets");
     expect(home.actions.some((action) => action.type === "open_planned_session")).toBe(true);
   });
 

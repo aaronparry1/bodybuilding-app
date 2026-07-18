@@ -12,10 +12,10 @@ import type { WorkoutSession } from "@/domain/training/models";
 import { buildSessionPrepRecord, getSessionPrepRoutine, type SessionPrepRecord } from "@/domain/training/session-prep";
 import { summarizeWorkoutSession } from "@/domain/training/workout-history";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
-import { completeCanonicalSession, recordCanonicalPerformedWork, startCanonicalSession, prescriptionHash } from "@/application/training/canonical-recorded-session-application";
-import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
+import { startCanonicalSession, prescriptionHash } from "@/application/training/canonical-recorded-session-application";
 import { applyCanonicalActiveSessionFixture } from "@/application/design-qa/canonical-session-fixtures";
 import { createCanonicalTrainProjection } from "@/application/design-qa/canonical-train-projection";
+import { applyCanonicalHomeVisualState, canonicalFiveDayFixtureInput, type CanonicalHomeVisualState } from "@/application/design-qa/canonical-five-day-plan-fixture";
 
 export type DesignQaFixtureId =
   | "progress_low"
@@ -152,7 +152,7 @@ export const designQaFixtures: DesignQaFixtureDefinition[] = [
   { id: "home_active_plan", area: "Home", label: "Active plan today", description: "Real active plan with today’s workout.", targetHref: "/(protected)/(tabs)" },
   { id: "home_active_workout", area: "Home", label: "Workout in progress", description: "Continue workout should override generated plan.", targetHref: "/(protected)/(tabs)" },
   { id: "home_completed_today", area: "Home", label: "Today completed", description: "Completed state with next planned session.", targetHref: "/(protected)/(tabs)" },
-  { id: "home_rest_day", area: "Home", label: "4-day Upper/Lower", description: "Compact week should show four workouts without Rest consuming a slot.", targetHref: "/(protected)/(tabs)" },
+  { id: "home_rest_day", area: "Home", label: "Certified recovery day", description: "The current five-day plan remains authoritative while Home presents no session due.", targetHref: "/(protected)/(tabs)" },
   { id: "home_recovery_capacity", area: "Home", label: "Recovery target", description: "Home shows a legitimate Recovery & Capacity weekly target.", targetHref: "/(protected)/(tabs)" },
   { id: "home_recent_prs", area: "Home", label: "Recent PRs", description: "Home shows meaningful recent PRs without baseline spam.", targetHref: "/(protected)/(tabs)" },
   { id: "train_overview_fresh", area: "Train", label: "Session overview fresh", description: "Unstarted workout overview.", targetHref: "/(protected)/(tabs)/train" },
@@ -209,7 +209,7 @@ export function ensureDesignQaLocalWorkoutReadyState(environment: AppEnvironment
   if (getActiveDesignQaFixture()) return;
 
   canonicalActivePlanState.clear();
-  const created = canonicalActivePlanState.create({ planId: "design-qa-canonical-plan", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell", "bodyweight"], units: "kg", exercises: exerciseLibrary });
+  const created = canonicalActivePlanState.create(canonicalFiveDayFixtureInput("design-qa-canonical-plan"));
   if (created.hydration !== "hydrated" || !created.model) throw new Error(`canonical_visual_setup_plan_failed:${created.error ?? created.hydration}`);
 
   const plan = canonicalActivePlanState.getReadModel();
@@ -246,16 +246,35 @@ export function applyDesignQaFixture(id: DesignQaFixtureId, environment: AppEnvi
   throw new Error(`unsupported_design_qa_fixture_family:${id}`);
 }
 
+export function applyCanonicalHomeVisualPreview(state: CanonicalHomeVisualState, environment: AppEnvironment = "development"): ActiveDesignQaFixture {
+  if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
+  clearFixtureViewStateOnly();
+  appSettingsStore.patch({ onboardingCompleted: true });
+  applyCanonicalHomeVisualState(state, { planId: `design-qa:home-preview-${state}` });
+  const fixtureId: DesignQaFixtureId = state === "active" || state === "paused"
+    ? "home_active_workout"
+    : state === "completed"
+      ? "home_completed_today"
+      : state === "rest_day"
+        ? "home_rest_day"
+        : "home_active_plan";
+  const activeFixture = { id: fixtureId, label: `Certified Home: ${state.replace("_", " ")}`, appliedAt: new Date().toISOString() };
+  jsonStore.set(activeFixtureKey, activeFixture);
+  return activeFixture;
+}
+
 function applyPlanStateFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
   if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
   clearFixtureViewStateOnly();
   appSettingsStore.patch({ onboardingCompleted: true });
   canonicalActivePlanState.clear();
-  if (id !== "home_no_plan" && id !== "plan_no_plan") {
-    const daysPerWeek = id === "home_rest_day" ? 4 : id === "plan_single_hypertrophy" ? 2 : 4;
+  if (id.startsWith("home_") && id !== "home_no_plan") {
+    const state = id === "home_completed_today" ? "completed" : id === "home_rest_day" ? "rest_day" : "planned";
+    applyCanonicalHomeVisualState(state, { planId: `design-qa:${id}` });
+  } else if (id !== "home_no_plan" && id !== "plan_no_plan") {
+    const daysPerWeek = id === "plan_single_hypertrophy" ? 2 : 4;
     const result = canonicalActivePlanState.create({ planId: `design-qa:${id}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: id === "plan_event_custom" ? "strength_hypertrophy" : "hypertrophy", macrocycleGoal: id === "plan_event_custom" ? "build_strength" : "build_muscle", experienceLevel: "intermediate", daysPerWeek, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell", "bodyweight"], units: "kg", exercises: exerciseLibrary });
     if (result.hydration !== "hydrated" || !result.model) throw new Error(`canonical_design_qa_plan_failed:${result.error ?? result.hydration}`);
-    if (id === "home_completed_today") completeCanonicalHomeFixtureSessions(1, new Date().toISOString(), id);
   }
   const definition = getFixtureDefinition(id);
   const activeFixture = { id, label: definition.label, appliedAt: new Date().toISOString() };
@@ -263,35 +282,12 @@ function applyPlanStateFixture(id: DesignQaFixtureId, environment: AppEnvironmen
   return activeFixture;
 }
 
-function completeCanonicalHomeFixtureSessions(count: number, completedAt: string, fixtureId: string): void {
-  for (let index = 0; index < count; index += 1) {
-    const model = canonicalActivePlanState.getReadModel();
-    const planned = model?.nextSession;
-    const snapshot = planned ? model.plannedSessions.find((candidate) => candidate.id === planned.id)?.snapshot : null;
-    if (!model || !planned || !snapshot) {
-      if (index > 0) return;
-      throw new Error(`canonical_home_fixture_session_unavailable:${fixtureId}:${index}`);
-    }
-    const startedAt = new Date(Date.parse(completedAt) - 60_000).toISOString();
-    const started = startCanonicalSession({ planId: model.planId, expectedPlanRevision: model.revision, plannedSessionId: planned.id, expectedPrescriptionHash: prescriptionHash(snapshot), operationId: `${fixtureId}:start:${index}`, startedAt, provenance: "design_qa_home" });
-    if (!started.recordedSessionId || started.planRevision === undefined) throw new Error(`canonical_home_fixture_start_failed:${fixtureId}:${index}:${started.reason}`);
-    const aggregate = canonicalRecordedSessionLedger.get(started.recordedSessionId);
-    const slots = aggregate.status === "found" && Array.isArray(aggregate.session.prescriptionSnapshot.slots) ? aggregate.session.prescriptionSnapshot.slots as Array<Record<string, unknown>> : [];
-    const slot = slots[0];
-    if (aggregate.status !== "found" || !slot) throw new Error(`canonical_home_fixture_snapshot_failed:${fixtureId}:${index}`);
-    const work = recordCanonicalPerformedWork({ planId: model.planId, expectedPlanRevision: started.planRevision, recordedSessionId: started.recordedSessionId, expectedLedgerVersion: aggregate.session.version, operationId: `${fixtureId}:work:${index}`, occurredAt: new Date(Date.parse(completedAt) - 30_000).toISOString(), provenance: "design_qa_home", slotId: String(slot.id), exerciseId: String(slot.exerciseId), setId: `${fixtureId}:set:${index}`, setOrder: 1, reps: 8, load: 60, unit: "kg", completion: "complete" });
-    if (work.ledgerVersion === undefined) throw new Error(`canonical_home_fixture_work_failed:${fixtureId}:${index}:${work.reason}`);
-    const completed = completeCanonicalSession({ planId: model.planId, expectedPlanRevision: started.planRevision, recordedSessionId: started.recordedSessionId, expectedLedgerVersion: work.ledgerVersion, operationId: `${fixtureId}:complete:${index}`, occurredAt: completedAt, provenance: "design_qa_home" });
-    if (completed.status !== "applied" && completed.status !== "idempotent") throw new Error(`canonical_home_fixture_completion_failed:${fixtureId}:${index}:${completed.reason}`);
-  }
-}
 function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
   if (id === "home_active_workout") {
     if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
     clearFixtureViewStateOnly();
     appSettingsStore.patch({ onboardingCompleted: true });
-    const result = applyCanonicalActiveSessionFixture(id);
-    if (result.status === "rejected") throw new Error(result.reason);
+    applyCanonicalHomeVisualState("active", { planId: `design-qa:${id}` });
     const definition = getFixtureDefinition(id);
     const activeFixture = { id, label: definition.label, appliedAt: new Date().toISOString() };
     jsonStore.set(activeFixtureKey, activeFixture);
@@ -332,7 +328,9 @@ function applyProgressDecisionFixture(id: DesignQaFixtureId, environment: AppEnv
     clearFixtureViewStateOnly();
     appSettingsStore.patch({ onboardingCompleted: true });
     canonicalActivePlanState.clear();
-    const result = canonicalActivePlanState.create({ planId: `design-qa:${id}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell"], units: "kg", exercises: exerciseLibrary, history: [] });
+    const result = id === "home_recovery_capacity"
+      ? canonicalActivePlanState.create(canonicalFiveDayFixtureInput(`design-qa:${id}`))
+      : canonicalActivePlanState.create({ planId: `design-qa:${id}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell"], units: "kg", exercises: exerciseLibrary, history: [] });
     if (result.hydration !== "hydrated" || !result.model) throw new Error(`canonical_progress_fixture_failed:${result.error ?? result.hydration}`);
     const definition = getFixtureDefinition(id);
     const activeFixture = { id, label: definition.label, appliedAt: "2026-01-01T00:00:00.000Z" };
