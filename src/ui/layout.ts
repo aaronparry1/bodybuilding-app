@@ -1,9 +1,9 @@
-export const tabBarBaseHeight = 68;
-export const tabBarTopPadding = 8;
-export const tabScreenBottomGap = 40;
+export const tabBarBaseHeight = 54;
+export const tabBarTopPadding = 4;
+export const tabScreenBottomGap = 16;
 
 export function getTabBarHeight(bottomInset: number): number {
-  return tabBarBaseHeight + Math.max(bottomInset, 10);
+  return tabBarBaseHeight + Math.max(bottomInset, 6);
 }
 
 export function getTabScreenBottomPadding(bottomInset: number): number {

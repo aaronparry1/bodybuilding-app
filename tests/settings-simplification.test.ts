@@ -4,7 +4,10 @@ import { isDesignQaModeAvailable } from "@/application/runtime/app-environment-c
 
 const settingsSource = () => readFileSync("app/(protected)/settings.tsx", "utf8");
 const capacityFocusSource = () => readFileSync("app/(protected)/capacity-focus.tsx", "utf8");
-const homeSource = () => readFileSync("app/(protected)/(tabs)/index.tsx", "utf8");
+const homeSource = () => [
+  readFileSync("app/(protected)/(tabs)/index.tsx", "utf8"),
+  readFileSync("src/ui/home-dashboard.tsx", "utf8"),
+].join("\n");
 
 describe("settings simplification", () => {
   it("hides rep strategy and global rep min and max from normal settings", () => {

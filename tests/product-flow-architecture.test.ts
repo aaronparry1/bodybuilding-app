@@ -245,12 +245,13 @@ describe("product flow architecture", () => {
     expect(dashboard.thisWeek).toEqual([]);
   });
 
-  it("uses a custom premium text tab bar instead of default triangle markers", () => {
+  it("uses the compact accessible application tab bar instead of default triangle markers", () => {
     const source = readFileSync(join(process.cwd(), "app/(protected)/(tabs)/_layout.tsx"), "utf8");
 
-    expect(source).toContain("tabBar={(props) => <PremiumTabBar");
+    expect(source).toContain("<CompactTabBar");
+    expect(source).toContain("<AppShellIcon");
     expect(source).toContain("accessibilityRole=\"tab\"");
-    expect(source).toContain("minimumFontScale={0.78}");
+    expect(source).toContain("minimumFontScale={0.76}");
     expect(source).not.toContain("tabBarIcon");
   });
 

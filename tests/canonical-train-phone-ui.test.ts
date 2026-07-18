@@ -19,7 +19,8 @@ describe("phone-first canonical Train UI", () => {
     expect(trainSource).toContain("BackHandler.addEventListener");
     expect(trainSource).toContain('setModal("close")');
     expect(trainSource).toContain("Discard active attempt?");
-    expect(tabsSource).toContain('name="train" options={{ title: "Train", headerShown: false }}');
+    expect(tabsSource).toMatch(/name="train" options=\{\{ title: "Train", headerShown: false/);
+    expect(tabsSource).toContain("focusedWorkoutActive");
   });
 
   it("uses a bounded four-column set row with a non-wrapping accessible completion control", () => {

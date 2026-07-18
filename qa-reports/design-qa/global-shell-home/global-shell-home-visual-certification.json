@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "global_shell_home_visual_certification_v1",
+  "baseCommit": "5a4d765",
+  "designQaOnly": true,
+  "productionMutationPerformed": false,
+  "viewports": [
+    { "width": 390, "height": 844 },
+    { "width": 375, "height": 812 },
+    { "width": 320, "height": 568 }
+  ],
+  "states": [
+    {
+      "id": "planned_zero_history",
+      "source": "canonical_active_plan_and_immutable_snapshot",
+      "viewport": "390x844",
+      "screenshot": "screenshots/home-planned-390x844.jpg",
+      "sha256": "1e6d59c967372e3fab9359765806a4c8d7ca656fc8508429af09be1233d3e9fa",
+      "result": "passed",
+      "assertions": ["start_action_visible", "programme_position_visible", "honest_empty_progress", "bottom_navigation_clear"]
+    },
+    {
+      "id": "active_workout",
+      "source": "canonical_recorded_session_projection",
+      "viewport": "390x844",
+      "screenshot": "screenshots/home-active-390x844.jpg",
+      "sha256": "7f53867c98623b5aa5ffd4d08e73c5964d2a06ef5befa9de6e1756aa7f09259b",
+      "result": "passed",
+      "assertions": ["resume_action_visible", "working_set_progress_visible", "authoritative_active_session_used"]
+    },
+    {
+      "id": "active_paused_workout",
+      "source": "canonical_pause_and_leave_lifecycle",
+      "viewport": "375x812",
+      "screenshot": "screenshots/home-active-paused-375x812.jpg",
+      "sha256": "3ea75ac9cea94a5d5eff51ffe2f2d88c52e484973adc7cfb746b2476c755cd52",
+      "result": "passed",
+      "assertions": ["pause_and_leave_preserved_work", "resume_action_visible", "normal_tabs_restored"]
+    },
+    {
+      "id": "completed_today",
+      "source": "canonical_ledger_completion",
+      "viewport": "390x844",
+      "screenshot": "screenshots/home-completed-390x844.jpg",
+      "sha256": "b7a392e91551ae9f5581de2b35d3f19c1b9f177f8b58fef97992e74bf3855b75",
+      "result": "passed",
+      "assertions": ["completion_summary_visible", "recorded_sets_visible", "next_action_visible", "no_duplicate_completion_side_effect"]
+    },
+    {
+      "id": "rest_day",
+      "source": "canonical_home_presentation_preview_over_canonical_plan",
+      "viewport": "375x812",
+      "screenshot": "screenshots/home-rest-day-375x812.jpg",
+      "sha256": "726ab1fd0ad4ac45f4c1820dbc7efb120665acef0ecf2de3b8bf20728e8d1552",
+      "result": "passed",
+      "assertions": ["no_workout_invented", "recovery_context_visible", "review_action_non_mutating"]
+    },
+    {
+      "id": "recoverable_storage_error",
+      "source": "canonical_home_presentation_preview",
+      "viewport": "320x568",
+      "screenshot": "screenshots/home-storage-error-320x568.jpg",
+      "sha256": "b439029b917d578bb65cf2a5204714879ef904885fb0260ed8f873562b543268",
+      "result": "passed",
+      "assertions": ["customer_safe_copy", "retry_action_visible", "no_raw_identifier", "navigation_not_obscured"]
+    },
+    {
+      "id": "no_plan",
+      "source": "canonical_active_plan_missing",
+      "viewport": "320x568",
+      "screenshot": "screenshots/home-no-plan-320x568.jpg",
+      "sha256": "72f57ba53f495f927cf888d75140d21a6310c6ab1eb0af4d24f481b3ed5b0497",
+      "result": "passed",
+      "assertions": ["setup_action_visible", "programme_sections_absent", "distinct_from_pre_onboarding", "no_clipped_text"]
+    }
+  ],
+  "responsiveFindings": {
+    "primaryActionVisible": true,
+    "horizontalOverflowObserved": false,
+    "clippedTextObserved": false,
+    "bottomNavigationObscuresContent": false,
+    "compactSettingsActionAccessible": true,
+    "narrowWidthUsable": true
+  },
+  "trainLifecycleFindings": {
+    "safeClosePreserved": true,
+    "pauseAndLeavePreserved": true,
+    "discardPreserved": true,
+    "resumePreserved": true,
+    "tabsHiddenOnlyForFocusedActiveWorkout": true,
+    "normalTabsRestoreAfterLeaving": true
+  }
+}

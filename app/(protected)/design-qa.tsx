@@ -93,6 +93,13 @@ export default function DesignQaScreen() {
         <SecondaryButton label="Clear QA fixtures" onPress={() => clearFixtures({ redirectToSettings: false })} />
       </PremiumCard>
 
+      <PremiumCard tone="quiet">
+        <Text selectable style={{ color: colors.text, fontSize: 20, lineHeight: 25, fontWeight: "900" }}>Home visual states</Text>
+        <Text selectable style={{ ...type.body, color: colors.textMuted }}>Presentation-only checks. These do not alter the canonical plan or recorded-session ledger.</Text>
+        <SecondaryButton label="Preview Home rest day" onPress={() => router.replace({ pathname: "/(protected)/(tabs)", params: { qaHomePreview: "rest_day" } })} />
+        <SecondaryButton label="Preview Home storage error" onPress={() => router.replace({ pathname: "/(protected)/(tabs)", params: { qaHomePreview: "storage_error" } })} />
+      </PremiumCard>
+
       {Object.entries(fixturesByArea).map(([area, fixtures]) => (
         <SectionList key={area} title={area}>
           <View style={{ gap: spacing.sm }}>

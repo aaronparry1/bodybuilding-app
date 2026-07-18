@@ -12,7 +12,8 @@ import type { WorkoutSession } from "@/domain/training/models";
 import { buildSessionPrepRecord, getSessionPrepRoutine, type SessionPrepRecord } from "@/domain/training/session-prep";
 import { summarizeWorkoutSession } from "@/domain/training/workout-history";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
-import { startCanonicalSession, prescriptionHash } from "@/application/training/canonical-recorded-session-application";
+import { completeCanonicalSession, recordCanonicalPerformedWork, startCanonicalSession, prescriptionHash } from "@/application/training/canonical-recorded-session-application";
+import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { applyCanonicalActiveSessionFixture } from "@/application/design-qa/canonical-session-fixtures";
 import { createCanonicalTrainProjection } from "@/application/design-qa/canonical-train-projection";
 
@@ -254,11 +255,35 @@ function applyPlanStateFixture(id: DesignQaFixtureId, environment: AppEnvironmen
     const daysPerWeek = id === "home_rest_day" ? 4 : id === "plan_single_hypertrophy" ? 2 : 4;
     const result = canonicalActivePlanState.create({ planId: `design-qa:${id}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: id === "plan_event_custom" ? "strength_hypertrophy" : "hypertrophy", macrocycleGoal: id === "plan_event_custom" ? "build_strength" : "build_muscle", experienceLevel: "intermediate", daysPerWeek, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell", "bodyweight"], units: "kg", exercises: exerciseLibrary });
     if (result.hydration !== "hydrated" || !result.model) throw new Error(`canonical_design_qa_plan_failed:${result.error ?? result.hydration}`);
+    if (id === "home_completed_today") completeCanonicalHomeFixtureSessions(1, new Date().toISOString(), id);
   }
   const definition = getFixtureDefinition(id);
   const activeFixture = { id, label: definition.label, appliedAt: new Date().toISOString() };
   jsonStore.set(activeFixtureKey, activeFixture);
   return activeFixture;
+}
+
+function completeCanonicalHomeFixtureSessions(count: number, completedAt: string, fixtureId: string): void {
+  for (let index = 0; index < count; index += 1) {
+    const model = canonicalActivePlanState.getReadModel();
+    const planned = model?.nextSession;
+    const snapshot = planned ? model.plannedSessions.find((candidate) => candidate.id === planned.id)?.snapshot : null;
+    if (!model || !planned || !snapshot) {
+      if (index > 0) return;
+      throw new Error(`canonical_home_fixture_session_unavailable:${fixtureId}:${index}`);
+    }
+    const startedAt = new Date(Date.parse(completedAt) - 60_000).toISOString();
+    const started = startCanonicalSession({ planId: model.planId, expectedPlanRevision: model.revision, plannedSessionId: planned.id, expectedPrescriptionHash: prescriptionHash(snapshot), operationId: `${fixtureId}:start:${index}`, startedAt, provenance: "design_qa_home" });
+    if (!started.recordedSessionId || started.planRevision === undefined) throw new Error(`canonical_home_fixture_start_failed:${fixtureId}:${index}:${started.reason}`);
+    const aggregate = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    const slots = aggregate.status === "found" && Array.isArray(aggregate.session.prescriptionSnapshot.slots) ? aggregate.session.prescriptionSnapshot.slots as Array<Record<string, unknown>> : [];
+    const slot = slots[0];
+    if (aggregate.status !== "found" || !slot) throw new Error(`canonical_home_fixture_snapshot_failed:${fixtureId}:${index}`);
+    const work = recordCanonicalPerformedWork({ planId: model.planId, expectedPlanRevision: started.planRevision, recordedSessionId: started.recordedSessionId, expectedLedgerVersion: aggregate.session.version, operationId: `${fixtureId}:work:${index}`, occurredAt: new Date(Date.parse(completedAt) - 30_000).toISOString(), provenance: "design_qa_home", slotId: String(slot.id), exerciseId: String(slot.exerciseId), setId: `${fixtureId}:set:${index}`, setOrder: 1, reps: 8, load: 60, unit: "kg", completion: "complete" });
+    if (work.ledgerVersion === undefined) throw new Error(`canonical_home_fixture_work_failed:${fixtureId}:${index}:${work.reason}`);
+    const completed = completeCanonicalSession({ planId: model.planId, expectedPlanRevision: started.planRevision, recordedSessionId: started.recordedSessionId, expectedLedgerVersion: work.ledgerVersion, operationId: `${fixtureId}:complete:${index}`, occurredAt: completedAt, provenance: "design_qa_home" });
+    if (completed.status !== "applied" && completed.status !== "idempotent") throw new Error(`canonical_home_fixture_completion_failed:${fixtureId}:${index}:${completed.reason}`);
+  }
 }
 function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
   if (id === "home_active_workout") {

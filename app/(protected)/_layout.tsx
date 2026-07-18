@@ -51,7 +51,7 @@ export default function ProtectedLayout() {
           </Text>
         </View>
       ) : null}
-      <Stack
+      <View style={{ flex: 1 }}><Stack
         screenOptions={{
           headerStyle: { backgroundColor: colors.background },
           headerTintColor: colors.text,
@@ -81,7 +81,7 @@ export default function ProtectedLayout() {
         <Stack.Screen name="diagnostics" options={{ title: "Diagnostics" }} />
         <Stack.Screen name="design-qa" options={{ title: "Design QA" }} />
         <Stack.Screen name="v2-benchmark-qa" options={{ title: "V2 QA" }} />
-      </Stack>
+      </Stack></View>
     </View>
   );
 }

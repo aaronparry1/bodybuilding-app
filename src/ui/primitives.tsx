@@ -1,10 +1,10 @@
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, type RefObject } from "react";
 import type { PressableProps } from "react-native";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getTabScreenBottomPadding } from "@/ui/layout";
-import { colors, radius, shadow, spacing, type } from "@/ui/theme";
+import { colors, radius, shadow, shellTokens, spacing, type } from "@/ui/theme";
 
 export function Screen({
   children,
@@ -462,19 +462,22 @@ export function RowItem({
 export function AppScreen({
   children,
   bottom,
+  scrollRef,
 }: {
   children: ReactNode;
   bottom?: number;
+  scrollRef?: RefObject<ScrollView | null>;
 }) {
   const insets = useSafeAreaInsets();
   const bottomPadding = bottom == null ? getTabScreenBottomPadding(insets.bottom) : bottom + insets.bottom;
 
   return (
     <ScrollView
+      ref={scrollRef}
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={{ paddingHorizontal: spacing.xl, paddingTop: spacing.lg, paddingBottom: bottomPadding, gap: spacing.xxl }}
+      contentContainerStyle={{ paddingHorizontal: shellTokens.pageHorizontal, paddingTop: spacing.lg, paddingBottom: bottomPadding, gap: spacing.xxl }}
     >
       {children}
     </ScrollView>

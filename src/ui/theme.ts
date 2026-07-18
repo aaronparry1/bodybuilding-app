@@ -20,6 +20,8 @@ export const colors = {
   dangerSoft: "#241314",
   blue: "#9ab8ff",
   blueSoft: "#121a2d",
+  focus: "#8ee8ff",
+  scrim: "rgba(3, 5, 8, 0.72)",
 };
 
 export const spacing = {
@@ -41,12 +43,23 @@ export const radius = {
 };
 
 export const type = {
-  hero: { fontSize: 40, lineHeight: 44, fontWeight: "900" as const, letterSpacing: 0 },
+  hero: { fontSize: 36, lineHeight: 40, fontWeight: "900" as const, letterSpacing: -0.4 },
   title: { fontSize: 30, lineHeight: 34, fontWeight: "900" as const, letterSpacing: 0 },
+  display: { fontSize: 26, lineHeight: 31, fontWeight: "900" as const, letterSpacing: -0.2 },
   section: { fontSize: 18, lineHeight: 23, fontWeight: "800" as const, letterSpacing: 0 },
   body: { fontSize: 15, lineHeight: 22, fontWeight: "500" as const, letterSpacing: 0 },
   label: { fontSize: 12, lineHeight: 16, fontWeight: "800" as const, letterSpacing: 0 },
   metric: { fontSize: 28, lineHeight: 32, fontWeight: "900" as const, letterSpacing: 0 },
+};
+
+/** Shared semantic design tokens for the mounted application shell. */
+export const shellTokens = {
+  pageHorizontal: spacing.lg,
+  sectionGap: spacing.xl,
+  cardPadding: spacing.lg,
+  controlMinHeight: 44,
+  border: colors.line,
+  focus: colors.focus,
 };
 
 export const shadow = {

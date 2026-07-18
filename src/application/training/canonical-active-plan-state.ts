@@ -15,7 +15,7 @@ export function createCanonicalActivePlanStateStore(): CanonicalActivePlanStateS
   const store: CanonicalActivePlanStateStore = {
     getState: () => state,
     subscribe: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
-    hydrate: () => { const result = loadCanonicalActivePlan(); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : result.reason === "canonical_plan_missing" ? { hydration: "empty", model: null } : { hydration: "error", model: null, error: result.reason }; publish(); return state; },
+    hydrate: () => { const result = loadCanonicalActivePlan(); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : result.reason === "canonical_plan_missing" || result.reason === "missing" ? { hydration: "empty", model: null } : { hydration: "error", model: null, error: result.reason }; publish(); return state; },
     create: (command) => { const result = createCanonicalActivePlan(command); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : { hydration: "error", model: null, error: result.reason }; publish(); return state; },
     applyProgressDecision: (command) => { const result = applyCanonicalProgressDecision(command); if (result.status === "applied" || result.status === "unchanged") store.hydrate(); return result; },
     refresh: () => store.hydrate(),
