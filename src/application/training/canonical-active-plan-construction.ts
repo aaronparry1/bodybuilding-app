@@ -7,6 +7,7 @@ import { constructCanonicalSession, resolveCanonicalSessionIdentity } from "@/do
 import type { Equipment, ExperienceLevel, Exercise, ProgrammeGoal, UnitSystem, WorkoutHistorySummary } from "@/domain/training/models";
 import { canonicalConstructionReferencesForPlan } from "@/application/training/canonical-construction-facts";
 import type { CanonicalLoadEvidence } from "@/domain/training/canonical-load-prescription";
+import { allocateCanonicalMicrocycleVolume } from "@/domain/training/canonical-microcycle-volume-allocator";
 
 export type CanonicalConstructionInput = Readonly<{ planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: Parameters<typeof createMacrocycle>[0]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: Parameters<typeof createMicrocycle>[0]["split"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; plannedSessions: readonly CanonicalPlannedSessionSnapshot[] }>;
 export type CanonicalConstructionResult = Readonly<{ status: "constructed"; carrier: CanonicalActivePlanCarrier } | { status: "invalid_input" | "no_initial_mesocycle" | "session_role_mismatch" | "carrier_validation_failed"; reason: string }>;
@@ -22,6 +23,21 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
   const policyResult = resolveMesocyclePrescriptionPolicy(mesocycle.id, { goal: input.macrocycleGoal });
   if (policyResult.status !== "resolved") return { status: "no_initial_mesocycle", reason: policyResult.reason };
   const microcycle = createMicrocycle({ parentMesocycleId: mesocycle.id, trainingDays: input.daysPerWeek, split: input.preferredSplit });
+  const allocation = allocateCanonicalMicrocycleVolume({
+    macrocycleGoal: input.macrocycleGoal,
+    mesocycleId: mesocycle.id,
+    mesocyclePurpose: mesocycle.adaptation,
+    microcyclePriority: microcycle.priority,
+    microcycleSequence: microcycle.sequenceNumber,
+    experience: input.experienceLevel,
+    frequency: input.daysPerWeek,
+    split: input.preferredSplit,
+    equipment: input.equipment,
+    recoveryRestricted: false,
+    establishedLoadExerciseIds: Object.keys(input.establishedLoads ?? {}).sort(),
+    sessionRoles: microcycle.sessionRoles,
+  });
+  if (allocation.certification.status !== "passed") return { status: "carrier_validation_failed", reason: `microcycle_allocation:${allocation.certification.failures.join(",")}` };
   const microcycleId = `${input.planId}:microcycle:1`;
   const sessions: CanonicalPlannedSessionSnapshot[] = [];
   for (const [index, role] of microcycle.sessionRoles.entries()) {
@@ -33,6 +49,7 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
       athlete: { experienceLevel: input.experienceLevel, preferredSplit: input.preferredSplit, equipment: input.equipment, limitations: input.limitations ?? [], units: input.units, exercises: input.exercises },
       progress: { evidenceVersion: "progress_v1", history: input.history ?? [], establishedLoads: input.establishedLoads, loadEvidence: input.loadEvidence },
       operational: { constructionVersion: "canonical_plan_v3", seed: `${input.planId}:${index}`, identity: "", revision: input.updatedAt },
+      allocation,
     };
     const identity = resolveCanonicalSessionIdentity(sessionInput);
     const constructed = constructCanonicalSession({ ...sessionInput, microcycle: { ...sessionInput.microcycle, sessionId: identity }, operational: { ...sessionInput.operational, identity } });
