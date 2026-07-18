@@ -17,7 +17,7 @@ export function methodDisplayName(method: string): string {
 
 export function loadingModeDisplayName(mode: string): string {
   const labels: Record<string, string> = { fixed: "Prescribed load", guided: "Choose a comfortable load", autoregulated: "Adjust by effort", bodyweight: "Bodyweight", unavailable: "Load to be confirmed" };
-  return labels[mode] ?? "Load guidance";
+  return labels[mode] ?? "Calibration required";
 }
 
 export function trainingGoalDisplayName(goal: string): string {

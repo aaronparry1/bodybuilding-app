@@ -58,22 +58,26 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
     const requiredSets = Math.max(1, number(settings.requiredSets, 1));
     const restSeconds = number(object(slot.rest).seconds, 90);
     const loadingMode = String(slot.loadingMode ?? "unavailable");
-    const prescribedLoad = numberOrNull(slot.prescribedLoad) ?? numberOrNull(object(slot.loadPrescription).prescribedBaseLoad);
+    const loadPrescription = object(slot.loadPrescription);
+    const prescribedLoad = numberOrNull(slot.prescribedLoad) ?? numberOrNull(loadPrescription.prescribedBaseLoad);
+    const loadState = String(loadPrescription.state ?? loadingMode);
     const actual = performance.filter((event) => String(object(event.payload).slotId) === String(slot.id));
     const sets = Array.from({ length: requiredSets }, (_, offset) => {
       const setNumber = offset + 1;
       const event = actual.find((candidate) => number(object(candidate.payload).setOrder, 0) === setNumber);
-      const target = min === max ? `${min} reps` : `${min}–${max} reps`;
-      return { id: `${String(slot.id)}:set:${setNumber}`, number: setNumber, target, prescribedLoad, loadLabel: prescribedLoad === null ? loadingModeDisplayName(loadingMode) : `${prescribedLoad} kg`, unit: "kg" as const, previous: null, restSeconds, actualReps: event ? numberOrNull(object(event.payload).reps) : null, actualLoad: event ? numberOrNull(object(event.payload).load) : null, state: event ? "completed" as const : performance.length === 0 && setNumber === 1 && index === 0 ? "current" as const : "upcoming" as const };
+      const target = `${min} reps`;
+      const loadLabel = prescribedLoad === null ? (loadState === "calibration_required" ? "Calibration · choose load" : loadingModeDisplayName(loadState)) : `${prescribedLoad} kg`;
+      return { id: `${String(slot.id)}:set:${setNumber}`, number: setNumber, target, prescribedLoad, loadLabel, unit: "kg" as const, previous: null, restSeconds, actualReps: event ? numberOrNull(object(event.payload).reps) : null, actualLoad: event ? numberOrNull(object(event.payload).load) : null, state: event ? "completed" as const : performance.length === 0 && setNumber === 1 && index === 0 ? "current" as const : "upcoming" as const };
     });
-    return { id: String(slot.id), order: index + 1, name: exerciseDisplayName(String(slot.exerciseId)), method: methodDisplayName(String(slot.method)), groupType: groupTypeForMethod(String(slot.method)), loadState: loadingModeDisplayName(loadingMode), sets };
+    return { id: String(slot.id), order: index + 1, name: exerciseDisplayName(String(slot.exerciseId)), method: methodDisplayName(String(slot.method)), groupType: groupTypeForMethod(String(slot.method)), loadState: loadingModeDisplayName(loadState), sets };
   });
   const totalSets = exercises.reduce((sum, exercise) => sum + exercise.sets.length, 0);
   const completedSets = exercises.reduce((sum, exercise) => sum + exercise.sets.filter((set) => set.state === "completed").length, 0);
   const lifecycle = input.session ? input.session.status === "started" ? "active" : input.session.status === "paused" ? "paused" : input.session.status === "completed" ? "completed" : "unavailable" : "planned";
   const startedAt = input.session?.startedAt ? Date.parse(input.session.startedAt) : NaN;
   const estimatedDurationMinutes = totalSets ? Math.max(1, Math.round((totalSets * 2 + exercises.reduce((sum, exercise) => sum + exercise.sets[0].restSeconds, 0) / 60) / 2)) : null;
-  return { id: input.session?.recordedSessionId ?? String(input.snapshot.sessionId ?? "planned-workout"), title: sessionRoleDisplayName(String(input.snapshot.role ?? input.session?.role ?? "Training session")), purpose: "Follow the prescribed sets, then record what you actually completed.", lifecycle, completedSets, totalSets, progressPercent: totalSets ? Math.round((completedSets / totalSets) * 100) : 0, finishAllowed: completedSets > 0 && (lifecycle === "active" || lifecycle === "paused"), finishBlockedReason: completedSets > 0 ? null : "Complete at least one valid set before finishing.", exercises, estimatedDurationMinutes, elapsedSeconds: Number.isFinite(startedAt) ? Math.max(0, Math.floor((Date.now() - startedAt) / 1000)) : 0 };
+  const elapsedSeconds = Number.isFinite(startedAt) ? Math.min(24 * 60 * 60, Math.max(0, Math.floor((Date.now() - startedAt) / 1000))) : 0;
+  return { id: input.session?.recordedSessionId ?? String(input.snapshot.sessionId ?? "planned-workout"), title: sessionRoleDisplayName(String(input.snapshot.role ?? input.session?.role ?? "Training session")), purpose: "Follow the prescribed sets, then record what you actually completed.", lifecycle, completedSets, totalSets, progressPercent: totalSets ? Math.round((completedSets / totalSets) * 100) : 0, finishAllowed: completedSets > 0 && (lifecycle === "active" || lifecycle === "paused"), finishBlockedReason: completedSets > 0 ? null : "Complete at least one valid set before finishing.", exercises, estimatedDurationMinutes, elapsedSeconds };
 }
 
 function groupTypeForMethod(method: string): WorkoutExercisePresentation["groupType"] { if (/triset/i.test(method)) return "triset"; if (/super/i.test(method)) return "superset"; if (/giant/i.test(method)) return "giant_set"; if (/circuit/i.test(method)) return "circuit"; return "straight_set"; }

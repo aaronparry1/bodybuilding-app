@@ -13,7 +13,7 @@ describe("canonical workout presentation", () => {
     const planned = projectCanonicalWorkoutPresentation({ session: null, snapshot });
     expect(planned.title).toBe("Bench and hypertrophy");
     expect(planned.totalSets).toBe(3);
-    expect(planned.exercises[0]?.sets.map((set) => [set.target, set.loadLabel, set.restSeconds, set.state])).toEqual([["6–8 reps", "80 kg", 120, "current"], ["6–8 reps", "80 kg", 120, "upcoming"], ["6–8 reps", "80 kg", 120, "upcoming"]]);
+    expect(planned.exercises[0]?.sets.map((set) => [set.target, set.loadLabel, set.restSeconds, set.state])).toEqual([["6 reps", "80 kg", 120, "current"], ["6 reps", "80 kg", 120, "upcoming"], ["6 reps", "80 kg", 120, "upcoming"]]);
     expect(JSON.stringify(planned)).not.toMatch(/straight_sets|ex-bench|canonical_session/);
   });
 
