@@ -36,6 +36,8 @@ export type WorkoutPresentation = Readonly<{
   finishAllowed: boolean;
   finishBlockedReason: string | null;
   exercises: readonly WorkoutExercisePresentation[];
+  estimatedDurationMinutes: number | null;
+  elapsedSeconds: number;
 }>;
 
 type SnapshotSlot = Readonly<Record<string, unknown>>;
@@ -69,7 +71,9 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
   const totalSets = exercises.reduce((sum, exercise) => sum + exercise.sets.length, 0);
   const completedSets = exercises.reduce((sum, exercise) => sum + exercise.sets.filter((set) => set.state === "completed").length, 0);
   const lifecycle = input.session ? input.session.status === "started" ? "active" : input.session.status === "paused" ? "paused" : input.session.status === "completed" ? "completed" : "unavailable" : "planned";
-  return { id: input.session?.recordedSessionId ?? String(input.snapshot.sessionId ?? "planned-workout"), title: sessionRoleDisplayName(String(input.snapshot.role ?? input.session?.role ?? "Training session")), purpose: "Follow the prescribed sets, then record what you actually completed.", lifecycle, completedSets, totalSets, progressPercent: totalSets ? Math.round((completedSets / totalSets) * 100) : 0, finishAllowed: completedSets > 0 && (lifecycle === "active" || lifecycle === "paused"), finishBlockedReason: completedSets > 0 ? null : "Complete at least one valid set before finishing.", exercises };
+  const startedAt = input.session?.startedAt ? Date.parse(input.session.startedAt) : NaN;
+  const estimatedDurationMinutes = totalSets ? Math.max(1, Math.round((totalSets * 2 + exercises.reduce((sum, exercise) => sum + exercise.sets[0].restSeconds, 0) / 60) / 2)) : null;
+  return { id: input.session?.recordedSessionId ?? String(input.snapshot.sessionId ?? "planned-workout"), title: sessionRoleDisplayName(String(input.snapshot.role ?? input.session?.role ?? "Training session")), purpose: "Follow the prescribed sets, then record what you actually completed.", lifecycle, completedSets, totalSets, progressPercent: totalSets ? Math.round((completedSets / totalSets) * 100) : 0, finishAllowed: completedSets > 0 && (lifecycle === "active" || lifecycle === "paused"), finishBlockedReason: completedSets > 0 ? null : "Complete at least one valid set before finishing.", exercises, estimatedDurationMinutes, elapsedSeconds: Number.isFinite(startedAt) ? Math.max(0, Math.floor((Date.now() - startedAt) / 1000)) : 0 };
 }
 
 function groupTypeForMethod(method: string): WorkoutExercisePresentation["groupType"] { if (/triset/i.test(method)) return "triset"; if (/super/i.test(method)) return "superset"; if (/giant/i.test(method)) return "giant_set"; if (/circuit/i.test(method)) return "circuit"; return "straight_set"; }
