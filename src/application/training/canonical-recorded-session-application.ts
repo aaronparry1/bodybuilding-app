@@ -4,6 +4,7 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
 import { reconcileCanonicalRecordedReference } from "@/application/training/canonical-recorded-reference-reconciliation";
+import { startCanonicalRestTimer } from "@/application/training/canonical-rest-timer";
 
 export type CanonicalStartSessionCommand = Readonly<{ planId: string; expectedPlanRevision: number; plannedSessionId: string; expectedPrescriptionHash: string; operationId: string; startedAt: string; provenance: string }>;
 export type CanonicalStartSessionResult = Readonly<{ status: "started" | "already_started" | "rejected" | "retryable"; reason: string; recordedSessionId?: string; planRevision?: number }>;
@@ -74,7 +75,21 @@ export function recordCanonicalPerformedWork(command: CanonicalPerformedWorkComm
   const evidence = canonicalProgressEvidenceRepository.record({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:evidence:${command.setId}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, slotId: command.slotId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}`, kind: "performance", observations: { reps: command.reps, load: command.load, completion: command.completion, ...(command.effort === undefined ? {} : { effort: command.effort }) }, evidenceVersion: "progress_v1" });
   canonicalActivePlanState.hydrate();
   const instruction = nextSetInstruction(aggregate.session.prescriptionSnapshot, command.slotId, command.setOrder, command.reps, command.load, command.provenance);
+  if (evidence.status === "saved" || evidence.status === "duplicate") startCanonicalRestTimer({ workoutId: aggregate.session.recordedSessionId, setId: command.setId, durationSeconds: Number(((slot.rest as Record<string, unknown> | undefined)?.seconds ?? 90)) });
   return { status: evidence.status === "saved" || evidence.status === "duplicate" ? "applied" : "retryable", reason: evidence.status === "saved" || evidence.status === "duplicate" ? "performed_work_recorded" : "progress_evidence_pending", ledgerVersion: appended.session!.version, nextInstruction: instruction };
+}
+
+export type CanonicalEditPerformedWorkCommand = Readonly<CanonicalPerformedWorkCommand>;
+export function editCanonicalPerformedWork(command: CanonicalEditPerformedWorkCommand): CanonicalRecordedLifecycleResult {
+  const aggregate = canonicalRecordedSessionLedger.get(command.recordedSessionId);
+  if (aggregate.status !== "found") return { status: "rejected", reason: "recorded_session_not_found" };
+  if (aggregate.session.version !== command.expectedLedgerVersion) return { status: "rejected", reason: "stale_ledger_version" };
+  if (!["started", "paused"].includes(aggregate.session.status)) return { status: "rejected", reason: "performed_work_edit_not_allowed" };
+  const original = aggregate.events.find((event) => event.type === "performance" && String(event.payload.setId) === command.setId);
+  if (!original) return { status: "rejected", reason: "performed_set_not_found" };
+  const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, { eventId: `${command.recordedSessionId}:repair:${command.operationId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "repair", occurredAt: command.occurredAt, operationId: command.operationId, payload: { ...command, editedSetId: command.setId, replacesEventId: original.eventId } });
+  if (appended.status !== "saved") return { status: "rejected", reason: "performed_work_edit_conflict" };
+  return { status: "applied", reason: "performed_work_edited", ledgerVersion: appended.session!.version, nextInstruction: nextSetInstruction(aggregate.session.prescriptionSnapshot, command.slotId, command.setOrder, command.reps, command.load, command.provenance) };
 }
 
 function nextSetInstruction(snapshot: Readonly<Record<string, unknown>>, slotId: string, setOrder: number, reps: number, load: number, _provenance: string): string {

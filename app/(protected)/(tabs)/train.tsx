@@ -72,6 +72,7 @@ export default function TrainScreen() {
     if (!plan || aggregate.status !== "found") return;
     const result = completeCanonicalSession({ planId: plan.planId, expectedPlanRevision: plan.revision, recordedSessionId: aggregate.session.recordedSessionId, expectedLedgerVersion: aggregate.session.version, operationId: operationId("complete"), occurredAt: new Date().toISOString(), provenance: "canonical_train" });
     setMessage(result.reason);
+    if (result.status === "applied") { awaitHaptic(hapticFeedback.workoutCompleted()); router.replace(`/(protected)/completion-summary?recordedSessionId=${encodeURIComponent(aggregate.session.recordedSessionId)}`); return; }
     canonicalActivePlanState.refresh();
   };
 
