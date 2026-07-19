@@ -57,7 +57,7 @@ describe("Plan page view model", () => {
     expect(viewModel.summary.macrocycle).toBe("Powerbuilding");
     expect(viewModel.currentMesocyclePurpose).toBe("Establish repeatable squat, bench and deadlift");
     expect(viewModel.currentMicrocycle).toEqual({ number: 1, priority: "Main lifts plus muscle development" });
-    expect(viewModel.currentSessionRole).toBe("Bench and hypertrophy");
+    expect(viewModel.currentSessionRole).toBe("Upper strength and hypertrophy");
     expect("roadmap" in viewModel).toBe(false);
     expect("nextBlock" in viewModel).toBe(false);
   });

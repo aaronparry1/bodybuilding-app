@@ -142,7 +142,7 @@ describe("Home dashboard view model", () => {
     expect(dashboard.planningContext.status).toBe("ready");
     expect(dashboard.planningContext.mesocyclePurpose).toBe("Build work capacity and movement tolerance");
     expect(dashboard.planningContext.microcycleLabel).toContain("Microcycle 1");
-    expect(dashboard.planningContext.sessionRole).toBe("Squat emphasis");
+    expect(dashboard.planningContext.sessionRole).toBe("Upper strength");
   });
 
   it("shows stored exact targets from an open planned workout without reading its range", () => {

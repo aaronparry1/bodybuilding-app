@@ -73,7 +73,8 @@ export function certifyCanonicalConstructedMicrocycle(input: Readonly<{
     if ((direct[region] ?? 0) >= minimum) checks.push(`${region}_direct_coverage`);
     else failures.push(`${region}_direct_coverage_missing`);
   }
-  if ((secondary.anterior_delts ?? 0) >= 6) checks.push("anterior_delts_meaningful_secondary_coverage");
+  if (input.allocation.profile !== "powerbuilding_five_day_v1") checks.push("secondary_stimulus_reported_separately");
+  else if ((secondary.anterior_delts ?? 0) >= 6) checks.push("anterior_delts_meaningful_secondary_coverage");
   else failures.push("anterior_delts_meaningful_secondary_coverage_missing");
   if (accounting.some((entry) => exerciseById.get(entry.exerciseId)?.selectionProfile === "strength_specialist" && !input.allocation.slots.find((slot) => slot.sessionIndex === entry.sessionIndex && slot.order === entry.slotIndex)?.specialistsPermitted)) failures.push("unauthorised_specialist_selection");
   else checks.push("no_unauthorised_specialist_selection");

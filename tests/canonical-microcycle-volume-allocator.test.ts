@@ -108,7 +108,8 @@ describe("canonical microcycle volume allocator", () => {
     expect(result.status, result.status === "constructed" ? undefined : result.reason).toBe("constructed");
     if (result.status === "constructed") {
       expect(result.carrier.plannedSessions).toHaveLength(daysPerWeek);
-      expect(result.carrier.microcycle.output.split).toBe(preferredSplit);
+      expect(result.carrier.microcycle.output.requestedSplit).toBe(preferredSplit);
+      expect(result.carrier.microcycle.output.split).not.toBe("let_app_choose");
       expect(result.carrier.constraints.experienceLevel).toBe(experienceLevel);
     }
   });

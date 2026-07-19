@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { constructCanonicalActivePlan } from "@/application/training/canonical-active-plan-construction";
 
-const sessions = ["Bench and hypertrophy", "Squat and hypertrophy", "Deadlift and back", "Upper support", "Lower support"].map((role, index) => ({ id: `construction-session-${index}`, microcycleId: "construction:microcycle:1", planSessionIndex: index, role, kind: "planned" as const, status: "planned" as const, constructionVersion: "session_construction_v1", revision: 0, prescriptionSnapshot: { owner: "Session Construction", slots: [] } }));
+const sessions = ["Upper strength and hypertrophy", "Lower strength and hypertrophy", "Upper strength and hypertrophy", "Lower strength and hypertrophy", "Full body powerbuilding E"].map((role, index) => ({ id: `construction-session-${index}`, microcycleId: "construction:microcycle:1", planSessionIndex: index, role, kind: "planned" as const, status: "planned" as const, constructionVersion: "session_construction_v1", revision: 0, prescriptionSnapshot: { owner: "Session Construction", slots: [] } }));
 
 describe("canonical active-plan construction and repository", () => {
   it("constructs from Macrocycle, Mesocycle and Microcycle owners", () => {

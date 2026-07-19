@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { migrateCanonicalPlanV1ToV2 } from "@/application/training/canonical-plan-v2-migration";
+import { createMicrocycle } from "@/domain/training/microcycle-scheduler";
 
-const sessions = ["Bench and hypertrophy", "Squat and hypertrophy", "Deadlift and back", "Upper support", "Lower support"].map((role, index) => ({ id: `migration-session-${index}`, microcycleId: "legacy-id:microcycle:1", planSessionIndex: index, role, kind: "planned" as const, status: "planned" as const, constructionVersion: "session_construction_v1", revision: 0, prescriptionSnapshot: { owner: "Session Construction", slots: [] } }));
+const roles = createMicrocycle({ parentMesocycleId: "powerbuilding_foundation", trainingDays: 5, split: "upper_lower" }).sessionRoles;
+const sessions = roles.map((role, index) => ({ id: `migration-session-${index}`, microcycleId: "legacy-id:microcycle:1", planSessionIndex: index, role, kind: "planned" as const, status: "planned" as const, constructionVersion: "session_construction_v1", revision: 0, prescriptionSnapshot: { owner: "Session Construction", slots: [] } }));
 const canonicalInputs = { goal: "strength_hypertrophy" as const, macrocycleGoal: "build_muscle_and_strength" as const, experienceLevel: "intermediate" as const, daysPerWeek: 5 as const, preferredSplit: "upper_lower" as const, equipment: ["barbell" as const], units: "kg" as const };
 
 describe("canonical v1 to v2 migration", () => {

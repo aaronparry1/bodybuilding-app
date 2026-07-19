@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "canonical_adaptive_planning_certification_v1",
+  "strategy": "exhaustive goal × experience × frequency × onboarding-selectable framework; representative cross-owner interactions only where the input is actually executable",
+  "categoricalCases": 375,
+  "allSupportedPairsCovered": true,
+  "coveredGroups": [
+    {
+      "dimensions": [
+        "goal",
+        "experience",
+        "frequency",
+        "onboarding_framework"
+      ],
+      "evidence": "375 exhaustive compatible constructions"
+    },
+    {
+      "dimensions": [
+        "framework",
+        "history_state"
+      ],
+      "evidence": "ten paired five-day hypertrophy cases"
+    },
+    {
+      "dimensions": [
+        "equipment",
+        "exercise_selection",
+        "coverage"
+      ],
+      "evidence": "limited-equipment goldens plus barbell construction test"
+    },
+    {
+      "dimensions": [
+        "goal",
+        "experience",
+        "event_horizon"
+      ],
+      "evidence": "30 rolling/fixed Macrocycle cases"
+    },
+    {
+      "dimensions": [
+        "limitation",
+        "exercise_selection"
+      ],
+      "evidence": "typed exclusion golden and rejection cases"
+    }
+  ],
+  "ownerSeparatedOrUnsupportedDimensions": [
+    {
+      "input": "session_duration_constraint",
+      "reason": "not a production input; fail closed"
+    },
+    {
+      "input": "recovery_cardio_preference",
+      "reason": "recovery policy/Progress owner, not initial prescription authority"
+    },
+    {
+      "input": "sport_workload",
+      "reason": "factual Progress evidence owner; absent from onboarding construction"
+    },
+    {
+      "input": "body_metrics",
+      "reason": "evidence/presentation only"
+    }
+  ],
+  "additionalGoldenCaseIds": [
+    "beginner-hypertrophy-2",
+    "intermediate-hypertrophy-3",
+    "intermediate-hypertrophy-4",
+    "intermediate-hypertrophy-5",
+    "intermediate-hypertrophy-6",
+    "beginner-strength-3",
+    "intermediate-strength-4",
+    "intermediate-powerbuilding-3",
+    "intermediate-powerbuilding-5",
+    "athletic-concurrent-workload",
+    "getting-lean-recovery-boundary",
+    "limited-dumbbells",
+    "limited-machines",
+    "event-strength",
+    "established-loads",
+    "no-load-history",
+    "exercise-limitation",
+    "short-session-gap"
+  ]
+}

@@ -55,7 +55,7 @@ describe("programme framework rules", () => {
     expect(optionFor("lose_fat", "bench_squat_deadlift").suitability).toBe("not_recommended");
 
     expect(optionFor("build_muscle_strength", "upper_lower").suitability).toBe("best");
-    expect(optionFor("build_muscle_strength", "body_part_split").suitability).toBe("advanced");
+    expect(optionFor("build_muscle_strength", "body_part_split").suitability).toBe("not_recommended");
   });
 
   it("keeps user override available even when a framework is not recommended", () => {

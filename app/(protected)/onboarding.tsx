@@ -5,7 +5,7 @@ import { useAppSettings } from "@/application/settings/app-settings";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { exerciseLibrary } from "@/domain/training/presets";
 import type { ExperienceLevel, ProgrammeGoal, UnitSystem } from "@/domain/training/models";
-import { getFrameworkOptionsForGoal, type ProgrammeFrameworkSuitability, type UserProgrammeFrameworkId } from "@/domain/training/programme-framework-rules";
+import { getSelectableFrameworkOptionsForGoal, type ProgrammeFrameworkSuitability, type UserProgrammeFrameworkId } from "@/domain/training/programme-framework-rules";
 import {
   type EventType,
   type PlanningChoice,
@@ -33,6 +33,7 @@ const goalOptions: Array<{ value: TrainingSetupGoal; label: string; detail: stri
   { value: "build_muscle_and_strength", label: "Powerbuilding", detail: "Build muscle and strength together with heavy anchors and productive volume." },
   { value: "build_strength", label: "Strength", detail: "Build force production with enough muscle work to support it." },
   { value: "athletic_performance", label: "Athletic Performance", detail: "Power and strength without forgetting tissue." },
+  { value: "get_leaner", label: "Getting Lean", detail: "Preserve useful strength and muscle while managing recovery and conditioning." },
 ];
 
 const commitmentOptions: Array<{ value: TrainingCommitmentType; label: string; detail: string }> = [
@@ -400,7 +401,7 @@ function eventTypeForTrainingCommitment(eventType: TrainingEventType): EventType
 }
 
 function frameworkOptionsForGoal(goalId: TrainingGoalId): Array<{ value: PreferredSplit; label: string; detail: string }> {
-  return getFrameworkOptionsForGoal(goalId).map((option) => ({
+  return getSelectableFrameworkOptionsForGoal(goalId).map((option) => ({
     value: preferredSplitForFramework(option.id),
     label: option.displayName,
     detail: `${suitabilityLabel(option.suitability)} · ${option.shortDescription}`,

@@ -200,7 +200,7 @@ describe("recovery and capacity system", () => {
     expect(resolveNextLiftingContext({ activePlan: activePlan("powerlifting_meet"), history: [], exercises: exerciseLibrary, eventTaperPhase: "event_week" })).toBe("event_week");
     expect(resolveNextLiftingContext({ activePlan: activePlan("powerlifting_meet"), history: [], exercises: exerciseLibrary, eventTaperPhase: "taper" })).toBe("peak_or_taper");
     expect(resolveNextLiftingContext({ activePlan: null, history: [], exercises: [] })).toBe("none");
-    expect(resolveNextLiftingContext({ activePlan: activePlan("build_strength"), history: [], exercises: [] })).toBe("squat_focused");
+    expect(resolveNextLiftingContext({ activePlan: activePlan("build_strength"), history: [], exercises: [] })).toBe("heavy_upper");
   });
 });
 

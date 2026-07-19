@@ -4,14 +4,13 @@ import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-p
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { startCanonicalSession, recordCanonicalPerformedWork, pauseCanonicalSession, resumeCanonicalSession, completeCanonicalSession, prescriptionHash } from "@/application/training/canonical-recorded-session-application";
-
-const exercise = { id: "journey-press", name: "Journey Press", category: "chest", primaryMuscles: ["chest"], secondaryMuscles: [], equipment: ["barbell"], movementPattern: "horizontal_push", defaultRepRange: { min: 6, max: 12 }, defaultLoadJump: 2.5, unitCompatibility: ["kg"], kind: "barbell", role: "primary_compound", roles: ["primary_compound", "secondary_compound", "accessory", "isolation"], family: "horizontal_press", tier: "A", fatigueCost: "low", jointStress: "low", suitability: ["beginner", "intermediate", "advanced"], isBeginnerFriendly: true, isAdvanced: false, notes: [], suitableBlocks: [], swapTags: [], isCustom: false, defaultSettings: { repRange: { min: 6, max: 12 }, dropOffPercent: 0, loadIncrease: 2.5, unit: "kg", requiredWorkSets: 3 } } as any;
+import { exerciseLibrary } from "@/domain/training/presets";
 
 describe("canonical physical journey", () => {
   beforeEach(() => { canonicalActivePlanV2Repository.clear(); canonicalRecordedSessionLedger.clear(); canonicalProgressEvidenceRepository.clear(); });
 
   it("hydrates, starts, records, restores, completes and remains idempotent", () => {
-    const created = createCanonicalActivePlan({ planId: "journey-plan", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "strength_hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 3, preferredSplit: "push_pull_legs", equipment: ["barbell"], units: "kg", exercises: [exercise], establishedLoads: { [exercise.id]: 80 }, history: [] });
+    const created = createCanonicalActivePlan({ planId: "journey-plan", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "strength_hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 3, preferredSplit: "push_pull_legs", equipment: ["barbell", "dumbbell", "machine", "cable", "bodyweight"], units: "kg", exercises: exerciseLibrary, establishedLoads: Object.fromEntries(exerciseLibrary.map((exercise) => [exercise.id, 80])), history: [] });
     expect(created.status).toBe("ok");
     if (created.status !== "ok") return;
     const planned = created.model.nextSession && created.model.plannedSessions.find((candidate) => candidate.id === created.model.nextSession!.id);

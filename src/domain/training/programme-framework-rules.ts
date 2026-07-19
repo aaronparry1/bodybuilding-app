@@ -1,4 +1,5 @@
 import type { TrainingGoalId } from "@/domain/training/training-goals";
+import type { PreferredSplit, TrainingSetupGoal } from "@/domain/training/plan-setup";
 
 export type ProgrammeFrameworkGoal =
   | "hypertrophy"
@@ -161,7 +162,7 @@ const frameworkSuitabilityByGoal: Record<TrainingGoalId, Record<UserProgrammeFra
     bench_squat_deadlift: "recommended",
     push_pull_legs: "recommended",
     full_body: "recommended",
-    body_part_split: "advanced",
+    body_part_split: "not_recommended",
   },
   athletic_performance: {
     asc_recommended: "best",
@@ -213,6 +214,85 @@ export function getFrameworkOptionsForGoal(goal: TrainingGoalId): ProgrammeFrame
     coachingReason: id === "asc_recommended" ? "Default: let ASC choose the best framework from the available evidence." : frameworkReasons[suitability[id]],
     isDefaultRecommendation: id === "asc_recommended",
   }));
+}
+
+/** Options that may create an active programme. Informational `not_recommended`
+ * entries remain available through `getFrameworkOptionsForGoal`, but are not
+ * executable onboarding choices. */
+export function getSelectableFrameworkOptionsForGoal(goal: TrainingGoalId): ProgrammeFrameworkOption[] {
+  return getFrameworkOptionsForGoal(goal).filter((option) => option.suitability !== "not_recommended");
+}
+
+export type CanonicalFrameworkResolution = Readonly<{
+  status: "resolved";
+  goal: ProgrammeFrameworkGoal;
+  requested: PreferredSplit;
+  framework: ProgrammeFrameworkId;
+  reason: "explicit_supported_preference" | "asc_recommended_for_frequency" | "phase_specific_morph";
+}> | Readonly<{
+  status: "unsupported";
+  reason: "unsupported_goal" | "unsupported_framework" | "unsupported_frequency";
+}>;
+
+/** Resolves a user preference into an executable framework. The caller retains
+ * `requested`; the resolved framework is Microcycle-owned and may morph at an
+ * authorised phase boundary. */
+export function resolveCanonicalProgrammeFramework(input: Readonly<{
+  goal: TrainingSetupGoal;
+  sessionsPerWeek: number;
+  requested: PreferredSplit;
+  phase?: string;
+}>): CanonicalFrameworkResolution {
+  if (!Number.isInteger(input.sessionsPerWeek) || input.sessionsPerWeek < 2 || input.sessionsPerWeek > 6) {
+    return { status: "unsupported", reason: "unsupported_frequency" };
+  }
+  const goal = frameworkGoalForSetupGoal(input.goal);
+  if (!goal) return { status: "unsupported", reason: "unsupported_goal" };
+  const phaseFramework = phaseSpecificFramework(goal, input.phase, input.sessionsPerWeek);
+  if (phaseFramework) return { status: "resolved", goal, requested: input.requested, framework: phaseFramework, reason: "phase_specific_morph" };
+  if (input.requested === "let_app_choose") {
+    return { status: "resolved", goal, requested: input.requested, framework: recommendedFramework(goal, input.sessionsPerWeek), reason: "asc_recommended_for_frequency" };
+  }
+  const framework = executableFramework(input.requested);
+  if (!framework || !getAllowedProgrammeFrameworks(goal).includes(framework)) return { status: "unsupported", reason: "unsupported_framework" };
+  return { status: "resolved", goal, requested: input.requested, framework, reason: "explicit_supported_preference" };
+}
+
+export function frameworkGoalForSetupGoal(goal: TrainingSetupGoal): ProgrammeFrameworkGoal | null {
+  if (goal === "build_muscle") return "hypertrophy";
+  if (goal === "get_leaner") return "get_lean";
+  if (goal === "build_strength" || goal === "powerlifting_meet") return "strength";
+  if (goal === "build_muscle_and_strength") return "build_muscle_strength";
+  if (goal === "athletic_performance") return "athletic_performance";
+  return null;
+}
+
+export function preferredSplitForProgrammeFramework(framework: ProgrammeFrameworkId): PreferredSplit {
+  return framework === "chest_back_shoulders_arms_legs" ? "body_part_split" : framework;
+}
+
+function executableFramework(split: PreferredSplit): ProgrammeFrameworkId | null {
+  if (split === "body_part_split") return "chest_back_shoulders_arms_legs";
+  if (split === "push_pull_legs" || split === "upper_lower" || split === "full_body" || split === "bench_squat_deadlift") return split;
+  return null;
+}
+
+function recommendedFramework(goal: ProgrammeFrameworkGoal, frequency: number): ProgrammeFrameworkId {
+  if (goal === "athletic_performance") return frequency <= 3 ? "full_body" : "upper_lower";
+  if (goal === "strength") return frequency <= 2 ? "full_body" : "bench_squat_deadlift";
+  if (goal === "build_muscle_strength") return frequency <= 3 ? "full_body" : frequency === 4 ? "upper_lower" : "bench_squat_deadlift";
+  if (frequency <= 3) return "full_body";
+  if (frequency === 4) return "upper_lower";
+  return "push_pull_legs";
+}
+
+function phaseSpecificFramework(goal: ProgrammeFrameworkGoal, phase: string | undefined, frequency: number): ProgrammeFrameworkId | null {
+  if (!phase) return null;
+  const strengthSpecific = /specific|intensification|realisation|taper/.test(phase);
+  if ((goal === "strength" || goal === "build_muscle_strength") && strengthSpecific) return frequency === 2 ? "full_body" : "bench_squat_deadlift";
+  if (goal === "build_muscle_strength" && /powerbuilding_(strength|intensification|realisation)/.test(phase) && frequency >= 3) return "bench_squat_deadlift";
+  if (goal === "athletic_performance" && /power|pre_competition/.test(phase)) return "full_body";
+  return null;
 }
 
 export function buildWeeklySessionSequence({

@@ -35,7 +35,7 @@ describe("Adaptive Strength Coach positioning", () => {
     expect(source).not.toContain("Prepare For Event");
   });
 
-  it("maps Lose Fat to body recomposition with sustainable annual planning", () => {
+  it("maps Lose Fat to body recomposition with a distinct recoverable resistance pathway", () => {
     const plan = createActiveTrainingPlan({
       goal: "get_leaner",
       planningChoice: "recommended_12_month",
@@ -48,7 +48,7 @@ describe("Adaptive Strength Coach positioning", () => {
 
     expect(plan.goal).toBe("get_leaner");
     expect(plan.programmeGoal).toBe("body_recomposition");
-    expect(totalWeeks).toBe(18);
+    expect(totalWeeks).toBe(14);
     expect(plan.blocks.map((block) => block.type)).toContain("deload");
   });
 

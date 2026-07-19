@@ -7,7 +7,7 @@ export interface MacrocyclePhaseSpec { phase: MacrocyclePhase; minWeeks: number;
 export interface MacrocycleSpec { goal: TrainingSetupGoal; phases: MacrocyclePhaseSpec[]; rolling: boolean; targetDate?: string; }
 
 export function macrocycleEngineForGoal(goal: TrainingSetupGoal): MacrocycleEngineId {
-  if (goal === "build_muscle") return "hypertrophy";
+  if (goal === "build_muscle" || goal === "get_leaner") return "hypertrophy";
   if (goal === "build_muscle_and_strength") return "powerbuilding";
   if (goal === "build_strength" || goal === "powerlifting_meet") return "strength";
   return "athletic_performance";
@@ -16,7 +16,12 @@ export function macrocycleEngineForGoal(goal: TrainingSetupGoal): MacrocycleEngi
 export function createMacrocycle(goal: TrainingSetupGoal, experience: ExperienceLevel, targetDate?: string, createdAt = new Date().toISOString()): MacrocycleSpec {
   const beginner = experience === "beginner";
   const engine = macrocycleEngineForGoal(goal);
-  const phases: MacrocyclePhaseSpec[] = engine === "hypertrophy" ? [
+  const phases: MacrocyclePhaseSpec[] = goal === "get_leaner" ? [
+    { phase: "calibration", minWeeks: 1, maxWeeks: 2, emphasis: "Establish recoverable resistance-training and conditioning baselines." },
+    { phase: "accumulation", minWeeks: beginner ? 4 : 3, maxWeeks: 6, emphasis: "Preserve muscle and useful strength while recovery capacity supports body-composition work." },
+    { phase: "consolidation", minWeeks: 2, maxWeeks: 4, emphasis: "Retain training quality while dissipating accumulated fatigue." },
+    { phase: "transition", minWeeks: 1, maxWeeks: 2, emphasis: "Restore readiness before the next productive cycle." },
+  ] : engine === "hypertrophy" ? [
     { phase: "calibration", minWeeks: 1, maxWeeks: 2, emphasis: "Establish exercises, loads and recoverability." },
     { phase: "accumulation", minWeeks: beginner ? 4 : 3, maxWeeks: 6, emphasis: "Build productive muscle-specific volume." },
     { phase: "consolidation", minWeeks: 2, maxWeeks: 4, emphasis: "Retain muscle and restore strength expression." },
@@ -42,6 +47,21 @@ export function createMacrocycle(goal: TrainingSetupGoal, experience: Experience
     { phase: "transition", minWeeks: 1, maxWeeks: 2, emphasis: "Restore before the next rolling development cycle." },
   ];
   return { goal, phases: targetDate ? reverseEngineerToDate(phases, targetDate, createdAt) : phases, rolling: !targetDate, targetDate };
+}
+
+export type MacrocycleTimelineValidation = Readonly<{ status: "valid"; availableWeeks?: number }> | Readonly<{ status: "invalid"; reason: "invalid_created_at" | "invalid_target_date" | "target_not_after_start" | "impossible_event_timeline"; availableWeeks?: number; minimumWeeks?: number }>;
+
+export function validateMacrocycleTimeline(goal: TrainingSetupGoal, experience: ExperienceLevel, targetDate: string | undefined, createdAt: string): MacrocycleTimelineValidation {
+  if (Number.isNaN(Date.parse(createdAt))) return { status: "invalid", reason: "invalid_created_at" };
+  if (!targetDate) return { status: "valid" };
+  if (Number.isNaN(Date.parse(targetDate))) return { status: "invalid", reason: "invalid_target_date" };
+  const availableWeeks = Math.floor((Date.parse(targetDate) - Date.parse(createdAt)) / 604_800_000);
+  if (availableWeeks <= 0) return { status: "invalid", reason: "target_not_after_start", availableWeeks };
+  const rolling = createMacrocycle(goal, experience, undefined, createdAt);
+  const minimumWeeks = rolling.phases.reduce((sum, phase) => sum + phase.minWeeks, 0);
+  return availableWeeks < minimumWeeks
+    ? { status: "invalid", reason: "impossible_event_timeline", availableWeeks, minimumWeeks }
+    : { status: "valid", availableWeeks };
 }
 
 function reverseEngineerToDate(phases: MacrocyclePhaseSpec[], targetDate: string, createdAt: string): MacrocyclePhaseSpec[] {

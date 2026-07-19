@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { constructCanonicalActivePlan } from "@/application/training/canonical-active-plan-construction";
+import { createMicrocycle } from "@/domain/training/microcycle-scheduler";
 
-const sessions = ["Bench and hypertrophy", "Squat and hypertrophy", "Deadlift and back", "Upper support", "Lower support"].map((role, index) => ({ id: `repository-session-${index}`, microcycleId: "repository:microcycle:1", planSessionIndex: index, role, kind: "planned" as const, status: "planned" as const, constructionVersion: "session_construction_v1", revision: 0, prescriptionSnapshot: { owner: "Session Construction", slots: [] } }));
+const roles = createMicrocycle({ parentMesocycleId: "powerbuilding_foundation", trainingDays: 5, split: "upper_lower" }).sessionRoles;
+const sessions = roles.map((role, index) => ({ id: `repository-session-${index}`, microcycleId: "repository:microcycle:1", planSessionIndex: index, role, kind: "planned" as const, status: "planned" as const, constructionVersion: "session_construction_v1", revision: 0, prescriptionSnapshot: { owner: "Session Construction", slots: [] } }));
 
 describe("canonical active-plan v2 repository", () => {
   beforeEach(() => canonicalActivePlanV2Repository.clear());

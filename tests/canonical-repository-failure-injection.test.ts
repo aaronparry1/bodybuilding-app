@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { constructCanonicalActivePlan } from "@/application/training/canonical-active-plan-construction";
 import { createCanonicalActivePlanV2Repository, type CanonicalOpaqueStorage } from "@/data/local/canonical-active-plan-v2-repository";
+import { createMicrocycle } from "@/domain/training/microcycle-scheduler";
 
-const sessions = ["Bench and hypertrophy", "Squat and hypertrophy", "Deadlift and back", "Upper support", "Lower support"].map((role, index) => ({ id: `fault-session-${index}`, microcycleId: "fault:microcycle:1", planSessionIndex: index, role, kind: "planned" as const, status: "planned" as const, constructionVersion: "session_construction_v1", revision: 0, prescriptionSnapshot: { owner: "Session Construction", slots: [] } }));
+const roles = createMicrocycle({ parentMesocycleId: "powerbuilding_foundation", trainingDays: 5, split: "upper_lower" }).sessionRoles;
+const sessions = roles.map((role, index) => ({ id: `fault-session-${index}`, microcycleId: "fault:microcycle:1", planSessionIndex: index, role, kind: "planned" as const, status: "planned" as const, constructionVersion: "session_construction_v1", revision: 0, prescriptionSnapshot: { owner: "Session Construction", slots: [] } }));
 function carrier() {
   const result = constructCanonicalActivePlan({ planId: "fault", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "strength_hypertrophy", macrocycleGoal: "build_muscle_and_strength", experienceLevel: "intermediate", daysPerWeek: 5, preferredSplit: "upper_lower", equipment: ["barbell"], units: "kg", plannedSessions: sessions });
   if (result.status !== "constructed") throw new Error(result.reason);

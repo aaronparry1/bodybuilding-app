@@ -31,6 +31,14 @@ export type CanonicalProgressSnapshot = Readonly<{
   revision: number;
 }>;
 
+export type CanonicalPlanningRationale = Readonly<{
+  schemaVersion: "canonical_planning_rationale_v1";
+  goalStrategyId: string;
+  rotationReasons: readonly string[];
+  sessionReasons: readonly Readonly<{ planSessionIndex: number; role: string; reasons: readonly string[] }>[];
+  changeReasons: readonly string[];
+}>;
+
 export type CanonicalActivePlanCarrier = Readonly<{
   schema: CanonicalActivePlanSchema;
   planId: string;
@@ -54,6 +62,7 @@ export type CanonicalActivePlanCarrier = Readonly<{
   }>;
   operational: Readonly<{ openWorkoutId?: string; migrationId?: string; recoverySourceReference?: string; syncRevision?: string }>;
   constructionInputs?: Readonly<{ schemaVersion: "canonical_construction_inputs_v1"; athleteId: string; exerciseCatalogueSource: string; equipmentSource: string; limitationsSource: string; preferencesSource: string; progressEvidenceScope: string; establishedLoadSource: string }>;
+  planningRationale?: CanonicalPlanningRationale;
   cycleLineage?: readonly import("@/domain/training/canonical-session-lineage").CanonicalCycleLineage[];
   recordedSessionReferences?: readonly import("@/domain/training/canonical-session-lineage").CanonicalRecordedSessionReference[];
 }>;
@@ -131,6 +140,7 @@ export function validateCanonicalActivePlan(value: unknown): CanonicalCarrierVal
     ids.add(session.id); indexes.add(session.planSessionIndex);
   }
   if (!candidate.progress || typeof candidate.progress !== "object" || typeof candidate.progress.evidenceVersion !== "string" || typeof candidate.progress.revision !== "number") return { status: "invalid", reason: "invalid_progress_reference", path: "progress" };
+  if (candidate.planningRationale && (candidate.planningRationale.schemaVersion !== "canonical_planning_rationale_v1" || !candidate.planningRationale.goalStrategyId || !Array.isArray(candidate.planningRationale.rotationReasons) || !Array.isArray(candidate.planningRationale.sessionReasons) || !Array.isArray(candidate.planningRationale.changeReasons))) return { status: "invalid", reason: "invalid_progress_reference", path: "planningRationale" };
   if (candidate.progress.revision !== candidate.revision) return { status: "invalid", reason: "invalid_progress_reference", path: "progress.revision" };
   if (candidate.cycleLineage || candidate.recordedSessionReferences) {
     const lineageError = validateCanonicalLineage(candidate.cycleLineage ?? [], candidate.recordedSessionReferences ?? []);

@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "canonical_adaptive_planning_certification_v1",
+  "results": [
+    {
+      "input": "goal",
+      "expected": "structure,dosage,exercise_selection,recovery",
+      "status": "certified_or_owner_isolated",
+      "evidence": "375-case construction matrix and five goal-specific strategy records"
+    },
+    {
+      "input": "experience",
+      "expected": "dosage,exercise_selection,load",
+      "status": "certified_or_owner_isolated",
+      "evidence": "canonical-microcycle-volume-allocator beginner/intermediate/advanced certification"
+    },
+    {
+      "input": "days_per_week",
+      "expected": "scheduling,dosage",
+      "status": "certified_or_owner_isolated",
+      "evidence": "2-6-day construction matrix and rotation/recovery assertions"
+    },
+    {
+      "input": "framework_preference",
+      "expected": "structure,scheduling,exercise_selection",
+      "status": "certified_or_owner_isolated",
+      "evidence": "framework morph tests and ten paired five-day hypertrophy certifications"
+    },
+    {
+      "input": "commitment",
+      "expected": "structure,scheduling",
+      "status": "certified_or_owner_isolated",
+      "evidence": "rolling and fixed-horizon Macrocycle certification"
+    },
+    {
+      "input": "event_type",
+      "expected": "structure,scheduling",
+      "status": "certified_or_owner_isolated",
+      "evidence": "Macrocycle compatibility boundary; event type never authors a set"
+    },
+    {
+      "input": "target_date",
+      "expected": "structure,scheduling",
+      "status": "certified_or_owner_isolated",
+      "evidence": "typed rolling/fixed/impossible timeline certification"
+    },
+    {
+      "input": "equipment",
+      "expected": "exercise_selection",
+      "status": "certified_or_owner_isolated",
+      "evidence": "full-gym, dumbbell/bodyweight, machine/cable and barbell/bodyweight construction tests"
+    },
+    {
+      "input": "units",
+      "expected": "presentation",
+      "status": "certified_or_owner_isolated",
+      "evidence": "kg/lb metamorphic physiology equality"
+    },
+    {
+      "input": "load_increment_profile",
+      "expected": "load,presentation",
+      "status": "certified_or_owner_isolated",
+      "evidence": "canonical load-resolution and unit-rounding tests"
+    },
+    {
+      "input": "recovery_cardio_preference",
+      "expected": "recovery,scheduling",
+      "status": "certified_or_owner_isolated",
+      "evidence": "recovery-capacity policy tests; construction cannot delete resistance stimulus"
+    },
+    {
+      "input": "exercise_catalogue",
+      "expected": "exercise_selection",
+      "status": "certified_or_owner_isolated",
+      "evidence": "real catalogue orchestration plus incomplete-catalogue fail-closed test"
+    },
+    {
+      "input": "exercise_preferences",
+      "expected": "exercise_selection",
+      "status": "certified_or_owner_isolated",
+      "evidence": "learned-avoidance equivalent-selection test with invariant slot count"
+    },
+    {
+      "input": "limitations",
+      "expected": "exercise_selection",
+      "status": "certified_or_owner_isolated",
+      "evidence": "typed exclusion golden plus unknown/free-text rejection"
+    },
+    {
+      "input": "established_loads",
+      "expected": "load",
+      "status": "certified_or_owner_isolated",
+      "evidence": "ten paired five-day calibration/established certifications"
+    },
+    {
+      "input": "performed_work",
+      "expected": "evidence_only",
+      "status": "certified_or_owner_isolated",
+      "evidence": "canonical ledger, completion and Progress-evidence suites"
+    },
+    {
+      "input": "adherence_and_missed_sessions",
+      "expected": "scheduling,evidence_only",
+      "status": "certified_or_owner_isolated",
+      "evidence": "asymmetric missed-session reflow and completion evidence tests"
+    },
+    {
+      "input": "performance_trend",
+      "expected": "evidence_only,dosage",
+      "status": "certified_or_owner_isolated",
+      "evidence": "canonical Progress v2 evaluation/intervention tests"
+    },
+    {
+      "input": "rep_drop_off",
+      "expected": "dosage,evidence_only",
+      "status": "certified_or_owner_isolated",
+      "evidence": "canonical stop-rule and progression-engine drop-off tests"
+    },
+    {
+      "input": "fatigue_readiness",
+      "expected": "recovery,dosage,scheduling",
+      "status": "certified_or_owner_isolated",
+      "evidence": "Mesocycle recovery policy and Progress recovery intervention tests"
+    },
+    {
+      "input": "active_cycle_state",
+      "expected": "structure,scheduling",
+      "status": "certified_or_owner_isolated",
+      "evidence": "carrier identity, lineage and revision validation suites"
+    },
+    {
+      "input": "previous_mesocycles",
+      "expected": "structure,evidence_only",
+      "status": "certified_or_owner_isolated",
+      "evidence": "canonical successor resolution and decision-application suites"
+    },
+    {
+      "input": "custom_movements",
+      "expected": "exercise_selection",
+      "status": "certified_or_owner_isolated",
+      "evidence": "incomplete custom metadata fail-closed coverage"
+    },
+    {
+      "input": "session_duration_constraint",
+      "expected": "unsupported",
+      "status": "fail_closed",
+      "evidence": "explicit unsupported-input registry and fail-closed case"
+    },
+    {
+      "input": "sport_workload",
+      "expected": "recovery,scheduling",
+      "status": "certified_or_owner_isolated",
+      "evidence": "factual recovery/capacity evidence boundary; absent evidence cannot invent dosage"
+    },
+    {
+      "input": "body_metrics",
+      "expected": "evidence_only,presentation",
+      "status": "certified_or_owner_isolated",
+      "evidence": "Progress evidence-only authority boundary; Session Construction exclusion"
+    }
+  ],
+  "unsupportedInputs": [
+    "session_duration_constraint"
+  ]
+}
