@@ -10,9 +10,14 @@
     "tests": 2070,
     "commit": "730952658effff5d04817e9fef1d1221e8293bb9"
   },
-  "finalDiscovery": {
+  "adversarialCorrectionStart": {
     "files": 350,
-    "tests": 2080
+    "tests": 2080,
+    "commit": "1ab62df921f3e38fac4fa052a33f09f654a761e5"
+  },
+  "finalDiscovery": {
+    "files": 351,
+    "tests": 2088
   },
   "filesAddedAtTaskStart": [
     "tests/canonical-final-adaptive-planning.test.ts"
@@ -20,6 +25,9 @@
   "filesDeletedAtTaskStart": [],
   "filesAddedByThisTask": [
     "tests/canonical-dosage-evolution-certification.test.ts"
+  ],
+  "filesAddedByAdversarialCorrection": [
+    "tests/canonical-session-duration-planning.test.ts"
   ],
   "individualTestsRemovedAtTaskStart": [
     "complete canonical adaptive planning system > does not expose goal combinations classified as not recommended",
@@ -74,12 +82,12 @@
     "canonical dosage, rotation, method evolution and cardio certification > constructs Legs F through real Session Construction as a complementary hinge-led session",
     "canonical dosage, rotation, method evolution and cardio certification > normalises five lifting days from the complete rotation and keeps every lower-body region above its floor",
     "canonical dosage, rotation, method evolution and cardio certification > requires productive history and demonstrated capacity before an upper starting dose",
-    "canonical dosage, rotation, method evolution and cardio certification > certifies the 95-set calendar slice from muscle-specific floors and ceilings rather than total-set rhetoric",
+    "canonical dosage, rotation, method evolution and cardio certification > replaces the contradictory 95/101 claims with one executable muscle-specific start",
     "canonical dosage, rotation, method evolution and cardio certification > evolves exact method structure only when a Mesocycle owns a useful reason",
     "canonical dosage, rotation, method evolution and cardio certification > simulates productive, local, systemic, missed-session and stagnation paths without weekly auto-escalation",
     "canonical dosage, rotation, method evolution and cardio certification > individualises eight cardio profiles and exposes their recovery-budget effect",
     "canonical dosage, rotation, method evolution and cardio certification > never prescribes cardio against an explicit off preference or conflicting sport workload",
-    "canonical dosage, rotation, method evolution and cardio certification > keeps session duration as a declared product-input gap and passes every dosage quality gate"
+    "canonical dosage, rotation, method evolution and cardio certification > uses typed session duration and passes every adversarial dosage quality gate"
   ],
   "renamedOrConsolidated": [
     {
@@ -113,7 +121,9 @@
     "baselineToTaskStartFiles": "348 + 1 added - 0 deleted = 349",
     "baselineToTaskStartTests": "2072 - 23 removed + 21 added = 2070",
     "taskStartToFinalFiles": "349 + 1 added - 0 deleted = 350",
-    "taskStartToFinalTests": "2070 + 10 added - 0 deleted = 2080"
+    "taskStartToFinalTests": "2070 + 10 added - 0 deleted = 2080",
+    "adversarialCorrectionFiles": "350 + 1 added - 0 deleted = 351",
+    "adversarialCorrectionTests": "2080 + 8 added - 0 deleted = 2088"
   },
   "lostCoverageWithoutReplacement": []
 }

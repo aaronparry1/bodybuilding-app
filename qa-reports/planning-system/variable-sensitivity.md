@@ -146,9 +146,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     },
     {
       "input": "session_duration_constraint",
-      "expected": "unsupported",
-      "status": "fail_closed",
-      "evidence": "explicit unsupported-input registry and fail-closed case"
+      "expected": "dosage,scheduling",
+      "status": "certified_or_owner_isolated",
+      "evidence": "typed 30/45/60/75/90-minute construction matrix plus atomic future-session reconstruction"
     },
     {
       "input": "sport_workload",
@@ -163,8 +163,6 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "evidence": "Progress evidence-only authority boundary; Session Construction exclusion"
     }
   ],
-  "unsupportedInputs": [
-    "session_duration_constraint"
-  ]
+  "unsupportedInputs": []
 }
 ```

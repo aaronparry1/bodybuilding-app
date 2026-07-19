@@ -529,23 +529,28 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     },
     {
       "id": "session_duration_constraint",
-      "sourceOfTruth": "none",
-      "availability": "not_currently_supported",
-      "domain": "not in production onboarding/settings/command",
-      "validValues": "unsupported",
-      "defaultValue": "allocator feasibility cap only",
-      "validation": "must not be inferred",
-      "mayAffect": [],
-      "mustNotAffect": [
-        "Macrocycle",
-        "Mesocycle",
+      "sourceOfTruth": "canonical_session_duration_policy_v1",
+      "availability": "onboarding",
+      "domain": "typed onboarding/settings fact reconstructed through canonical active-plan application",
+      "validValues": "30 | 45 | 60 | 75 | 90 minutes",
+      "defaultValue": "75 minutes",
+      "validation": "exact enum; infeasible coverage fails closed; active attempts block reconstruction",
+      "mayAffect": [
         "Microcycle",
         "Session Construction",
         "Set Prescription"
       ],
-      "effects": [],
+      "mustNotAffect": [
+        "Macrocycle",
+        "Mesocycle",
+        "Progress"
+      ],
+      "effects": [
+        "dosage",
+        "scheduling"
+      ],
       "applies": "next_session",
-      "precedence": "requires a future owned contract"
+      "precedence": "athlete time constraint bounds discrete dosage after muscle policy; it never invents frequency or mutates recorded history"
     },
     {
       "id": "sport_workload",

@@ -27,6 +27,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     },
     {
       "dimensions": [
+        "duration",
+        "frequency",
+        "experience"
+      ],
+      "evidence": "30/45/60/75/90-minute construction certification across 2-6 days and three experience levels"
+    },
+    {
+      "dimensions": [
         "equipment",
         "exercise_selection",
         "coverage"
@@ -50,10 +58,6 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     }
   ],
   "ownerSeparatedOrUnsupportedDimensions": [
-    {
-      "input": "session_duration_constraint",
-      "reason": "not a production input; fail closed"
-    },
     {
       "input": "sport_workload",
       "reason": "factual Progress evidence refines rather than invents initial prescription"
@@ -81,7 +85,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     "established-loads",
     "no-load-history",
     "exercise-limitation",
-    "short-session-gap"
+    "short-session-30"
   ]
 }
 ```

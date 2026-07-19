@@ -10,6 +10,7 @@ import {
   normalizeLoadIncrementProfile,
   type LoadIncrementProfile,
 } from "@/domain/training/load-increment-strategy";
+import { normalizeCanonicalSessionDuration, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
 
 export interface AppSettings {
   onboardingCompleted: boolean;
@@ -27,6 +28,7 @@ export interface AppSettings {
   theme: "dark" | "system";
   trainingGoal: ProgrammeGoal;
   experienceLevel: ExperienceLevel;
+  availableSessionMinutes: CanonicalSessionDurationMinutes;
 }
 
 export const defaultAppSettings: AppSettings = {
@@ -42,6 +44,7 @@ export const defaultAppSettings: AppSettings = {
   theme: "dark",
   trainingGoal: "hypertrophy",
   experienceLevel: "intermediate",
+  availableSessionMinutes: 75,
 };
 
 export function normalizeAppSettings(settings: AppSettings): AppSettings {
@@ -58,6 +61,7 @@ export function normalizeAppSettings(settings: AppSettings): AppSettings {
     defaultLoadJump: Math.max(0, merged.defaultLoadJump),
     loadIncrementProfile: normalizeLoadIncrementProfile(merged.loadIncrementProfile),
     capacityFocus: normalizeCapacityFocusSettings(merged.capacityFocus),
+    availableSessionMinutes: normalizeCanonicalSessionDuration(merged.availableSessionMinutes),
   };
 }
 

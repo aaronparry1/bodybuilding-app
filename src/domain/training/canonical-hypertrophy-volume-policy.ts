@@ -54,6 +54,7 @@ export type CanonicalStartingVolumeResolution = Readonly<{
   authorisedCeiling: number;
   target: Readonly<{ min: number; max: number }>;
   calibrationRequired: boolean;
+  retainedHistoryEffect: "calibration_floor" | "productive_baseline" | "demonstrated_upper_start";
   reasonCodes: readonly string[];
 }>;
 
@@ -87,21 +88,23 @@ export function resolveCanonicalHypertrophyStartingVolume(input: Readonly<{
   const small = smallRegions.has(input.region);
   const lowerBody = new Set<CanonicalStimulusRegion>(["quadriceps", "hamstrings_knee_flexion", "hip_extension", "calves"]);
   const authorisedFloor = Math.max(1, landmark.target.min - (small ? 1 : 2));
-  let starting = landmark.starting;
+  // Without retained comparable work, the policy starts at its authorised
+  // muscle-specific floor. Experience changes exercise complexity and the
+  // width of the safe band; it is never evidence that the athlete tolerates
+  // the middle or top of that band.
+  let starting = input.context.history === "none" ? authorisedFloor : landmark.starting;
   const reasons = [`experience:${input.experience}`, `region:${input.region}`];
-  if (input.experience === "advanced" && input.context.history === "none") {
-    starting -= 1;
-    reasons.push("advanced_without_productive_history_is_not_automatic_volume");
-  }
+  if (input.context.history === "none") reasons.push("absent_productive_history_uses_calibration_floor");
+  else reasons.push("retained_productive_history_authorises_productive_baseline");
   if (input.context.recovery === "low_acceptable") {
-    starting -= small ? 1 : 2;
+    starting = authorisedFloor;
     reasons.push("low_acceptable_recovery_uses_starting_floor");
   }
   const highCapacityAuthorised = input.context.recovery === "high"
     && input.context.history === "established_productive"
     && input.context.workCapacity === "demonstrated_high";
   if (highCapacityAuthorised) {
-    starting += small ? 1 : 2;
+    starting = landmark.maximumAuthorisedStarting;
     reasons.push("productive_history_and_high_capacity_authorise_upper_start");
   } else if (input.context.workCapacity === "demonstrated_high") {
     reasons.push("work_capacity_without_complete_supporting_evidence_does_not_raise_volume");
@@ -112,7 +115,7 @@ export function resolveCanonicalHypertrophyStartingVolume(input: Readonly<{
   }
   starting = Math.max(authorisedFloor, Math.min(landmark.maximumAuthorisedStarting, starting));
   if (input.context.history === "none") reasons.push("calibration_from_absent_comparable_history");
-  if (input.context.recovery === "ordinary") reasons.push("ordinary_recovery_uses_middle_start");
+  if (input.context.recovery === "ordinary") reasons.push(input.context.history === "none" ? "ordinary_recovery_does_not_replace_missing_tolerance_evidence" : "ordinary_recovery_supports_productive_baseline");
   return {
     policyId: canonicalHypertrophyVolumePolicy.policyId,
     startingDirectSets: starting,
@@ -120,6 +123,7 @@ export function resolveCanonicalHypertrophyStartingVolume(input: Readonly<{
     authorisedCeiling: landmark.maximumAuthorisedStarting,
     target: landmark.target,
     calibrationRequired: input.context.history === "none",
+    retainedHistoryEffect: highCapacityAuthorised ? "demonstrated_upper_start" : input.context.history === "established_productive" ? "productive_baseline" : "calibration_floor",
     reasonCodes: reasons,
   };
 }

@@ -57,6 +57,8 @@ export function certifyCanonicalConstructedMicrocycle(input: Readonly<{
         if (!exercise.roles.includes(allocatedSlot.exerciseRole)) failures.push(`slot_role_mismatch:${exercise.id}:${allocatedSlot.purpose}`);
       }
       const fatigueUnits = workingSets * (exercise.fatigueCost === "high" ? 3 : exercise.fatigueCost === "moderate" ? 2 : 1);
+      const exactTargets = slot.exactTargets ?? Array.from({ length: workingSets }, () => slot.targetReps);
+      if (exercise.fatigueCost === "high" && (exactTargets.some((target) => target > 8) || slot.rest.seconds < 150)) failures.push(`high_fatigue_prescription_inappropriate:${exercise.id}`);
       for (const region of exercise.stimulusProfile.direct) direct[region] = (direct[region] ?? 0) + workingSets;
       for (const region of exercise.stimulusProfile.meaningfulSecondary) secondary[region] = (secondary[region] ?? 0) + workingSets;
       fatigueBySession[sessionIndex] += fatigueUnits;
@@ -84,6 +86,19 @@ export function certifyCanonicalConstructedMicrocycle(input: Readonly<{
     if (["stable_primary_practice", "only_equivalent_available"].includes(repeated.reason)) checks.push(`repeat_authorised:${repeated.exerciseId}`);
     else failures.push(`repeat_without_programme_reason:${repeated.exerciseId}`);
   }
+  // This arithmetic score is useful for relative comparisons, but it is not an
+  // owned universal safety threshold. Prescription safety is enforced above
+  // from exercise fatigue, exact rep targets and the rest prescription.
+  checks.push("session_systemic_fatigue_reported_for_comparison");
+  const sameRoleFamilies = ["Push", "Pull", "Legs", "Upper", "Lower"];
+  for (const family of sameRoleFamilies) {
+    const matching = input.sessions.filter((session) => session.role.startsWith(family));
+    if (matching.length < 2) continue;
+    const signatures = matching.map((session) => session.slots.map((slot) => slot.exerciseId).join("|"));
+    if (new Set(signatures).size !== signatures.length) failures.push(`same_role_sessions_accidentally_identical:${family.toLowerCase()}`);
+    else checks.push(`same_role_sessions_complementary:${family.toLowerCase()}`);
+  }
+  if (!failures.some((failure) => failure.startsWith("high_fatigue_prescription_inappropriate"))) checks.push("high_fatigue_reps_and_rest_appropriate");
 
   return { schemaVersion: CANONICAL_CONSTRUCTED_MICROCYCLE_CERTIFICATION_VERSION, status: failures.length ? "failed" : "passed", exercises: accounting, directStimulusSets: direct, meaningfulSecondaryStimulusSets: secondary, fatigueUnits: { perSession: fatigueBySession, weekly: fatigueBySession.reduce((sum, value) => sum + value, 0) }, repeatedExercises, checks, failures };
 }

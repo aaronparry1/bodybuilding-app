@@ -1,6 +1,7 @@
 import type { CanonicalStimulusRegion, Equipment, ExerciseRole, ExperienceLevel, MovementPattern, MuscleGroup } from "@/domain/training/models";
 import type { ProgrammeFrameworkSessionType } from "@/domain/training/programme-framework-rules";
-import { canonicalHypertrophyLandmark, canonicalHypertrophyVolumePolicy } from "@/domain/training/canonical-hypertrophy-volume-policy";
+import { canonicalHypertrophyLandmark, canonicalHypertrophyVolumePolicy, resolveCanonicalHypertrophyStartingVolume, type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
+import { normalizeCanonicalSessionDuration, resolveCanonicalSessionDuration, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
 
 export const canonicalMicrocycleVolumePolicy = {
   policyId: "canonical_microcycle_volume_policy_v3",
@@ -65,6 +66,8 @@ export type CanonicalMicrocycleVolumeAllocationInput = Readonly<{
   establishedLoadExerciseIds: readonly string[];
   sessionRoles: readonly string[];
   sessionTypes?: readonly ProgrammeFrameworkSessionType[];
+  startingVolumeContext?: CanonicalStartingVolumeContext;
+  availableSessionMinutes?: CanonicalSessionDurationMinutes;
 }>;
 export type CanonicalMicrocycleVolumeAllocation = Readonly<{
   schemaVersion: "canonical_microcycle_volume_allocation_v1";
@@ -83,6 +86,8 @@ export type CanonicalMicrocycleVolumeAllocation = Readonly<{
   totalWorkingSets: number;
   sessionWorkingSets: readonly number[];
   estimatedSessionMinutes: readonly number[];
+  durationConstraint: Readonly<{ minutes: CanonicalSessionDurationMinutes; maximumWorkingSets: number; constrainedSessionIndexes: readonly number[]; unmetStartingTargets: readonly CanonicalStimulusRegion[] }>;
+  startingDosage: Readonly<{ context: CanonicalStartingVolumeContext; policyTargets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>; rotationNormalisation: "calendar_microcycle" | "six_session_rotation_at_five_sessions_per_week"; rounding: "nearest_whole_set_then_proportional_discrete_allocation" }>;
   fatigue: Readonly<{ perSession: readonly number[]; weeklyUnits: number; overlapFlags: readonly string[] }>;
   certification: Readonly<{ status: "passed" | "failed"; checks: readonly string[]; failures: readonly string[] }>;
 }>;
@@ -128,7 +133,7 @@ const fiveDayPurpose: Readonly<Record<(typeof requiredFiveDayRoles)[number], rea
 
 export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolumeAllocationInput): CanonicalMicrocycleVolumeAllocation {
   const profile = isExactFiveDayProfile(input.sessionRoles) ? "powerbuilding_five_day_v1" : "goal_phase_frequency_v1";
-  const slots: AllocatedSlot[] = [];
+  let slots: AllocatedSlot[] = [];
   for (const [sessionIndex, sessionRole] of input.sessionRoles.entries()) {
     const contract = profile === "powerbuilding_five_day_v1" ? fiveDayPurpose[sessionRole as (typeof requiredFiveDayRoles)[number]] : canonicalContract(input, input.sessionTypes?.[sessionIndex] ?? inferSessionType(sessionRole), sessionIndex);
     contract.forEach((entry, order) => slots.push({
@@ -139,6 +144,28 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
       workingSets: Math.max(entry.minimumSets ?? 1, setsFor(input.experience, entry.constructionRole, input.mesocycleId, input.recoveryRestricted, input.frequency, entry.baseWorkingSets, profile === "powerbuilding_five_day_v1", input.establishedLoadExerciseIds.length > 0)),
     }));
   }
+
+  const hypertrophy = input.macrocycleGoal === "build_muscle" || input.macrocycleGoal === "get_leaner";
+  const startingContext: CanonicalStartingVolumeContext = input.startingVolumeContext ?? {
+    recovery: input.recoveryRestricted ? "low_acceptable" : "ordinary",
+    history: "none",
+    workCapacity: "not_demonstrated",
+    concurrentSport: "none",
+  };
+  const policyTargets: Partial<Record<CanonicalStimulusRegion, number>> = {};
+  if (hypertrophy) {
+    for (const region of new Set(slots.flatMap((entry) => entry.requiredStimuli))) {
+      policyTargets[region] = resolveCanonicalHypertrophyStartingVolume({ experience: input.experience, region, context: startingContext }).startingDirectSets;
+    }
+    slots = applyCanonicalStartingDosage(input, slots, policyTargets);
+  }
+
+  const duration = resolveCanonicalSessionDuration(normalizeCanonicalSessionDuration(input.availableSessionMinutes));
+  if (duration.status !== "valid") throw new Error("canonical_session_duration_normalisation_failed");
+  const maximumSessionSets = Math.min(duration.maximumWorkingSets, hypertrophy ? 24 : 20);
+  const constrained = constrainSlotsToDuration(slots, input.sessionRoles.length, maximumSessionSets);
+  slots = constrained.slots;
+  const constrainedSessionIndexes = constrained.constrainedSessionIndexes;
 
   const directSets: Partial<Record<CanonicalStimulusRegion, number>> = {};
   const movementPatternExposures: Record<string, number> = {};
@@ -153,17 +180,25 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
     primary: slots.filter((entry) => entry.primaryLift === lift && entry.liftExposure === "primary").length,
     secondaryVariation: slots.filter((entry) => entry.primaryLift === lift && entry.liftExposure === "secondary_variation").length,
   }])) as CanonicalMicrocycleVolumeAllocation["primaryLiftExposures"];
-  const hypertrophy = input.macrocycleGoal === "build_muscle" || input.macrocycleGoal === "get_leaner";
   const directSetTargets = profile === "powerbuilding_five_day_v1"
     ? Object.fromEntries((["chest", "lats", "upper_back", "lateral_delts", "rear_delts", "triceps", "biceps", "quadriceps", "hamstrings_knee_flexion", "hip_extension", "calves", "core"] as CanonicalStimulusRegion[]).map((region) => [region, weeklyBounds(input.experience, region)]))
     : hypertrophy
       ? Object.fromEntries(Object.keys(directSets).map((region) => {
         const stimulus = region as CanonicalStimulusRegion;
         const landmark = canonicalHypertrophyLandmark(input.experience, stimulus);
-        return [region, { min: planStartingFloor(input, stimulus), max: landmark.target.max }];
+        const policyMinimum = policyTargets[stimulus] ?? resolveCanonicalHypertrophyStartingVolume({ experience: input.experience, region: stimulus, context: startingContext }).startingDirectSets;
+        return [region, { min: isRollingPpl(input) || constrainedSessionIndexes.length > 0 ? Math.min(policyMinimum, directSets[stimulus] ?? policyMinimum) : policyMinimum, max: landmark.target.max }];
       }))
       : Object.fromEntries(Object.entries(directSets).map(([region, sets]) => [region, { min: Math.max(1, Number(sets) - Math.max(1, Math.floor(Number(sets) * 0.2))), max: Number(sets) + Math.max(2, Math.ceil(Number(sets) * 0.35)) }]));
-  const checks = certify(input, profile, slots, directSets, sessionWorkingSets, estimatedSessionMinutes, primaryLiftExposures);
+  const dosageComparison = isRollingPpl(input)
+    ? directSetsForSlots(constrainSlotsToDuration(buildCanonicalRollingPplDosage(input, policyTargets), rollingPplRoles.length, maximumSessionSets).slots)
+    : directSets;
+  const dosageScale = isRollingPpl(input) ? 5 / 6 : 1;
+  const unmetStartingTargets = hypertrophy ? Object.entries(policyTargets).filter(([region, target]) => {
+    const actual = Number(dosageComparison[region as CanonicalStimulusRegion] ?? 0) * dosageScale;
+    return actual + 0.51 < Number(target);
+  }).map(([region]) => region as CanonicalStimulusRegion) : [];
+  const checks = certify(input, profile, slots, directSets, sessionWorkingSets, estimatedSessionMinutes, primaryLiftExposures, duration.minutes, policyTargets, constrainedSessionIndexes.length > 0);
   return {
     schemaVersion: "canonical_microcycle_volume_allocation_v1",
     policyId: canonicalMicrocycleVolumePolicy.policyId,
@@ -181,6 +216,8 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
     totalWorkingSets: sessionWorkingSets.reduce((sum, sets) => sum + sets, 0),
     sessionWorkingSets,
     estimatedSessionMinutes,
+    durationConstraint: { minutes: duration.minutes, maximumWorkingSets: duration.maximumWorkingSets, constrainedSessionIndexes, unmetStartingTargets },
+    startingDosage: { context: startingContext, policyTargets, rotationNormalisation: isRollingPpl(input) ? "six_session_rotation_at_five_sessions_per_week" : "calendar_microcycle", rounding: "nearest_whole_set_then_proportional_discrete_allocation" },
     fatigue: { perSession: perSessionFatigue, weeklyUnits: perSessionFatigue.reduce((sum, units) => sum + units, 0), overlapFlags: profile === "powerbuilding_five_day_v1" || input.macrocycleGoal === "build_strength" || input.macrocycleGoal === "build_muscle_and_strength" ? detectCanonicalMicrocycleOverlap(slots) : [] },
     certification: { status: checks.failures.length ? "failed" : "passed", checks: checks.passed, failures: checks.failures },
   };
@@ -188,6 +225,99 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
 
 export function isStrictCanonicalAllocation(allocation: CanonicalMicrocycleVolumeAllocation | undefined): boolean {
   return Boolean(allocation);
+}
+
+const rollingPplRoles = ["Push hypertrophy A", "Pull hypertrophy B", "Legs hypertrophy C", "Push hypertrophy D", "Pull hypertrophy E", "Legs hypertrophy F"] as const;
+const rollingPplTypes = ["push", "pull", "legs", "push", "pull", "legs"] as const;
+
+/** Converts the muscle-specific seven-day policy into integer slot sets. A
+ * five-day rolling PPL is allocated over its complete six-session rotation,
+ * then normalised by 5/6; all other schedules use their calendar microcycle.
+ * This is the only production bridge from policy dosage to discrete slots. */
+function applyCanonicalStartingDosage(
+  input: CanonicalMicrocycleVolumeAllocationInput,
+  current: readonly AllocatedSlot[],
+  targets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>,
+): AllocatedSlot[] {
+  if (!isRollingPpl(input)) return distributeCanonicalRegionTargets(current, targets, 1);
+  const allocatedRotation = buildCanonicalRollingPplDosage(input, targets);
+  const byRoleAndOrder = new Map(allocatedRotation.map((entry) => [`${entry.sessionRole}:${entry.order}`, entry.workingSets]));
+  return current.map((entry) => ({ ...entry, workingSets: byRoleAndOrder.get(`${entry.sessionRole}:${entry.order}`) ?? entry.workingSets }));
+}
+
+function buildCanonicalRollingPplDosage(
+  input: CanonicalMicrocycleVolumeAllocationInput,
+  targets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>,
+): AllocatedSlot[] {
+  const virtual: AllocatedSlot[] = [];
+  const virtualInput: CanonicalMicrocycleVolumeAllocationInput = { ...input, sessionRoles: rollingPplRoles, sessionTypes: rollingPplTypes };
+  rollingPplRoles.forEach((sessionRole, sessionIndex) => {
+    canonicalContract(virtualInput, rollingPplTypes[sessionIndex]!, sessionIndex).forEach((entry, order) => virtual.push({
+      ...entry,
+      sessionIndex,
+      sessionRole,
+      order,
+      workingSets: Math.max(1, entry.baseWorkingSets ?? (entry.constructionRole === "primary" ? 3 : 2)),
+    }));
+  });
+  return distributeCanonicalRegionTargets(virtual, targets, 6 / 5);
+}
+
+function distributeCanonicalRegionTargets(
+  source: readonly AllocatedSlot[],
+  targets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>,
+  rotationScale: number,
+): AllocatedSlot[] {
+  const resolved = source.map((entry) => ({ ...entry, workingSets: 1 }));
+  for (const region of new Set(resolved.flatMap((entry) => entry.requiredStimuli))) {
+    const indexes = resolved.map((entry, index) => entry.requiredStimuli.includes(region) ? index : -1).filter((index) => index >= 0);
+    const requested = Math.max(indexes.length, Math.round(Number(targets[region] ?? indexes.length) * rotationScale));
+    let remaining = requested - indexes.length;
+    while (remaining > 0) {
+      const selected = indexes.slice().sort((left, right) => {
+        const a = resolved[left]!; const b = resolved[right]!;
+        const aScore = (a.baseWorkingSets ?? defaultSlotWeight(a.constructionRole)) / (a.workingSets + 1);
+        const bScore = (b.baseWorkingSets ?? defaultSlotWeight(b.constructionRole)) / (b.workingSets + 1);
+        return bScore - aScore || a.sessionRole.localeCompare(b.sessionRole) || a.order - b.order;
+      })[0];
+      if (selected === undefined) break;
+      resolved[selected] = { ...resolved[selected]!, workingSets: resolved[selected]!.workingSets + 1 };
+      remaining -= 1;
+    }
+  }
+  return resolved;
+}
+
+function defaultSlotWeight(role: AllocatedSlot["constructionRole"]): number { return role === "primary" ? 3 : role === "secondary" ? 2 : 1; }
+function roleReductionPriority(role: AllocatedSlot["constructionRole"]): number { return role === "accessory" ? 0 : role === "secondary" ? 1 : 2; }
+function constrainSlotsToDuration(source: readonly AllocatedSlot[], sessionCount: number, maximumSessionSets: number): Readonly<{ slots: AllocatedSlot[]; constrainedSessionIndexes: number[] }> {
+  let slots = source.map((entry) => ({ ...entry }));
+  const constrainedSessionIndexes: number[] = [];
+  for (let sessionIndex = 0; sessionIndex < sessionCount; sessionIndex += 1) {
+    const local = slots.filter((entry) => entry.sessionIndex === sessionIndex);
+    let excess = local.reduce((sum, entry) => sum + entry.workingSets, 0) - maximumSessionSets;
+    if (excess <= 0) continue;
+    constrainedSessionIndexes.push(sessionIndex);
+    const reductionOrder = local.slice().sort((a, b) => roleReductionPriority(a.constructionRole) - roleReductionPriority(b.constructionRole) || b.order - a.order);
+    for (const entry of reductionOrder) {
+      if (excess <= 0) break;
+      const reducible = Math.min(excess, entry.workingSets - 1);
+      if (reducible <= 0) continue;
+      slots = slots.map((candidate) => candidate.sessionIndex === entry.sessionIndex && candidate.order === entry.order ? { ...candidate, workingSets: candidate.workingSets - reducible } : candidate);
+      excess -= reducible;
+    }
+  }
+  return { slots, constrainedSessionIndexes };
+}
+function directSetsForSlots(slots: readonly AllocatedSlot[]): Partial<Record<CanonicalStimulusRegion, number>> {
+  const direct: Partial<Record<CanonicalStimulusRegion, number>> = {};
+  for (const slot of slots) for (const region of slot.requiredStimuli) direct[region] = (direct[region] ?? 0) + slot.workingSets;
+  return direct;
+}
+function isRollingPpl(input: CanonicalMicrocycleVolumeAllocationInput): boolean {
+  return input.frequency === 5
+    && input.sessionTypes?.every((type) => type === "push" || type === "pull" || type === "legs") === true
+    && input.sessionRoles.every((role) => rollingPplRoles.includes(role as (typeof rollingPplRoles)[number]));
 }
 
 type SlotOptions = Readonly<Partial<Pick<SlotContract, "minimumSets" | "primaryLift" | "liftExposure" | "specialistsPermitted" | "repeatPolicy" | "baseWorkingSets" | "preferredHypertrophyBias" | "transferRationale">>>;
@@ -269,7 +399,7 @@ function adaptOptionalStimulusToEquipment(contract: readonly SlotContract[], equ
 }
 
 function pushContract(strengthSpecific = false): readonly SlotContract[] { return [
-  slot(strengthSpecific ? "primary_compound" : "secondary_compound", "primary", ["chest"], ["chest"], "primary horizontal press", ["horizontal_push"], { repeatPolicy: "stable_primary_practice", baseWorkingSets: 4 }),
+  slot("primary_compound", "primary", ["chest"], ["chest"], "high-priority horizontal press", ["horizontal_push"], { repeatPolicy: strengthSpecific ? "stable_primary_practice" : "variation_preferred", baseWorkingSets: 4 }),
   slot("secondary_compound", "secondary", ["chest"], ["chest"], "second-angle chest stimulus", ["horizontal_push"], { repeatPolicy: "variation_preferred", preferredHypertrophyBias: "lengthened", baseWorkingSets: 3 }),
   slot("secondary_compound", "secondary", ["shoulders"], ["anterior_delts"], "vertical pressing stimulus", ["vertical_push"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3 }),
   slot("isolation", "accessory", ["shoulders"], ["lateral_delts"], "lateral-delt stimulus", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3 }),
@@ -278,12 +408,12 @@ function pushContract(strengthSpecific = false): readonly SlotContract[] { retur
 ]; }
 
 function pullContract(beginnerStable = false): readonly SlotContract[] { return [
-  slot(beginnerStable ? "secondary_compound" : "primary_compound", "primary", ["back"], ["upper_back"], "primary horizontal pull", ["horizontal_pull"], { repeatPolicy: "stable_primary_practice", baseWorkingSets: 4 }),
+  slot("secondary_compound", "primary", ["back"], ["upper_back"], "supported horizontal-pull anchor", ["horizontal_pull"], { repeatPolicy: beginnerStable ? "stable_primary_practice" : "variation_preferred", baseWorkingSets: 4 }),
   slot("secondary_compound", "secondary", ["back"], ["lats"], "vertical-pull lat stimulus", ["vertical_pull"], { repeatPolicy: "variation_preferred", baseWorkingSets: 4 }),
   slot("secondary_compound", "secondary", ["back"], ["upper_back"], "second-angle upper-back stimulus", ["horizontal_pull"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3 }),
   slot("isolation", "accessory", ["rear_delts"], ["rear_delts"], "rear-delt and scapular work", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3 }),
   slot("isolation", "accessory", ["biceps"], ["biceps"], "lengthened elbow-flexor work", ["isolation"], { repeatPolicy: "variation_preferred", preferredHypertrophyBias: "lengthened", baseWorkingSets: 3 }),
-  slot("isolation", "accessory", ["biceps"], ["biceps"], "shortened-range biceps finish", ["isolation"], { repeatPolicy: "variation_preferred", preferredHypertrophyBias: "shortened", baseWorkingSets: 2 }),
+  slot("secondary_compound", "secondary", ["back"], ["lats"], "second-angle lat stimulus", ["vertical_pull"], { repeatPolicy: "variation_preferred", baseWorkingSets: 2 }),
 ]; }
 
 function lowerContract(squatSpecific: boolean, beginnerSimple = false, denseHypertrophy = true, complementarySecond = false): readonly SlotContract[] {
@@ -302,7 +432,7 @@ function lowerContract(squatSpecific: boolean, beginnerSimple = false, denseHype
     slot("isolation", "accessory", ["calves"], ["calves"], "calf retention", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 2 }),
   ];
   if (complementarySecond) return [
-    slot("primary_compound", "primary", ["hamstrings", "glutes"], ["hip_extension"], "hinge-led posterior-chain anchor", ["hinge"], { repeatPolicy: "stable_primary_practice", baseWorkingSets: 4 }),
+    slot("secondary_compound", "primary", ["hamstrings", "glutes"], ["hip_extension"], "moderate-fatigue hinge-led posterior-chain anchor", ["hinge"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3 }),
     slot("secondary_compound", "secondary", ["quads", "glutes"], ["quadriceps"], "single-leg knee-dominant hypertrophy", ["lunge"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3 }),
     slot("isolation", "accessory", ["hamstrings"], ["hamstrings_knee_flexion"], "knee-flexion hamstring work", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3 }),
     slot("isolation", "accessory", ["quads"], ["quadriceps"], "low-systemic-cost quadriceps work", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 2 }),
@@ -313,8 +443,8 @@ function lowerContract(squatSpecific: boolean, beginnerSimple = false, denseHype
   return [
   slot(squatSpecific ? "primary_compound" : "secondary_compound", "primary", ["quads"], ["quadriceps"], squatSpecific ? "squat-specific anchor" : "knee-dominant anchor", ["squat", "lunge"], squatSpecific ? { primaryLift: "squat", liftExposure: "primary", repeatPolicy: "stable_primary_practice", transferRationale: "squat_quad_drive", baseWorkingSets: 4 } : { repeatPolicy: "stable_primary_practice", baseWorkingSets: 4 }),
   slot("secondary_compound", "secondary", ["quads", "glutes"], ["quadriceps"], "complementary knee-dominant hypertrophy", ["squat", "lunge"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3, transferRationale: squatSpecific ? "squat_quad_drive" : undefined }),
-  slot("secondary_compound", "secondary", ["hamstrings", "glutes"], ["hip_extension"], "hip-extension support", ["hinge"], { repeatPolicy: "variation_preferred", baseWorkingSets: 4, transferRationale: squatSpecific ? "squat_posterior_support" : undefined }),
-  slot("isolation", "accessory", ["hamstrings"], ["hamstrings_knee_flexion"], "knee-flexion hamstring work", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3 }),
+  slot("secondary_compound", "secondary", ["hamstrings", "glutes"], ["hip_extension"], "hip-extension support", ["hinge"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3, transferRationale: squatSpecific ? "squat_posterior_support" : undefined }),
+  slot("isolation", "accessory", ["hamstrings"], ["hamstrings_knee_flexion"], "knee-flexion hamstring work", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 4 }),
   slot("secondary_compound", "secondary", ["glutes"], ["hip_extension"], "shortened hip-extension stimulus", ["hip_thrust"], { repeatPolicy: "variation_preferred", preferredHypertrophyBias: "shortened", baseWorkingSets: 3 }),
   slot("isolation", "accessory", ["calves"], ["calves"], "calf work", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 4 }),
   ];
@@ -426,20 +556,31 @@ function inferSessionType(role: string): ProgrammeFrameworkSessionType {
   return "full_body";
 }
 
-function certify(input: CanonicalMicrocycleVolumeAllocationInput, profile: CanonicalMicrocycleAllocationProfile, slots: readonly AllocatedSlot[], direct: Partial<Record<CanonicalStimulusRegion, number>>, sessionSets: readonly number[], durations: readonly number[], lifts: CanonicalMicrocycleVolumeAllocation["primaryLiftExposures"]): { passed: string[]; failures: string[] } {
+function certify(input: CanonicalMicrocycleVolumeAllocationInput, profile: CanonicalMicrocycleAllocationProfile, slots: readonly AllocatedSlot[], direct: Partial<Record<CanonicalStimulusRegion, number>>, sessionSets: readonly number[], durations: readonly number[], lifts: CanonicalMicrocycleVolumeAllocation["primaryLiftExposures"], availableMinutes: CanonicalSessionDurationMinutes, policyTargets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>, durationConstrained: boolean): { passed: string[]; failures: string[] } {
   const failures: string[] = [];
   const passed: string[] = [];
   check(slots.length > 0 && slots.every((entry) => Number.isInteger(entry.workingSets) && entry.workingSets >= 1), "exact_working_sets_resolved", "invalid_set_allocation", passed, failures);
   const ppl = input.sessionTypes?.every((type) => type === "push" || type === "pull" || type === "legs");
-  const hypertrophyPpl = (input.macrocycleGoal === "build_muscle" || input.macrocycleGoal === "get_leaner") && ppl;
+  const hypertrophy = input.macrocycleGoal === "build_muscle" || input.macrocycleGoal === "get_leaner";
+  const hypertrophyPpl = hypertrophy && ppl;
   check(sessionSets.every((sets) => sets >= 3 && sets <= ((ppl || input.macrocycleGoal === "build_muscle" || input.macrocycleGoal === "get_leaner") ? 24 : 20)), "session_volume_bounded", "session_volume_out_of_bounds", passed, failures);
-  check(durations.every((minutes) => minutes > 0 && minutes <= 90), "session_duration_bounded", "session_duration_exceeded", passed, failures);
+  check(durations.every((minutes) => minutes > 0 && minutes <= availableMinutes), "available_session_duration_respected", "available_session_duration_exceeded", passed, failures);
   check(slots.every((entry) => entry.muscles.length > 0 && entry.movementPatterns.length > 0), "slot_targets_resolved", "unresolved_slot_target", passed, failures);
   if (hypertrophyPpl && !input.recoveryRestricted) {
     check(input.sessionTypes!.every((type, index) => slots.filter((entry) => entry.sessionIndex === index).length >= (input.experience === "beginner" ? 5 : 6)), "ppl_session_density_authorised", "skeletal_ppl_session", passed, failures);
     check(input.sessionTypes!.every((type, index) => type !== "push" || ["chest", "anterior_delts", "lateral_delts", "triceps"].every((region) => slots.some((entry) => entry.sessionIndex === index && entry.requiredStimuli.includes(region as CanonicalStimulusRegion)))), "push_identity_preserved", "push_identity_incomplete", passed, failures);
     check(input.sessionTypes!.every((type, index) => type !== "pull" || ["upper_back", "lats", "rear_delts", "biceps"].every((region) => slots.some((entry) => entry.sessionIndex === index && entry.requiredStimuli.includes(region as CanonicalStimulusRegion)))), "pull_identity_preserved", "pull_identity_incomplete", passed, failures);
     check(input.sessionTypes!.every((type, index) => type !== "legs" || ["quadriceps", "hamstrings_knee_flexion", "hip_extension", "calves"].every((region) => slots.some((entry) => entry.sessionIndex === index && entry.requiredStimuli.includes(region as CanonicalStimulusRegion)))), "legs_identity_preserved", "legs_identity_incomplete", passed, failures);
+  }
+  if (hypertrophy && !durationConstrained && !isRollingPpl(input)) {
+    check(Object.entries(policyTargets).every(([region, target]) => {
+      const stimulus = region as CanonicalStimulusRegion;
+      const actual = Number(direct[stimulus] ?? 0);
+      const minimumDiscreteExposures = slots.filter((entry) => entry.requiredStimuli.includes(stimulus)).length;
+      return actual >= Number(target) && actual <= Number(target) + Math.max(0, minimumDiscreteExposures - Number(target));
+    }), "starting_dosage_matches_policy_or_minimum_discrete_exposure", "starting_dosage_policy_mismatch", passed, failures);
+  } else if (hypertrophy && durationConstrained) {
+    check(slots.every((entry) => entry.workingSets >= 1), "duration_constraint_preserves_every_planned_stimulus", "duration_constraint_deleted_essential_coverage", passed, failures);
   }
   const strengthSlots = slots.filter((entry) => entry.primaryLift && entry.liftExposure === "primary" && ["bench", "squat", "deadlift"].includes(input.sessionTypes?.[entry.sessionIndex] ?? ""));
   check(strengthSlots.every((primary) => slots.filter((entry) => entry.sessionIndex === primary.sessionIndex && entry.order > primary.order).slice(0, 2).every((entry) => Boolean(entry.transferRationale))), "strength_assistance_transfer_explained", "strength_assistance_transfer_missing", passed, failures);
@@ -465,17 +606,6 @@ function weeklyBounds(experience: ExperienceLevel, region: CanonicalStimulusRegi
   // intermediate floor until Progress evidence authorises a bounded change.
   const min = experience === "beginner" ? Math.max(region === "core" ? 1 : 2, baseMin - 1) : baseMin;
   return { min, max: min + (region === "core" || region.includes("delts") ? 6 : 10) };
-}
-
-function planStartingFloor(input: CanonicalMicrocycleVolumeAllocationInput, region: CanonicalStimulusRegion): number {
-  if (region === "core") return 1;
-  const locallySmaller = ["lats", "upper_back", "anterior_delts", "lateral_delts", "rear_delts", "triceps", "biceps", "hamstrings_knee_flexion", "calves", "core"].includes(region);
-  const advancedEvidence = input.experience === "advanced" && input.establishedLoadExerciseIds.length > 0;
-  const base = input.experience === "beginner" ? (locallySmaller ? 2 : 5) : advancedEvidence ? (locallySmaller ? 4 : 8) : (locallySmaller ? 3 : 7);
-  const allFullBody = input.sessionTypes?.every((type) => type === "full_body" || type === "full_body_strength");
-  const allUpperLower = input.sessionTypes?.every((type) => type === "upper" || type === "lower" || type === "upper_strength" || type === "lower_strength");
-  const distributionFactor = allFullBody || allUpperLower ? 0.5 : 1;
-  return Math.max(1, Math.ceil(base * distributionFactor));
 }
 
 export function detectCanonicalMicrocycleOverlap(slots: readonly AllocatedSlot[]): string[] {

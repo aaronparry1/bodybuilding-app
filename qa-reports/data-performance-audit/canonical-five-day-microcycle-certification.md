@@ -18,7 +18,7 @@
 - Fatigue units: 29 / 26 / 28 / 29 / 26 (total 138); overlap flags: more_than_three_primary_sessions
 - Selected-exercise fatigue units: 29 / 26 / 28 / 29 / 26 (total 138)
 - Repeated exercises: ex-bench-press ×2 (stable_primary_practice) · ex-deadlift ×2 (stable_primary_practice)
-- Certification checks: exact_working_sets_resolved · session_volume_bounded · session_duration_bounded · slot_targets_resolved · strength_assistance_transfer_explained
+- Certification checks: exact_working_sets_resolved · session_volume_bounded · available_session_duration_respected · slot_targets_resolved · strength_assistance_transfer_explained
 - Certification failures: none
 
 ## 1. Push strength and hypertrophy
@@ -81,6 +81,6 @@ Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 50 
 | 4 | Low Row Plate Loaded (`ex-low-row-plate-loaded`) | upper-back hypertrophy and position support | horizontal_pull; horizontal_pull; stable_hypertrophy | primary_choice | not_repeated | upper_back / biceps | 3 | 10 reps / 10 reps / 10 reps | calibration_required; pre-work ramp to 10 reps; retain evidence | 120s | moderate |
 | 5 | Cable Curl (`ex-cable-curl`) | elbow-flexor muscle retention | isolation; biceps_isolation; stable_hypertrophy | primary_choice | not_repeated | biceps / none | 2 | 12 reps / 12 reps | calibration_required; pre-work ramp to 12 reps; retain evidence | 75s | low |
 
-Constructed-week checks: chest_direct_coverage · upper_back_direct_coverage · triceps_direct_coverage · lateral_delts_direct_coverage · hip_extension_direct_coverage · lats_direct_coverage · hamstrings_knee_flexion_direct_coverage · biceps_direct_coverage · quadriceps_direct_coverage · calves_direct_coverage · secondary_stimulus_reported_separately · no_unauthorised_specialist_selection · repeat_authorised:ex-bench-press · repeat_authorised:ex-deadlift
+Constructed-week checks: chest_direct_coverage · upper_back_direct_coverage · triceps_direct_coverage · lateral_delts_direct_coverage · hip_extension_direct_coverage · lats_direct_coverage · hamstrings_knee_flexion_direct_coverage · biceps_direct_coverage · quadriceps_direct_coverage · calves_direct_coverage · secondary_stimulus_reported_separately · no_unauthorised_specialist_selection · repeat_authorised:ex-bench-press · repeat_authorised:ex-deadlift · session_systemic_fatigue_reported_for_comparison · same_role_sessions_complementary:push · same_role_sessions_complementary:pull · high_fatigue_reps_and_rest_appropriate
 
 Final status: **PASSED**

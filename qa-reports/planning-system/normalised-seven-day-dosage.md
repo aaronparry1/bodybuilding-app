@@ -7,31 +7,30 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
   "schemaVersion": "canonical_dosage_evolution_certification_v1",
   "basis": "complete_six_session_rotation_scaled_by_five_lifting_sessions_per_seven_days",
   "completeRotation": {
-    "totalWorkingSets": 116,
-    "estimatedMinutes": 396,
+    "totalWorkingSets": 78,
+    "estimatedMinutes": 282,
     "directSets": {
-      "chest": 14,
+      "chest": 7,
       "anterior_delts": 6,
       "lateral_delts": 6,
-      "triceps": 10,
-      "upper_back": 14,
-      "lats": 8,
+      "triceps": 6,
+      "upper_back": 7,
+      "lats": 7,
       "rear_delts": 6,
-      "biceps": 10,
-      "quadriceps": 12,
-      "hip_extension": 14,
+      "biceps": 6,
+      "quadriceps": 7,
+      "hip_extension": 7,
       "hamstrings_knee_flexion": 6,
-      "calves": 8,
-      "core": 2
+      "calves": 6,
+      "core": 1
     },
     "meaningfulSecondarySets": {
-      "triceps": 20,
-      "anterior_delts": 11,
-      "biceps": 22,
-      "rear_delts": 14,
-      "hip_extension": 15,
-      "upper_back": 14,
-      "quadriceps": 4
+      "triceps": 13,
+      "anterior_delts": 6,
+      "biceps": 14,
+      "rear_delts": 6,
+      "upper_back": 10,
+      "hip_extension": 4
     },
     "frequency": {
       "chest": 2,
@@ -48,34 +47,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "calves": 2,
       "core": 1
     },
-    "systemicFatigueUnits": 196
+    "systemicFatigueUnits": 123
   },
   "averageSevenDays": {
-    "totalWorkingSets": 96.67,
-    "estimatedMinutes": 330,
+    "totalWorkingSets": 65,
+    "estimatedMinutes": 235,
     "directSets": {
-      "chest": 11.67,
+      "chest": 5.83,
       "anterior_delts": 5,
       "lateral_delts": 5,
-      "triceps": 8.33,
-      "upper_back": 11.67,
-      "lats": 6.67,
+      "triceps": 5,
+      "upper_back": 5.83,
+      "lats": 5.83,
       "rear_delts": 5,
-      "biceps": 8.33,
-      "quadriceps": 10,
-      "hip_extension": 11.67,
+      "biceps": 5,
+      "quadriceps": 5.83,
+      "hip_extension": 5.83,
       "hamstrings_knee_flexion": 5,
-      "calves": 6.67,
-      "core": 1.67
+      "calves": 5,
+      "core": 0.83
     },
     "meaningfulSecondarySets": {
-      "triceps": 16.67,
-      "anterior_delts": 9.17,
-      "biceps": 18.33,
-      "rear_delts": 11.67,
-      "hip_extension": 12.5,
-      "upper_back": 11.67,
-      "quadriceps": 3.33
+      "triceps": 10.83,
+      "anterior_delts": 5,
+      "biceps": 11.67,
+      "rear_delts": 5,
+      "upper_back": 8.33,
+      "hip_extension": 3.33
     },
     "frequency": {
       "chest": 1.67,
@@ -92,9 +90,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "calves": 1.67,
       "core": 0.83
     },
-    "systemicFatigueUnits": 163.33,
+    "systemicFatigueUnits": 102.5,
     "cardioMinutes": 40,
-    "totalTrainingMinutes": 370
+    "totalTrainingMinutes": 275
   },
   "calendarSlices": [
     {
@@ -111,29 +109,29 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "pull": 2,
         "legs": 1
       },
-      "totalWorkingSets": 95,
-      "estimatedMinutes": 325,
+      "totalWorkingSets": 66,
+      "estimatedMinutes": 238,
       "directSets": {
-        "chest": 14,
+        "chest": 7,
         "anterior_delts": 6,
         "lateral_delts": 6,
-        "triceps": 10,
-        "upper_back": 14,
-        "lats": 8,
+        "triceps": 6,
+        "upper_back": 7,
+        "lats": 7,
         "rear_delts": 6,
-        "biceps": 10,
-        "quadriceps": 7,
-        "hip_extension": 7,
-        "hamstrings_knee_flexion": 3,
-        "calves": 4
+        "biceps": 6,
+        "quadriceps": 4,
+        "hip_extension": 4,
+        "hamstrings_knee_flexion": 4,
+        "calves": 3
       },
       "meaningfulSecondarySets": {
-        "triceps": 20,
-        "anterior_delts": 11,
-        "biceps": 22,
-        "rear_delts": 14,
-        "hip_extension": 12,
-        "upper_back": 10
+        "triceps": 13,
+        "anterior_delts": 6,
+        "biceps": 14,
+        "rear_delts": 6,
+        "upper_back": 8,
+        "hip_extension": 2
       },
       "frequency": {
         "chest": 2,
@@ -150,7 +148,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "calves": 1,
         "core": 0
       },
-      "systemicFatigueUnits": 159
+      "systemicFatigueUnits": 105
     },
     {
       "calendarSlice": 2,
@@ -166,31 +164,30 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "pull": 1,
         "legs": 2
       },
-      "totalWorkingSets": 97,
-      "estimatedMinutes": 331,
+      "totalWorkingSets": 66,
+      "estimatedMinutes": 238,
       "directSets": {
-        "hip_extension": 14,
-        "quadriceps": 12,
+        "hip_extension": 7,
+        "quadriceps": 7,
         "hamstrings_knee_flexion": 6,
-        "calves": 8,
-        "core": 2,
-        "chest": 14,
+        "calves": 6,
+        "core": 1,
+        "chest": 7,
         "anterior_delts": 6,
         "lateral_delts": 6,
-        "triceps": 10,
-        "upper_back": 7,
+        "triceps": 6,
+        "upper_back": 4,
         "lats": 4,
         "rear_delts": 3,
-        "biceps": 5
+        "biceps": 3
       },
       "meaningfulSecondarySets": {
-        "upper_back": 11,
-        "quadriceps": 4,
-        "hip_extension": 11,
-        "triceps": 20,
-        "anterior_delts": 11,
-        "biceps": 11,
-        "rear_delts": 7
+        "upper_back": 7,
+        "hip_extension": 4,
+        "triceps": 13,
+        "anterior_delts": 6,
+        "biceps": 8,
+        "rear_delts": 4
       },
       "frequency": {
         "chest": 2,
@@ -207,7 +204,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "calves": 2,
         "core": 1
       },
-      "systemicFatigueUnits": 162
+      "systemicFatigueUnits": 105
     },
     {
       "calendarSlice": 3,
@@ -223,31 +220,30 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "pull": 2,
         "legs": 2
       },
-      "totalWorkingSets": 98,
-      "estimatedMinutes": 334,
+      "totalWorkingSets": 66,
+      "estimatedMinutes": 238,
       "directSets": {
-        "upper_back": 14,
-        "lats": 8,
+        "upper_back": 7,
+        "lats": 7,
         "rear_delts": 6,
-        "biceps": 10,
-        "hip_extension": 14,
-        "quadriceps": 12,
+        "biceps": 6,
+        "hip_extension": 7,
+        "quadriceps": 7,
         "hamstrings_knee_flexion": 6,
-        "calves": 8,
-        "core": 2,
-        "chest": 7,
+        "calves": 6,
+        "core": 1,
+        "chest": 4,
         "anterior_delts": 3,
         "lateral_delts": 3,
-        "triceps": 5
+        "triceps": 3
       },
       "meaningfulSecondarySets": {
-        "biceps": 22,
-        "rear_delts": 14,
-        "hip_extension": 15,
-        "upper_back": 14,
-        "quadriceps": 4,
-        "triceps": 10,
-        "anterior_delts": 7
+        "biceps": 14,
+        "rear_delts": 6,
+        "upper_back": 10,
+        "hip_extension": 4,
+        "triceps": 7,
+        "anterior_delts": 4
       },
       "frequency": {
         "chest": 1,
@@ -264,7 +260,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "calves": 2,
         "core": 1
       },
-      "systemicFatigueUnits": 168
+      "systemicFatigueUnits": 103
     }
   ],
   "balanceProof": {
@@ -292,7 +288,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     },
     "lowerBody": {
       "quadriceps": {
-        "averageDirectSets": 10,
+        "averageDirectSets": 5.83,
         "averageFrequency": 1.67,
         "authorisedFloor": 6
       },
@@ -302,17 +298,18 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "authorisedFloor": 5
       },
       "hip_extension": {
-        "averageDirectSets": 11.67,
+        "averageDirectSets": 5.83,
         "averageFrequency": 1.67,
         "authorisedFloor": 6
       },
       "calves": {
-        "averageDirectSets": 6.67,
+        "averageDirectSets": 5,
         "averageFrequency": 1.67,
         "authorisedFloor": 5
       }
     },
-    "chronicLowerUnderexposureAbsent": true
+    "chronicLowerUnderexposureAbsent": true,
+    "discreteRoundingRule": "Each six-session rotation target is rounded to the nearest whole set before slot distribution. Normalising by 5/6 may therefore differ from the policy target by at most one sixth of a set."
   }
 }
 ```

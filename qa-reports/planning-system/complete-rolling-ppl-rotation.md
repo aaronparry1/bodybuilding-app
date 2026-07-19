@@ -103,25 +103,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "purpose": "Establish reproducible exercise, load and recovery baselines",
         "exercises": [
           {
-            "exerciseId": "ex-decline-barbell-bench",
-            "exercise": "Decline Barbell Bench",
-            "purpose": "primary horizontal press",
-            "workingSets": 4,
+            "exerciseId": "ex-bench-press",
+            "exercise": "Bench Press",
+            "purpose": "high-priority horizontal press",
+            "workingSets": 2,
             "exactTargets": [
-              12,
-              12,
-              12,
-              12
+              8,
+              8
             ],
             "exactTargetKinds": [
-              "reps",
-              "reps",
               "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
-            "restSeconds": 120,
+            "restSeconds": 150,
             "directMuscles": [
               "chest"
             ],
@@ -129,7 +125,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "triceps",
               "anterior_delts"
             ],
-            "fatigueClass": "moderate",
+            "fatigueClass": "high",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -137,14 +133,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-incline-dumbbell-press",
             "exercise": "Incline Dumbbell Press",
             "purpose": "second-angle chest stimulus",
-            "workingSets": 3,
+            "workingSets": 2,
             "exactTargets": [
-              10,
               10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
               "reps",
               "reps"
             ],
@@ -220,32 +214,6 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-cable-rope-overhead-extension",
             "exercise": "Rope Overhead Triceps Extension",
             "purpose": "lengthened elbow-extension work",
-            "workingSets": 3,
-            "exactTargets": [
-              12,
-              12,
-              12
-            ],
-            "exactTargetKinds": [
-              "reps",
-              "reps",
-              "reps"
-            ],
-            "method": "straight_sets",
-            "loadState": "calibration_required",
-            "restSeconds": 75,
-            "directMuscles": [
-              "triceps"
-            ],
-            "meaningfulSecondaryMuscles": [],
-            "fatigueClass": "low",
-            "progression": "rep_progression",
-            "stopRule": "change_target"
-          },
-          {
-            "exerciseId": "ex-close-neutral-pushdown",
-            "exercise": "Close Neutral Pushdown",
-            "purpose": "shortened-range triceps finish",
             "workingSets": 2,
             "exactTargets": [
               12,
@@ -265,20 +233,42 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "fatigueClass": "low",
             "progression": "rep_progression",
             "stopRule": "change_target"
+          },
+          {
+            "exerciseId": "ex-close-neutral-pushdown",
+            "exercise": "Close Neutral Pushdown",
+            "purpose": "shortened-range triceps finish",
+            "workingSets": 1,
+            "exactTargets": [
+              12
+            ],
+            "exactTargetKinds": [
+              "reps"
+            ],
+            "method": "straight_sets",
+            "loadState": "calibration_required",
+            "restSeconds": 75,
+            "directMuscles": [
+              "triceps"
+            ],
+            "meaningfulSecondaryMuscles": [],
+            "fatigueClass": "low",
+            "progression": "rep_progression",
+            "stopRule": "change_target"
           }
         ],
-        "workingSets": 18,
-        "estimatedMinutes": 62,
+        "workingSets": 13,
+        "estimatedMinutes": 47,
         "localFatigue": {
-          "chest": 7,
+          "chest": 4,
           "anterior_delts": 3,
           "lateral_delts": 3,
-          "triceps": 5
+          "triceps": 3
         },
-        "systemicFatigueUnits": 28,
+        "systemicFatigueUnits": 22,
         "meaningfulSecondarySets": {
-          "triceps": 10,
-          "anterior_delts": 7
+          "triceps": 7,
+          "anterior_delts": 4
         }
       },
       {
@@ -287,34 +277,29 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "purpose": "Establish reproducible exercise, load and recovery baselines",
         "exercises": [
           {
-            "exerciseId": "ex-barbell-row",
-            "exercise": "Barbell Row",
-            "purpose": "primary horizontal pull",
-            "workingSets": 4,
+            "exerciseId": "ex-chest-supported-row",
+            "exercise": "Chest Supported Row",
+            "purpose": "supported horizontal-pull anchor",
+            "workingSets": 2,
             "exactTargets": [
-              8,
-              8,
-              8,
-              8
+              12,
+              12
             ],
             "exactTargetKinds": [
-              "reps",
-              "reps",
               "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
-            "restSeconds": 150,
+            "restSeconds": 120,
             "directMuscles": [
               "upper_back"
             ],
             "meaningfulSecondaryMuscles": [
               "biceps",
-              "rear_delts",
-              "hip_extension"
+              "rear_delts"
             ],
-            "fatigueClass": "high",
+            "fatigueClass": "moderate",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -322,15 +307,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-lat-pulldown",
             "exercise": "Lat Pulldown",
             "purpose": "vertical-pull lat stimulus",
-            "workingSets": 4,
+            "workingSets": 3,
             "exactTargets": [
-              10,
               10,
               10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
               "reps",
               "reps",
               "reps"
@@ -349,17 +332,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "stopRule": "change_target"
           },
           {
-            "exerciseId": "ex-chest-supported-row",
-            "exercise": "Chest Supported Row",
+            "exerciseId": "ex-dorian-yates-row-machine",
+            "exercise": "Dorian Yates Row Machine",
             "purpose": "second-angle upper-back stimulus",
-            "workingSets": 3,
+            "workingSets": 2,
             "exactTargets": [
-              10,
               10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
               "reps",
               "reps"
             ],
@@ -432,43 +413,42 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "stopRule": "change_target"
           },
           {
-            "exerciseId": "ex-cable-curl",
-            "exercise": "Cable Curl",
-            "purpose": "shortened-range biceps finish",
-            "workingSets": 2,
+            "exerciseId": "ex-lat-pulldown-machine",
+            "exercise": "Lat Pulldown Machine",
+            "purpose": "second-angle lat stimulus",
+            "workingSets": 1,
             "exactTargets": [
-              12,
-              12
+              10
             ],
             "exactTargetKinds": [
-              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
-            "restSeconds": 75,
+            "restSeconds": 120,
             "directMuscles": [
+              "lats"
+            ],
+            "meaningfulSecondaryMuscles": [
               "biceps"
             ],
-            "meaningfulSecondaryMuscles": [],
-            "fatigueClass": "low",
+            "fatigueClass": "moderate",
             "progression": "rep_progression",
             "stopRule": "change_target"
           }
         ],
-        "workingSets": 19,
-        "estimatedMinutes": 65,
+        "workingSets": 14,
+        "estimatedMinutes": 50,
         "localFatigue": {
-          "upper_back": 7,
+          "upper_back": 4,
           "lats": 4,
           "rear_delts": 3,
-          "biceps": 5
+          "biceps": 3
         },
-        "systemicFatigueUnits": 34,
+        "systemicFatigueUnits": 22,
         "meaningfulSecondarySets": {
-          "biceps": 11,
-          "rear_delts": 7,
-          "hip_extension": 4,
+          "biceps": 8,
+          "rear_delts": 4,
           "upper_back": 3
         }
       },
@@ -481,16 +461,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-hack-squat-machine",
             "exercise": "Hack Squat Machine",
             "purpose": "knee-dominant anchor",
-            "workingSets": 4,
+            "workingSets": 2,
             "exactTargets": [
-              12,
-              12,
               12,
               12
             ],
             "exactTargetKinds": [
-              "reps",
-              "reps",
               "reps",
               "reps"
             ],
@@ -511,14 +487,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-belt-squat",
             "exercise": "Belt Squat",
             "purpose": "complementary knee-dominant hypertrophy",
-            "workingSets": 3,
+            "workingSets": 2,
             "exactTargets": [
-              10,
               10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
               "reps",
               "reps"
             ],
@@ -537,16 +511,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-stiff-leg-deadlift",
             "exercise": "Stiff-Leg Deadlift",
             "purpose": "hip-extension support",
-            "workingSets": 4,
+            "workingSets": 2,
             "exactTargets": [
-              10,
-              10,
               10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
-              "reps",
               "reps",
               "reps"
             ],
@@ -567,13 +537,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-kneeling-leg-curl",
             "exercise": "Kneeling Leg Curl",
             "purpose": "knee-flexion hamstring work",
-            "workingSets": 3,
+            "workingSets": 4,
             "exactTargets": [
+              12,
               12,
               12,
               12
             ],
             "exactTargetKinds": [
+              "reps",
               "reps",
               "reps",
               "reps"
@@ -593,14 +565,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-hip-thrust-machine",
             "exercise": "Hip Thrust Machine",
             "purpose": "shortened hip-extension stimulus",
-            "workingSets": 3,
+            "workingSets": 2,
             "exactTargets": [
-              10,
               10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
               "reps",
               "reps"
             ],
@@ -619,15 +589,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-donkey-calf-raise",
             "exercise": "Donkey Calf Raise",
             "purpose": "calf work",
-            "workingSets": 4,
+            "workingSets": 3,
             "exactTargets": [
-              15,
               15,
               15,
               15
             ],
             "exactTargetKinds": [
-              "reps",
               "reps",
               "reps",
               "reps"
@@ -644,18 +612,18 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "stopRule": "change_target"
           }
         ],
-        "workingSets": 21,
-        "estimatedMinutes": 71,
+        "workingSets": 15,
+        "estimatedMinutes": 53,
         "localFatigue": {
-          "quadriceps": 7,
-          "hip_extension": 7,
-          "hamstrings_knee_flexion": 3,
-          "calves": 4
-        },
-        "systemicFatigueUnits": 35,
-        "meaningfulSecondarySets": {
+          "quadriceps": 4,
           "hip_extension": 4,
-          "upper_back": 4
+          "hamstrings_knee_flexion": 4,
+          "calves": 3
+        },
+        "systemicFatigueUnits": 23,
+        "meaningfulSecondarySets": {
+          "hip_extension": 2,
+          "upper_back": 2
         }
       },
       {
@@ -664,25 +632,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "purpose": "Establish reproducible exercise, load and recovery baselines",
         "exercises": [
           {
-            "exerciseId": "ex-decline-barbell-bench",
-            "exercise": "Decline Barbell Bench",
-            "purpose": "primary horizontal press",
-            "workingSets": 4,
+            "exerciseId": "ex-incline-barbell-bench",
+            "exercise": "Incline Barbell Bench",
+            "purpose": "high-priority horizontal press",
+            "workingSets": 2,
             "exactTargets": [
-              12,
-              12,
-              12,
-              12
+              8,
+              8
             ],
             "exactTargetKinds": [
-              "reps",
-              "reps",
               "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
-            "restSeconds": 120,
+            "restSeconds": 150,
             "directMuscles": [
               "chest"
             ],
@@ -690,7 +654,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "triceps",
               "anterior_delts"
             ],
-            "fatigueClass": "moderate",
+            "fatigueClass": "high",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -698,15 +662,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-decline-plate-loaded-press",
             "exercise": "Decline Plate Loaded Press",
             "purpose": "second-angle chest stimulus",
-            "workingSets": 3,
+            "workingSets": 1,
             "exactTargets": [
-              10,
-              10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
-              "reps",
               "reps"
             ],
             "method": "straight_sets",
@@ -780,32 +740,6 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-ez-bar-pushdown",
             "exercise": "EZ-Bar Pushdown",
             "purpose": "lengthened elbow-extension work",
-            "workingSets": 3,
-            "exactTargets": [
-              12,
-              12,
-              12
-            ],
-            "exactTargetKinds": [
-              "reps",
-              "reps",
-              "reps"
-            ],
-            "method": "straight_sets",
-            "loadState": "calibration_required",
-            "restSeconds": 75,
-            "directMuscles": [
-              "triceps"
-            ],
-            "meaningfulSecondaryMuscles": [],
-            "fatigueClass": "low",
-            "progression": "rep_progression",
-            "stopRule": "change_target"
-          },
-          {
-            "exerciseId": "ex-machine-triceps-extension",
-            "exercise": "Machine Tricep Extension",
-            "purpose": "shortened-range triceps finish",
             "workingSets": 2,
             "exactTargets": [
               12,
@@ -825,20 +759,42 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "fatigueClass": "low",
             "progression": "rep_progression",
             "stopRule": "change_target"
+          },
+          {
+            "exerciseId": "ex-machine-triceps-extension",
+            "exercise": "Machine Tricep Extension",
+            "purpose": "shortened-range triceps finish",
+            "workingSets": 1,
+            "exactTargets": [
+              12
+            ],
+            "exactTargetKinds": [
+              "reps"
+            ],
+            "method": "straight_sets",
+            "loadState": "calibration_required",
+            "restSeconds": 75,
+            "directMuscles": [
+              "triceps"
+            ],
+            "meaningfulSecondaryMuscles": [],
+            "fatigueClass": "low",
+            "progression": "rep_progression",
+            "stopRule": "change_target"
           }
         ],
-        "workingSets": 18,
-        "estimatedMinutes": 62,
+        "workingSets": 12,
+        "estimatedMinutes": 44,
         "localFatigue": {
-          "chest": 7,
+          "chest": 3,
           "anterior_delts": 3,
           "lateral_delts": 3,
-          "triceps": 5
+          "triceps": 3
         },
-        "systemicFatigueUnits": 28,
+        "systemicFatigueUnits": 20,
         "meaningfulSecondarySets": {
-          "triceps": 10,
-          "anterior_delts": 4
+          "triceps": 6,
+          "anterior_delts": 2
         }
       },
       {
@@ -847,51 +803,42 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "purpose": "Establish reproducible exercise, load and recovery baselines",
         "exercises": [
           {
-            "exerciseId": "ex-barbell-row",
-            "exercise": "Barbell Row",
-            "purpose": "primary horizontal pull",
-            "workingSets": 4,
+            "exerciseId": "ex-high-row-plate-loaded",
+            "exercise": "High Row Plate Loaded",
+            "purpose": "supported horizontal-pull anchor",
+            "workingSets": 2,
             "exactTargets": [
-              8,
-              8,
-              8,
-              8
+              12,
+              12
             ],
             "exactTargetKinds": [
-              "reps",
-              "reps",
               "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
-            "restSeconds": 150,
+            "restSeconds": 120,
             "directMuscles": [
               "upper_back"
             ],
             "meaningfulSecondaryMuscles": [
               "biceps",
-              "rear_delts",
-              "hip_extension"
+              "rear_delts"
             ],
-            "fatigueClass": "high",
+            "fatigueClass": "moderate",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
           {
-            "exerciseId": "ex-lat-pulldown-machine",
-            "exercise": "Lat Pulldown Machine",
+            "exerciseId": "ex-lat-pulldown-narrow",
+            "exercise": "Lat Pulldown Narrow",
             "purpose": "vertical-pull lat stimulus",
-            "workingSets": 4,
+            "workingSets": 2,
             "exactTargets": [
-              10,
-              10,
               10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
-              "reps",
               "reps",
               "reps"
             ],
@@ -909,18 +856,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "stopRule": "change_target"
           },
           {
-            "exerciseId": "ex-dorian-yates-row-machine",
-            "exercise": "Dorian Yates Row Machine",
+            "exerciseId": "ex-low-row-plate-loaded",
+            "exercise": "Low Row Plate Loaded",
             "purpose": "second-angle upper-back stimulus",
-            "workingSets": 3,
+            "workingSets": 1,
             "exactTargets": [
-              10,
-              10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
-              "reps",
               "reps"
             ],
             "method": "straight_sets",
@@ -930,8 +873,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "upper_back"
             ],
             "meaningfulSecondaryMuscles": [
-              "biceps",
-              "rear_delts"
+              "biceps"
             ],
             "fatigueClass": "moderate",
             "progression": "rep_progression",
@@ -966,8 +908,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "stopRule": "change_target"
           },
           {
-            "exerciseId": "ex-machine-preacher-curl",
-            "exercise": "Machine Preacher Curl",
+            "exerciseId": "ex-cable-curl",
+            "exercise": "Cable Curl",
             "purpose": "lengthened elbow-flexor work",
             "workingSets": 3,
             "exactTargets": [
@@ -992,9 +934,54 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "stopRule": "change_target"
           },
           {
-            "exerciseId": "ex-preacher-curl",
-            "exercise": "Preacher Curl",
-            "purpose": "shortened-range biceps finish",
+            "exerciseId": "ex-lat-pulldown-neutral-close",
+            "exercise": "Lat Pulldown Neutral Close",
+            "purpose": "second-angle lat stimulus",
+            "workingSets": 1,
+            "exactTargets": [
+              10
+            ],
+            "exactTargetKinds": [
+              "reps"
+            ],
+            "method": "straight_sets",
+            "loadState": "calibration_required",
+            "restSeconds": 120,
+            "directMuscles": [
+              "lats"
+            ],
+            "meaningfulSecondaryMuscles": [
+              "biceps"
+            ],
+            "fatigueClass": "moderate",
+            "progression": "rep_progression",
+            "stopRule": "change_target"
+          }
+        ],
+        "workingSets": 12,
+        "estimatedMinutes": 44,
+        "localFatigue": {
+          "upper_back": 3,
+          "lats": 3,
+          "rear_delts": 3,
+          "biceps": 3
+        },
+        "systemicFatigueUnits": 18,
+        "meaningfulSecondarySets": {
+          "biceps": 6,
+          "rear_delts": 2,
+          "upper_back": 3
+        }
+      },
+      {
+        "role": "Legs hypertrophy F",
+        "calendarDayOffset": 0,
+        "purpose": "Establish reproducible exercise, load and recovery baselines",
+        "exercises": [
+          {
+            "exerciseId": "ex-safety-squat-bar-good-morning",
+            "exercise": "Safety Squat Bar Good Morning",
+            "purpose": "moderate-fatigue hinge-led posterior-chain anchor",
             "workingSets": 2,
             "exactTargets": [
               12,
@@ -1006,65 +993,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
-            "restSeconds": 75,
-            "directMuscles": [
-              "biceps"
-            ],
-            "meaningfulSecondaryMuscles": [],
-            "fatigueClass": "low",
-            "progression": "rep_progression",
-            "stopRule": "change_target"
-          }
-        ],
-        "workingSets": 19,
-        "estimatedMinutes": 65,
-        "localFatigue": {
-          "upper_back": 7,
-          "lats": 4,
-          "rear_delts": 3,
-          "biceps": 5
-        },
-        "systemicFatigueUnits": 34,
-        "meaningfulSecondarySets": {
-          "biceps": 11,
-          "rear_delts": 7,
-          "hip_extension": 4,
-          "upper_back": 3
-        }
-      },
-      {
-        "role": "Legs hypertrophy F",
-        "calendarDayOffset": 0,
-        "purpose": "Establish reproducible exercise, load and recovery baselines",
-        "exercises": [
-          {
-            "exerciseId": "ex-deadlift",
-            "exercise": "Deadlift",
-            "purpose": "hinge-led posterior-chain anchor",
-            "workingSets": 4,
-            "exactTargets": [
-              8,
-              8,
-              8,
-              8
-            ],
-            "exactTargetKinds": [
-              "reps",
-              "reps",
-              "reps",
-              "reps"
-            ],
-            "method": "straight_sets",
-            "loadState": "calibration_required",
-            "restSeconds": 150,
+            "restSeconds": 120,
             "directMuscles": [
               "hip_extension"
             ],
             "meaningfulSecondaryMuscles": [
-              "upper_back",
-              "quadriceps"
+              "upper_back"
             ],
-            "fatigueClass": "high",
+            "fatigueClass": "moderate",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -1072,14 +1008,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-walking-lunge",
             "exercise": "Walking Lunge",
             "purpose": "single-leg knee-dominant hypertrophy",
-            "workingSets": 3,
+            "workingSets": 2,
             "exactTargets": [
-              10,
               10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
               "reps",
               "reps"
             ],
@@ -1100,14 +1034,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-kneeling-leg-curl",
             "exercise": "Kneeling Leg Curl",
             "purpose": "knee-flexion hamstring work",
-            "workingSets": 3,
+            "workingSets": 2,
             "exactTargets": [
-              12,
               12,
               12
             ],
             "exactTargetKinds": [
-              "reps",
               "reps",
               "reps"
             ],
@@ -1126,13 +1058,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-leg-extension",
             "exercise": "Leg Extension",
             "purpose": "low-systemic-cost quadriceps work",
-            "workingSets": 2,
+            "workingSets": 1,
             "exactTargets": [
-              12,
               12
             ],
             "exactTargetKinds": [
-              "reps",
               "reps"
             ],
             "method": "straight_sets",
@@ -1150,15 +1080,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-hip-thrust-machine",
             "exercise": "Hip Thrust Machine",
             "purpose": "shortened hip-extension stimulus",
-            "workingSets": 3,
+            "workingSets": 1,
             "exactTargets": [
-              10,
-              10,
               10
             ],
             "exactTargetKinds": [
-              "reps",
-              "reps",
               "reps"
             ],
             "method": "straight_sets",
@@ -1176,15 +1102,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-donkey-calf-raise",
             "exercise": "Donkey Calf Raise",
             "purpose": "calf work",
-            "workingSets": 4,
+            "workingSets": 3,
             "exactTargets": [
-              15,
               15,
               15,
               15
             ],
             "exactTargetKinds": [
-              "reps",
               "reps",
               "reps",
               "reps"
@@ -1204,13 +1128,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-cable-crunch",
             "exercise": "Cable Crunch",
             "purpose": "trunk work",
-            "workingSets": 2,
+            "workingSets": 1,
             "exactTargets": [
-              12,
               12
             ],
             "exactTargetKinds": [
-              "reps",
               "reps"
             ],
             "method": "straight_sets",
@@ -1225,48 +1147,46 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "stopRule": "change_target"
           }
         ],
-        "workingSets": 21,
-        "estimatedMinutes": 71,
+        "workingSets": 12,
+        "estimatedMinutes": 44,
         "localFatigue": {
-          "hip_extension": 7,
-          "quadriceps": 5,
-          "hamstrings_knee_flexion": 3,
-          "calves": 4,
-          "core": 2
+          "hip_extension": 3,
+          "quadriceps": 3,
+          "hamstrings_knee_flexion": 2,
+          "calves": 3,
+          "core": 1
         },
-        "systemicFatigueUnits": 37,
+        "systemicFatigueUnits": 18,
         "meaningfulSecondarySets": {
-          "upper_back": 4,
-          "quadriceps": 4,
-          "hip_extension": 3
+          "upper_back": 2,
+          "hip_extension": 2
         }
       }
     ],
-    "totalWorkingSets": 116,
-    "estimatedMinutes": 396,
+    "totalWorkingSets": 78,
+    "estimatedMinutes": 282,
     "directSets": {
-      "chest": 14,
+      "chest": 7,
       "anterior_delts": 6,
       "lateral_delts": 6,
-      "triceps": 10,
-      "upper_back": 14,
-      "lats": 8,
+      "triceps": 6,
+      "upper_back": 7,
+      "lats": 7,
       "rear_delts": 6,
-      "biceps": 10,
-      "quadriceps": 12,
-      "hip_extension": 14,
+      "biceps": 6,
+      "quadriceps": 7,
+      "hip_extension": 7,
       "hamstrings_knee_flexion": 6,
-      "calves": 8,
-      "core": 2
+      "calves": 6,
+      "core": 1
     },
     "meaningfulSecondarySets": {
-      "triceps": 20,
-      "anterior_delts": 11,
-      "biceps": 22,
-      "rear_delts": 14,
-      "hip_extension": 15,
-      "upper_back": 14,
-      "quadriceps": 4
+      "triceps": 13,
+      "anterior_delts": 6,
+      "biceps": 14,
+      "rear_delts": 6,
+      "upper_back": 10,
+      "hip_extension": 4
     },
     "frequency": {
       "chest": 2,
@@ -1283,7 +1203,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "calves": 2,
       "core": 1
     },
-    "systemicFatigueUnits": 196,
+    "systemicFatigueUnits": 123,
     "recoverySpacing": {
       "chest": {
         "rotationExposures": 2,
@@ -1433,15 +1353,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "id": "Push A/D",
       "firstRole": "Push hypertrophy A",
       "secondRole": "Push hypertrophy D",
-      "stableExercises": [
-        "ex-decline-barbell-bench"
-      ],
+      "stableExercises": [],
       "variedExercises": [
+        "ex-bench-press",
         "ex-incline-dumbbell-press",
         "ex-machine-shoulder-press",
         "ex-cable-lateral-raise",
         "ex-cable-rope-overhead-extension",
         "ex-close-neutral-pushdown",
+        "ex-incline-barbell-bench",
         "ex-decline-plate-loaded-press",
         "ex-plate-loaded-shoulder-press-machine",
         "ex-lateral-raise-plate-loaded",
@@ -1461,20 +1381,20 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "id": "Pull B/E",
       "firstRole": "Pull hypertrophy B",
       "secondRole": "Pull hypertrophy E",
-      "stableExercises": [
-        "ex-barbell-row"
-      ],
+      "stableExercises": [],
       "variedExercises": [
-        "ex-lat-pulldown",
         "ex-chest-supported-row",
+        "ex-lat-pulldown",
+        "ex-dorian-yates-row-machine",
         "ex-cable-rear-delt-fly",
         "ex-bayesian-curl",
-        "ex-cable-curl",
         "ex-lat-pulldown-machine",
-        "ex-dorian-yates-row-machine",
+        "ex-high-row-plate-loaded",
+        "ex-lat-pulldown-narrow",
+        "ex-low-row-plate-loaded",
         "ex-rear-delt-machine",
-        "ex-machine-preacher-curl",
-        "ex-preacher-curl"
+        "ex-cable-curl",
+        "ex-lat-pulldown-neutral-close"
       ],
       "requiredRegions": [
         "upper_back",
@@ -1498,7 +1418,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "ex-hack-squat-machine",
         "ex-belt-squat",
         "ex-stiff-leg-deadlift",
-        "ex-deadlift",
+        "ex-safety-squat-bar-good-morning",
         "ex-walking-lunge",
         "ex-leg-extension",
         "ex-cable-crunch"

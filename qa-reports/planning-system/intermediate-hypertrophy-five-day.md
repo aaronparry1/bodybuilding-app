@@ -34,6 +34,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "cable",
           "bodyweight"
         ],
+        "availableSessionMinutes": 75,
         "establishedHistory": false
       },
       "authority": {
@@ -61,7 +62,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasons": [
                 "microcycle_role:Push hypertrophy A",
                 "mesocycle_purpose:Establish reproducible exercise, load and recovery baselines",
-                "slot:0:primary horizontal press",
+                "slot:0:high-priority horizontal press",
                 "slot:1:second-angle chest stimulus",
                 "slot:2:vertical pressing stimulus",
                 "slot:3:lateral-delt stimulus",
@@ -75,12 +76,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasons": [
                 "microcycle_role:Pull hypertrophy B",
                 "mesocycle_purpose:Establish reproducible exercise, load and recovery baselines",
-                "slot:0:primary horizontal pull",
+                "slot:0:supported horizontal-pull anchor",
                 "slot:1:vertical-pull lat stimulus",
                 "slot:2:second-angle upper-back stimulus",
                 "slot:3:rear-delt and scapular work",
                 "slot:4:lengthened elbow-flexor work",
-                "slot:5:shortened-range biceps finish"
+                "slot:5:second-angle lat stimulus"
               ]
             },
             {
@@ -103,7 +104,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasons": [
                 "microcycle_role:Push hypertrophy D",
                 "mesocycle_purpose:Establish reproducible exercise, load and recovery baselines",
-                "slot:0:primary horizontal press",
+                "slot:0:high-priority horizontal press",
                 "slot:1:second-angle chest stimulus",
                 "slot:2:vertical pressing stimulus",
                 "slot:3:lateral-delt stimulus",
@@ -117,12 +118,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasons": [
                 "microcycle_role:Pull hypertrophy E",
                 "mesocycle_purpose:Establish reproducible exercise, load and recovery baselines",
-                "slot:0:primary horizontal pull",
+                "slot:0:supported horizontal-pull anchor",
                 "slot:1:vertical-pull lat stimulus",
                 "slot:2:second-angle upper-back stimulus",
                 "slot:3:rear-delt and scapular work",
                 "slot:4:lengthened elbow-flexor work",
-                "slot:5:shortened-range biceps finish"
+                "slot:5:second-angle lat stimulus"
               ]
             }
           ],
@@ -154,21 +155,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 0,
           "role": "Push hypertrophy A",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 18,
-          "estimatedMinutes": 62,
+          "workingSets": 13,
+          "estimatedMinutes": 47,
           "dosageAssessment": {
             "exerciseCount": 6,
-            "workingSets": 18,
+            "workingSets": 13,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "6 owned movement/muscle slots supply 18 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "6 owned movement/muscle slots supply 13 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
-              "exerciseId": "ex-decline-barbell-bench",
-              "exercise": "Decline Barbell Bench",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "primary horizontal press",
+              "slotPurpose": "high-priority horizontal press",
               "directStimuli": [
                 "chest"
               ],
@@ -176,32 +177,28 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps",
                 "shoulders"
               ],
-              "exerciseFatigue": "moderate",
-              "workingSets": 4,
+              "exerciseFatigue": "high",
+              "workingSets": 2,
               "exactReps": [
-                12,
-                12,
-                12,
-                12
+                8,
+                8
               ],
               "exactTargetKinds": [
-                "reps",
-                "reps",
                 "reps",
                 "reps"
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 150,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:primary horizontal press",
-                "fatigue:moderate",
+                "slot:high-priority horizontal press",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
+                "stability:moderate",
                 "repeat:not_repeated",
                 "preference_score:0"
               ]
@@ -219,14 +216,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 3,
+              "workingSets": 2,
               "exactReps": [
-                10,
                 10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -332,14 +327,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 2,
               "exactReps": [
-                12,
                 12,
                 12
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -369,13 +362,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 2,
+              "workingSets": 1,
               "exactReps": [
-                12,
                 12
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps"
               ],
               "method": "straight_sets",
@@ -401,55 +392,49 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 1,
           "role": "Pull hypertrophy B",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 19,
-          "estimatedMinutes": 65,
+          "workingSets": 14,
+          "estimatedMinutes": 50,
           "dosageAssessment": {
             "exerciseCount": 6,
-            "workingSets": 19,
+            "workingSets": 14,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "6 owned movement/muscle slots supply 19 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "6 owned movement/muscle slots supply 14 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
-              "exerciseId": "ex-barbell-row",
-              "exercise": "Barbell Row",
+              "exerciseId": "ex-chest-supported-row",
+              "exercise": "Chest Supported Row",
               "movement": "horizontal_pull",
-              "slotPurpose": "primary horizontal pull",
+              "slotPurpose": "supported horizontal-pull anchor",
               "directStimuli": [
                 "upper_back"
               ],
               "meaningfulSecondaryMuscles": [
-                "biceps",
-                "rear_delts",
-                "hamstrings"
+                "biceps"
               ],
-              "exerciseFatigue": "high",
-              "workingSets": 4,
+              "exerciseFatigue": "moderate",
+              "workingSets": 2,
               "exactReps": [
-                8,
-                8,
-                8,
-                8
+                12,
+                12
               ],
               "exactTargetKinds": [
-                "reps",
-                "reps",
                 "reps",
                 "reps"
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 150,
+              "restSeconds": 120,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:primary horizontal pull",
-                "fatigue:high",
+                "slot:supported horizontal-pull anchor",
+                "fatigue:moderate",
                 "recovery:normal",
-                "stability:moderate",
+                "stability:high",
                 "repeat:not_repeated",
                 "preference_score:0"
               ]
@@ -466,15 +451,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "biceps"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 4,
+              "workingSets": 3,
               "exactReps": [
-                10,
                 10,
                 10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -496,25 +479,24 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-chest-supported-row",
-              "exercise": "Chest Supported Row",
+              "exerciseId": "ex-dorian-yates-row-machine",
+              "exercise": "Dorian Yates Row Machine",
               "movement": "horizontal_pull",
               "slotPurpose": "second-angle upper-back stimulus",
               "directStimuli": [
                 "upper_back"
               ],
               "meaningfulSecondaryMuscles": [
-                "biceps"
+                "biceps",
+                "rear_delts"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 3,
+              "workingSets": 2,
               "exactReps": [
-                10,
                 10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -612,34 +594,34 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-cable-curl",
-              "exercise": "Cable Curl",
-              "movement": "isolation",
-              "slotPurpose": "shortened-range biceps finish",
+              "exerciseId": "ex-lat-pulldown-machine",
+              "exercise": "Lat Pulldown Machine",
+              "movement": "vertical_pull",
+              "slotPurpose": "second-angle lat stimulus",
               "directStimuli": [
+                "lats"
+              ],
+              "meaningfulSecondaryMuscles": [
                 "biceps"
               ],
-              "meaningfulSecondaryMuscles": [],
-              "exerciseFatigue": "low",
-              "workingSets": 2,
+              "exerciseFatigue": "moderate",
+              "workingSets": 1,
               "exactReps": [
-                12,
-                12
+                10
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps"
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 75,
+              "restSeconds": 120,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:shortened-range biceps finish",
-                "fatigue:low",
+                "slot:second-angle lat stimulus",
+                "fatigue:moderate",
                 "recovery:normal",
                 "stability:high",
                 "repeat:not_repeated",
@@ -653,14 +635,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 2,
           "role": "Legs hypertrophy C",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 21,
-          "estimatedMinutes": 71,
+          "workingSets": 15,
+          "estimatedMinutes": 53,
           "dosageAssessment": {
             "exerciseCount": 6,
-            "workingSets": 21,
+            "workingSets": 15,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "6 owned movement/muscle slots supply 21 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "6 owned movement/muscle slots supply 15 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
@@ -675,16 +657,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "glutes"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 4,
+              "workingSets": 2,
               "exactReps": [
-                12,
-                12,
                 12,
                 12
               ],
               "exactTargetKinds": [
-                "reps",
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -716,14 +694,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "adductors"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 3,
+              "workingSets": 2,
               "exactReps": [
-                10,
                 10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -755,16 +731,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "back"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 4,
+              "workingSets": 2,
               "exactReps": [
-                10,
-                10,
                 10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -794,13 +766,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 4,
               "exactReps": [
+                12,
                 12,
                 12,
                 12
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -833,14 +807,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "hamstrings"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 3,
+              "workingSets": 2,
               "exactReps": [
-                10,
                 10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -870,15 +842,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 4,
+              "workingSets": 3,
               "exactReps": [
-                15,
                 15,
                 15,
                 15
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -906,55 +876,51 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 4,
           "role": "Push hypertrophy D",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 18,
-          "estimatedMinutes": 62,
+          "workingSets": 12,
+          "estimatedMinutes": 44,
           "dosageAssessment": {
             "exerciseCount": 6,
-            "workingSets": 18,
+            "workingSets": 12,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "6 owned movement/muscle slots supply 18 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "6 owned movement/muscle slots supply 12 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
-              "exerciseId": "ex-decline-barbell-bench",
-              "exercise": "Decline Barbell Bench",
+              "exerciseId": "ex-incline-barbell-bench",
+              "exercise": "Incline Barbell Bench",
               "movement": "horizontal_push",
-              "slotPurpose": "primary horizontal press",
+              "slotPurpose": "high-priority horizontal press",
               "directStimuli": [
                 "chest"
               ],
               "meaningfulSecondaryMuscles": [
-                "triceps",
-                "shoulders"
+                "shoulders",
+                "triceps"
               ],
-              "exerciseFatigue": "moderate",
-              "workingSets": 4,
+              "exerciseFatigue": "high",
+              "workingSets": 2,
               "exactReps": [
-                12,
-                12,
-                12,
-                12
+                8,
+                8
               ],
               "exactTargetKinds": [
-                "reps",
-                "reps",
                 "reps",
                 "reps"
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 150,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:primary horizontal press",
-                "fatigue:moderate",
+                "slot:high-priority horizontal press",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
-                "repeat:stable_primary_practice",
+                "stability:moderate",
+                "repeat:not_repeated",
                 "preference_score:0"
               ]
             },
@@ -970,15 +936,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 3,
+              "workingSets": 1,
               "exactReps": [
-                10,
-                10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
-                "reps",
                 "reps"
               ],
               "method": "straight_sets",
@@ -1083,14 +1045,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 2,
               "exactReps": [
-                12,
                 12,
                 12
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -1120,13 +1080,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 2,
+              "workingSets": 1,
               "exactReps": [
-                12,
                 12
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps"
               ],
               "method": "straight_sets",
@@ -1152,62 +1110,57 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 5,
           "role": "Pull hypertrophy E",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 19,
-          "estimatedMinutes": 65,
+          "workingSets": 12,
+          "estimatedMinutes": 44,
           "dosageAssessment": {
             "exerciseCount": 6,
-            "workingSets": 19,
+            "workingSets": 12,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "6 owned movement/muscle slots supply 19 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "6 owned movement/muscle slots supply 12 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
-              "exerciseId": "ex-barbell-row",
-              "exercise": "Barbell Row",
+              "exerciseId": "ex-high-row-plate-loaded",
+              "exercise": "High Row Plate Loaded",
               "movement": "horizontal_pull",
-              "slotPurpose": "primary horizontal pull",
+              "slotPurpose": "supported horizontal-pull anchor",
               "directStimuli": [
                 "upper_back"
               ],
               "meaningfulSecondaryMuscles": [
                 "biceps",
-                "rear_delts",
-                "hamstrings"
+                "rear_delts"
               ],
-              "exerciseFatigue": "high",
-              "workingSets": 4,
+              "exerciseFatigue": "moderate",
+              "workingSets": 2,
               "exactReps": [
-                8,
-                8,
-                8,
-                8
+                12,
+                12
               ],
               "exactTargetKinds": [
-                "reps",
-                "reps",
                 "reps",
                 "reps"
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 150,
+              "restSeconds": 120,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:primary horizontal pull",
-                "fatigue:high",
+                "slot:supported horizontal-pull anchor",
+                "fatigue:moderate",
                 "recovery:normal",
-                "stability:moderate",
-                "repeat:stable_primary_practice",
+                "stability:high",
+                "repeat:not_repeated",
                 "preference_score:0"
               ]
             },
             {
-              "exerciseId": "ex-lat-pulldown-machine",
-              "exercise": "Lat Pulldown Machine",
+              "exerciseId": "ex-lat-pulldown-narrow",
+              "exercise": "Lat Pulldown Narrow",
               "movement": "vertical_pull",
               "slotPurpose": "vertical-pull lat stimulus",
               "directStimuli": [
@@ -1217,16 +1170,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "biceps"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 4,
+              "workingSets": 2,
               "exactReps": [
-                10,
-                10,
                 10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -1247,27 +1196,22 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-dorian-yates-row-machine",
-              "exercise": "Dorian Yates Row Machine",
+              "exerciseId": "ex-low-row-plate-loaded",
+              "exercise": "Low Row Plate Loaded",
               "movement": "horizontal_pull",
               "slotPurpose": "second-angle upper-back stimulus",
               "directStimuli": [
                 "upper_back"
               ],
               "meaningfulSecondaryMuscles": [
-                "biceps",
-                "rear_delts"
+                "biceps"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 3,
+              "workingSets": 1,
               "exactReps": [
-                10,
-                10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
-                "reps",
                 "reps"
               ],
               "method": "straight_sets",
@@ -1326,8 +1270,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-machine-preacher-curl",
-              "exercise": "Machine Preacher Curl",
+              "exerciseId": "ex-cable-curl",
+              "exercise": "Cable Curl",
               "movement": "isolation",
               "slotPurpose": "lengthened elbow-flexor work",
               "directStimuli": [
@@ -1363,34 +1307,34 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-preacher-curl",
-              "exercise": "Preacher Curl",
-              "movement": "isolation",
-              "slotPurpose": "shortened-range biceps finish",
+              "exerciseId": "ex-lat-pulldown-neutral-close",
+              "exercise": "Lat Pulldown Neutral Close",
+              "movement": "vertical_pull",
+              "slotPurpose": "second-angle lat stimulus",
               "directStimuli": [
+                "lats"
+              ],
+              "meaningfulSecondaryMuscles": [
                 "biceps"
               ],
-              "meaningfulSecondaryMuscles": [],
-              "exerciseFatigue": "low",
-              "workingSets": 2,
+              "exerciseFatigue": "moderate",
+              "workingSets": 1,
               "exactReps": [
-                12,
-                12
+                10
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps"
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 75,
+              "restSeconds": 120,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:shortened-range biceps finish",
-                "fatigue:low",
+                "slot:second-angle lat stimulus",
+                "fatigue:moderate",
                 "recovery:normal",
                 "stability:high",
                 "repeat:not_repeated",
@@ -1402,26 +1346,26 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       ],
       "accounting": {
         "directSets": {
-          "chest": 14,
+          "chest": 7,
           "anterior_delts": 6,
           "lateral_delts": 6,
-          "triceps": 10,
-          "upper_back": 14,
-          "lats": 8,
+          "triceps": 6,
+          "upper_back": 7,
+          "lats": 7,
           "rear_delts": 6,
-          "biceps": 10,
-          "quadriceps": 7,
-          "hip_extension": 7,
-          "hamstrings_knee_flexion": 3,
-          "calves": 4
+          "biceps": 6,
+          "quadriceps": 4,
+          "hip_extension": 4,
+          "hamstrings_knee_flexion": 4,
+          "calves": 3
         },
         "meaningfulSecondarySets": {
-          "triceps": 20,
-          "anterior_delts": 11,
-          "biceps": 22,
-          "rear_delts": 14,
-          "hip_extension": 12,
-          "upper_back": 10
+          "triceps": 13,
+          "anterior_delts": 6,
+          "biceps": 14,
+          "rear_delts": 6,
+          "upper_back": 8,
+          "hip_extension": 2
         },
         "muscleFrequency": {
           "anterior_delts": 2,
@@ -1440,9 +1384,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "movementPatternExposures": {
           "horizontal_push": 4,
           "vertical_push": 2,
-          "isolation": 14,
+          "isolation": 12,
           "horizontal_pull": 4,
-          "vertical_pull": 2,
+          "vertical_pull": 4,
           "squat": 2,
           "lunge": 2,
           "hinge": 1,
@@ -1462,44 +1406,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondaryVariation": 0
           }
         },
-        "totalWorkingSets": 95,
+        "totalWorkingSets": 66,
         "perSessionWorkingSets": [
-          18,
-          19,
-          21,
-          18,
-          19
+          13,
+          14,
+          15,
+          12,
+          12
         ],
         "perSessionEstimatedMinutes": [
-          62,
-          65,
-          71,
-          62,
-          65
+          47,
+          50,
+          53,
+          44,
+          44
         ],
         "fatigueUnits": {
           "perSession": [
-            32,
-            34,
-            39,
-            32,
-            34
+            22,
+            24,
+            25,
+            20,
+            20
           ],
-          "weeklyUnits": 171,
+          "weeklyUnits": 111,
           "overlapFlags": []
         },
-        "repeatedExercises": [
-          {
-            "exerciseId": "ex-barbell-row",
-            "count": 2,
-            "reason": "stable_primary_practice"
-          },
-          {
-            "exerciseId": "ex-decline-barbell-bench",
-            "count": 2,
-            "reason": "stable_primary_practice"
-          }
-        ]
+        "repeatedExercises": []
       },
       "progression": {
         "volumePolicyId": "canonical_hypertrophy_volume_policy_v1",
@@ -1573,7 +1506,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "checks": [
             "exact_working_sets_resolved",
             "session_volume_bounded",
-            "session_duration_bounded",
+            "available_session_duration_respected",
             "slot_targets_resolved",
             "ppl_session_density_authorised",
             "push_identity_preserved",
@@ -1600,8 +1533,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "calves_direct_coverage",
             "secondary_stimulus_reported_separately",
             "no_unauthorised_specialist_selection",
-            "repeat_authorised:ex-barbell-row",
-            "repeat_authorised:ex-decline-barbell-bench"
+            "session_systemic_fatigue_reported_for_comparison",
+            "same_role_sessions_complementary:push",
+            "same_role_sessions_complementary:pull",
+            "high_fatigue_reps_and_rest_appropriate"
           ],
           "failures": []
         }
@@ -1623,6 +1558,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "cable",
           "bodyweight"
         ],
+        "availableSessionMinutes": 75,
         "establishedHistory": true
       },
       "authority": {
@@ -1650,7 +1586,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasons": [
                 "microcycle_role:Push hypertrophy A",
                 "mesocycle_purpose:Establish reproducible exercise, load and recovery baselines",
-                "slot:0:primary horizontal press",
+                "slot:0:high-priority horizontal press",
                 "slot:1:second-angle chest stimulus",
                 "slot:2:vertical pressing stimulus",
                 "slot:3:lateral-delt stimulus",
@@ -1664,12 +1600,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasons": [
                 "microcycle_role:Pull hypertrophy B",
                 "mesocycle_purpose:Establish reproducible exercise, load and recovery baselines",
-                "slot:0:primary horizontal pull",
+                "slot:0:supported horizontal-pull anchor",
                 "slot:1:vertical-pull lat stimulus",
                 "slot:2:second-angle upper-back stimulus",
                 "slot:3:rear-delt and scapular work",
                 "slot:4:lengthened elbow-flexor work",
-                "slot:5:shortened-range biceps finish"
+                "slot:5:second-angle lat stimulus"
               ]
             },
             {
@@ -1692,7 +1628,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasons": [
                 "microcycle_role:Push hypertrophy D",
                 "mesocycle_purpose:Establish reproducible exercise, load and recovery baselines",
-                "slot:0:primary horizontal press",
+                "slot:0:high-priority horizontal press",
                 "slot:1:second-angle chest stimulus",
                 "slot:2:vertical pressing stimulus",
                 "slot:3:lateral-delt stimulus",
@@ -1706,12 +1642,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasons": [
                 "microcycle_role:Pull hypertrophy E",
                 "mesocycle_purpose:Establish reproducible exercise, load and recovery baselines",
-                "slot:0:primary horizontal pull",
+                "slot:0:supported horizontal-pull anchor",
                 "slot:1:vertical-pull lat stimulus",
                 "slot:2:second-angle upper-back stimulus",
                 "slot:3:rear-delt and scapular work",
                 "slot:4:lengthened elbow-flexor work",
-                "slot:5:shortened-range biceps finish"
+                "slot:5:second-angle lat stimulus"
               ]
             }
           ],
@@ -1743,21 +1679,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 0,
           "role": "Push hypertrophy A",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 18,
-          "estimatedMinutes": 62,
+          "workingSets": 20,
+          "estimatedMinutes": 68,
           "dosageAssessment": {
             "exerciseCount": 6,
-            "workingSets": 18,
+            "workingSets": 20,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "6 owned movement/muscle slots supply 18 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "6 owned movement/muscle slots supply 20 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
-              "exerciseId": "ex-decline-barbell-bench",
-              "exercise": "Decline Barbell Bench",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "primary horizontal press",
+              "slotPurpose": "high-priority horizontal press",
               "directStimuli": [
                 "chest"
               ],
@@ -1765,13 +1701,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps",
                 "shoulders"
               ],
-              "exerciseFatigue": "moderate",
+              "exerciseFatigue": "high",
               "workingSets": 4,
               "exactReps": [
-                12,
-                12,
-                12,
-                12
+                8,
+                8,
+                8,
+                8
               ],
               "exactTargetKinds": [
                 "reps",
@@ -1782,16 +1718,16 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "method": "straight_sets",
               "loadState": "established",
               "prescribedBaseLoad": 50,
-              "restSeconds": 120,
+              "restSeconds": 150,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:primary horizontal press",
-                "fatigue:moderate",
+                "slot:high-priority horizontal press",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
+                "stability:moderate",
                 "repeat:not_repeated",
                 "preference_score:0"
               ]
@@ -1849,13 +1785,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 3,
+              "workingSets": 4,
               "exactReps": [
+                10,
                 10,
                 10,
                 10
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -1887,13 +1825,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 4,
               "exactReps": [
+                15,
                 15,
                 15,
                 15
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -1996,36 +1936,34 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 1,
           "role": "Pull hypertrophy B",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 19,
-          "estimatedMinutes": 65,
+          "workingSets": 21,
+          "estimatedMinutes": 71,
           "dosageAssessment": {
             "exerciseCount": 6,
-            "workingSets": 19,
+            "workingSets": 21,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "6 owned movement/muscle slots supply 19 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "6 owned movement/muscle slots supply 21 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
-              "exerciseId": "ex-barbell-row",
-              "exercise": "Barbell Row",
+              "exerciseId": "ex-chest-supported-row",
+              "exercise": "Chest Supported Row",
               "movement": "horizontal_pull",
-              "slotPurpose": "primary horizontal pull",
+              "slotPurpose": "supported horizontal-pull anchor",
               "directStimuli": [
                 "upper_back"
               ],
               "meaningfulSecondaryMuscles": [
-                "biceps",
-                "rear_delts",
-                "hamstrings"
+                "biceps"
               ],
-              "exerciseFatigue": "high",
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
-                8,
-                8,
-                8,
-                8
+                12,
+                12,
+                12,
+                12
               ],
               "exactTargetKinds": [
                 "reps",
@@ -2036,16 +1974,16 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "method": "straight_sets",
               "loadState": "established",
               "prescribedBaseLoad": 50,
-              "restSeconds": 150,
+              "restSeconds": 120,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:primary horizontal pull",
-                "fatigue:high",
+                "slot:supported horizontal-pull anchor",
+                "fatigue:moderate",
                 "recovery:normal",
-                "stability:moderate",
+                "stability:high",
                 "repeat:not_repeated",
                 "preference_score:0"
               ]
@@ -2093,15 +2031,16 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-chest-supported-row",
-              "exercise": "Chest Supported Row",
+              "exerciseId": "ex-dorian-yates-row-machine",
+              "exercise": "Dorian Yates Row Machine",
               "movement": "horizontal_pull",
               "slotPurpose": "second-angle upper-back stimulus",
               "directStimuli": [
                 "upper_back"
               ],
               "meaningfulSecondaryMuscles": [
-                "biceps"
+                "biceps",
+                "rear_delts"
               ],
               "exerciseFatigue": "moderate",
               "workingSets": 3,
@@ -2145,13 +2084,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "back"
               ],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 4,
               "exactReps": [
+                15,
                 15,
                 15,
                 15
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -2183,13 +2124,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 4,
               "exactReps": [
+                12,
                 12,
                 12,
                 12
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -2212,19 +2155,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-cable-curl",
-              "exercise": "Cable Curl",
-              "movement": "isolation",
-              "slotPurpose": "shortened-range biceps finish",
+              "exerciseId": "ex-lat-pulldown-machine",
+              "exercise": "Lat Pulldown Machine",
+              "movement": "vertical_pull",
+              "slotPurpose": "second-angle lat stimulus",
               "directStimuli": [
+                "lats"
+              ],
+              "meaningfulSecondaryMuscles": [
                 "biceps"
               ],
-              "meaningfulSecondaryMuscles": [],
-              "exerciseFatigue": "low",
+              "exerciseFatigue": "moderate",
               "workingSets": 2,
               "exactReps": [
-                12,
-                12
+                10,
+                10
               ],
               "exactTargetKinds": [
                 "reps",
@@ -2233,14 +2178,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "method": "straight_sets",
               "loadState": "established",
               "prescribedBaseLoad": 50,
-              "restSeconds": 75,
+              "restSeconds": 120,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:shortened-range biceps finish",
-                "fatigue:low",
+                "slot:second-angle lat stimulus",
+                "fatigue:moderate",
                 "recovery:normal",
                 "stability:high",
                 "repeat:not_repeated",
@@ -2254,14 +2199,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 2,
           "role": "Legs hypertrophy C",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 21,
-          "estimatedMinutes": 71,
+          "workingSets": 22,
+          "estimatedMinutes": 74,
           "dosageAssessment": {
             "exerciseCount": 6,
-            "workingSets": 21,
+            "workingSets": 22,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "6 owned movement/muscle slots supply 21 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "6 owned movement/muscle slots supply 22 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
@@ -2358,15 +2303,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "back"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 4,
+              "workingSets": 3,
               "exactReps": [
-                10,
                 10,
                 10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -2398,13 +2341,17 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 5,
               "exactReps": [
+                12,
+                12,
                 12,
                 12,
                 12
               ],
               "exactTargetKinds": [
+                "reps",
+                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -2513,38 +2460,36 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 4,
           "role": "Push hypertrophy D",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 18,
-          "estimatedMinutes": 62,
+          "workingSets": 16,
+          "estimatedMinutes": 56,
           "dosageAssessment": {
             "exerciseCount": 6,
-            "workingSets": 18,
+            "workingSets": 16,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "6 owned movement/muscle slots supply 18 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "6 owned movement/muscle slots supply 16 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
-              "exerciseId": "ex-decline-barbell-bench",
-              "exercise": "Decline Barbell Bench",
+              "exerciseId": "ex-incline-barbell-bench",
+              "exercise": "Incline Barbell Bench",
               "movement": "horizontal_push",
-              "slotPurpose": "primary horizontal press",
+              "slotPurpose": "high-priority horizontal press",
               "directStimuli": [
                 "chest"
               ],
               "meaningfulSecondaryMuscles": [
-                "triceps",
-                "shoulders"
+                "shoulders",
+                "triceps"
               ],
-              "exerciseFatigue": "moderate",
-              "workingSets": 4,
+              "exerciseFatigue": "high",
+              "workingSets": 3,
               "exactReps": [
-                12,
-                12,
-                12,
-                12
+                8,
+                8,
+                8
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -2552,17 +2497,17 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "method": "straight_sets",
               "loadState": "established",
               "prescribedBaseLoad": 50,
-              "restSeconds": 120,
+              "restSeconds": 150,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:primary horizontal press",
-                "fatigue:moderate",
+                "slot:high-priority horizontal press",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
-                "repeat:stable_primary_practice",
+                "stability:moderate",
+                "repeat:not_repeated",
                 "preference_score:0"
               ]
             },
@@ -2578,14 +2523,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 3,
+              "workingSets": 2,
               "exactReps": [
-                10,
                 10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -2618,13 +2561,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 3,
+              "workingSets": 4,
               "exactReps": [
+                10,
                 10,
                 10,
                 10
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -2656,13 +2601,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 4,
               "exactReps": [
+                15,
                 15,
                 15,
                 15
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -2694,14 +2641,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 2,
               "exactReps": [
-                12,
                 12,
                 12
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -2732,13 +2677,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 2,
+              "workingSets": 1,
               "exactReps": [
-                12,
                 12
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps"
               ],
               "method": "straight_sets",
@@ -2776,28 +2719,25 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           },
           "exercises": [
             {
-              "exerciseId": "ex-barbell-row",
-              "exercise": "Barbell Row",
+              "exerciseId": "ex-high-row-plate-loaded",
+              "exercise": "High Row Plate Loaded",
               "movement": "horizontal_pull",
-              "slotPurpose": "primary horizontal pull",
+              "slotPurpose": "supported horizontal-pull anchor",
               "directStimuli": [
                 "upper_back"
               ],
               "meaningfulSecondaryMuscles": [
                 "biceps",
-                "rear_delts",
-                "hamstrings"
+                "rear_delts"
               ],
-              "exerciseFatigue": "high",
-              "workingSets": 4,
+              "exerciseFatigue": "moderate",
+              "workingSets": 3,
               "exactReps": [
-                8,
-                8,
-                8,
-                8
+                12,
+                12,
+                12
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -2805,23 +2745,23 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "method": "straight_sets",
               "loadState": "established",
               "prescribedBaseLoad": 50,
-              "restSeconds": 150,
+              "restSeconds": 120,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:primary horizontal pull",
-                "fatigue:high",
+                "slot:supported horizontal-pull anchor",
+                "fatigue:moderate",
                 "recovery:normal",
-                "stability:moderate",
-                "repeat:stable_primary_practice",
+                "stability:high",
+                "repeat:not_repeated",
                 "preference_score:0"
               ]
             },
             {
-              "exerciseId": "ex-lat-pulldown-machine",
-              "exercise": "Lat Pulldown Machine",
+              "exerciseId": "ex-lat-pulldown-narrow",
+              "exercise": "Lat Pulldown Narrow",
               "movement": "vertical_pull",
               "slotPurpose": "vertical-pull lat stimulus",
               "directStimuli": [
@@ -2862,26 +2802,23 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-dorian-yates-row-machine",
-              "exercise": "Dorian Yates Row Machine",
+              "exerciseId": "ex-low-row-plate-loaded",
+              "exercise": "Low Row Plate Loaded",
               "movement": "horizontal_pull",
               "slotPurpose": "second-angle upper-back stimulus",
               "directStimuli": [
                 "upper_back"
               ],
               "meaningfulSecondaryMuscles": [
-                "biceps",
-                "rear_delts"
+                "biceps"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 3,
+              "workingSets": 2,
               "exactReps": [
-                10,
                 10,
                 10
               ],
               "exactTargetKinds": [
-                "reps",
                 "reps",
                 "reps"
               ],
@@ -2914,13 +2851,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "back"
               ],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 4,
               "exactReps": [
+                15,
                 15,
                 15,
                 15
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -2943,8 +2882,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-machine-preacher-curl",
-              "exercise": "Machine Preacher Curl",
+              "exerciseId": "ex-cable-curl",
+              "exercise": "Cable Curl",
               "movement": "isolation",
               "slotPurpose": "lengthened elbow-flexor work",
               "directStimuli": [
@@ -2952,13 +2891,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 3,
+              "workingSets": 4,
               "exactReps": [
+                12,
                 12,
                 12,
                 12
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps",
                 "reps"
@@ -2981,19 +2922,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-preacher-curl",
-              "exercise": "Preacher Curl",
-              "movement": "isolation",
-              "slotPurpose": "shortened-range biceps finish",
+              "exerciseId": "ex-lat-pulldown-neutral-close",
+              "exercise": "Lat Pulldown Neutral Close",
+              "movement": "vertical_pull",
+              "slotPurpose": "second-angle lat stimulus",
               "directStimuli": [
+                "lats"
+              ],
+              "meaningfulSecondaryMuscles": [
                 "biceps"
               ],
-              "meaningfulSecondaryMuscles": [],
-              "exerciseFatigue": "low",
+              "exerciseFatigue": "moderate",
               "workingSets": 2,
               "exactReps": [
-                12,
-                12
+                10,
+                10
               ],
               "exactTargetKinds": [
                 "reps",
@@ -3002,14 +2945,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "method": "straight_sets",
               "loadState": "established",
               "prescribedBaseLoad": 50,
-              "restSeconds": 75,
+              "restSeconds": 120,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle",
                 "mesocycle:hypertrophy_calibration",
-                "slot:shortened-range biceps finish",
-                "fatigue:low",
+                "slot:second-angle lat stimulus",
+                "fatigue:moderate",
                 "recovery:normal",
                 "stability:high",
                 "repeat:not_repeated",
@@ -3021,26 +2964,26 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       ],
       "accounting": {
         "directSets": {
-          "chest": 14,
-          "anterior_delts": 6,
-          "lateral_delts": 6,
-          "triceps": 10,
-          "upper_back": 14,
-          "lats": 8,
-          "rear_delts": 6,
-          "biceps": 10,
+          "chest": 12,
+          "anterior_delts": 8,
+          "lateral_delts": 8,
+          "triceps": 8,
+          "upper_back": 12,
+          "lats": 12,
+          "rear_delts": 8,
+          "biceps": 8,
           "quadriceps": 7,
-          "hip_extension": 7,
-          "hamstrings_knee_flexion": 3,
+          "hip_extension": 6,
+          "hamstrings_knee_flexion": 5,
           "calves": 4
         },
         "meaningfulSecondarySets": {
           "triceps": 20,
-          "anterior_delts": 11,
-          "biceps": 22,
-          "rear_delts": 14,
-          "hip_extension": 12,
-          "upper_back": 10
+          "anterior_delts": 10,
+          "biceps": 24,
+          "rear_delts": 10,
+          "upper_back": 11,
+          "hip_extension": 4
         },
         "muscleFrequency": {
           "anterior_delts": 2,
@@ -3059,9 +3002,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "movementPatternExposures": {
           "horizontal_push": 4,
           "vertical_push": 2,
-          "isolation": 14,
+          "isolation": 12,
           "horizontal_pull": 4,
-          "vertical_pull": 2,
+          "vertical_pull": 4,
           "squat": 2,
           "lunge": 2,
           "hinge": 1,
@@ -3081,44 +3024,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondaryVariation": 0
           }
         },
-        "totalWorkingSets": 95,
+        "totalWorkingSets": 98,
         "perSessionWorkingSets": [
-          18,
-          19,
+          20,
           21,
-          18,
+          22,
+          16,
           19
         ],
         "perSessionEstimatedMinutes": [
-          62,
-          65,
+          68,
           71,
-          62,
+          74,
+          56,
           65
         ],
         "fatigueUnits": {
           "perSession": [
-            32,
-            34,
+            35,
+            38,
             39,
-            32,
-            34
+            28,
+            33
           ],
-          "weeklyUnits": 171,
+          "weeklyUnits": 173,
           "overlapFlags": []
         },
-        "repeatedExercises": [
-          {
-            "exerciseId": "ex-barbell-row",
-            "count": 2,
-            "reason": "stable_primary_practice"
-          },
-          {
-            "exerciseId": "ex-decline-barbell-bench",
-            "count": 2,
-            "reason": "stable_primary_practice"
-          }
-        ]
+        "repeatedExercises": []
       },
       "progression": {
         "volumePolicyId": "canonical_hypertrophy_volume_policy_v1",
@@ -3192,7 +3124,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "checks": [
             "exact_working_sets_resolved",
             "session_volume_bounded",
-            "session_duration_bounded",
+            "available_session_duration_respected",
             "slot_targets_resolved",
             "ppl_session_density_authorised",
             "push_identity_preserved",
@@ -3219,8 +3151,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "calves_direct_coverage",
             "secondary_stimulus_reported_separately",
             "no_unauthorised_specialist_selection",
-            "repeat_authorised:ex-barbell-row",
-            "repeat_authorised:ex-decline-barbell-bench"
+            "session_systemic_fatigue_reported_for_comparison",
+            "same_role_sessions_complementary:push",
+            "same_role_sessions_complementary:pull",
+            "high_fatigue_reps_and_rest_appropriate"
           ],
           "failures": []
         }

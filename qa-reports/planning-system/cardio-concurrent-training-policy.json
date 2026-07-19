@@ -943,6 +943,60 @@
           "resistanceDosageAdjustment": "none"
         }
       }
+    },
+    {
+      "id": "short-session-30",
+      "goal": "build_muscle",
+      "liftingSessions": 3,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-short-session-30:cardio:1",
+            "dayOffset": 1,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-short-session-30:cardio:2",
+            "dayOffset": 3,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
+      }
     }
   ]
 }

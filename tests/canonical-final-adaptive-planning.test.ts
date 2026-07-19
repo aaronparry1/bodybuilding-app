@@ -69,7 +69,9 @@ describe("final canonical adaptive-planning product rules", () => {
     expect(result.sessions.map((session) => session.role)).toEqual(["Push hypertrophy A", "Pull hypertrophy B", "Legs hypertrophy C", "Push hypertrophy D", "Pull hypertrophy E"]);
     expect(result.sessions.every((session) => session.exercises.length >= 6)).toBe(true);
     expect(result.sessions.every((session) => session.exercises.every((exercise) => exercise.exactReps.length === exercise.workingSets))).toBe(true);
-    expect(result.accounting.totalWorkingSets).toBe(95);
+    // This calendar slice is now the executable result of the muscle-specific
+    // no-history start, not the removed per-slot 95-set heuristic.
+    expect(result.accounting.totalWorkingSets).toBe(66);
     expect(result.accounting.totalWorkingSets).toBeGreaterThan(49);
     expect(result.sessions.flatMap((session) => session.exercises).some((exercise) => exercise.loadState === "calibration_required")).toBe(true);
   });

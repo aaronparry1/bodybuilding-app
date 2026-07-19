@@ -27,9 +27,9 @@
     {
       "id": "unsupported-duration",
       "input": {
-        "sessionDurationMinutes": 30
+        "sessionDurationMinutes": 42
       },
-      "expected": "unsupported_input_not_in_activation_contract"
+      "expected": "unsupported_session_duration"
     },
     {
       "id": "unsupported-custom-movement",

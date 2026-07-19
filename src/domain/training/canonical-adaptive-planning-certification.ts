@@ -46,6 +46,7 @@ export type CanonicalGoldenCase = Readonly<{
   establishedHistory?: boolean;
   expected: "constructed" | "unsupported";
   note?: string;
+  availableSessionMinutes?: 30 | 45 | 60 | 75 | 90;
 }>;
 
 export const canonicalRepresentativeGoldenCases: readonly CanonicalGoldenCase[] = [
@@ -66,13 +67,12 @@ export const canonicalRepresentativeGoldenCases: readonly CanonicalGoldenCase[] 
   golden("established-loads", "Hypertrophy · established comparable loads", "build_muscle", "hypertrophy", "intermediate", 5, "push_pull_legs", { establishedHistory: true }),
   golden("no-load-history", "Hypertrophy · calibration required", "build_muscle", "hypertrophy", "intermediate", 5, "push_pull_legs"),
   golden("exercise-limitation", "Hypertrophy · bench exercise excluded", "build_muscle", "hypertrophy", "intermediate", 4, "upper_lower", { limitation: "exclude_exercise:ex-bench-press" }),
-  { ...golden("short-session-gap", "Short-session duration · unsupported input", "build_muscle", "hypertrophy", "intermediate", 3, "full_body"), expected: "unsupported", note: "Production has no session-duration input owner; activation must not infer one." },
+  golden("short-session-30", "Short-session duration · 30 minutes", "build_muscle", "hypertrophy", "intermediate", 3, "full_body", { availableSessionMinutes: 30, note: "The typed time constraint preserves each planned stimulus and records dosage constrained by available time." }),
 ] as const;
 
 export type CanonicalProgrammeSummary = ReturnType<typeof constructGoldenProgramme>;
 
 export function constructGoldenProgramme(testCase: CanonicalGoldenCase) {
-  if (testCase.expected === "unsupported") return { id: testCase.id, label: testCase.label, status: "unsupported" as const, reason: "session_duration_constraint_not_supported", note: testCase.note };
   const establishedLoads = testCase.establishedHistory ? Object.fromEntries(exerciseLibrary.map((exercise) => [exercise.id, 50])) : undefined;
   const loadEvidence = testCase.establishedHistory ? Object.fromEntries(exerciseLibrary.map((exercise) => [exercise.id, loadEvidenceFor(exercise.id)])) : undefined;
   const result = constructCanonicalActivePlanFromCanonicalInputs({
@@ -88,9 +88,11 @@ export function constructGoldenProgramme(testCase: CanonicalGoldenCase) {
     units: "kg",
     targetDate: testCase.targetDate,
     recoveryCardioPreference: "recommended",
+    availableSessionMinutes: testCase.availableSessionMinutes,
     limitations: testCase.limitation ? [testCase.limitation] : undefined,
     establishedLoads,
     loadEvidence,
+    startingVolumeContext: testCase.establishedHistory ? { recovery: "ordinary", history: "established_productive", workCapacity: "not_demonstrated", concurrentSport: "none" } : undefined,
     exercises: exerciseLibrary,
   });
   if (result.status !== "constructed") return { id: testCase.id, label: testCase.label, status: "failed" as const, reason: result.reason, note: testCase.note };
@@ -110,6 +112,8 @@ export function constructGoldenProgramme(testCase: CanonicalGoldenCase) {
     establishedLoadExerciseIds: Object.keys(establishedLoads ?? {}),
     sessionRoles: carrier.microcycle.output.sessionRoles,
     sessionTypes: carrier.microcycle.output.sessionTypes,
+    availableSessionMinutes: testCase.availableSessionMinutes,
+    startingVolumeContext: testCase.establishedHistory ? { recovery: "ordinary", history: "established_productive", workCapacity: "not_demonstrated", concurrentSport: "none" } : undefined,
   });
   const certification = certifyCanonicalConstructedMicrocycle({ allocation, sessions: snapshots, exercises: exerciseLibrary });
   const exerciseById = new Map(exerciseLibrary.map((exercise) => [exercise.id, exercise]));
@@ -153,7 +157,7 @@ export function constructGoldenProgramme(testCase: CanonicalGoldenCase) {
     id: testCase.id,
     label: testCase.label,
     status: "constructed" as const,
-    input: { goal: testCase.setupGoal, experience: testCase.experience, frequency: testCase.frequency, requestedFramework: testCase.framework, equipment: testCase.equipment, targetDate: testCase.targetDate, establishedHistory: Boolean(testCase.establishedHistory), limitation: testCase.limitation },
+    input: { goal: testCase.setupGoal, experience: testCase.experience, frequency: testCase.frequency, requestedFramework: testCase.framework, equipment: testCase.equipment, targetDate: testCase.targetDate, availableSessionMinutes: testCase.availableSessionMinutes ?? 75, establishedHistory: Boolean(testCase.establishedHistory), limitation: testCase.limitation },
     authority: { macrocycle: carrier.macrocycle.id, mesocycle: carrier.mesocycle.id, microcycle: carrier.microcycle.id, sessionConstruction: snapshots[0]?.provenance.constructionVersion, prescriptionPolicy: snapshots[0]?.provenance.policyVersion, rationale: carrier.planningRationale },
     rotation: { lengthDays: carrier.microcycle.output.lengthDays, mode: carrier.microcycle.output.scheduleMode, publicFrameworkPreference: carrier.microcycle.output.publicFrameworkPreference, deliveryStrategy: carrier.microcycle.output.deliveryStrategy, resolvedFramework: carrier.microcycle.output.split, reason: carrier.microcycle.output.frameworkReason, sessionDayOffsets: carrier.microcycle.output.sessionDayOffsets, recoveryDays: carrier.microcycle.output.recoveryDays },
     sessions,
@@ -183,7 +187,7 @@ export function buildCanonicalPlanningCertificationArtifacts() {
     { id: "unsupported-framework", input: { goal: "build_muscle", framework: "bench_squat_deadlift" }, expected: "unsupported_input_combination" },
     { id: "impossible-event-timeline", input: { createdAt: CREATED_AT, targetDate: "2026-07-20" }, expected: "impossible_event_timeline" },
     { id: "unsafe-free-text-limitation", input: { limitation: "sore shoulder" }, expected: "unsafe_limitation_conflict" },
-    { id: "unsupported-duration", input: { sessionDurationMinutes: 30 }, expected: "unsupported_input_not_in_activation_contract" },
+    { id: "unsupported-duration", input: { sessionDurationMinutes: 42 }, expected: "unsupported_session_duration" },
     { id: "unsupported-custom-movement", input: { metadata: "incomplete" }, expected: "no_suitable_exercise" },
   ];
   const sensitivityEvidence: Readonly<Record<string, string>> = {
@@ -210,7 +214,7 @@ export function buildCanonicalPlanningCertificationArtifacts() {
     active_cycle_state: "carrier identity, lineage and revision validation suites",
     previous_mesocycles: "canonical successor resolution and decision-application suites",
     custom_movements: "incomplete custom metadata fail-closed coverage",
-    session_duration_constraint: "explicit unsupported-input registry and fail-closed case",
+    session_duration_constraint: "typed 30/45/60/75/90-minute construction matrix plus atomic future-session reconstruction",
     sport_workload: "factual recovery/capacity evidence boundary; absent evidence cannot invent dosage",
     body_metrics: "Progress evidence-only authority boundary; Session Construction exclusion",
   };
@@ -224,7 +228,7 @@ export function buildCanonicalPlanningCertificationArtifacts() {
     { id: "recovery_decline", owner: "Mesocycle recovery policy + Progress", disposition: "bounded review only unless persisted decision/application exists", status: "covered" },
     { id: "event_approaches", owner: "Macrocycle/Mesocycle", disposition: "approved successor and prohibited taper methods", status: "covered" },
     { id: "mesocycle_transition", owner: "Mesocycle successor + canonical active-plan application", disposition: "approved edge, CAS revision, future regeneration", status: "covered_by_existing_canonical_application" },
-    { id: "changed_availability", owner: "canonical plan reconstruction", disposition: "future revision only; completed history preserved", status: "application_contract_requires_explicit_user_command" },
+    { id: "changed_availability", owner: "canonical active-plan application + Session Construction", disposition: "atomic future revision only; active attempts fail closed; completed history preserved", status: "covered_by_change_session_duration_command" },
     { id: "new_equipment_restriction", owner: "Session Construction", disposition: "future snapshots select only compatible catalogue exercises; recorded snapshots remain immutable", status: "covered" },
     { id: "framework_morph", owner: "Microcycle", disposition: "phase-specific delivery changes while the public preference remains linked and explained", status: "covered" },
     { id: "cardio_adherence_or_interference", owner: "Progress then Mesocycle", disposition: "record factual adherence; hold progression and review when lower-body recovery declines", status: "covered_by_bounded_policy" },
@@ -246,7 +250,7 @@ export function buildCanonicalPlanningCertificationArtifacts() {
   const fiveDayConstructed = fiveDay.filter((entry) => entry.status === "constructed");
   const qualityGates = [
     "muscle_first_dosage_before_slots", "ppl_identity_and_density", "experience_is_material", "framework_preference_linked_through_morph",
-    "strength_assistance_transfer_explained", "methods_require_mesocycle_permission", "cardio_not_merged_into_lifting_count", "fatigue_and_duration_certified",
+    "strength_assistance_transfer_explained", "methods_require_mesocycle_permission", "cardio_not_merged_into_lifting_count", "typed_duration_and_fatigue_certified",
     "missing_load_never_zero", "progression_requires_comparable_evidence", "asymmetric_strategy_requires_rationale",
   ];
   const strategyClassification = {
@@ -260,7 +264,7 @@ export function buildCanonicalPlanningCertificationArtifacts() {
     "planning-input-registry": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_SYSTEM_VERSION, inputs: canonicalPlanningInputRegistry },
     "authority-boundary": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_CERTIFICATION_VERSION, authority: canonicalPlanningAuthority, precedence: canonicalPlanningPrecedence },
     "supported-combination-matrix": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_CERTIFICATION_VERSION, count: combinations.length, allResolved: combinations.every((entry) => entry.status === "resolved"), allConstructed: combinations.every((entry) => entry.constructionStatus === "constructed"), combinations },
-    "pairwise-coverage": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_CERTIFICATION_VERSION, strategy: "exhaustive goal × experience × frequency × onboarding-selectable framework; representative cross-owner interactions only where the input is actually executable", categoricalCases: combinations.length, allSupportedPairsCovered: combinations.every((entry) => entry.status === "resolved" && entry.constructionStatus === "constructed"), coveredGroups: [{ dimensions: ["goal", "experience", "frequency", "onboarding_framework"], evidence: `${combinations.length} exhaustive compatible constructions` }, { dimensions: ["framework", "history_state"], evidence: "paired five-day PPL certifications" }, { dimensions: ["equipment", "exercise_selection", "coverage"], evidence: "limited-equipment goldens plus barbell construction test" }, { dimensions: ["goal", "experience", "event_horizon"], evidence: "30 rolling/fixed Macrocycle cases" }, { dimensions: ["limitation", "exercise_selection"], evidence: "typed exclusion golden and rejection cases" }], ownerSeparatedOrUnsupportedDimensions: [{ input: "session_duration_constraint", reason: "not a production input; fail closed" }, { input: "sport_workload", reason: "factual Progress evidence refines rather than invents initial prescription" }, { input: "body_metrics", reason: "evidence/presentation only" }], additionalGoldenCaseIds: canonicalRepresentativeGoldenCases.map((item) => item.id) },
+    "pairwise-coverage": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_CERTIFICATION_VERSION, strategy: "exhaustive goal × experience × frequency × onboarding-selectable framework; representative cross-owner interactions only where the input is actually executable", categoricalCases: combinations.length, allSupportedPairsCovered: combinations.every((entry) => entry.status === "resolved" && entry.constructionStatus === "constructed"), coveredGroups: [{ dimensions: ["goal", "experience", "frequency", "onboarding_framework"], evidence: `${combinations.length} exhaustive compatible constructions` }, { dimensions: ["framework", "history_state"], evidence: "paired five-day PPL certifications" }, { dimensions: ["duration", "frequency", "experience"], evidence: "30/45/60/75/90-minute construction certification across 2-6 days and three experience levels" }, { dimensions: ["equipment", "exercise_selection", "coverage"], evidence: "limited-equipment goldens plus barbell construction test" }, { dimensions: ["goal", "experience", "event_horizon"], evidence: "30 rolling/fixed Macrocycle cases" }, { dimensions: ["limitation", "exercise_selection"], evidence: "typed exclusion golden and rejection cases" }], ownerSeparatedOrUnsupportedDimensions: [{ input: "sport_workload", reason: "factual Progress evidence refines rather than invents initial prescription" }, { input: "body_metrics", reason: "evidence/presentation only" }], additionalGoldenCaseIds: canonicalRepresentativeGoldenCases.map((item) => item.id) },
     "variable-sensitivity": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_CERTIFICATION_VERSION, results: sensitivity, unsupportedInputs: canonicalPlanningInputRegistry.filter((entry) => entry.availability === "not_currently_supported").map((entry) => entry.id) },
     "macrocycle-certification": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_CERTIFICATION_VERSION, goalStrategies: canonicalGoalStrategies, cases: macrocycles },
     "mesocycle-certification": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_CERTIFICATION_VERSION, cases: mesocycles },

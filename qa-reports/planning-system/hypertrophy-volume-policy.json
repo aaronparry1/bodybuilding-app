@@ -32,28 +32,28 @@
   "correctedFiveDay": [
     {
       "id": "intermediate-hypertrophy-5-push_pull_legs-calibration",
-      "totalWorkingSets": 95,
+      "totalWorkingSets": 66,
       "directSets": {
-        "chest": 14,
+        "chest": 7,
         "anterior_delts": 6,
         "lateral_delts": 6,
-        "triceps": 10,
-        "upper_back": 14,
-        "lats": 8,
+        "triceps": 6,
+        "upper_back": 7,
+        "lats": 7,
         "rear_delts": 6,
-        "biceps": 10,
-        "quadriceps": 7,
-        "hip_extension": 7,
-        "hamstrings_knee_flexion": 3,
-        "calves": 4
+        "biceps": 6,
+        "quadriceps": 4,
+        "hip_extension": 4,
+        "hamstrings_knee_flexion": 4,
+        "calves": 3
       },
       "secondarySets": {
-        "triceps": 20,
-        "anterior_delts": 11,
-        "biceps": 22,
-        "rear_delts": 14,
-        "hip_extension": 12,
-        "upper_back": 10
+        "triceps": 13,
+        "anterior_delts": 6,
+        "biceps": 14,
+        "rear_delts": 6,
+        "upper_back": 8,
+        "hip_extension": 2
       },
       "frequency": {
         "anterior_delts": 2,
@@ -72,28 +72,28 @@
     },
     {
       "id": "intermediate-hypertrophy-5-push_pull_legs-established",
-      "totalWorkingSets": 95,
+      "totalWorkingSets": 98,
       "directSets": {
-        "chest": 14,
-        "anterior_delts": 6,
-        "lateral_delts": 6,
-        "triceps": 10,
-        "upper_back": 14,
-        "lats": 8,
-        "rear_delts": 6,
-        "biceps": 10,
+        "chest": 12,
+        "anterior_delts": 8,
+        "lateral_delts": 8,
+        "triceps": 8,
+        "upper_back": 12,
+        "lats": 12,
+        "rear_delts": 8,
+        "biceps": 8,
         "quadriceps": 7,
-        "hip_extension": 7,
-        "hamstrings_knee_flexion": 3,
+        "hip_extension": 6,
+        "hamstrings_knee_flexion": 5,
         "calves": 4
       },
       "secondarySets": {
         "triceps": 20,
-        "anterior_delts": 11,
-        "biceps": 22,
-        "rear_delts": 14,
-        "hip_extension": 12,
-        "upper_back": 10
+        "anterior_delts": 10,
+        "biceps": 24,
+        "rear_delts": 10,
+        "upper_back": 11,
+        "hip_extension": 4
       },
       "frequency": {
         "anterior_delts": 2,

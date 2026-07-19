@@ -32,9 +32,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     {
       "id": "unsupported-duration",
       "input": {
-        "sessionDurationMinutes": 30
+        "sessionDurationMinutes": 42
       },
-      "expected": "unsupported_input_not_in_activation_contract"
+      "expected": "unsupported_session_duration"
     },
     {
       "id": "unsupported-custom-movement",

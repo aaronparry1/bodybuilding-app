@@ -25,8 +25,9 @@ import { deriveTrainingFrequency, trainingFrequencyOptions, type TrainingDaysPer
 import type { TrainingGoalId } from "@/domain/training/training-goals";
 import { AppScreen, HeroPanel, PremiumCard, PrimaryButton, SecondaryButton } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
+import { canonicalSessionDurationOptions, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
 
-type StepKey = "goal" | "commitment" | "event" | "schedule" | "split" | "experience" | "recovery" | "review";
+type StepKey = "goal" | "commitment" | "event" | "schedule" | "duration" | "split" | "experience" | "recovery" | "review";
 
 const goalOptions: Array<{ value: TrainingSetupGoal; label: string; detail: string }> = [
   { value: "build_muscle", label: "Hypertrophy", detail: "Build muscle with productive volume and steady performance." },
@@ -69,6 +70,7 @@ export default function OnboardingScreen() {
   const [eventType, setEventType] = useState<TrainingEventType>("custom");
   const [targetDate, setTargetDate] = useState("2026-12-01");
   const [daysPerWeek, setDaysPerWeek] = useState<TrainingDaysPerWeek>(5);
+  const [availableSessionMinutes, setAvailableSessionMinutes] = useState<CanonicalSessionDurationMinutes>(settings.availableSessionMinutes);
   const [preferredSplit, setPreferredSplit] = useState<PreferredSplit>("push_pull_legs");
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(settings.experienceLevel);
   const [recoveryCardioPreference, setRecoveryCardioPreference] = useState<RecoveryCardioPreference>(settings.recoveryCardioPreference);
@@ -76,7 +78,7 @@ export default function OnboardingScreen() {
   const steps = useMemo(() => {
     const next: StepKey[] = ["goal", "commitment"];
     if (commitmentType === "event_driven") next.push("event");
-    next.push("schedule", "split", "experience", "recovery", "review");
+    next.push("schedule", "duration", "split", "experience", "recovery", "review");
     return next;
   }, [commitmentType]);
   const step = steps[Math.min(stepIndex, steps.length - 1)] ?? "goal";
@@ -126,6 +128,7 @@ export default function OnboardingScreen() {
       equipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight", "bands", "other"],
       units: unit,
       recoveryCardioPreference,
+      availableSessionMinutes,
       exercises: exerciseLibrary,
     });
     if (state.hydration !== "hydrated") return;
@@ -134,6 +137,7 @@ export default function OnboardingScreen() {
       trainingGoal: programmeGoalForSetup(setupGoal, experienceLevel),
       experienceLevel,
       recoveryCardioPreference,
+      availableSessionMinutes,
       onboardingCompleted: true,
     });
     router.replace("/(protected)");
@@ -169,6 +173,13 @@ export default function OnboardingScreen() {
           onSelect={chooseDaysPerWeek}
         />
       ) : null}
+      {step === "duration" ? (
+        <OptionList<CanonicalSessionDurationMinutes>
+          options={canonicalSessionDurationOptions.map((minutes) => ({ value: minutes, label: `${minutes} minutes`, detail: "Maximum time available for each workout. ASC keeps required coverage or asks you to choose a viable option." }))}
+          selected={availableSessionMinutes}
+          onSelect={setAvailableSessionMinutes}
+        />
+      ) : null}
       {step === "split" ? <OptionList<PreferredSplit> options={splitOptions} selected={preferredSplit} onSelect={setPreferredSplit} /> : null}
       {step === "experience" ? (
         <OptionList<ExperienceLevel>
@@ -185,6 +196,7 @@ export default function OnboardingScreen() {
           goal={labelFor(goalOptions, setupGoal)}
           commitment={trainingCommitment.userFacingSummary}
           daysPerWeek={daysPerWeek}
+          availableSessionMinutes={availableSessionMinutes}
           framework={labelFor(splitOptions, preferredSplit)}
           experience={labelForExperience(experienceLevel)}
           recoveryCapacity={labelFor(recoveryCardioOptions, recoveryCardioPreference)}
@@ -248,6 +260,7 @@ function ReviewPanel({
   goal,
   commitment,
   daysPerWeek,
+  availableSessionMinutes,
   framework,
   experience,
   recoveryCapacity,
@@ -258,6 +271,7 @@ function ReviewPanel({
   goal: string;
   commitment: string;
   daysPerWeek: number;
+  availableSessionMinutes: CanonicalSessionDurationMinutes;
   framework: string;
   experience: string;
   recoveryCapacity: string;
@@ -278,6 +292,7 @@ function ReviewPanel({
           <SummaryRow label="Goal" value={goal} />
           <SummaryRow label="Training commitment" value={commitment} />
           <SummaryRow label="Training days" value={`${daysPerWeek} days/week`} />
+          <SummaryRow label="Workout length" value={`${availableSessionMinutes} minutes`} />
           <SummaryRow label="Framework" value={framework} />
           <SummaryRow label="Experience" value={experience} />
           <SummaryRow label="Recovery & Capacity" value={recoveryCapacity} />
@@ -361,6 +376,7 @@ function titleForStep(step: StepKey): string {
     commitment: "Are you training for something specific?",
     event: "Set the target",
     schedule: "How many days can you realistically commit to training every week?",
+    duration: "How much time do you have for each workout?",
     split: "Preferred split",
     experience: "How would you describe your lifting experience?",
     recovery: "Recovery & Cardio",
@@ -373,6 +389,7 @@ function subtitleForStep(step: StepKey): string {
   if (step === "schedule") {
     return "Choose the number you can consistently achieve. You can change this later and ASC will adjust your programme.";
   }
+  if (step === "duration") return "Choose the time you can reliably protect. This is separate from how many days you train.";
   if (step === "experience") {
     return "This helps ASC choose an appropriate starting coaching strategy. It will continue learning from your training over time.";
   }

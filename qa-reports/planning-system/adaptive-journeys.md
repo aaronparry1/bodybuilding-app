@@ -56,9 +56,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     },
     {
       "id": "changed_availability",
-      "owner": "canonical plan reconstruction",
-      "disposition": "future revision only; completed history preserved",
-      "status": "application_contract_requires_explicit_user_command"
+      "owner": "canonical active-plan application + Session Construction",
+      "disposition": "atomic future revision only; active attempts fail closed; completed history preserved",
+      "status": "covered_by_change_session_duration_command"
     },
     {
       "id": "new_equipment_restriction",
