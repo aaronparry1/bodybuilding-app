@@ -12,7 +12,11 @@ export function createMicrocycle(input: { parentMesocycleId: MesocycleId; traini
   if (resolution.status !== "resolved") throw new Error(`unsupported_microcycle_framework:${resolution.reason}`);
   const sequenceNumber = input.sequenceNumber ?? 1;
   const sessionTypes = buildWeeklySessionSequence({ goal: resolution.goal, framework: resolution.framework, sessionsPerWeek: input.trainingDays, sequenceNumber });
-  const roles = sessionTypes.map((type, index) => roleFor(input.parentMesocycleId, type, index));
+  const roles = sessionTypes.map((type, index) => roleFor(input.parentMesocycleId, type, index, {
+    publicFrameworkPreference: resolution.publicPreference,
+    trainingDays: input.trainingDays,
+    sequenceNumber,
+  }));
   const sessionDayOffsets = defaultDayOffsets(input.trainingDays);
   const rollingPpl = resolution.publicPreference === "push_pull_legs" && input.trainingDays !== 3 && input.trainingDays !== 6 && resolution.framework === "push_pull_legs";
   return { parentMesocycleId: input.parentMesocycleId, sequenceNumber, lengthDays: 7, trainingDays: input.trainingDays, requestedSplit: input.split, publicFrameworkPreference: resolution.publicPreference, split: preferredSplitForProgrammeFramework(resolution.framework), frameworkReason: resolution.reason, deliveryStrategy: resolution.morphPolicy.deliveryStrategy, morphRationaleCodes: resolution.morphPolicy.rationaleCodes, logicalRotation: resolution.framework === "push_pull_legs" ? ["push", "pull", "legs"] : [...sessionTypes], rotationCursor: rollingPpl ? ((sequenceNumber - 1) * input.trainingDays) % 3 : 0, scheduleMode: rollingPpl || resolution.morphPolicy.deliveryStrategy === "athletic_asymmetric_rotation" ? "asymmetric_rotation" : "calendar_week", sessionDayOffsets, sessionTypes, sessionRoles: roles, priority: priorityFor(input.parentMesocycleId), progressionState: input.progressionState ?? "build", requiredExposures: roles, recoveryDays: 7 - input.trainingDays, missedSessionPriority: missedPriorityFor(input.parentMesocycleId) };
@@ -27,7 +31,11 @@ export function reflowCanonicalMicrocycleAfterMissedSession(plan: MicrocyclePlan
   return { ...plan, lengthDays, scheduleMode: lengthDays === 7 ? plan.scheduleMode : "asymmetric_rotation", sessionDayOffsets, recoveryDays: Math.max(0, lengthDays - plan.trainingDays), progressionState: "repeat" };
 }
 
-function roleFor(mesocycle: MesocycleId, type: ProgrammeFrameworkSessionType, index: number): string {
+function roleFor(mesocycle: MesocycleId, type: ProgrammeFrameworkSessionType, index: number, rotation: Readonly<{ publicFrameworkPreference: CustomerProgrammeFrameworkId; trainingDays: CanonicalTrainingDaysPerWeek; sequenceNumber: number }>): string {
+  if (mesocycle.startsWith("hypertrophy_") && rotation.publicFrameworkPreference === "push_pull_legs" && (type === "push" || type === "pull" || type === "legs")) {
+    const position = ((rotation.sequenceNumber - 1) * rotation.trainingDays + index) % 6;
+    return `${displayType(type)} hypertrophy ${String.fromCharCode(65 + position)}`;
+  }
   const letter = String.fromCharCode(65 + index);
   if (mesocycle.startsWith("powerbuilding_")) {
     const roles: Partial<Record<ProgrammeFrameworkSessionType, string>> = { bench: "Bench and hypertrophy", squat: "Squat and hypertrophy", deadlift: "Deadlift and back", upper_strength: "Upper support", lower_strength: "Lower support", push: "Push strength and hypertrophy", pull: "Pull strength and hypertrophy", legs: "Legs strength and hypertrophy", upper: "Upper strength and hypertrophy", lower: "Lower strength and hypertrophy", full_body: `Full body powerbuilding ${letter}`, full_body_strength: "Technical support" };

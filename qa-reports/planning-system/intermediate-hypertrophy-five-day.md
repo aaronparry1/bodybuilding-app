@@ -169,6 +169,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Decline Barbell Bench",
               "movement": "horizontal_push",
               "slotPurpose": "primary horizontal press",
+              "directStimuli": [
+                "chest"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "triceps",
+                "shoulders"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 12,
@@ -203,6 +211,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Incline Dumbbell Press",
               "movement": "horizontal_push",
               "slotPurpose": "second-angle chest stimulus",
+              "directStimuli": [
+                "chest"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "shoulders",
+                "triceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -235,6 +251,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Machine Shoulder Press",
               "movement": "vertical_push",
               "slotPurpose": "vertical pressing stimulus",
+              "directStimuli": [
+                "anterior_delts"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "triceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -267,6 +290,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Cable Lateral Raise",
               "movement": "isolation",
               "slotPurpose": "lateral-delt stimulus",
+              "directStimuli": [
+                "lateral_delts"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 15,
@@ -299,6 +327,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Rope Overhead Triceps Extension",
               "movement": "isolation",
               "slotPurpose": "lengthened elbow-extension work",
+              "directStimuli": [
+                "triceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 12,
@@ -331,6 +364,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Close Neutral Pushdown",
               "movement": "isolation",
               "slotPurpose": "shortened-range triceps finish",
+              "directStimuli": [
+                "triceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 2,
               "exactReps": [
                 12,
@@ -378,6 +416,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Barbell Row",
               "movement": "horizontal_pull",
               "slotPurpose": "primary horizontal pull",
+              "directStimuli": [
+                "upper_back"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps",
+                "rear_delts",
+                "hamstrings"
+              ],
+              "exerciseFatigue": "high",
               "workingSets": 4,
               "exactReps": [
                 8,
@@ -412,6 +459,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Lat Pulldown",
               "movement": "vertical_pull",
               "slotPurpose": "vertical-pull lat stimulus",
+              "directStimuli": [
+                "lats"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 10,
@@ -446,6 +500,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Chest Supported Row",
               "movement": "horizontal_pull",
               "slotPurpose": "second-angle upper-back stimulus",
+              "directStimuli": [
+                "upper_back"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -478,6 +539,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Cable Rear Delt Fly",
               "movement": "isolation",
               "slotPurpose": "rear-delt and scapular work",
+              "directStimuli": [
+                "rear_delts"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "shoulders",
+                "back"
+              ],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 15,
@@ -510,6 +579,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Bayesian Curl",
               "movement": "isolation",
               "slotPurpose": "lengthened elbow-flexor work",
+              "directStimuli": [
+                "biceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 12,
@@ -542,6 +616,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Cable Curl",
               "movement": "isolation",
               "slotPurpose": "shortened-range biceps finish",
+              "directStimuli": [
+                "biceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 2,
               "exactReps": [
                 12,
@@ -589,6 +668,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Hack Squat Machine",
               "movement": "squat",
               "slotPurpose": "knee-dominant anchor",
+              "directStimuli": [
+                "quadriceps"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "glutes"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 12,
@@ -623,6 +709,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Belt Squat",
               "movement": "squat",
               "slotPurpose": "complementary knee-dominant hypertrophy",
+              "directStimuli": [
+                "quadriceps"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "adductors"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -655,6 +748,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Stiff-Leg Deadlift",
               "movement": "hinge",
               "slotPurpose": "hip-extension support",
+              "directStimuli": [
+                "hip_extension"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "back"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 10,
@@ -689,6 +789,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Kneeling Leg Curl",
               "movement": "isolation",
               "slotPurpose": "knee-flexion hamstring work",
+              "directStimuli": [
+                "hamstrings_knee_flexion"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 12,
@@ -721,6 +826,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Hip Thrust Machine",
               "movement": "hip_thrust",
               "slotPurpose": "shortened hip-extension stimulus",
+              "directStimuli": [
+                "hip_extension"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "hamstrings"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -753,6 +865,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Donkey Calf Raise",
               "movement": "isolation",
               "slotPurpose": "calf work",
+              "directStimuli": [
+                "calves"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 4,
               "exactReps": [
                 15,
@@ -804,6 +921,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Decline Barbell Bench",
               "movement": "horizontal_push",
               "slotPurpose": "primary horizontal press",
+              "directStimuli": [
+                "chest"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "triceps",
+                "shoulders"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 12,
@@ -838,6 +963,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Decline Plate Loaded Press",
               "movement": "horizontal_push",
               "slotPurpose": "second-angle chest stimulus",
+              "directStimuli": [
+                "chest"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "triceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -870,6 +1002,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Plate Loaded Shoulder Press Machine",
               "movement": "vertical_push",
               "slotPurpose": "vertical pressing stimulus",
+              "directStimuli": [
+                "anterior_delts"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "triceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -902,6 +1041,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Lateral Raise Plate Loaded",
               "movement": "isolation",
               "slotPurpose": "lateral-delt stimulus",
+              "directStimuli": [
+                "lateral_delts"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 15,
@@ -934,6 +1078,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "EZ-Bar Pushdown",
               "movement": "isolation",
               "slotPurpose": "lengthened elbow-extension work",
+              "directStimuli": [
+                "triceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 12,
@@ -966,6 +1115,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Machine Tricep Extension",
               "movement": "isolation",
               "slotPurpose": "shortened-range triceps finish",
+              "directStimuli": [
+                "triceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 2,
               "exactReps": [
                 12,
@@ -1013,6 +1167,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Barbell Row",
               "movement": "horizontal_pull",
               "slotPurpose": "primary horizontal pull",
+              "directStimuli": [
+                "upper_back"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps",
+                "rear_delts",
+                "hamstrings"
+              ],
+              "exerciseFatigue": "high",
               "workingSets": 4,
               "exactReps": [
                 8,
@@ -1047,6 +1210,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Lat Pulldown Machine",
               "movement": "vertical_pull",
               "slotPurpose": "vertical-pull lat stimulus",
+              "directStimuli": [
+                "lats"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 10,
@@ -1081,6 +1251,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Dorian Yates Row Machine",
               "movement": "horizontal_pull",
               "slotPurpose": "second-angle upper-back stimulus",
+              "directStimuli": [
+                "upper_back"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps",
+                "rear_delts"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -1113,6 +1291,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Rear Delt Machine",
               "movement": "isolation",
               "slotPurpose": "rear-delt and scapular work",
+              "directStimuli": [
+                "rear_delts"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "back"
+              ],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 15,
@@ -1145,6 +1330,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Machine Preacher Curl",
               "movement": "isolation",
               "slotPurpose": "lengthened elbow-flexor work",
+              "directStimuli": [
+                "biceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 12,
@@ -1177,6 +1367,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Preacher Curl",
               "movement": "isolation",
               "slotPurpose": "shortened-range biceps finish",
+              "directStimuli": [
+                "biceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 2,
               "exactReps": [
                 12,
@@ -1356,13 +1551,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       },
       "certification": {
         "allocation": {
@@ -1555,6 +1758,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Decline Barbell Bench",
               "movement": "horizontal_push",
               "slotPurpose": "primary horizontal press",
+              "directStimuli": [
+                "chest"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "triceps",
+                "shoulders"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 12,
@@ -1590,6 +1801,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Incline Dumbbell Press",
               "movement": "horizontal_push",
               "slotPurpose": "second-angle chest stimulus",
+              "directStimuli": [
+                "chest"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "shoulders",
+                "triceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -1623,6 +1842,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Machine Shoulder Press",
               "movement": "vertical_push",
               "slotPurpose": "vertical pressing stimulus",
+              "directStimuli": [
+                "anterior_delts"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "triceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -1656,6 +1882,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Cable Lateral Raise",
               "movement": "isolation",
               "slotPurpose": "lateral-delt stimulus",
+              "directStimuli": [
+                "lateral_delts"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 15,
@@ -1689,6 +1920,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Rope Overhead Triceps Extension",
               "movement": "isolation",
               "slotPurpose": "lengthened elbow-extension work",
+              "directStimuli": [
+                "triceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 12,
@@ -1722,6 +1958,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Close Neutral Pushdown",
               "movement": "isolation",
               "slotPurpose": "shortened-range triceps finish",
+              "directStimuli": [
+                "triceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 2,
               "exactReps": [
                 12,
@@ -1770,6 +2011,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Barbell Row",
               "movement": "horizontal_pull",
               "slotPurpose": "primary horizontal pull",
+              "directStimuli": [
+                "upper_back"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps",
+                "rear_delts",
+                "hamstrings"
+              ],
+              "exerciseFatigue": "high",
               "workingSets": 4,
               "exactReps": [
                 8,
@@ -1805,6 +2055,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Lat Pulldown",
               "movement": "vertical_pull",
               "slotPurpose": "vertical-pull lat stimulus",
+              "directStimuli": [
+                "lats"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 10,
@@ -1840,6 +2097,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Chest Supported Row",
               "movement": "horizontal_pull",
               "slotPurpose": "second-angle upper-back stimulus",
+              "directStimuli": [
+                "upper_back"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -1873,6 +2137,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Cable Rear Delt Fly",
               "movement": "isolation",
               "slotPurpose": "rear-delt and scapular work",
+              "directStimuli": [
+                "rear_delts"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "shoulders",
+                "back"
+              ],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 15,
@@ -1906,6 +2178,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Bayesian Curl",
               "movement": "isolation",
               "slotPurpose": "lengthened elbow-flexor work",
+              "directStimuli": [
+                "biceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 12,
@@ -1939,6 +2216,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Cable Curl",
               "movement": "isolation",
               "slotPurpose": "shortened-range biceps finish",
+              "directStimuli": [
+                "biceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 2,
               "exactReps": [
                 12,
@@ -1987,6 +2269,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Hack Squat Machine",
               "movement": "squat",
               "slotPurpose": "knee-dominant anchor",
+              "directStimuli": [
+                "quadriceps"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "glutes"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 12,
@@ -2022,6 +2311,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Belt Squat",
               "movement": "squat",
               "slotPurpose": "complementary knee-dominant hypertrophy",
+              "directStimuli": [
+                "quadriceps"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "adductors"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -2055,6 +2351,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Stiff-Leg Deadlift",
               "movement": "hinge",
               "slotPurpose": "hip-extension support",
+              "directStimuli": [
+                "hip_extension"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "back"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 10,
@@ -2090,6 +2393,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Kneeling Leg Curl",
               "movement": "isolation",
               "slotPurpose": "knee-flexion hamstring work",
+              "directStimuli": [
+                "hamstrings_knee_flexion"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 12,
@@ -2123,6 +2431,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Hip Thrust Machine",
               "movement": "hip_thrust",
               "slotPurpose": "shortened hip-extension stimulus",
+              "directStimuli": [
+                "hip_extension"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "hamstrings"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -2156,6 +2471,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Donkey Calf Raise",
               "movement": "isolation",
               "slotPurpose": "calf work",
+              "directStimuli": [
+                "calves"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 4,
               "exactReps": [
                 15,
@@ -2208,6 +2528,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Decline Barbell Bench",
               "movement": "horizontal_push",
               "slotPurpose": "primary horizontal press",
+              "directStimuli": [
+                "chest"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "triceps",
+                "shoulders"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 12,
@@ -2243,6 +2571,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Decline Plate Loaded Press",
               "movement": "horizontal_push",
               "slotPurpose": "second-angle chest stimulus",
+              "directStimuli": [
+                "chest"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "triceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -2276,6 +2611,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Plate Loaded Shoulder Press Machine",
               "movement": "vertical_push",
               "slotPurpose": "vertical pressing stimulus",
+              "directStimuli": [
+                "anterior_delts"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "triceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -2309,6 +2651,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Lateral Raise Plate Loaded",
               "movement": "isolation",
               "slotPurpose": "lateral-delt stimulus",
+              "directStimuli": [
+                "lateral_delts"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 15,
@@ -2342,6 +2689,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "EZ-Bar Pushdown",
               "movement": "isolation",
               "slotPurpose": "lengthened elbow-extension work",
+              "directStimuli": [
+                "triceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 12,
@@ -2375,6 +2727,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Machine Tricep Extension",
               "movement": "isolation",
               "slotPurpose": "shortened-range triceps finish",
+              "directStimuli": [
+                "triceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 2,
               "exactReps": [
                 12,
@@ -2423,6 +2780,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Barbell Row",
               "movement": "horizontal_pull",
               "slotPurpose": "primary horizontal pull",
+              "directStimuli": [
+                "upper_back"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps",
+                "rear_delts",
+                "hamstrings"
+              ],
+              "exerciseFatigue": "high",
               "workingSets": 4,
               "exactReps": [
                 8,
@@ -2458,6 +2824,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Lat Pulldown Machine",
               "movement": "vertical_pull",
               "slotPurpose": "vertical-pull lat stimulus",
+              "directStimuli": [
+                "lats"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 4,
               "exactReps": [
                 10,
@@ -2493,6 +2866,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Dorian Yates Row Machine",
               "movement": "horizontal_pull",
               "slotPurpose": "second-angle upper-back stimulus",
+              "directStimuli": [
+                "upper_back"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "biceps",
+                "rear_delts"
+              ],
+              "exerciseFatigue": "moderate",
               "workingSets": 3,
               "exactReps": [
                 10,
@@ -2526,6 +2907,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Rear Delt Machine",
               "movement": "isolation",
               "slotPurpose": "rear-delt and scapular work",
+              "directStimuli": [
+                "rear_delts"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "back"
+              ],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 15,
@@ -2559,6 +2947,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Machine Preacher Curl",
               "movement": "isolation",
               "slotPurpose": "lengthened elbow-flexor work",
+              "directStimuli": [
+                "biceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 3,
               "exactReps": [
                 12,
@@ -2592,6 +2985,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exercise": "Preacher Curl",
               "movement": "isolation",
               "slotPurpose": "shortened-range biceps finish",
+              "directStimuli": [
+                "biceps"
+              ],
+              "meaningfulSecondaryMuscles": [],
+              "exerciseFatigue": "low",
               "workingSets": 2,
               "exactReps": [
                 12,
@@ -2772,13 +3170,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       },
       "certification": {
         "allocation": {

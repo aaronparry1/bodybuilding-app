@@ -44,13 +44,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -90,13 +98,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -136,13 +152,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -182,13 +206,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -228,13 +260,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -280,7 +320,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -326,7 +373,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -366,13 +420,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -412,13 +474,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -481,7 +551,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 68,
+          "intervalWorkMinutes": 6,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "moderate",
+          "resistanceDosageAdjustment": "review_lower_body_dosage"
+        }
       }
     },
     {
@@ -539,7 +616,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 75,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -579,13 +663,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -625,13 +717,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -677,7 +777,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -717,13 +824,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -763,13 +878,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     },
     {
@@ -809,13 +932,21 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "weeklyFrequency": 2,
         "rationaleCodes": [
           "recovery_capacity",
-          "hypertrophy_stimulus_preserved"
+          "hypertrophy_stimulus_preserved",
+          "ordinary_recovery_start"
         ],
         "interferenceRules": [
           "cardio_never_changes_lifting_session_count",
           "hard_conditioning_not_before_priority_lower_session",
           "progress_requires_completed_tolerated_evidence"
-        ]
+        ],
+        "recoveryBudget": {
+          "cardioMinutes": 40,
+          "intervalWorkMinutes": 0,
+          "concurrentSportSessions": 0,
+          "lowerBodyInterference": "low",
+          "resistanceDosageAdjustment": "none"
+        }
       }
     }
   ]

@@ -74,7 +74,7 @@ describe("canonical microcycle volume allocator", () => {
         exercises: exerciseLibrary,
         history: [],
       });
-      expect(result.status, `${macrocycleGoal}/${daysPerWeek}`).toBe("constructed");
+      expect(result.status, result.status === "constructed" ? `${macrocycleGoal}/${daysPerWeek}` : `${macrocycleGoal}/${daysPerWeek}:${result.reason}`).toBe("constructed");
       if (result.status === "constructed") expect(result.carrier.plannedSessions).toHaveLength(daysPerWeek);
     }
   });

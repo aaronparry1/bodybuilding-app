@@ -40,9 +40,29 @@ export type CanonicalHypertrophyVolumeEvidence = Readonly<{
   destinationBelowTarget?: boolean;
 }>;
 
-const smallRegions = new Set<CanonicalStimulusRegion>(["anterior_delts", "lateral_delts", "rear_delts", "triceps", "biceps", "calves", "core"]);
+export type CanonicalStartingVolumeContext = Readonly<{
+  recovery: "low_acceptable" | "ordinary" | "high";
+  history: "none" | "established_productive";
+  workCapacity: "not_demonstrated" | "demonstrated_high";
+  concurrentSport: "none" | "lower_body_loading";
+}>;
+
+export type CanonicalStartingVolumeResolution = Readonly<{
+  policyId: typeof canonicalHypertrophyVolumePolicy.policyId;
+  startingDirectSets: number;
+  authorisedFloor: number;
+  authorisedCeiling: number;
+  target: Readonly<{ min: number; max: number }>;
+  calibrationRequired: boolean;
+  reasonCodes: readonly string[];
+}>;
+
+const smallRegions = new Set<CanonicalStimulusRegion>(["anterior_delts", "lateral_delts", "rear_delts", "triceps", "biceps", "hamstrings_knee_flexion", "calves", "core"]);
 
 export function canonicalHypertrophyLandmark(experience: ExperienceLevel, region: CanonicalStimulusRegion): CanonicalHypertrophyVolumeLandmark {
+  if (region === "core") return experience === "beginner"
+    ? { starting: 1, target: { min: 1, max: 4 }, maximumAuthorisedStarting: 2 }
+    : { starting: 2, target: { min: 1, max: 6 }, maximumAuthorisedStarting: experience === "advanced" ? 4 : 3 };
   const small = smallRegions.has(region);
   if (experience === "beginner") return small
     ? { starting: 4, target: { min: 4, max: 8 }, maximumAuthorisedStarting: 6 }
@@ -53,6 +73,55 @@ export function canonicalHypertrophyLandmark(experience: ExperienceLevel, region
   return small
     ? { starting: 7, target: { min: 6, max: 14 }, maximumAuthorisedStarting: 10 }
     : { starting: 10, target: { min: 8, max: 16 }, maximumAuthorisedStarting: 12 };
+}
+
+/** Resolves an initial *muscle-specific* dosage. Experience selects the
+ * policy band; only retained productive history plus demonstrated work
+ * capacity can authorise the top of that starting band. */
+export function resolveCanonicalHypertrophyStartingVolume(input: Readonly<{
+  experience: ExperienceLevel;
+  region: CanonicalStimulusRegion;
+  context: CanonicalStartingVolumeContext;
+}>): CanonicalStartingVolumeResolution {
+  const landmark = canonicalHypertrophyLandmark(input.experience, input.region);
+  const small = smallRegions.has(input.region);
+  const lowerBody = new Set<CanonicalStimulusRegion>(["quadriceps", "hamstrings_knee_flexion", "hip_extension", "calves"]);
+  const authorisedFloor = Math.max(1, landmark.target.min - (small ? 1 : 2));
+  let starting = landmark.starting;
+  const reasons = [`experience:${input.experience}`, `region:${input.region}`];
+  if (input.experience === "advanced" && input.context.history === "none") {
+    starting -= 1;
+    reasons.push("advanced_without_productive_history_is_not_automatic_volume");
+  }
+  if (input.context.recovery === "low_acceptable") {
+    starting -= small ? 1 : 2;
+    reasons.push("low_acceptable_recovery_uses_starting_floor");
+  }
+  const highCapacityAuthorised = input.context.recovery === "high"
+    && input.context.history === "established_productive"
+    && input.context.workCapacity === "demonstrated_high";
+  if (highCapacityAuthorised) {
+    starting += small ? 1 : 2;
+    reasons.push("productive_history_and_high_capacity_authorise_upper_start");
+  } else if (input.context.workCapacity === "demonstrated_high") {
+    reasons.push("work_capacity_without_complete_supporting_evidence_does_not_raise_volume");
+  }
+  if (input.context.concurrentSport === "lower_body_loading" && lowerBody.has(input.region)) {
+    starting -= small ? 1 : 2;
+    reasons.push("concurrent_lower_body_workload_reduces_starting_resistance_dose");
+  }
+  starting = Math.max(authorisedFloor, Math.min(landmark.maximumAuthorisedStarting, starting));
+  if (input.context.history === "none") reasons.push("calibration_from_absent_comparable_history");
+  if (input.context.recovery === "ordinary") reasons.push("ordinary_recovery_uses_middle_start");
+  return {
+    policyId: canonicalHypertrophyVolumePolicy.policyId,
+    startingDirectSets: starting,
+    authorisedFloor,
+    authorisedCeiling: landmark.maximumAuthorisedStarting,
+    target: landmark.target,
+    calibrationRequired: input.context.history === "none",
+    reasonCodes: reasons,
+  };
 }
 
 export function resolveCanonicalHypertrophyVolumeProgression(input: Readonly<{

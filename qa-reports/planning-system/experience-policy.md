@@ -61,7 +61,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     {
       "id": "intermediate-hypertrophy-6",
       "experience": "intermediate",
-      "totalWorkingSets": 86
+      "totalWorkingSets": 85
     },
     {
       "id": "beginner-strength-3",

@@ -15,6 +15,7 @@ export function selectSetMethod(input: { mesocycleId?: MesocycleId; experience: 
   if ((phase.startsWith("strength_specific") || phase.startsWith("athletic_force")) && intermediate && input.exerciseRole === "primary_compound") return "clusters";
   if ((phase.startsWith("strength_accumulation") || phase.startsWith("hypertrophy_base")) && input.exerciseRole === "secondary_compound") return "ladder";
   if ((phase.startsWith("hypertrophy_base") || phase.startsWith("powerbuilding_hypertrophy")) && input.exerciseRole === "primary_compound") return "pyramid";
+  if ((phase.startsWith("hypertrophy_volume") || phase.startsWith("hypertrophy_specialisation")) && intermediate && input.exerciseRole === "isolation") return "controlled_performance_set";
   if ((phase.startsWith("athletic_power") || phase.startsWith("strength_specific")) && intermediate && input.sessionRole.toLowerCase().includes("power")) return "dynamic_effort";
   if (phase.startsWith("athletic_power")) return "output_controlled_sets";
   if (phase.startsWith("strength_") && input.exerciseRole === "primary_compound" && input.experience !== "beginner") return "top_set_backoffs";

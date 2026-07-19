@@ -16,6 +16,7 @@ import { CANONICAL_ADAPTIVE_PLANNING_SYSTEM_VERSION, canonicalGoalStrategies, ca
 import { canonicalHypertrophyVolumePolicy } from "@/domain/training/canonical-hypertrophy-volume-policy";
 import { CANONICAL_CARDIO_PRESCRIPTION_VERSION } from "@/domain/training/canonical-cardio-prescription";
 import { customerFrameworkFrequencyPolicy, getCustomerFrameworksForFrequency, resolveCanonicalFrameworkMorph } from "@/domain/training/programme-framework-rules";
+import { buildCanonicalDosageEvolutionArtifacts } from "@/domain/training/canonical-dosage-evolution-certification";
 
 export const CANONICAL_ADAPTIVE_PLANNING_CERTIFICATION_VERSION = "canonical_adaptive_planning_certification_v1" as const;
 
@@ -131,6 +132,9 @@ export function constructGoldenProgramme(testCase: CanonicalGoldenCase) {
       exercise: exerciseById.get(slot.exerciseId)?.name ?? "metadata unavailable",
       movement: exerciseById.get(slot.exerciseId)?.movementPattern,
       slotPurpose: allocation.slots.find((item) => item.sessionIndex === sessionIndex && item.order === slot.index)?.purpose,
+      directStimuli: allocation.slots.find((item) => item.sessionIndex === sessionIndex && item.order === slot.index)?.requiredStimuli ?? [],
+      meaningfulSecondaryMuscles: exerciseById.get(slot.exerciseId)?.secondaryMuscles ?? [],
+      exerciseFatigue: exerciseById.get(slot.exerciseId)?.fatigueCost,
       workingSets: slot.settings.requiredSets,
       exactReps: slot.exactTargets ?? Array.from({ length: slot.settings.requiredSets ?? 0 }, () => slot.targetReps),
       exactTargetKinds: slot.exactTargetKinds,
@@ -252,6 +256,7 @@ export function buildCanonicalPlanningCertificationArtifacts() {
     futureNotAuthorised: ["arbitrary_bodypart_split", "caller_authored_rotation", "unexplained_variety"],
   };
   return {
+    ...buildCanonicalDosageEvolutionArtifacts(),
     "planning-input-registry": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_SYSTEM_VERSION, inputs: canonicalPlanningInputRegistry },
     "authority-boundary": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_CERTIFICATION_VERSION, authority: canonicalPlanningAuthority, precedence: canonicalPlanningPrecedence },
     "supported-combination-matrix": { schemaVersion: CANONICAL_ADAPTIVE_PLANNING_CERTIFICATION_VERSION, count: combinations.length, allResolved: combinations.every((entry) => entry.status === "resolved"), allConstructed: combinations.every((entry) => entry.constructionStatus === "constructed"), combinations },

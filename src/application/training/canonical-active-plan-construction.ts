@@ -14,7 +14,7 @@ import type { ExercisePreferenceRecord } from "@/domain/training/exercise-prefer
 import { resolveCanonicalCardioPrescription } from "@/domain/training/canonical-cardio-prescription";
 import type { RecoveryCardioPreference } from "@/domain/training/plan-setup";
 
-export type CanonicalConstructionInput = Readonly<{ planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: Parameters<typeof createMacrocycle>[0]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: Parameters<typeof createMicrocycle>[0]["split"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; recoveryCardioPreference?: RecoveryCardioPreference; plannedSessions: readonly CanonicalPlannedSessionSnapshot[] }>;
+export type CanonicalConstructionInput = Readonly<{ planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: Parameters<typeof createMacrocycle>[0]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: Parameters<typeof createMicrocycle>[0]["split"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; recoveryCardioPreference?: RecoveryCardioPreference; microcycleSequenceNumber?: number; plannedSessions: readonly CanonicalPlannedSessionSnapshot[] }>;
 export type CanonicalConstructionResult = Readonly<{ status: "constructed"; carrier: CanonicalActivePlanCarrier } | { status: "invalid_input" | "no_initial_mesocycle" | "session_role_mismatch" | "carrier_validation_failed"; reason: string }>;
 
 export type CanonicalGeneratedPlanInput = Readonly<Omit<CanonicalConstructionInput, "plannedSessions"> & { exercises: readonly Exercise[]; limitations?: readonly string[]; exercisePreferences?: Readonly<Record<string, ExercisePreferenceRecord>>; history?: readonly WorkoutHistorySummary[]; establishedLoads?: Readonly<Record<string, number>>; loadEvidence?: Readonly<Record<string, CanonicalLoadEvidence>> }>;
@@ -31,7 +31,7 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
   if (!mesocycle) return { status: "no_initial_mesocycle", reason: "no_eligible_initial_mesocycle" };
   const policyResult = resolveMesocyclePrescriptionPolicy(mesocycle.id, { goal: input.macrocycleGoal });
   if (policyResult.status !== "resolved") return { status: "no_initial_mesocycle", reason: policyResult.reason };
-  const microcycle = createMicrocycle({ parentMesocycleId: mesocycle.id, trainingDays: input.daysPerWeek, split: input.preferredSplit });
+  const microcycle = createMicrocycle({ parentMesocycleId: mesocycle.id, trainingDays: input.daysPerWeek, split: input.preferredSplit, sequenceNumber: input.microcycleSequenceNumber });
   const allocation = allocateCanonicalMicrocycleVolume({
     macrocycleGoal: input.macrocycleGoal,
     mesocycleId: mesocycle.id,
@@ -48,7 +48,7 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
     sessionTypes: microcycle.sessionTypes,
   });
   if (allocation.certification.status !== "passed") return { status: "carrier_validation_failed", reason: `microcycle_allocation:${allocation.certification.failures.join(",")}` };
-  const microcycleId = `${input.planId}:microcycle:1`;
+  const microcycleId = `${input.planId}:microcycle:${microcycle.sequenceNumber}`;
   const sessions: CanonicalPlannedSessionSnapshot[] = [];
   const weeklyExerciseUsage: Record<string, number> = {};
   for (const [index, role] of microcycle.sessionRoles.entries()) {
@@ -84,9 +84,9 @@ export function constructCanonicalActivePlan(input: CanonicalConstructionInput):
   const macrocycle = createMacrocycle(input.macrocycleGoal, input.experienceLevel, input.targetDate, input.createdAt);
   const mesocycle = selectMesocycles(macrocycleEngineForGoal(input.macrocycleGoal), input.experienceLevel)[0];
   if (!mesocycle) return { status: "no_initial_mesocycle", reason: "no_eligible_initial_mesocycle" };
-  const microcycle = createMicrocycle({ parentMesocycleId: mesocycle.id, trainingDays: input.daysPerWeek, split: input.preferredSplit });
+  const microcycle = createMicrocycle({ parentMesocycleId: mesocycle.id, trainingDays: input.daysPerWeek, split: input.preferredSplit, sequenceNumber: input.microcycleSequenceNumber });
   if (input.plannedSessions.some((session) => !microcycle.sessionRoles[session.planSessionIndex] || microcycle.sessionRoles[session.planSessionIndex] !== session.role)) return { status: "session_role_mismatch", reason: "planned_session_role_not_in_microcycle" };
   const conditioning = resolveCanonicalCardioPrescription({ planId: input.planId, goal: input.macrocycleGoal, preference: input.recoveryCardioPreference ?? "recommended", experience: input.experienceLevel, liftingDays: input.daysPerWeek, liftingDayOffsets: microcycle.sessionDayOffsets });
-  const assembled = assembleCanonicalActivePlan({ planId: input.planId, createdAt: input.createdAt, updatedAt: input.updatedAt, macrocycle, mesocycle, microcycle: { ...microcycle, id: `${input.planId}:microcycle:1`, constructionVersion: "microcycle_v1" }, plannedSessions: input.plannedSessions, progress: { evidenceVersion: "progress_v1", revision: 0 }, conditioning, constraints: { goal: input.goal, experienceLevel: input.experienceLevel, daysPerWeek: input.daysPerWeek, preferredSplit: input.preferredSplit, equipment: [...input.equipment], units: input.units, targetDate: input.targetDate, recoveryCardioPreference: input.recoveryCardioPreference ?? "recommended" } });
+  const assembled = assembleCanonicalActivePlan({ planId: input.planId, createdAt: input.createdAt, updatedAt: input.updatedAt, macrocycle, mesocycle, microcycle: { ...microcycle, id: `${input.planId}:microcycle:${microcycle.sequenceNumber}`, constructionVersion: "microcycle_v1" }, plannedSessions: input.plannedSessions, progress: { evidenceVersion: "progress_v1", revision: 0 }, conditioning, constraints: { goal: input.goal, experienceLevel: input.experienceLevel, daysPerWeek: input.daysPerWeek, preferredSplit: input.preferredSplit, equipment: [...input.equipment], units: input.units, targetDate: input.targetDate, recoveryCardioPreference: input.recoveryCardioPreference ?? "recommended" } });
   return assembled.status === "valid" ? { status: "constructed", carrier: assembled.carrier } : { status: "carrier_validation_failed", reason: assembled.reason };
 }

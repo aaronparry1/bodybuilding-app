@@ -1,0 +1,4470 @@
+{
+  "schemaVersion": "canonical_dosage_evolution_certification_v1",
+  "policyId": "canonical_hypertrophy_volume_policy_v1",
+  "rows": [
+    {
+      "experience": "beginner",
+      "profile": "low-acceptable-recovery-no-history",
+      "context": {
+        "recovery": "low_acceptable",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:chest",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lats",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:upper_back",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:anterior_delts",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lateral_delts",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:rear_delts",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:triceps",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:biceps",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:quadriceps",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hamstrings_knee_flexion",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hip_extension",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:calves",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 1,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 2,
+          "target": {
+            "min": 1,
+            "max": 4
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:core",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        }
+      },
+      "totalDirectSets": 42,
+      "expectedSessionMinutes": 33.2,
+      "reason": "calibration_start_without_tolerance_claim"
+    },
+    {
+      "experience": "beginner",
+      "profile": "ordinary-recovery-no-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:chest",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lats",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:upper_back",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:anterior_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lateral_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:rear_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:triceps",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:biceps",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:quadriceps",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hamstrings_knee_flexion",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hip_extension",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:calves",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 1,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 2,
+          "target": {
+            "min": 1,
+            "max": 4
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:core",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 59,
+      "expectedSessionMinutes": 43.4,
+      "reason": "calibration_start_without_tolerance_claim"
+    },
+    {
+      "experience": "beginner",
+      "profile": "ordinary-recovery-productive-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "established_productive",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:chest",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lats",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:upper_back",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:anterior_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lateral_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:rear_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:triceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:biceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:quadriceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hamstrings_knee_flexion",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hip_extension",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:calves",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 1,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 2,
+          "target": {
+            "min": 1,
+            "max": 4
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:core",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 59,
+      "expectedSessionMinutes": 43.4,
+      "reason": "middle_start_with_retained_productive_history"
+    },
+    {
+      "experience": "beginner",
+      "profile": "high-demonstrated-capacity",
+      "context": {
+        "recovery": "high",
+        "history": "established_productive",
+        "workCapacity": "demonstrated_high",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:chest",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lats",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:upper_back",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 5,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:anterior_delts",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 5,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lateral_delts",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 5,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:rear_delts",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 5,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:triceps",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 5,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:biceps",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:quadriceps",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 5,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hamstrings_knee_flexion",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hip_extension",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 5,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:calves",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 2,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 2,
+          "target": {
+            "min": 1,
+            "max": 4
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:core",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        }
+      },
+      "totalDirectSets": 77,
+      "expectedSessionMinutes": 54.2,
+      "reason": "upper_start_requires_productive_history_and_high_capacity"
+    },
+    {
+      "experience": "beginner",
+      "profile": "concurrent-sport-no-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "lower_body_loading"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:chest",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lats",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:upper_back",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:anterior_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lateral_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:rear_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:triceps",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:biceps",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:quadriceps",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hamstrings_knee_flexion",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hip_extension",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:calves",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 1,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 2,
+          "target": {
+            "min": 1,
+            "max": 4
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:core",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 53,
+      "expectedSessionMinutes": 39.8,
+      "reason": "calibration_start_without_tolerance_claim"
+    },
+    {
+      "experience": "beginner",
+      "profile": "concurrent-sport-productive-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "established_productive",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "lower_body_loading"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:chest",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lats",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:upper_back",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:anterior_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:lateral_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:rear_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:triceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:biceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:quadriceps",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hamstrings_knee_flexion",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 4,
+          "authorisedFloor": 4,
+          "authorisedCeiling": 8,
+          "target": {
+            "min": 6,
+            "max": 10
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:hip_extension",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 3,
+          "authorisedCeiling": 6,
+          "target": {
+            "min": 4,
+            "max": 8
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:calves",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 1,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 2,
+          "target": {
+            "min": 1,
+            "max": 4
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:beginner",
+            "region:core",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 53,
+      "expectedSessionMinutes": 39.8,
+      "reason": "middle_start_with_retained_productive_history"
+    },
+    {
+      "experience": "intermediate",
+      "profile": "low-acceptable-recovery-no-history",
+      "context": {
+        "recovery": "low_acceptable",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:chest",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lats",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:upper_back",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:anterior_delts",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lateral_delts",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:rear_delts",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:triceps",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:biceps",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:quadriceps",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hamstrings_knee_flexion",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hip_extension",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:calves",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 1,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 3,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:core",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        }
+      },
+      "totalDirectSets": 83,
+      "expectedSessionMinutes": 57.8,
+      "reason": "calibration_start_without_tolerance_claim"
+    },
+    {
+      "experience": "intermediate",
+      "profile": "ordinary-recovery-no-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:chest",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lats",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:upper_back",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:anterior_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lateral_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:rear_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:triceps",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:biceps",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:quadriceps",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hamstrings_knee_flexion",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hip_extension",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:calves",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 2,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 3,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:core",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 101,
+      "expectedSessionMinutes": 68.6,
+      "reason": "calibration_start_without_tolerance_claim"
+    },
+    {
+      "experience": "intermediate",
+      "profile": "ordinary-recovery-productive-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "established_productive",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:chest",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lats",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:upper_back",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:anterior_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lateral_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:rear_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:triceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:biceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:quadriceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hamstrings_knee_flexion",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hip_extension",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:calves",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 2,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 3,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:core",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 101,
+      "expectedSessionMinutes": 68.6,
+      "reason": "middle_start_with_retained_productive_history"
+    },
+    {
+      "experience": "intermediate",
+      "profile": "high-demonstrated-capacity",
+      "context": {
+        "recovery": "high",
+        "history": "established_productive",
+        "workCapacity": "demonstrated_high",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 12,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:chest",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 12,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lats",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 12,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:upper_back",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:anterior_delts",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lateral_delts",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:rear_delts",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:triceps",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:biceps",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 12,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:quadriceps",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hamstrings_knee_flexion",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 12,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hip_extension",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:calves",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 3,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:core",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        }
+      },
+      "totalDirectSets": 119,
+      "expectedSessionMinutes": 79.4,
+      "reason": "upper_start_requires_productive_history_and_high_capacity"
+    },
+    {
+      "experience": "intermediate",
+      "profile": "concurrent-sport-no-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "lower_body_loading"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:chest",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lats",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:upper_back",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:anterior_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lateral_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:rear_delts",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:triceps",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:biceps",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:quadriceps",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hamstrings_knee_flexion",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hip_extension",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:calves",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 2,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 3,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:core",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 95,
+      "expectedSessionMinutes": 65,
+      "reason": "calibration_start_without_tolerance_claim"
+    },
+    {
+      "experience": "intermediate",
+      "profile": "concurrent-sport-productive-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "established_productive",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "lower_body_loading"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:chest",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lats",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:upper_back",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:anterior_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:lateral_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:rear_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:triceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:biceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:quadriceps",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hamstrings_knee_flexion",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 6,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:hip_extension",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 6,
+          "authorisedFloor": 5,
+          "authorisedCeiling": 10,
+          "target": {
+            "min": 6,
+            "max": 14
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:calves",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 2,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 3,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:intermediate",
+            "region:core",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 95,
+      "expectedSessionMinutes": 65,
+      "reason": "middle_start_with_retained_productive_history"
+    },
+    {
+      "experience": "advanced",
+      "profile": "low-acceptable-recovery-no-history",
+      "context": {
+        "recovery": "low_acceptable",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:chest",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lats",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:upper_back",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:anterior_delts",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lateral_delts",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:rear_delts",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:triceps",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:biceps",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:quadriceps",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hamstrings_knee_flexion",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hip_extension",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:calves",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 1,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 4,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:core",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "low_acceptable_recovery_uses_starting_floor",
+            "calibration_from_absent_comparable_history"
+          ]
+        }
+      },
+      "totalDirectSets": 90,
+      "expectedSessionMinutes": 62,
+      "reason": "calibration_start_without_tolerance_claim"
+    },
+    {
+      "experience": "advanced",
+      "profile": "ordinary-recovery-no-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:chest",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lats",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:upper_back",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:anterior_delts",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lateral_delts",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:rear_delts",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:triceps",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:biceps",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:quadriceps",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hamstrings_knee_flexion",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hip_extension",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:calves",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 1,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 4,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:core",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 95,
+      "expectedSessionMinutes": 65,
+      "reason": "calibration_start_without_tolerance_claim"
+    },
+    {
+      "experience": "advanced",
+      "profile": "ordinary-recovery-productive-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "established_productive",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:chest",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lats",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:upper_back",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:anterior_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lateral_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:rear_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:triceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:biceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:quadriceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hamstrings_knee_flexion",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hip_extension",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:calves",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 2,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 4,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:core",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 108,
+      "expectedSessionMinutes": 72.8,
+      "reason": "middle_start_with_retained_productive_history"
+    },
+    {
+      "experience": "advanced",
+      "profile": "high-demonstrated-capacity",
+      "context": {
+        "recovery": "high",
+        "history": "established_productive",
+        "workCapacity": "demonstrated_high",
+        "concurrentSport": "none"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 12,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:chest",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 12,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lats",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 12,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:upper_back",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:anterior_delts",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lateral_delts",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:rear_delts",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:triceps",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:biceps",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 12,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:quadriceps",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hamstrings_knee_flexion",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 12,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hip_extension",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:calves",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 3,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 4,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:core",
+            "productive_history_and_high_capacity_authorise_upper_start"
+          ]
+        }
+      },
+      "totalDirectSets": 126,
+      "expectedSessionMinutes": 83.6,
+      "reason": "upper_start_requires_productive_history_and_high_capacity"
+    },
+    {
+      "experience": "advanced",
+      "profile": "concurrent-sport-no-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "lower_body_loading"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:chest",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lats",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 9,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:upper_back",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:anterior_delts",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lateral_delts",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:rear_delts",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:triceps",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:biceps",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:quadriceps",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hamstrings_knee_flexion",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hip_extension",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:calves",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 1,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 4,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": true,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:core",
+            "advanced_without_productive_history_is_not_automatic_volume",
+            "calibration_from_absent_comparable_history",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 93,
+      "expectedSessionMinutes": 63.8,
+      "reason": "calibration_start_without_tolerance_claim"
+    },
+    {
+      "experience": "advanced",
+      "profile": "concurrent-sport-productive-history",
+      "context": {
+        "recovery": "ordinary",
+        "history": "established_productive",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "lower_body_loading"
+      },
+      "frequency": {
+        "chest": 1.67,
+        "lats": 1.67,
+        "upper_back": 1.67,
+        "anterior_delts": 1.67,
+        "lateral_delts": 1.67,
+        "rear_delts": 1.67,
+        "triceps": 1.67,
+        "biceps": 1.67,
+        "quadriceps": 1.67,
+        "hamstrings_knee_flexion": 1.67,
+        "hip_extension": 1.67,
+        "calves": 1.67,
+        "core": 0.83
+      },
+      "muscles": {
+        "chest": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:chest",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lats": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lats",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "upper_back": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 10,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:upper_back",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "anterior_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:anterior_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "lateral_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:lateral_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "rear_delts": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:rear_delts",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "triceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:triceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "biceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:biceps",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "quadriceps": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:quadriceps",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hamstrings_knee_flexion": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hamstrings_knee_flexion",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "hip_extension": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 8,
+          "authorisedFloor": 8,
+          "authorisedCeiling": 14,
+          "target": {
+            "min": 10,
+            "max": 20
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:hip_extension",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "calves": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 7,
+          "authorisedFloor": 7,
+          "authorisedCeiling": 12,
+          "target": {
+            "min": 8,
+            "max": 16
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:calves",
+            "concurrent_lower_body_workload_reduces_starting_resistance_dose",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        },
+        "core": {
+          "policyId": "canonical_hypertrophy_volume_policy_v1",
+          "startingDirectSets": 2,
+          "authorisedFloor": 1,
+          "authorisedCeiling": 4,
+          "target": {
+            "min": 1,
+            "max": 6
+          },
+          "calibrationRequired": false,
+          "reasonCodes": [
+            "experience:advanced",
+            "region:core",
+            "ordinary_recovery_uses_middle_start"
+          ]
+        }
+      },
+      "totalDirectSets": 102,
+      "expectedSessionMinutes": 69.2,
+      "reason": "middle_start_with_retained_productive_history"
+    }
+  ]
+}

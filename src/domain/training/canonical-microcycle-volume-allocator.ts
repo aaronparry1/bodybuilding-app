@@ -226,7 +226,7 @@ function canonicalContract(input: CanonicalMicrocycleVolumeAllocationInput, type
   const denseHypertrophy = input.macrocycleGoal === "build_muscle" || input.macrocycleGoal === "get_leaner" || input.mesocycleId.includes("hypertrophy");
   const contract = type === "push" ? strengthOrPowerbuilding ? strengthPushContract() : pushContract(barbellDominant)
     : type === "pull" ? strengthOrPowerbuilding ? strengthPullContract() : pullContract(input.experience === "beginner")
-    : type === "legs" ? strengthOrPowerbuilding ? lowerContract(true, input.experience === "beginner", false) : lowerContract(false, input.experience === "beginner", true)
+    : type === "legs" ? strengthOrPowerbuilding ? lowerContract(true, input.experience === "beginner", false) : lowerContract(false, input.experience === "beginner", true, input.sessionRoles[index]?.endsWith(" F") === true)
     : type === "lower" || type === "lower_strength" ? strengthOrPowerbuilding ? lowerContract(true, input.experience === "beginner", false) : dumbbellBodyweightOnly ? limitedLowerContract("dumbbell") : machineCableOnly ? limitedLowerContract("machine") : lowerContract(false, input.experience === "beginner", denseHypertrophy)
     : type === "squat" ? lowerContract(true)
     : type === "bench" ? benchContract()
@@ -286,7 +286,7 @@ function pullContract(beginnerStable = false): readonly SlotContract[] { return 
   slot("isolation", "accessory", ["biceps"], ["biceps"], "shortened-range biceps finish", ["isolation"], { repeatPolicy: "variation_preferred", preferredHypertrophyBias: "shortened", baseWorkingSets: 2 }),
 ]; }
 
-function lowerContract(squatSpecific: boolean, beginnerSimple = false, denseHypertrophy = true): readonly SlotContract[] {
+function lowerContract(squatSpecific: boolean, beginnerSimple = false, denseHypertrophy = true, complementarySecond = false): readonly SlotContract[] {
   if (beginnerSimple && !squatSpecific) return [
     slot("secondary_compound", "primary", ["quads"], ["quadriceps"], "stable knee-dominant practice", ["squat", "lunge"], { repeatPolicy: "stable_primary_practice", baseWorkingSets: 6 }),
     slot("secondary_compound", "secondary", ["glutes"], ["hip_extension"], "stable hip-extension practice", ["hip_thrust"], { repeatPolicy: "variation_preferred", baseWorkingSets: 6 }),
@@ -300,6 +300,15 @@ function lowerContract(squatSpecific: boolean, beginnerSimple = false, denseHype
     slot("secondary_compound", "secondary", ["hamstrings", "glutes"], ["hip_extension"], "posterior-chain assistance", ["hinge", "hip_thrust"], { repeatPolicy: "variation_preferred", transferRationale: squatSpecific ? "squat_posterior_support" : undefined, baseWorkingSets: 3 }),
     slot("isolation", "accessory", ["hamstrings"], ["hamstrings_knee_flexion"], "knee-flexion hamstring support", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 2 }),
     slot("isolation", "accessory", ["calves"], ["calves"], "calf retention", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 2 }),
+  ];
+  if (complementarySecond) return [
+    slot("primary_compound", "primary", ["hamstrings", "glutes"], ["hip_extension"], "hinge-led posterior-chain anchor", ["hinge"], { repeatPolicy: "stable_primary_practice", baseWorkingSets: 4 }),
+    slot("secondary_compound", "secondary", ["quads", "glutes"], ["quadriceps"], "single-leg knee-dominant hypertrophy", ["lunge"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3 }),
+    slot("isolation", "accessory", ["hamstrings"], ["hamstrings_knee_flexion"], "knee-flexion hamstring work", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 3 }),
+    slot("isolation", "accessory", ["quads"], ["quadriceps"], "low-systemic-cost quadriceps work", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 2 }),
+    slot("secondary_compound", "secondary", ["glutes"], ["hip_extension"], "shortened hip-extension stimulus", ["hip_thrust"], { repeatPolicy: "variation_preferred", preferredHypertrophyBias: "shortened", baseWorkingSets: 3 }),
+    slot("isolation", "accessory", ["calves"], ["calves"], "calf work", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 4 }),
+    slot("accessory", "accessory", ["abs"], ["core"], "trunk work", ["core"], { repeatPolicy: "repeat_if_no_equivalent", baseWorkingSets: 2 }),
   ];
   return [
   slot(squatSpecific ? "primary_compound" : "secondary_compound", "primary", ["quads"], ["quadriceps"], squatSpecific ? "squat-specific anchor" : "knee-dominant anchor", ["squat", "lunge"], squatSpecific ? { primaryLift: "squat", liftExposure: "primary", repeatPolicy: "stable_primary_practice", transferRationale: "squat_quad_drive", baseWorkingSets: 4 } : { repeatPolicy: "stable_primary_practice", baseWorkingSets: 4 }),
@@ -459,6 +468,7 @@ function weeklyBounds(experience: ExperienceLevel, region: CanonicalStimulusRegi
 }
 
 function planStartingFloor(input: CanonicalMicrocycleVolumeAllocationInput, region: CanonicalStimulusRegion): number {
+  if (region === "core") return 1;
   const locallySmaller = ["lats", "upper_back", "anterior_delts", "lateral_delts", "rear_delts", "triceps", "biceps", "hamstrings_knee_flexion", "calves", "core"].includes(region);
   const advancedEvidence = input.experience === "advanced" && input.establishedLoadExerciseIds.length > 0;
   const base = input.experience === "beginner" ? (locallySmaller ? 2 : 5) : advancedEvidence ? (locallySmaller ? 4 : 8) : (locallySmaller ? 3 : 7);
