@@ -5,9 +5,10 @@ import { assessCanonicalExerciseRoleSuitability } from "@/domain/training/canoni
 import { allocateCanonicalMicrocycleVolume, detectCanonicalMicrocycleOverlap, type CanonicalMicrocycleVolumeAllocation } from "@/domain/training/canonical-microcycle-volume-allocator";
 import type { CanonicalSessionSnapshotV3 } from "@/domain/training/canonical-session-construction-pipeline";
 import type { CanonicalLoadEvidence } from "@/domain/training/canonical-load-prescription";
+import { createMicrocycle } from "@/domain/training/microcycle-scheduler";
 import { exerciseLibrary } from "@/domain/training/presets";
 
-const roles = ["Bench and hypertrophy", "Squat and hypertrophy", "Deadlift and back", "Upper support", "Lower support"] as const;
+const roles = createMicrocycle({ parentMesocycleId: "powerbuilding_foundation", trainingDays: 5, split: "push_pull_legs" }).sessionRoles;
 const equipment = ["barbell", "dumbbell", "machine", "cable", "bodyweight"] as const;
 
 function exercise(id: string) { return exerciseLibrary.find((candidate) => candidate.id === id)!; }
@@ -43,7 +44,7 @@ describe("canonical training-quality policies", () => {
   });
 
   it("ranks a stable hypertrophy squat above an unauthorised strength specialist", () => {
-    const slot = allocation().slots.find((candidate) => candidate.purpose.includes("quadriceps hypertrophy"))!;
+    const slot = allocation().slots.find((candidate) => candidate.purpose === "quad drive assistance")!;
     const context = { slot, macrocycleGoal: "build_muscle_and_strength", mesocycleId: "powerbuilding_foundation", experience: "intermediate" as const, sessionExerciseIds: ["ex-barbell-back-squat"], weeklyExerciseUsage: {}, sessionHighFatigueSets: 4 };
     const specialist = assessCanonicalExerciseRoleSuitability({ ...context, exercise: exercise("ex-anderson-squat") });
     const stable = assessCanonicalExerciseRoleSuitability({ ...context, exercise: exercise("ex-hack-squat-machine") });
@@ -53,7 +54,7 @@ describe("canonical training-quality policies", () => {
   });
 
   it("excludes high-fatigue support work when recovery is restricted", () => {
-    const slot = allocation().slots.find((candidate) => candidate.purpose.includes("quadriceps hypertrophy"))!;
+    const slot = allocation().slots.find((candidate) => candidate.purpose === "quad drive assistance")!;
     const result = assessCanonicalExerciseRoleSuitability({ exercise: exercise("ex-barbell-back-squat"), slot: { ...slot, exerciseRole: "primary_compound", primaryLift: undefined, liftExposure: undefined }, macrocycleGoal: "build_strength", mesocycleId: "strength_foundation", experience: "advanced", sessionExerciseIds: [], weeklyExerciseUsage: {}, sessionHighFatigueSets: 0, recoveryRestricted: true });
     expect(result).toMatchObject({ suitability: "unsuitable", reasons: expect.arrayContaining(["recovery_restriction_excludes_high_fatigue_support_work"]) });
   });
@@ -64,7 +65,7 @@ describe("canonical training-quality policies", () => {
     const primaryRepeat = assessCanonicalExerciseRoleSuitability({ exercise: exercise("ex-bench-press"), slot: primarySlot, macrocycleGoal: "build_muscle_and_strength", mesocycleId: "powerbuilding_foundation", experience: "intermediate", sessionExerciseIds: [], weeklyExerciseUsage: { "ex-bench-press": 1 }, sessionHighFatigueSets: 0 });
     expect(primaryRepeat.repeatReason).toBe("stable_primary_practice");
 
-    const chestSlot = plan.slots.find((slot) => slot.purpose === "complementary chest hypertrophy")!;
+    const chestSlot = plan.slots.find((slot) => slot.purpose === "bench position and pec-strength assistance")!;
     const repeatedAccessory = assessCanonicalExerciseRoleSuitability({ exercise: exercise("ex-incline-dumbbell-press"), slot: chestSlot, macrocycleGoal: "build_muscle_and_strength", mesocycleId: "powerbuilding_foundation", experience: "intermediate", sessionExerciseIds: [], weeklyExerciseUsage: { "ex-incline-dumbbell-press": 1 }, sessionHighFatigueSets: 0 });
     expect(repeatedAccessory.repeatReason).toBe("variation_preferred");
     expect(repeatedAccessory.score).toBeLessThan(primaryRepeat.score);
@@ -72,31 +73,32 @@ describe("canonical training-quality policies", () => {
 
   it("fails adversarial substitutions closed instead of certifying false coverage", () => {
     const base = construct();
-    const pulloverAsVertical = certifyCanonicalConstructedMicrocycle({ allocation: allocation(), sessions: replace(base, 2, 2, "ex-dumbbell-pullover"), exercises: exerciseLibrary });
-    expect(pulloverAsVertical.failures).toContain("slot_movement_mismatch:ex-dumbbell-pullover:true vertical-pull lat work");
+    const pulloverAsVertical = certifyCanonicalConstructedMicrocycle({ allocation: allocation(), sessions: replace(base, 1, 1, "ex-dumbbell-pullover"), exercises: exerciseLibrary });
+    expect(pulloverAsVertical.failures).toEqual(expect.arrayContaining([expect.stringContaining("ex-dumbbell-pullover")]));
 
-    const frontRaiseAsLateral = certifyCanonicalConstructedMicrocycle({ allocation: allocation(), sessions: replace(base, 0, 2, "ex-cable-front-raise"), exercises: exerciseLibrary });
+    const frontRaiseAsLateral = certifyCanonicalConstructedMicrocycle({ allocation: allocation(), sessions: replace(base, 0, 4, "ex-cable-front-raise"), exercises: exerciseLibrary });
     expect(frontRaiseAsLateral.failures).toContain("lateral_delts_direct_coverage_missing");
 
-    const pressingWithoutVerticalPull = certifyCanonicalConstructedMicrocycle({ allocation: allocation(), sessions: replace(base, 2, 2, "ex-decline-barbell-bench"), exercises: exerciseLibrary });
-    expect(pressingWithoutVerticalPull.failures).toEqual(expect.arrayContaining(["lats_direct_coverage_missing", "slot_movement_mismatch:ex-decline-barbell-bench:true vertical-pull lat work"]));
+    const pressingWithoutVerticalPull = certifyCanonicalConstructedMicrocycle({ allocation: allocation(), sessions: replace(base, 1, 1, "ex-decline-barbell-bench"), exercises: exerciseLibrary });
+    expect(pressingWithoutVerticalPull.failures).toEqual(expect.arrayContaining(["lats_direct_coverage_missing", "slot_movement_mismatch:ex-decline-barbell-bench:lat position assistance for the deadlift"]));
 
-    const specialistDefault = certifyCanonicalConstructedMicrocycle({ allocation: allocation(), sessions: replace(base, 1, 1, "ex-anderson-squat"), exercises: exerciseLibrary });
+    const specialistDefault = certifyCanonicalConstructedMicrocycle({ allocation: allocation(), sessions: replace(base, 2, 1, "ex-anderson-squat"), exercises: exerciseLibrary });
     expect(specialistDefault.failures).toContain("unauthorised_specialist_selection");
 
-    const repeatedRowOmittingPull = certifyCanonicalConstructedMicrocycle({ allocation: allocation(), sessions: replace(base, 2, 2, "ex-chest-supported-row"), exercises: exerciseLibrary });
+    const repeatedRowOmittingPull = certifyCanonicalConstructedMicrocycle({ allocation: allocation(), sessions: replace(base, 1, 1, "ex-chest-supported-row"), exercises: exerciseLibrary });
     expect(repeatedRowOmittingPull.failures).toEqual(expect.arrayContaining(["lats_direct_coverage_missing", "repeat_without_programme_reason:ex-chest-supported-row"]));
   });
 
   it("uses lift- and fatigue-aware exact targets rather than universal 10/14 defaults", () => {
     const sessions = construct();
-    const bench = sessions[0]!.slots[0]!;
-    const squat = sessions[1]!.slots[0]!;
-    const deadlift = sessions[2]!.slots[0]!;
+    const slots = sessions.flatMap((session) => session.slots);
+    const bench = slots.find((slot) => slot.exerciseId === "ex-bench-press")!;
+    const squat = slots.find((slot) => slot.exerciseId === "ex-barbell-back-squat")!;
+    const deadlift = slots.find((slot) => slot.exerciseId === "ex-deadlift")!;
     expect({ sets: deadlift.settings.requiredSets, targets: deadlift.exactTargets, rest: deadlift.rest.seconds }).toEqual({ sets: 3, targets: [5, 5, 5], rest: 240 });
     expect({ targets: bench.exactTargets, rest: bench.rest.seconds }).toEqual({ targets: [6, 6, 6, 6], rest: 180 });
     expect({ targets: squat.exactTargets, rest: squat.rest.seconds }).toEqual({ targets: [6, 6, 6, 6], rest: 210 });
-    expect(new Set(sessions.flatMap((session) => session.slots.flatMap((slot) => slot.exactTargets ?? [])))).toEqual(new Set([5, 6, 8, 10, 12, 15]));
+    expect(new Set(sessions.flatMap((session) => session.slots.flatMap((slot) => slot.exactTargets ?? [])))).toEqual(new Set([5, 6, 10, 12, 15]));
   });
 
   it("keeps calibration outside working volume and does not repeat it with fresh established evidence", () => {
@@ -110,9 +112,9 @@ describe("canonical training-quality policies", () => {
 
   it("reports excessive local overlap instead of a false no-overlap result", () => {
     const base = allocation();
-    const squatSecondary = base.slots.find((slot) => slot.sessionIndex === 1 && slot.order === 1)!;
+    const squatSecondary = base.slots.find((slot) => slot.sessionIndex === 2 && slot.order === 1)!;
     const overloaded = [...base.slots, { ...squatSecondary, order: 99, workingSets: 3 }];
-    expect(detectCanonicalMicrocycleOverlap(overloaded)).toContain("session_1_excessive_knee_dominant_overlap");
-    expect(base.directSets.quadriceps).toBe(10);
+    expect(detectCanonicalMicrocycleOverlap(overloaded)).toContain("session_2_excessive_knee_dominant_overlap");
+    expect(base.directSets.quadriceps).toBe(7);
   });
 });

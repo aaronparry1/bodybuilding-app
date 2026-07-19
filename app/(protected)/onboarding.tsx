@@ -5,7 +5,7 @@ import { useAppSettings } from "@/application/settings/app-settings";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { exerciseLibrary } from "@/domain/training/presets";
 import type { ExperienceLevel, ProgrammeGoal, UnitSystem } from "@/domain/training/models";
-import { getSelectableFrameworkOptionsForGoal, type ProgrammeFrameworkSuitability, type UserProgrammeFrameworkId } from "@/domain/training/programme-framework-rules";
+import { getCustomerFrameworksForFrequency, getRecommendedCustomerFramework, getSelectableFrameworkOptionsForGoal } from "@/domain/training/programme-framework-rules";
 import {
   type EventType,
   type PlanningChoice,
@@ -69,7 +69,7 @@ export default function OnboardingScreen() {
   const [eventType, setEventType] = useState<TrainingEventType>("custom");
   const [targetDate, setTargetDate] = useState("2026-12-01");
   const [daysPerWeek, setDaysPerWeek] = useState<TrainingDaysPerWeek>(5);
-  const [preferredSplit, setPreferredSplit] = useState<PreferredSplit>("let_app_choose");
+  const [preferredSplit, setPreferredSplit] = useState<PreferredSplit>("push_pull_legs");
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(settings.experienceLevel);
   const [recoveryCardioPreference, setRecoveryCardioPreference] = useState<RecoveryCardioPreference>(settings.recoveryCardioPreference);
 
@@ -81,7 +81,7 @@ export default function OnboardingScreen() {
   }, [commitmentType]);
   const step = steps[Math.min(stepIndex, steps.length - 1)] ?? "goal";
   const trainingGoalId = trainingGoalIdForSetup(setupGoal);
-  const splitOptions = frameworkOptionsForGoal(trainingGoalId);
+  const splitOptions = frameworkOptionsForGoal(trainingGoalId, daysPerWeek);
   const compatibleEventOptions = eventOptions.filter((option) => isTrainingEventTypeCompatibleWithGoal(trainingGoalId, option.value));
   const selectedEventType = isTrainingEventTypeCompatibleWithGoal(trainingGoalId, eventType) ? eventType : compatibleEventOptions[0]?.value ?? "custom";
   const trainingCommitment = deriveTrainingCommitment({
@@ -104,6 +104,12 @@ export default function OnboardingScreen() {
       setEventType(getCompatibleTrainingEventTypes(nextGoalId)[0] ?? "custom");
     }
   };
+  const chooseDaysPerWeek = (days: TrainingDaysPerWeek) => {
+    setDaysPerWeek(days);
+    if (!getCustomerFrameworksForFrequency(days).includes(preferredSplit as "full_body" | "upper_lower" | "push_pull_legs")) {
+      setPreferredSplit(getRecommendedCustomerFramework(trainingGoalId, days) ?? "full_body");
+    }
+  };
 
   const finish = () => {
     const now = new Date().toISOString();
@@ -119,6 +125,7 @@ export default function OnboardingScreen() {
       experienceLevel,
       equipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight", "bands", "other"],
       units: unit,
+      recoveryCardioPreference,
       exercises: exerciseLibrary,
     });
     if (state.hydration !== "hydrated") return;
@@ -159,7 +166,7 @@ export default function OnboardingScreen() {
             return { value: day, label: `${day} days`, detail: frequency.internalMeaning };
           })}
           selected={daysPerWeek}
-          onSelect={setDaysPerWeek}
+          onSelect={chooseDaysPerWeek}
         />
       ) : null}
       {step === "split" ? <OptionList<PreferredSplit> options={splitOptions} selected={preferredSplit} onSelect={setPreferredSplit} /> : null}
@@ -400,24 +407,12 @@ function eventTypeForTrainingCommitment(eventType: TrainingEventType): EventType
   return eventType;
 }
 
-function frameworkOptionsForGoal(goalId: TrainingGoalId): Array<{ value: PreferredSplit; label: string; detail: string }> {
-  return getSelectableFrameworkOptionsForGoal(goalId).map((option) => ({
-    value: preferredSplitForFramework(option.id),
+function frameworkOptionsForGoal(goalId: TrainingGoalId, daysPerWeek: TrainingDaysPerWeek): Array<{ value: PreferredSplit; label: string; detail: string }> {
+  return getSelectableFrameworkOptionsForGoal(goalId, daysPerWeek).map((option) => ({
+    value: option.id as PreferredSplit,
     label: option.displayName,
-    detail: `${suitabilityLabel(option.suitability)} · ${option.shortDescription}`,
+    detail: `${option.isDefaultRecommendation ? "Recommended · " : ""}${option.shortDescription}`,
   }));
-}
-
-function preferredSplitForFramework(frameworkId: UserProgrammeFrameworkId): PreferredSplit {
-  if (frameworkId === "asc_recommended") return "let_app_choose";
-  if (frameworkId === "body_part_split") return "body_part_split";
-  return frameworkId;
-}
-
-function suitabilityLabel(suitability: ProgrammeFrameworkSuitability): string {
-  if (suitability === "best") return "Best fit";
-  if (suitability === "not_recommended") return "Not recommended";
-  return titleValue(suitability);
 }
 
 function programmeGoalForSetup(goal: TrainingSetupGoal, experienceLevel: ExperienceLevel): ProgrammeGoal {

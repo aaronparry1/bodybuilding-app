@@ -1,0 +1,817 @@
+{
+  "schemaVersion": "canonical_adaptive_planning_certification_v1",
+  "prescriptionVersion": "canonical_cardio_prescription_v1",
+  "cases": [
+    {
+      "id": "beginner-hypertrophy-2",
+      "goal": "build_muscle",
+      "liftingSessions": 2,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-beginner-hypertrophy-2:cardio:1",
+            "dayOffset": 1,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-beginner-hypertrophy-2:cardio:2",
+            "dayOffset": 2,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "intermediate-hypertrophy-3",
+      "goal": "build_muscle",
+      "liftingSessions": 3,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-intermediate-hypertrophy-3:cardio:1",
+            "dayOffset": 1,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-intermediate-hypertrophy-3:cardio:2",
+            "dayOffset": 3,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "intermediate-hypertrophy-4",
+      "goal": "build_muscle",
+      "liftingSessions": 4,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-intermediate-hypertrophy-4:cardio:1",
+            "dayOffset": 2,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-intermediate-hypertrophy-4:cardio:2",
+            "dayOffset": 5,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "intermediate-hypertrophy-5",
+      "goal": "build_muscle",
+      "liftingSessions": 5,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-intermediate-hypertrophy-5:cardio:1",
+            "dayOffset": 3,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-intermediate-hypertrophy-5:cardio:2",
+            "dayOffset": 6,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "intermediate-hypertrophy-6",
+      "goal": "build_muscle",
+      "liftingSessions": 6,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-intermediate-hypertrophy-6:cardio:1",
+            "dayOffset": 6,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-intermediate-hypertrophy-6:cardio:2",
+            "dayOffset": 6,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "beginner-strength-3",
+      "goal": "build_strength",
+      "liftingSessions": 3,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_strength",
+        "sessions": [
+          {
+            "id": "cert-beginner-strength-3:cardio:1",
+            "dayOffset": 1,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-beginner-strength-3:cardio:2",
+            "dayOffset": 3,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "heavy_lower_interference_minimised"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "intermediate-strength-4",
+      "goal": "build_strength",
+      "liftingSessions": 4,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_strength",
+        "sessions": [
+          {
+            "id": "cert-intermediate-strength-4:cardio:1",
+            "dayOffset": 2,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-intermediate-strength-4:cardio:2",
+            "dayOffset": 5,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "heavy_lower_interference_minimised"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "intermediate-powerbuilding-3",
+      "goal": "build_muscle_and_strength",
+      "liftingSessions": 3,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle_and_strength",
+        "sessions": [
+          {
+            "id": "cert-intermediate-powerbuilding-3:cardio:1",
+            "dayOffset": 1,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-intermediate-powerbuilding-3:cardio:2",
+            "dayOffset": 3,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "intermediate-powerbuilding-5",
+      "goal": "build_muscle_and_strength",
+      "liftingSessions": 5,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle_and_strength",
+        "sessions": [
+          {
+            "id": "cert-intermediate-powerbuilding-5:cardio:1",
+            "dayOffset": 3,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-intermediate-powerbuilding-5:cardio:2",
+            "dayOffset": 6,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "athletic-concurrent-workload",
+      "goal": "athletic_performance",
+      "liftingSessions": 3,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "athletic_performance",
+        "sessions": [
+          {
+            "id": "cert-athletic-concurrent-workload:cardio:1",
+            "dayOffset": 1,
+            "kind": "capacity_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 25,
+            "intensity": "moderate_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-athletic-concurrent-workload:cardio:2",
+            "dayOffset": 3,
+            "kind": "capacity_cardio",
+            "modality": "cycle",
+            "durationMinutes": 25,
+            "intensity": "moderate_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-athletic-concurrent-workload:cardio:3",
+            "dayOffset": 6,
+            "kind": "performance_conditioning",
+            "modality": "run",
+            "durationMinutes": 18,
+            "intensity": "intervals",
+            "intervalStructure": {
+              "repetitions": 6,
+              "workSeconds": 60,
+              "recoverySeconds": 120
+            },
+            "placement": "separate_from_lower_lifting",
+            "progression": "Add one interval only after two completed sessions retain speed and lifting recovery.",
+            "stopOrAdjust": "End the session when running speed or movement quality materially declines; do not place within 24 hours before the hardest lower-body session."
+          }
+        ],
+        "weeklyFrequency": 3,
+        "rationaleCodes": [
+          "athletic_capacity_and_power",
+          "sport_workload_subtracted",
+          "lower_body_interference_managed"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "getting-lean-recovery-boundary",
+      "goal": "get_leaner",
+      "liftingSessions": 4,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "get_leaner",
+        "sessions": [
+          {
+            "id": "cert-getting-lean-recovery-boundary:cardio:1",
+            "dayOffset": 2,
+            "kind": "capacity_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 25,
+            "intensity": "moderate_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-getting-lean-recovery-boundary:cardio:2",
+            "dayOffset": 5,
+            "kind": "capacity_cardio",
+            "modality": "cycle",
+            "durationMinutes": 25,
+            "intensity": "moderate_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-getting-lean-recovery-boundary:cardio:3",
+            "dayOffset": 6,
+            "kind": "capacity_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 25,
+            "intensity": "moderate_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 3,
+        "rationaleCodes": [
+          "energy_expenditure_support",
+          "resistance_stimulus_preserved",
+          "duration_before_frequency"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "limited-dumbbells",
+      "goal": "build_muscle",
+      "liftingSessions": 4,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-limited-dumbbells:cardio:1",
+            "dayOffset": 2,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-limited-dumbbells:cardio:2",
+            "dayOffset": 5,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "limited-machines",
+      "goal": "build_muscle",
+      "liftingSessions": 4,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-limited-machines:cardio:1",
+            "dayOffset": 2,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-limited-machines:cardio:2",
+            "dayOffset": 5,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "event-strength",
+      "goal": "build_strength",
+      "liftingSessions": 4,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_strength",
+        "sessions": [
+          {
+            "id": "cert-event-strength:cardio:1",
+            "dayOffset": 2,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-event-strength:cardio:2",
+            "dayOffset": 5,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "heavy_lower_interference_minimised"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "established-loads",
+      "goal": "build_muscle",
+      "liftingSessions": 5,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-established-loads:cardio:1",
+            "dayOffset": 3,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-established-loads:cardio:2",
+            "dayOffset": 6,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "no-load-history",
+      "goal": "build_muscle",
+      "liftingSessions": 5,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-no-load-history:cardio:1",
+            "dayOffset": 3,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-no-load-history:cardio:2",
+            "dayOffset": 6,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    },
+    {
+      "id": "exercise-limitation",
+      "goal": "build_muscle",
+      "liftingSessions": 4,
+      "conditioning": {
+        "schemaVersion": "canonical_cardio_prescription_v1",
+        "policyId": "canonical_concurrent_training_policy_v1",
+        "preference": "recommended",
+        "status": "active",
+        "goal": "build_muscle",
+        "sessions": [
+          {
+            "id": "cert-exercise-limitation:cardio:1",
+            "dayOffset": 2,
+            "kind": "recovery_cardio",
+            "modality": "incline_walk",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          },
+          {
+            "id": "cert-exercise-limitation:cardio:2",
+            "dayOffset": 5,
+            "kind": "recovery_cardio",
+            "modality": "cycle",
+            "durationMinutes": 20,
+            "intensity": "easy_zone_2",
+            "placement": "recovery_day",
+            "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+            "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+          }
+        ],
+        "weeklyFrequency": 2,
+        "rationaleCodes": [
+          "recovery_capacity",
+          "hypertrophy_stimulus_preserved"
+        ],
+        "interferenceRules": [
+          "cardio_never_changes_lifting_session_count",
+          "hard_conditioning_not_before_priority_lower_session",
+          "progress_requires_completed_tolerated_evidence"
+        ]
+      }
+    }
+  ]
+}

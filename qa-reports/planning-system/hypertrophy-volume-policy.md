@@ -1,0 +1,120 @@
+# Hypertrophy Volume Policy
+
+Generated from `canonical_adaptive_planning_certification_v1`. This report is evidence, not a second planning authority.
+
+```json
+{
+  "schemaVersion": "canonical_adaptive_planning_certification_v1",
+  "allocatorPolicy": {
+    "policyId": "canonical_microcycle_volume_policy_v3",
+    "accountingConvention": "A working set counts once for every explicitly programmed direct stimulus region it meaningfully trains; it is not divided into fractional set-equivalents. Meaningful secondary stimulus and fatigue are reported separately and are not added to direct volume. These categories are guardrails, not claims of physiological precision.",
+    "durationConvention": "The construction estimate reserves eight minutes of session overhead and three minutes per working set; it is a feasibility bound, not a promise of elapsed workout time.",
+    "fatigueConvention": "The planning index weights primary, secondary and accessory sets 3/2/1 only to detect concentration and overlap. Exercise-level output retains the catalogue's factual high/moderate/low fatigue class.",
+    "sourceReferences": [
+      "docs/evidence-based-prescription-model.md#weekly-volume-targets",
+      "docs/evidence-based-prescription-model.md#session-volume-targets",
+      "src/domain/training/productive-set-targets.ts#targetTable",
+      "src/domain/training/volume-landmarks.ts#getStartingVolumeLandmarks"
+    ]
+  },
+  "volumePolicy": {
+    "policyId": "canonical_hypertrophy_volume_policy_v1",
+    "sourceReferences": [
+      "docs/evidence-based-prescription-model.md#weekly-volume-targets",
+      "docs/evidence-based-prescription-model.md#session-volume-targets",
+      "src/domain/training/volume-landmarks.ts#getStartingVolumeLandmarks"
+    ],
+    "accounting": "Direct working sets are counted by explicitly programmed stimulus region. Secondary stimulus is reported separately and never silently promoted to a direct set.",
+    "progression": {
+      "add": "Add one direct set to one local stimulus region only after at least three comparable completed observations show productive performance, recovery is acceptable, the region remains below target, and no rep drop-off or technique contraindication is present.",
+      "retain": "Retain dosage when comparable performance is improving or stable inside the target range, or when evidence is not yet sufficient for a safe change.",
+      "remove": "Remove one direct set from the affected region after confirmed local rep drop-off or local recovery failure; remove two only when the same fresh signal is repeated and the resulting dose remains above the starting floor.",
+      "reallocate": "Reallocate one low-benefit accessory set to a lagging region only when systemic recovery is acceptable, the source region is at or above target, the destination is below target, and both regions have comparable evidence.",
+      "systemic": "Systemic fatigue never triggers an automatic local increase. Hold all additions and require stress-reduction review; deload remains a separate Mesocycle decision."
+    }
+  },
+  "previousFiveDayWorkingSets": 49,
+  "correctedFiveDay": [
+    {
+      "id": "intermediate-hypertrophy-5-push_pull_legs-calibration",
+      "totalWorkingSets": 95,
+      "directSets": {
+        "chest": 14,
+        "anterior_delts": 6,
+        "lateral_delts": 6,
+        "triceps": 10,
+        "upper_back": 14,
+        "lats": 8,
+        "rear_delts": 6,
+        "biceps": 10,
+        "quadriceps": 7,
+        "hip_extension": 7,
+        "hamstrings_knee_flexion": 3,
+        "calves": 4
+      },
+      "secondarySets": {
+        "triceps": 20,
+        "anterior_delts": 11,
+        "biceps": 22,
+        "rear_delts": 14,
+        "hip_extension": 12,
+        "upper_back": 10
+      },
+      "frequency": {
+        "anterior_delts": 2,
+        "biceps": 2,
+        "calves": 1,
+        "chest": 2,
+        "hamstrings_knee_flexion": 1,
+        "hip_extension": 1,
+        "lateral_delts": 2,
+        "lats": 2,
+        "quadriceps": 1,
+        "rear_delts": 2,
+        "triceps": 2,
+        "upper_back": 2
+      }
+    },
+    {
+      "id": "intermediate-hypertrophy-5-push_pull_legs-established",
+      "totalWorkingSets": 95,
+      "directSets": {
+        "chest": 14,
+        "anterior_delts": 6,
+        "lateral_delts": 6,
+        "triceps": 10,
+        "upper_back": 14,
+        "lats": 8,
+        "rear_delts": 6,
+        "biceps": 10,
+        "quadriceps": 7,
+        "hip_extension": 7,
+        "hamstrings_knee_flexion": 3,
+        "calves": 4
+      },
+      "secondarySets": {
+        "triceps": 20,
+        "anterior_delts": 11,
+        "biceps": 22,
+        "rear_delts": 14,
+        "hip_extension": 12,
+        "upper_back": 10
+      },
+      "frequency": {
+        "anterior_delts": 2,
+        "biceps": 2,
+        "calves": 1,
+        "chest": 2,
+        "hamstrings_knee_flexion": 1,
+        "hip_extension": 1,
+        "lateral_delts": 2,
+        "lats": 2,
+        "quadriceps": 1,
+        "rear_delts": 2,
+        "triceps": 2,
+        "upper_back": 2
+      }
+    }
+  ]
+}
+```

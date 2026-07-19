@@ -34,7 +34,7 @@ describe("canonical Home Design-QA states", () => {
     const home = readCanonicalHomeProjection({ now: Date.parse("2026-07-18T12:00:00.000Z") });
     expect(home.primary?.kind).toBe("completed_today");
     expect(home.progress.historicalCount).toBe(1);
-    expect(home.primary?.detail).toContain("11 working sets");
+    expect(home.primary?.detail).toContain("15 working sets");
     expect(home.actions.some((action) => action.type === "open_planned_session")).toBe(true);
   });
 

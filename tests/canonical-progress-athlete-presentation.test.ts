@@ -32,7 +32,7 @@ describe("athlete-facing canonical Progress presentation", () => {
     expect(progress.status).toBe("early");
     expect(progress.overview).toMatchObject({ completedWorkouts: 1 });
     expect(progress.recentTraining).toHaveLength(1);
-    expect(progress.recentTraining[0]!.detail).toBe("11 of 11 working sets completed · 45 min");
+    expect(progress.recentTraining[0]!.detail).toBe("15 of 15 working sets completed · 45 min");
     expect(progress.overview).toMatchObject({ completedSummary: "1 workout completed", recentConsistency: "Trained 1 of the last 4 weeks", phaseProgress: "1 session this phase" });
     expect(progress.overview?.guidance).toBe("Keep training—your first reliable trends will appear after 2 more comparable workouts.");
     expect(progress.trend).toBeUndefined();
@@ -49,7 +49,7 @@ describe("athlete-facing canonical Progress presentation", () => {
     expect(progress.trend).toMatchObject({ direction: "stable", metric: "e1rm", summary: "Bench Press is holding steady at 70 kg estimated 1RM across 3 completed workouts." });
     expect(progress.overview).toMatchObject({ completedSummary: "3 workouts completed", recentConsistency: "Trained 3 of the last 4 weeks", phaseProgress: "3 sessions this phase" });
     expect(progress.overview?.calculationDisclosure).toContain("3 completed workouts and 3 comparable exercise observations");
-    expect(progress.recentTraining.every((session) => session.detail.startsWith("11 of 11 working sets completed · "))).toBe(true);
+    expect(progress.recentTraining.every((session) => session.detail.startsWith("15 of 15 working sets completed · "))).toBe(true);
     expect(progress.recentTraining.every((session) => session.action.label === "View workout")).toBe(true);
     expect(new Set(progress.recentTraining.map((session) => session.id)).size).toBe(progress.recentTraining.length);
   });
@@ -147,7 +147,7 @@ describe("athlete-facing canonical Progress presentation", () => {
       const performed = effectiveCanonicalPerformedWork(record.events);
       const completedAt = record.events.find((event) => event.type === "completed")?.occurredAt;
       expect(record.session.status).toBe("completed");
-      expect(prescribed).toBe(11);
+      expect(prescribed).toBe(15);
       expect(performed).toHaveLength(prescribed);
       expect(performed.every((event) => event.payload.completion === "complete")).toBe(true);
       expect((Date.parse(completedAt!) - Date.parse(record.session.startedAt!)) / 60_000).toBeGreaterThanOrEqual(45);

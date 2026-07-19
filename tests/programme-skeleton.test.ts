@@ -79,10 +79,10 @@ describe("programme skeleton", () => {
       "push_pull_legs",
     );
     expect(resolveProgrammeSkeletonFramework({ goal: "get_stronger", sessionsPerWeek: 3, frameworkPreference: "asc_recommended" })).toBe(
-      "bench_squat_deadlift",
+      "full_body",
     );
     expect(resolveProgrammeSkeletonFramework({ goal: "athletic_performance", sessionsPerWeek: 4, frameworkPreference: "let_app_choose" })).toBe(
-      "full_body",
+      "upper_lower",
     );
     expect(resolveProgrammeSkeletonFramework({ goal: "lose_fat", sessionsPerWeek: 2, frameworkPreference: "asc_recommended" })).toBe("full_body");
   });
@@ -94,7 +94,7 @@ describe("programme skeleton", () => {
         trainingDaysPerWeek: 5,
         frameworkPreference: "push_pull_legs",
       }).scheduledSessions.map((session) => session.sessionType),
-    ).toEqual(["push", "pull", "legs", "upper", "lower"]);
+    ).toEqual(["push", "pull", "legs", "push", "pull"]);
 
     expect(
       createProgrammeSkeleton({

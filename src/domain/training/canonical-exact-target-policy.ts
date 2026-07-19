@@ -8,6 +8,7 @@ export type CanonicalExactTarget = Readonly<{
   status: "resolved";
   policyId: typeof CANONICAL_EXACT_TARGET_POLICY_ID;
   targets: readonly number[];
+  targetKinds: readonly ("reps" | "amrap")[];
   restSeconds: number;
   reasonCodes: readonly string[];
 }>;
@@ -30,12 +31,14 @@ export function resolveCanonicalExactTarget(input: Readonly<{
   const maximum = input.slot.liftExposure === "primary" ? input.envelope.maxReps : Math.min(input.envelope.maxReps, input.exercise.defaultRepRange.max);
   if (minimum > maximum) return { status: "blocked", policyId: CANONICAL_EXACT_TARGET_POLICY_ID, reason: "exercise_and_mesocycle_targets_do_not_overlap" };
   const reps = Math.max(minimum, Math.min(maximum, ideal));
-  const targets = Array.from({ length: input.slot.workingSets }, () => reps);
+  const targets = targetsForMethod(input.method, input.slot.workingSets, reps, minimum, maximum);
+  const targetKinds = targets.map((_, index) => input.method === "amrap" && index === targets.length - 1 ? "amrap" as const : "reps" as const);
   const restSeconds = fatigueAwareRest(input.exercise, input.slot, input.lane);
   return {
     status: "resolved",
     policyId: CANONICAL_EXACT_TARGET_POLICY_ID,
     targets,
+    targetKinds,
     restSeconds,
     reasonCodes: [
       `lift:${input.slot.primaryLift ?? "none"}`,
@@ -48,6 +51,22 @@ export function resolveCanonicalExactTarget(input: Readonly<{
       `experience:${input.experience}`,
     ],
   };
+}
+
+function targetsForMethod(method: PrescriptionMethodFamily, sets: number, base: number, min: number, max: number): number[] {
+  const clamp = (value: number) => Math.max(min, Math.min(max, value));
+  if (method === "five_three_one") return fit([5, 3, 1], sets, clamp);
+  if (method === "bbb") return fit([10, 10, 10, 10, 10], sets, clamp);
+  if (method === "eight_across") return fit(Array.from({ length: 8 }, () => 8), sets, clamp);
+  if (method === "pyramid") return fit([base + 2, base, base - 2, base + 4], sets, clamp);
+  if (method === "ladder") return fit([base - 2, base, base + 2, base], sets, clamp);
+  if (method === "back_off_sets" || method === "heavy_single_triple_five_backoffs") return fit([base - 2, base + 2, base + 2, base + 2], sets, clamp);
+  if (method === "cluster" || method === "dynamic_effort" || method === "max_effort") return Array.from({ length: sets }, () => clamp(method === "max_effort" ? 1 : 3));
+  return Array.from({ length: sets }, () => clamp(base));
+}
+
+function fit(values: readonly number[], sets: number, clamp: (value: number) => number): number[] {
+  return Array.from({ length: sets }, (_, index) => clamp(values[Math.min(index, values.length - 1)]!));
 }
 
 function idealReps(exercise: Exercise, slot: AllocatedSlot, lane: TrainingLane): number {

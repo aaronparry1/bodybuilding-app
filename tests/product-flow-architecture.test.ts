@@ -190,8 +190,8 @@ describe("product flow architecture", () => {
     });
 
     expect(dashboard.todayState).toBe("planned");
-    expect(dashboard.primaryActionLabel).toBe("Start Bench and hypertrophy");
-    expect(dashboard.todayWorkoutName).toBe("Bench and hypertrophy");
+    expect(dashboard.primaryActionLabel).toBe("Start Push strength and hypertrophy");
+    expect(dashboard.todayWorkoutName).toBe("Push strength and hypertrophy");
     expect(dashboard.todayWorkoutName).toBeTruthy();
     expect(dashboard.todayGoal).toBeTruthy();
     expect(dashboard.currentDayIndex).toBeGreaterThanOrEqual(0);

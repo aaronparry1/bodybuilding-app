@@ -83,10 +83,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "id": "framework_preference",
       "sourceOfTruth": "onboarding PreferredSplit",
       "availability": "onboarding",
-      "domain": "ASC recommended or supported framework",
-      "validValues": "let_app_choose, push_pull_legs, upper_lower, full_body, body_part_split, bench_squat_deadlift",
-      "defaultValue": "let_app_choose",
-      "validation": "not-recommended goal combinations are not executable",
+      "domain": "three customer-facing framework preferences",
+      "validValues": "push_pull_legs, upper_lower, full_body (frequency compatible only)",
+      "defaultValue": "frequency-specific ASC preselection",
+      "validation": "frequency truth table rejects incompatibility before plan creation; internal asymmetric/lift strategies remain Microcycle-owned",
       "mayAffect": [
         "Microcycle",
         "Session Construction"
@@ -101,7 +101,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "exercise_selection"
       ],
       "applies": "next_microcycle",
-      "precedence": "preference yields to phase/safety/recovery"
+      "precedence": "preference intent is preserved while phase/safety/recovery may morph delivery"
     },
     {
       "id": "commitment",
@@ -239,14 +239,15 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     {
       "id": "recovery_cardio_preference",
       "sourceOfTruth": "onboarding/AppSettings",
-      "availability": "settings",
+      "availability": "onboarding",
       "domain": "recommended | minimal | off",
       "validValues": "three modes",
       "defaultValue": "recommended",
-      "validation": "does not erase recovery coaching or lifting stimulus",
+      "validation": "canonical concurrent-training policy creates exact bounded sessions without changing lifting-session count",
       "mayAffect": [
         "Microcycle",
-        "Progress"
+        "Progress",
+        "Presentation"
       ],
       "mustNotAffect": [
         "Macrocycle",
@@ -254,10 +255,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       ],
       "effects": [
         "recovery",
-        "scheduling"
+        "scheduling",
+        "presentation"
       ],
       "applies": "next_microcycle",
-      "precedence": "below safety/recovery evidence"
+      "precedence": "below safety, sport workload and recovery evidence"
     },
     {
       "id": "exercise_catalogue",

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { constructCanonicalActivePlanFromCanonicalInputs } from "@/application/training/canonical-active-plan-construction";
 import { canonicalFiveDayFixtureInput, canonicalFiveDayFixtureProfile, constructCanonicalFiveDayFixture } from "@/application/design-qa/canonical-five-day-plan-fixture";
@@ -105,6 +105,7 @@ function report(): string {
 
 describe("canonical five-day microcycle certification", () => {
   it("matches the committed complete-week certification artifact", () => {
+    if (process.env.UPDATE_CANONICAL_FIVE_DAY_REPORT === "1") writeFileSync(artifactPath, report());
     const expected = readFileSync(artifactPath, "utf8");
     expect(report()).toEqual(expected);
   });
@@ -113,7 +114,7 @@ describe("canonical five-day microcycle certification", () => {
     const result = construct();
     expect(result.status).toBe("constructed");
     if (result.status !== "constructed") return;
-    expect(result.carrier.plannedSessions.map((session) => snapshotSlots(session).length)).toEqual([4, 4, 4, 6, 5]);
+    expect(result.carrier.plannedSessions.map((session) => snapshotSlots(session).length)).toEqual([5, 5, 5, 5, 5]);
     for (const session of result.carrier.plannedSessions) {
       const slots = snapshotSlots(session);
       const exerciseIds = slots.map((slot) => slot.exerciseId);
@@ -140,9 +141,9 @@ describe("canonical five-day microcycle certification", () => {
     expect(result.status).toBe("constructed");
     if (result.status !== "constructed") return;
     const mainLiftSlots = result.carrier.plannedSessions.slice(0, 3).map((session) => snapshotSlots(session)[0]!);
-    expect(mainLiftSlots.map((slot) => slot.exerciseId)).toEqual(["ex-bench-press", "ex-barbell-back-squat", "ex-deadlift"]);
+    expect(mainLiftSlots.map((slot) => slot.exerciseId)).toEqual(["ex-bench-press", "ex-deadlift", "ex-barbell-back-squat"]);
     expect(mainLiftSlots.map((slot) => slot.loadPrescription.state)).toEqual(["established", "established", "established"]);
-    expect(mainLiftSlots.map((slot) => slot.loadPrescription.state === "established" ? slot.loadPrescription.prescribedBaseLoad : null)).toEqual([80, 120, 150]);
+    expect(mainLiftSlots.map((slot) => slot.loadPrescription.state === "established" ? slot.loadPrescription.prescribedBaseLoad : null)).toEqual([80, 150, 120]);
   });
 
   it("generates byte-equivalent prescriptions for identical inputs", () => {

@@ -61,6 +61,7 @@ export type CanonicalHomeProjection = Readonly<{
     headline: string;
   }>;
   recent?: Readonly<{ title: string; detail: string; completedAt?: string }>;
+  conditioning?: Readonly<{ title: string; detail: string; placement: string }>;
   attention?: Readonly<{ tone: "info" | "warning"; title: string; detail: string; action?: CanonicalHomeAction }>;
   actions: readonly CanonicalHomeAction[];
 }>;
@@ -173,10 +174,15 @@ export function projectCanonicalHome(input: Readonly<{
     primary,
     programme: { goal: trainingGoalDisplayName(model.macrocycle.goal), phase: mesocyclePurposeDisplayName(model.mesocycle.purpose), microcycle: `Week ${model.microcycle.sequenceNumber}`, sessionPosition, completionLabel },
     progress: progressSummary(historical.length, completedThisMicrocycle, evidenceStatus, reviewAvailable),
+    ...(model.conditioning?.status === "active" && model.conditioning.sessions[0] ? { conditioning: { title: cardioTitle(model.conditioning.sessions[0].kind), detail: cardioDetail(model.conditioning.sessions[0]), placement: placementLabel(model.conditioning.sessions[0].placement) } } : {}),
     ...(latest ? { recent: { title: sessionRoleDisplayName(latest.role), detail: `${latest.performedSets} sets · ${latest.performedReps} reps`, ...(latest.completedAt ? { completedAt: latest.completedAt } : {}) } } : {}),
     actions,
   };
 }
+
+function cardioTitle(kind: string): string { return kind === "performance_conditioning" ? "Performance conditioning" : kind === "capacity_cardio" ? "Capacity cardio" : "Recovery cardio"; }
+function cardioDetail(session: NonNullable<CanonicalActivePlanReadModel["conditioning"]>["sessions"][number]): string { return session.intensity === "intervals" && session.intervalStructure ? `${session.intervalStructure.repetitions} × ${session.intervalStructure.workSeconds / 60} min with ${session.intervalStructure.recoverySeconds / 60} min easy recovery` : `${session.durationMinutes} min · ${session.intensity === "easy_zone_2" ? "easy Zone 2" : "moderate Zone 2"} · ${session.modality.replaceAll("_", " ")}`; }
+function placementLabel(value: string): string { return value === "recovery_day" ? "Recovery day" : value === "after_upper_lifting" ? "After upper-body lifting" : "Separate from lower-body lifting"; }
 
 function plannedAction(model: CanonicalActivePlanReadModel, sessionId: string): CanonicalHomeAction {
   return { type: "open_planned_session", planId: model.planId, planRevision: model.revision, sessionId };

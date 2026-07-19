@@ -2763,7 +2763,8 @@
             "back_off_sets",
             "pyramid",
             "amrap",
-            "eight_across"
+            "eight_across",
+            "bbb"
           ],
           "prohibited": [],
           "conditional": [
@@ -3144,7 +3145,9 @@
             "straight_sets",
             "back_off_sets",
             "pyramid",
-            "heavy_single_triple_five_backoffs"
+            "heavy_single_triple_five_backoffs",
+            "five_three_one",
+            "ladder"
           ],
           "prohibited": [],
           "conditional": []
@@ -4831,7 +4834,9 @@
             "straight_sets",
             "back_off_sets",
             "pyramid",
-            "heavy_single_triple_five_backoffs"
+            "heavy_single_triple_five_backoffs",
+            "five_three_one",
+            "ladder"
           ],
           "prohibited": [],
           "conditional": [
@@ -5161,7 +5166,8 @@
             "back_off_sets",
             "pyramid",
             "heavy_single_triple_five_backoffs",
-            "dynamic_effort"
+            "dynamic_effort",
+            "cluster"
           ],
           "prohibited": [],
           "conditional": [
@@ -5489,7 +5495,8 @@
             "back_off_sets",
             "pyramid",
             "heavy_single_triple_five_backoffs",
-            "dynamic_effort"
+            "dynamic_effort",
+            "max_effort"
           ],
           "prohibited": [],
           "conditional": []
@@ -6901,7 +6908,8 @@
           "permitted": [
             "straight_sets",
             "back_off_sets",
-            "pyramid"
+            "pyramid",
+            "cluster"
           ],
           "prohibited": [],
           "conditional": []

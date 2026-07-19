@@ -99,6 +99,10 @@ function policyFor(spec: MesocycleSpec): MesocyclePrescriptionPolicy {
   if (!isDeload && !isTaper && isPower) methods.push("dynamic_effort");
   if (["hypertrophy_base", "hypertrophy_volume", "hypertrophy_specialisation", "powerbuilding_hypertrophy"].includes(id)) methods.push("amrap");
   if (["hypertrophy_volume", "hypertrophy_specialisation", "powerbuilding_hypertrophy"].includes(id)) methods.push("eight_across");
+  if (id === "strength_accumulation" || id === "powerbuilding_strength") methods.push("five_three_one", "ladder");
+  if (id === "strength_specific" || id === "athletic_force") methods.push("cluster");
+  if (id === "powerbuilding_hypertrophy") methods.push("bbb");
+  if (id === "strength_intensification") methods.push("max_effort");
   const conditionalMethods: PrescriptionMethodFamily[] = id === "powerbuilding_hypertrophy"
     ? ["bbb"]
     : id === "strength_accumulation" || id === "strength_specific"

@@ -7,6 +7,7 @@ export function HomeDashboard({ projection, onAction }: Readonly<{ projection: C
     <HomeGreeting projection={projection} />
     {projection.primary ? <HomeNextAction primary={projection.primary} onAction={onAction} /> : null}
     {projection.programme ? <HomeProgrammePosition projection={projection} /> : null}
+    {projection.conditioning ? <DashboardSection eyebrow="Conditioning" title={projection.conditioning.title}><Text style={{ ...type.body, color: colors.text }}>{projection.conditioning.detail}</Text><Text style={{ color: colors.textMuted, fontSize: 13 }}>{projection.conditioning.placement}</Text></DashboardSection> : null}
     {projection.status === "ready" && !projection.progress.reviewAvailable ? <HomeZeroHistory projection={projection} /> : null}
     {projection.attention ? <HomeAttention projection={projection} onAction={onAction} /> : null}
     {projection.status === "ready" && projection.progress.reviewAvailable ? <HomeProgressSnapshot projection={projection} onAction={onAction} /> : null}

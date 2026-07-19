@@ -1,0 +1,29 @@
+# Strategy Classification
+
+Generated from `canonical_adaptive_planning_certification_v1`. This report is evidence, not a second planning authority.
+
+```json
+{
+  "schemaVersion": "canonical_adaptive_planning_certification_v1",
+  "supportedCustomerChoices": [
+    "full_body",
+    "upper_lower",
+    "push_pull_legs"
+  ],
+  "internalOnly": [
+    "lift_emphasis_rotation",
+    "athletic_asymmetric_rotation",
+    "hypertrophy_asymmetric_rotation"
+  ],
+  "historicalRejectionOnly": [
+    "asc_recommended",
+    "body_part_split",
+    "bench_squat_deadlift"
+  ],
+  "futureNotAuthorised": [
+    "arbitrary_bodypart_split",
+    "caller_authored_rotation",
+    "unexplained_variety"
+  ]
+}
+```

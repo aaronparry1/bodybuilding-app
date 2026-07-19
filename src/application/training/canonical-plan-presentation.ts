@@ -59,6 +59,7 @@ export type CanonicalPlanPresentation = Readonly<{
     progressPercent: number;
   }>;
   schedule: readonly CanonicalPlanSessionPresentation[];
+  conditioning: readonly Readonly<{ id: string; dayLabel: string; title: string; prescription: string; placement: string }> [];
   roadmap: readonly Readonly<{ state: "completed" | "current" | "reviewed_next"; label: string; title: string; detail: string }>[];
   phaseRationale?: string;
   primaryAction?: CanonicalPlanPresentationAction;
@@ -148,6 +149,7 @@ export function projectCanonicalPlanPresentation(input: Readonly<{
       progressPercent: model.microcycle.trainingDays ? Math.round((Math.min(completed, model.microcycle.trainingDays) / model.microcycle.trainingDays) * 100) : 0,
     },
     schedule: sessions,
+    conditioning: (model.conditioning?.sessions ?? []).map((session) => ({ id: session.id, dayLabel: `Day ${session.dayOffset + 1}`, title: session.kind === "performance_conditioning" ? "Performance conditioning" : session.kind === "capacity_cardio" ? "Capacity cardio" : "Recovery cardio", prescription: session.intensity === "intervals" && session.intervalStructure ? `${session.intervalStructure.repetitions} × ${session.intervalStructure.workSeconds / 60} min, ${session.intervalStructure.recoverySeconds / 60} min easy recovery` : `${session.durationMinutes} min · ${session.intensity === "easy_zone_2" ? "easy Zone 2" : "moderate Zone 2"} · ${session.modality.replaceAll("_", " ")}`, placement: session.placement.replaceAll("_", " ") })),
     roadmap,
     phaseRationale: spec ? `${spec.primaryStimulus}. Progress and recovery are reviewed before moving to ${spec.nextStates.map((id) => phaseName(id, id)).join(" or ")}.` : `${phasePurpose(model.mesocycle.purpose)} Your completed work determines what is reviewed next.`,
     ...(primaryAction ? { primaryAction } : {}),
@@ -233,5 +235,5 @@ function statusLabel(status: CanonicalPlanSessionStatus): string {
 function integer(value: unknown, fallback: number): number { return Number.isInteger(value) ? Number(value) : fallback; }
 
 function base(status: CanonicalPlanPresentation["status"], title: string, subtitle: string): CanonicalPlanPresentation {
-  return { contractVersion: CANONICAL_PLAN_PRESENTATION_VERSION, status, title, subtitle, schedule: [], roadmap: [] };
+  return { contractVersion: CANONICAL_PLAN_PRESENTATION_VERSION, status, title, subtitle, schedule: [], conditioning: [], roadmap: [] };
 }

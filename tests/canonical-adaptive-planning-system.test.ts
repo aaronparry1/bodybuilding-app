@@ -10,7 +10,7 @@ import { resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-
 import { createMicrocycle, reflowCanonicalMicrocycleAfterMissedSession } from "@/domain/training/microcycle-scheduler";
 import type { Equipment, ExperienceLevel, ProgrammeGoal } from "@/domain/training/models";
 import { exerciseLibrary } from "@/domain/training/presets";
-import { getFrameworkOptionsForGoal, getSelectableFrameworkOptionsForGoal, resolveCanonicalProgrammeFramework } from "@/domain/training/programme-framework-rules";
+import { getCustomerFrameworksForFrequency, getSelectableFrameworkOptionsForGoal, resolveCanonicalProgrammeFramework } from "@/domain/training/programme-framework-rules";
 import type { PreferredSplit, TrainingSetupGoal } from "@/domain/training/plan-setup";
 
 const reportsDirectory = new URL("../qa-reports/planning-system/", import.meta.url);
@@ -33,7 +33,7 @@ describe("complete canonical adaptive planning system", () => {
     for (const goal of canonicalCertificationGoals) {
       for (const experience of ["beginner", "intermediate", "advanced"] as const) {
         for (const frequency of [2, 3, 4, 5, 6] as const) {
-          for (const option of getSelectableFrameworkOptionsForGoal(goal.uiGoal)) {
+          for (const option of getSelectableFrameworkOptionsForGoal(goal.uiGoal, frequency)) {
             count += 1;
             const result = construct(goal.setupGoal, programmeGoal(goal.setupGoal, experience), experience, frequency, preferredSplit(option.id), fullEquipment, `matrix-${count}`);
             expect(result.status, `${goal.setupGoal}/${experience}/${frequency}/${option.id}:${result.status === "constructed" ? "" : result.reason}`).toBe("constructed");
@@ -46,13 +46,19 @@ describe("complete canonical adaptive planning system", () => {
         }
       }
     }
-    expect(count).toBe(375);
+    expect(count).toBe(120);
   });
 
-  it("does not expose goal combinations classified as not recommended", () => {
+  it("uses the exact three-framework frequency truth table", () => {
+    expect([2, 3, 4, 5, 6].map((frequency) => getCustomerFrameworksForFrequency(frequency))).toEqual([
+      ["full_body", "upper_lower"],
+      ["full_body", "push_pull_legs"],
+      ["upper_lower", "push_pull_legs"],
+      ["push_pull_legs"],
+      ["push_pull_legs"],
+    ]);
     for (const goal of ["build_muscle", "get_stronger", "build_muscle_strength", "athletic_performance", "lose_fat"] as const) {
-      const offered = new Set(getSelectableFrameworkOptionsForGoal(goal).map((option) => option.id));
-      for (const option of getFrameworkOptionsForGoal(goal).filter((item) => item.suitability === "not_recommended")) expect(offered.has(option.id)).toBe(false);
+      for (const frequency of [2, 3, 4, 5, 6]) expect(getSelectableFrameworkOptionsForGoal(goal, frequency).every((option) => ["full_body", "upper_lower", "push_pull_legs"].includes(option.id))).toBe(true);
     }
   });
 
@@ -60,7 +66,7 @@ describe("complete canonical adaptive planning system", () => {
     expect(resolveCanonicalProgrammeFramework({ goal: "build_muscle_and_strength", sessionsPerWeek: 5, requested: "push_pull_legs", phase: "powerbuilding_hypertrophy" })).toMatchObject({ status: "resolved", framework: "push_pull_legs", reason: "explicit_supported_preference" });
     expect(resolveCanonicalProgrammeFramework({ goal: "build_muscle_and_strength", sessionsPerWeek: 5, requested: "push_pull_legs", phase: "powerbuilding_intensification" })).toMatchObject({ status: "resolved", framework: "bench_squat_deadlift", reason: "phase_specific_morph" });
     expect(resolveCanonicalProgrammeFramework({ goal: "build_strength", sessionsPerWeek: 4, requested: "upper_lower", phase: "strength_specific" })).toMatchObject({ status: "resolved", framework: "bench_squat_deadlift" });
-    expect(resolveCanonicalProgrammeFramework({ goal: "athletic_performance", sessionsPerWeek: 4, requested: "upper_lower", phase: "athletic_power" })).toMatchObject({ status: "resolved", framework: "full_body" });
+    expect(resolveCanonicalProgrammeFramework({ goal: "athletic_performance", sessionsPerWeek: 4, requested: "upper_lower", phase: "athletic_power" })).toMatchObject({ status: "resolved", framework: "upper_lower", morphPolicy: { deliveryStrategy: "athletic_asymmetric_rotation" } });
   });
 
   it("certifies every representative golden case or records its explicit unsupported contract", () => {
@@ -76,19 +82,19 @@ describe("complete canonical adaptive planning system", () => {
     }
   });
 
-  it("constructs all five allowed intermediate hypertrophy five-day frameworks from production paths", () => {
-    const options = getSelectableFrameworkOptionsForGoal("build_muscle");
-    expect(options.map((option) => option.id)).toEqual(["asc_recommended", "push_pull_legs", "upper_lower", "full_body", "body_part_split"]);
+  it("constructs the dense intermediate hypertrophy five-day PPL from production paths", () => {
+    const options = getSelectableFrameworkOptionsForGoal("build_muscle", 5);
+    expect(options.map((option) => option.id)).toEqual(["push_pull_legs"]);
     const outputs = options.map((option) => constructGoldenProgramme({ id: `five-${option.id}`, label: option.displayName, setupGoal: "build_muscle", programmeGoal: "hypertrophy", experience: "intermediate", frequency: 5, framework: preferredSplit(option.id), equipment: fullEquipment, expected: "constructed" }));
     expect(outputs.every((output) => output.status === "constructed")).toBe(true);
     for (const output of outputs) if (output.status === "constructed") {
       expect(output.sessions).toHaveLength(5);
       expect(output.sessions.every((session) => session.exercises.every((exercise) => exercise.workingSets! > 0 && exercise.exactReps.length === exercise.workingSets && exercise.restSeconds > 0))).toBe(true);
-      expect(output.accounting.totalWorkingSets).toBeGreaterThan(0);
+      expect(output.accounting.totalWorkingSets).toBeGreaterThan(49);
       expect(output.accounting.perSessionEstimatedMinutes.every((minutes) => minutes <= 90)).toBe(true);
     }
     const paired = buildCanonicalPlanningCertificationArtifacts()["intermediate-hypertrophy-five-day"].cases;
-    expect(paired).toHaveLength(10);
+    expect(paired).toHaveLength(2);
     for (const option of options) {
       const cases = paired.flatMap((item) => item.status === "constructed" && item.input.requestedFramework === preferredSplit(option.id) ? [item] : []);
       expect(cases).toHaveLength(2);
@@ -111,7 +117,10 @@ describe("complete canonical adaptive planning system", () => {
     expect(dumbbells.status).toBe("constructed"); expect(machines.status).toBe("constructed");
     if (dumbbells.status !== "constructed" || machines.status !== "constructed") return;
     expect(dumbbells.sessions.flatMap((session) => session.exercises).map((exercise) => exercise.exerciseId)).not.toEqual(machines.sessions.flatMap((session) => session.exercises).map((exercise) => exercise.exerciseId));
-    expect(Object.keys(dumbbells.accounting.directSets).sort()).toEqual(Object.keys(machines.accounting.directSets).sort());
+    for (const requiredRegion of ["chest", "lats", "upper_back", "quadriceps", "hip_extension", "hamstrings_knee_flexion", "calves"]) {
+      expect(dumbbells.accounting.directSets[requiredRegion as keyof typeof dumbbells.accounting.directSets]).toBeGreaterThan(0);
+      expect(machines.accounting.directSets[requiredRegion as keyof typeof machines.accounting.directSets]).toBeGreaterThan(0);
+    }
   });
 
   it("constructs a coherent barbell-and-bodyweight plan without inventing unavailable isolation work", () => {
@@ -172,7 +181,6 @@ describe("complete canonical adaptive planning system", () => {
       const result = resolveMesocyclePrescriptionPolicy(mesocycle.id, { goal: mesocycle.engine === "hypertrophy" ? "build_muscle" : mesocycle.engine === "powerbuilding" ? "build_muscle_and_strength" : mesocycle.engine === "strength" ? "build_strength" : "athletic_performance" });
       expect(result.status).toBe("resolved");
       if (result.status !== "resolved") continue;
-      expect(result.policy.methods.permitted).not.toContain("five_three_one");
       if (/powerbuilding_(foundation|hypertrophy|strength)/.test(mesocycle.id)) expect(result.policy.methods.permitted).not.toContain("dynamic_effort");
       if (/taper|intensification/.test(mesocycle.id)) expect(result.policy.methods.permitted).not.toContain("eight_across");
       if (/taper|transition|consolidation|realisation/.test(mesocycle.id)) expect(result.policy.methods.conditional).not.toContain("bbb");

@@ -28,25 +28,25 @@ describe("canonical Home visual fixture alignment", () => {
     expect(actual.role).toBe(expected.role);
     expect(snapshotSignature(actual.snapshot)).toEqual(snapshotSignature(expected.prescriptionSnapshot));
     expect(snapshotSignature(actual.snapshot)).toMatchObject({
-      exerciseIds: ["ex-bench-press", "ex-incline-dumbbell-press", "ex-cable-lateral-raise", "ex-cable-rope-overhead-extension"],
-      requiredWorkSets: [4, 3, 2, 2],
-      totalWorkingSets: 11,
+      exerciseIds: ["ex-bench-press", "ex-decline-plate-loaded-press", "ex-chest-supported-row", "ex-cable-rope-overhead-extension", "ex-cable-lateral-raise"],
+      requiredWorkSets: [4, 3, 3, 3, 2],
+      totalWorkingSets: 15,
     });
 
     const home = readCanonicalHomeProjection();
-    expect(home.primary).toMatchObject({ kind: "planned", title: "Bench and hypertrophy", workout: { exerciseCount: 4, workingSetCount: 11 } });
+    expect(home.primary).toMatchObject({ kind: "planned", title: "Push strength and hypertrophy", workout: { exerciseCount: 5, workingSetCount: 15 } });
   });
 
   it("creates active, paused and fully completed states through the canonical ledger", () => {
     applyCanonicalHomeVisualState("active", { planId: "home-active", now: "2026-07-18T10:00:00.000Z" });
-    expect(readCanonicalHomeProjection({ now: Date.parse("2026-07-18T10:01:00.000Z") }).primary).toMatchObject({ kind: "active", workout: { lifecycle: "active", completedSetCount: 1, workingSetCount: 11 } });
+    expect(readCanonicalHomeProjection({ now: Date.parse("2026-07-18T10:01:00.000Z") }).primary).toMatchObject({ kind: "active", workout: { lifecycle: "active", completedSetCount: 1, workingSetCount: 15 } });
 
     applyCanonicalHomeVisualState("paused", { planId: "home-paused", now: "2026-07-18T10:00:00.000Z" });
-    expect(readCanonicalHomeProjection({ now: Date.parse("2026-07-18T10:01:00.000Z") }).primary).toMatchObject({ kind: "active", ctaLabel: "Resume workout", workout: { lifecycle: "paused", completedSetCount: 1, workingSetCount: 11 } });
+    expect(readCanonicalHomeProjection({ now: Date.parse("2026-07-18T10:01:00.000Z") }).primary).toMatchObject({ kind: "active", ctaLabel: "Resume workout", workout: { lifecycle: "paused", completedSetCount: 1, workingSetCount: 15 } });
 
     applyCanonicalHomeVisualState("completed", { planId: "home-completed", now: "2026-07-18T10:00:00.000Z" });
     const completed = readCanonicalHomeProjection({ now: Date.parse("2026-07-18T10:01:00.000Z") });
-    expect(completed.primary).toMatchObject({ kind: "completed_today", detail: expect.stringContaining("11 working sets") });
+    expect(completed.primary).toMatchObject({ kind: "completed_today", detail: expect.stringContaining("15 working sets") });
     expect(completed.progress).toMatchObject({ historicalCount: 1, reviewAvailable: true });
     expect(completed.actions.some((action) => action.type === "open_planned_session")).toBe(true);
   });

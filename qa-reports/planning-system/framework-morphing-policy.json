@@ -1,0 +1,273 @@
+{
+  "schemaVersion": "canonical_adaptive_planning_certification_v1",
+  "policyVersion": "canonical_framework_morph_policy_v1",
+  "cases": [
+    {
+      "goal": "build_muscle",
+      "phase": "hypertrophy_volume",
+      "preference": "full_body",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "full_body",
+        "internalFramework": "full_body",
+        "deliveryStrategy": "varied_full_body_rotation",
+        "sessionIdentity": "recognisable_preference",
+        "rationaleCodes": [
+          "preference:full_body",
+          "goal:hypertrophy",
+          "frequency_compatible",
+          "preference_identity_preserved"
+        ]
+      }
+    },
+    {
+      "goal": "build_muscle",
+      "phase": "hypertrophy_volume",
+      "preference": "upper_lower",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "upper_lower",
+        "internalFramework": "upper_lower",
+        "deliveryStrategy": "complementary_upper_lower_rotation",
+        "sessionIdentity": "recognisable_preference",
+        "rationaleCodes": [
+          "preference:upper_lower",
+          "goal:hypertrophy",
+          "frequency_compatible",
+          "preference_identity_preserved"
+        ]
+      }
+    },
+    {
+      "goal": "build_muscle",
+      "phase": "hypertrophy_volume",
+      "preference": "push_pull_legs",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "push_pull_legs",
+        "internalFramework": "push_pull_legs",
+        "deliveryStrategy": "classic_push_pull_legs_rotation",
+        "sessionIdentity": "recognisable_preference",
+        "rationaleCodes": [
+          "preference:push_pull_legs",
+          "goal:hypertrophy",
+          "frequency_compatible",
+          "preference_identity_preserved"
+        ]
+      }
+    },
+    {
+      "goal": "build_strength",
+      "phase": "strength_specific",
+      "preference": "full_body",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "full_body",
+        "internalFramework": "bench_squat_deadlift",
+        "deliveryStrategy": "lift_emphasis_rotation",
+        "sessionIdentity": "lift_emphasis_preserving_preference",
+        "rationaleCodes": [
+          "preference:full_body",
+          "phase:strength_specific",
+          "main_lift_priority",
+          "hypertrophy_assistance_retained"
+        ]
+      }
+    },
+    {
+      "goal": "build_strength",
+      "phase": "strength_specific",
+      "preference": "upper_lower",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "upper_lower",
+        "internalFramework": "bench_squat_deadlift",
+        "deliveryStrategy": "lift_emphasis_rotation",
+        "sessionIdentity": "lift_emphasis_preserving_preference",
+        "rationaleCodes": [
+          "preference:upper_lower",
+          "phase:strength_specific",
+          "main_lift_priority",
+          "hypertrophy_assistance_retained"
+        ]
+      }
+    },
+    {
+      "goal": "build_strength",
+      "phase": "strength_specific",
+      "preference": "push_pull_legs",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "push_pull_legs",
+        "internalFramework": "bench_squat_deadlift",
+        "deliveryStrategy": "lift_emphasis_rotation",
+        "sessionIdentity": "lift_emphasis_preserving_preference",
+        "rationaleCodes": [
+          "preference:push_pull_legs",
+          "phase:strength_specific",
+          "main_lift_priority",
+          "hypertrophy_assistance_retained"
+        ]
+      }
+    },
+    {
+      "goal": "build_muscle_and_strength",
+      "phase": "powerbuilding_intensification",
+      "preference": "full_body",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "full_body",
+        "internalFramework": "bench_squat_deadlift",
+        "deliveryStrategy": "lift_emphasis_rotation",
+        "sessionIdentity": "lift_emphasis_preserving_preference",
+        "rationaleCodes": [
+          "preference:full_body",
+          "phase:powerbuilding_intensification",
+          "main_lift_priority",
+          "hypertrophy_assistance_retained"
+        ]
+      }
+    },
+    {
+      "goal": "build_muscle_and_strength",
+      "phase": "powerbuilding_intensification",
+      "preference": "upper_lower",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "upper_lower",
+        "internalFramework": "bench_squat_deadlift",
+        "deliveryStrategy": "lift_emphasis_rotation",
+        "sessionIdentity": "lift_emphasis_preserving_preference",
+        "rationaleCodes": [
+          "preference:upper_lower",
+          "phase:powerbuilding_intensification",
+          "main_lift_priority",
+          "hypertrophy_assistance_retained"
+        ]
+      }
+    },
+    {
+      "goal": "build_muscle_and_strength",
+      "phase": "powerbuilding_intensification",
+      "preference": "push_pull_legs",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "push_pull_legs",
+        "internalFramework": "bench_squat_deadlift",
+        "deliveryStrategy": "lift_emphasis_rotation",
+        "sessionIdentity": "lift_emphasis_preserving_preference",
+        "rationaleCodes": [
+          "preference:push_pull_legs",
+          "phase:powerbuilding_intensification",
+          "main_lift_priority",
+          "hypertrophy_assistance_retained"
+        ]
+      }
+    },
+    {
+      "goal": "athletic_performance",
+      "phase": "athletic_power",
+      "preference": "full_body",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "full_body",
+        "internalFramework": "full_body",
+        "deliveryStrategy": "athletic_asymmetric_rotation",
+        "sessionIdentity": "athletic_delivery_preserving_preference",
+        "rationaleCodes": [
+          "preference:full_body",
+          "phase:athletic_power",
+          "power_and_sport_workload_coordinated"
+        ]
+      }
+    },
+    {
+      "goal": "athletic_performance",
+      "phase": "athletic_power",
+      "preference": "upper_lower",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "upper_lower",
+        "internalFramework": "upper_lower",
+        "deliveryStrategy": "athletic_asymmetric_rotation",
+        "sessionIdentity": "athletic_delivery_preserving_preference",
+        "rationaleCodes": [
+          "preference:upper_lower",
+          "phase:athletic_power",
+          "power_and_sport_workload_coordinated"
+        ]
+      }
+    },
+    {
+      "goal": "athletic_performance",
+      "phase": "athletic_power",
+      "preference": "push_pull_legs",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "push_pull_legs",
+        "internalFramework": "push_pull_legs",
+        "deliveryStrategy": "athletic_asymmetric_rotation",
+        "sessionIdentity": "athletic_delivery_preserving_preference",
+        "rationaleCodes": [
+          "preference:push_pull_legs",
+          "phase:athletic_power",
+          "power_and_sport_workload_coordinated"
+        ]
+      }
+    },
+    {
+      "goal": "get_leaner",
+      "phase": "hypertrophy_base",
+      "preference": "full_body",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "full_body",
+        "internalFramework": "full_body",
+        "deliveryStrategy": "varied_full_body_rotation",
+        "sessionIdentity": "recognisable_preference",
+        "rationaleCodes": [
+          "preference:full_body",
+          "goal:get_lean",
+          "frequency_compatible",
+          "preference_identity_preserved"
+        ]
+      }
+    },
+    {
+      "goal": "get_leaner",
+      "phase": "hypertrophy_base",
+      "preference": "upper_lower",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "upper_lower",
+        "internalFramework": "upper_lower",
+        "deliveryStrategy": "complementary_upper_lower_rotation",
+        "sessionIdentity": "recognisable_preference",
+        "rationaleCodes": [
+          "preference:upper_lower",
+          "goal:get_lean",
+          "frequency_compatible",
+          "preference_identity_preserved"
+        ]
+      }
+    },
+    {
+      "goal": "get_leaner",
+      "phase": "hypertrophy_base",
+      "preference": "push_pull_legs",
+      "result": {
+        "schemaVersion": "canonical_framework_morph_policy_v1",
+        "publicPreference": "push_pull_legs",
+        "internalFramework": "push_pull_legs",
+        "deliveryStrategy": "classic_push_pull_legs_rotation",
+        "sessionIdentity": "recognisable_preference",
+        "rationaleCodes": [
+          "preference:push_pull_legs",
+          "goal:get_lean",
+          "frequency_compatible",
+          "preference_identity_preserved"
+        ]
+      }
+    }
+  ]
+}

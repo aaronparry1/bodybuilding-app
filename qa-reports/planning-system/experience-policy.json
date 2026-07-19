@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "canonical_adaptive_planning_certification_v1",
+  "policy": {
+    "policyId": "canonical_experience_planning_policy_v1",
+    "beginner": {
+      "customerGuidance": "Build skill with stable exercises, simple progression and recoverable starting volume.",
+      "planning": [
+        "stable_core_patterns",
+        "simpler_progression",
+        "lower_starting_volume",
+        "advanced_methods_restricted",
+        "calibration_emphasised"
+      ]
+    },
+    "intermediate": {
+      "customerGuidance": "Use purposeful variation and muscle-specific progression as your completed training evidence grows.",
+      "planning": [
+        "balanced_starting_volume",
+        "purposeful_variation",
+        "selective_advanced_methods",
+        "muscle_specific_adaptation"
+      ]
+    },
+    "advanced": {
+      "customerGuidance": "Individualise dosage, weakness work and fatigue management from your own comparable training evidence.",
+      "planning": [
+        "evidence_dependent_dosage",
+        "specialised_weakness_work",
+        "phase_specific_methods",
+        "tight_fatigue_management",
+        "no_automatic_more_sets"
+      ]
+    }
+  },
+  "constructionEvidence": [
+    {
+      "id": "beginner-hypertrophy-2",
+      "experience": "beginner",
+      "totalWorkingSets": 20
+    },
+    {
+      "id": "intermediate-hypertrophy-3",
+      "experience": "intermediate",
+      "totalWorkingSets": 33
+    },
+    {
+      "id": "intermediate-hypertrophy-4",
+      "experience": "intermediate",
+      "totalWorkingSets": 70
+    },
+    {
+      "id": "intermediate-hypertrophy-5",
+      "experience": "intermediate",
+      "totalWorkingSets": 95
+    },
+    {
+      "id": "intermediate-hypertrophy-6",
+      "experience": "intermediate",
+      "totalWorkingSets": 86
+    },
+    {
+      "id": "beginner-strength-3",
+      "experience": "beginner",
+      "totalWorkingSets": 30
+    },
+    {
+      "id": "intermediate-strength-4",
+      "experience": "intermediate",
+      "totalWorkingSets": 56
+    },
+    {
+      "id": "intermediate-powerbuilding-3",
+      "experience": "intermediate",
+      "totalWorkingSets": 45
+    },
+    {
+      "id": "intermediate-powerbuilding-5",
+      "experience": "intermediate",
+      "totalWorkingSets": 72
+    },
+    {
+      "id": "athletic-concurrent-workload",
+      "experience": "intermediate",
+      "totalWorkingSets": 30
+    },
+    {
+      "id": "getting-lean-recovery-boundary",
+      "experience": "intermediate",
+      "totalWorkingSets": 70
+    },
+    {
+      "id": "limited-dumbbells",
+      "experience": "intermediate",
+      "totalWorkingSets": 56
+    },
+    {
+      "id": "limited-machines",
+      "experience": "intermediate",
+      "totalWorkingSets": 66
+    },
+    {
+      "id": "event-strength",
+      "experience": "intermediate",
+      "totalWorkingSets": 56
+    },
+    {
+      "id": "established-loads",
+      "experience": "intermediate",
+      "totalWorkingSets": 95
+    },
+    {
+      "id": "no-load-history",
+      "experience": "intermediate",
+      "totalWorkingSets": 95
+    },
+    {
+      "id": "exercise-limitation",
+      "experience": "intermediate",
+      "totalWorkingSets": 70
+    }
+  ]
+}

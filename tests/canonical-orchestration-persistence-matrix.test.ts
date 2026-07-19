@@ -9,7 +9,7 @@ const incompleteCatalogueExercise = {
 } as any;
 
 function construct(goal: "build_muscle" | "build_muscle_and_strength", daysPerWeek: 2 | 3 | 5) {
-  return constructCanonicalActivePlanFromCanonicalInputs({ planId: `matrix-${goal}-${daysPerWeek}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "strength_hypertrophy", macrocycleGoal: goal, experienceLevel: "intermediate", daysPerWeek, preferredSplit: daysPerWeek === 3 ? "push_pull_legs" : "upper_lower", equipment: ["barbell", "dumbbell", "machine", "cable", "bodyweight"], units: "kg", exercises: exerciseLibrary, history: [] });
+  return constructCanonicalActivePlanFromCanonicalInputs({ planId: `matrix-${goal}-${daysPerWeek}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "strength_hypertrophy", macrocycleGoal: goal, experienceLevel: "intermediate", daysPerWeek, preferredSplit: daysPerWeek === 5 || daysPerWeek === 3 ? "push_pull_legs" : "upper_lower", equipment: ["barbell", "dumbbell", "machine", "cable", "bodyweight"], units: "kg", exercises: exerciseLibrary, history: [] });
 }
 
 describe("canonical orchestration persistence matrix", () => {
@@ -33,6 +33,6 @@ describe("canonical orchestration persistence matrix", () => {
 
   it("fails closed instead of using one exercise as a generic programme", () => {
     const result = constructCanonicalActivePlanFromCanonicalInputs({ planId: "incomplete-catalogue", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 3, preferredSplit: "push_pull_legs", equipment: ["barbell"], units: "kg", exercises: [incompleteCatalogueExercise], establishedLoads: { [incompleteCatalogueExercise.id]: 80 }, history: [] });
-    expect(result).toMatchObject({ status: "carrier_validation_failed", reason: "session_0:no_suitable_exercise" });
+    expect(result).toMatchObject({ status: "carrier_validation_failed", reason: expect.stringContaining("microcycle_allocation:") });
   });
 });

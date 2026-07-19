@@ -10,7 +10,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "input": "goal",
       "expected": "structure,dosage,exercise_selection,recovery",
       "status": "certified_or_owner_isolated",
-      "evidence": "375-case construction matrix and five goal-specific strategy records"
+      "evidence": "120-case compatible construction matrix and five goal-specific strategy records"
     },
     {
       "input": "experience",
@@ -28,7 +28,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "input": "framework_preference",
       "expected": "structure,scheduling,exercise_selection",
       "status": "certified_or_owner_isolated",
-      "evidence": "framework morph tests and ten paired five-day hypertrophy certifications"
+      "evidence": "frequency truth table, typed morph tests and paired five-day PPL certifications"
     },
     {
       "input": "commitment",
@@ -68,9 +68,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     },
     {
       "input": "recovery_cardio_preference",
-      "expected": "recovery,scheduling",
+      "expected": "recovery,scheduling,presentation",
       "status": "certified_or_owner_isolated",
-      "evidence": "recovery-capacity policy tests; construction cannot delete resistance stimulus"
+      "evidence": "canonical concurrent-training prescription is constructed, persisted and projected on Home and Plan"
     },
     {
       "input": "exercise_catalogue",
@@ -94,7 +94,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "input": "established_loads",
       "expected": "load",
       "status": "certified_or_owner_isolated",
-      "evidence": "ten paired five-day calibration/established certifications"
+      "evidence": "paired five-day calibration/established certifications"
     },
     {
       "input": "performed_work",

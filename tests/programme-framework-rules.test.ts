@@ -1,210 +1,74 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 import {
   buildWeeklySessionSequence,
-  getAllowedProgrammeFrameworks,
+  customerFrameworkFrequencyPolicy,
+  getCustomerFrameworksForFrequency,
   getFrameworkOptionsForGoal,
-  type ProgrammeFrameworkGoal,
-  type ProgrammeFrameworkId,
+  getRecommendedCustomerFramework,
+  getSelectableFrameworkOptionsForGoal,
+  resolveCanonicalFrameworkMorph,
+  resolveCanonicalProgrammeFramework,
 } from "@/domain/training/programme-framework-rules";
 
-const hypertrophyFrameworks = ["push_pull_legs", "upper_lower", "full_body", "chest_back_shoulders_arms_legs"];
-const strengthFrameworks = ["bench_squat_deadlift", "push_pull_legs", "upper_lower", "full_body"];
-const allFrameworks: ProgrammeFrameworkId[] = [
-  "push_pull_legs",
-  "upper_lower",
-  "full_body",
-  "chest_back_shoulders_arms_legs",
-  "bench_squat_deadlift",
-];
-
-describe("programme framework rules", () => {
-  it("returns every user-facing framework option for each approved goal", () => {
-    const expectedIds = ["asc_recommended", "push_pull_legs", "upper_lower", "full_body", "body_part_split", "bench_squat_deadlift"];
-
+describe("canonical customer programme framework rules", () => {
+  it("exposes only the three plain-language framework preferences", () => {
     for (const goal of ["build_muscle", "get_stronger", "build_muscle_strength", "athletic_performance", "lose_fat"] as const) {
-      const options = getFrameworkOptionsForGoal(goal);
-
-      expect(options.map((option) => option.id)).toEqual(expectedIds);
-      expect(options.every((option) => option.displayName && option.shortDescription && option.coachingReason)).toBe(true);
+      expect(getFrameworkOptionsForGoal(goal).map((option) => option.id)).toEqual(["full_body", "upper_lower", "push_pull_legs"]);
+      expect(getFrameworkOptionsForGoal(goal).some((option) => ["asc_recommended", "body_part_split", "bench_squat_deadlift"].includes(option.id))).toBe(false);
     }
   });
 
-  it("marks ASC Recommended as default for every goal", () => {
-    for (const goal of ["build_muscle", "get_stronger", "build_muscle_strength", "athletic_performance", "lose_fat"] as const) {
-      const options = getFrameworkOptionsForGoal(goal);
-      const defaults = options.filter((option) => option.isDefaultRecommendation);
+  it("owns the final frequency truth table", () => {
+    expect(customerFrameworkFrequencyPolicy.policyId).toBe("canonical_customer_framework_frequency_policy_v1");
+    expect(getCustomerFrameworksForFrequency(2)).toEqual(["full_body", "upper_lower"]);
+    expect(getCustomerFrameworksForFrequency(3)).toEqual(["full_body", "push_pull_legs"]);
+    expect(getCustomerFrameworksForFrequency(4)).toEqual(["upper_lower", "push_pull_legs"]);
+    expect(getCustomerFrameworksForFrequency(5)).toEqual(["push_pull_legs"]);
+    expect(getCustomerFrameworksForFrequency(6)).toEqual(["push_pull_legs"]);
+    expect(getCustomerFrameworksForFrequency(1)).toEqual([]);
+  });
 
-      expect(defaults).toHaveLength(1);
-      expect(defaults[0]).toMatchObject({ id: "asc_recommended", suitability: "best" });
+  it("preselects a valid choice instead of adding an ASC option", () => {
+    for (const days of [2, 3, 4, 5, 6] as const) {
+      const options = getSelectableFrameworkOptionsForGoal("build_muscle", days);
+      const recommended = getRecommendedCustomerFramework("build_muscle", days);
+      expect(options).toHaveLength(getCustomerFrameworksForFrequency(days).length);
+      expect(options.filter((option) => option.isDefaultRecommendation).map((option) => option.id)).toEqual([recommended]);
     }
   });
 
-  it("applies goal-aware suitability rules", () => {
-    expect(optionFor("build_muscle", "push_pull_legs").suitability).toBe("best");
-    expect(optionFor("build_muscle", "bench_squat_deadlift").suitability).toBe("not_recommended");
-
-    expect(optionFor("get_stronger", "bench_squat_deadlift").suitability).toBe("best");
-    expect(optionFor("get_stronger", "body_part_split").suitability).toBe("not_recommended");
-
-    expect(optionFor("athletic_performance", "full_body").suitability).toBe("best");
-    expect(optionFor("athletic_performance", "body_part_split").suitability).toBe("not_recommended");
-
-    expect(optionFor("lose_fat", "upper_lower").suitability).toBe("best");
-    expect(optionFor("lose_fat", "full_body").suitability).toBe("best");
-    expect(optionFor("lose_fat", "bench_squat_deadlift").suitability).toBe("not_recommended");
-
-    expect(optionFor("build_muscle_strength", "upper_lower").suitability).toBe("best");
-    expect(optionFor("build_muscle_strength", "body_part_split").suitability).toBe("not_recommended");
+  it("rejects incompatible public preferences before construction", () => {
+    expect(resolveCanonicalProgrammeFramework({ goal: "build_muscle", sessionsPerWeek: 5, requested: "upper_lower" })).toEqual({ status: "unsupported", reason: "unsupported_framework" });
+    expect(resolveCanonicalProgrammeFramework({ goal: "build_muscle", sessionsPerWeek: 2, requested: "push_pull_legs" })).toEqual({ status: "unsupported", reason: "unsupported_framework" });
+    expect(resolveCanonicalProgrammeFramework({ goal: "build_strength", sessionsPerWeek: 4, requested: "bench_squat_deadlift" })).toEqual({ status: "unsupported", reason: "unsupported_framework" });
+    expect(resolveCanonicalProgrammeFramework({ goal: "build_muscle", sessionsPerWeek: 4, requested: "body_part_split" })).toEqual({ status: "unsupported", reason: "unsupported_framework" });
   });
 
-  it("keeps user override available even when a framework is not recommended", () => {
-    const buildMuscleOptions = getFrameworkOptionsForGoal("build_muscle");
-    const strengthOptions = getFrameworkOptionsForGoal("get_stronger");
-
-    expect(buildMuscleOptions.some((option) => option.id === "bench_squat_deadlift" && option.suitability === "not_recommended")).toBe(true);
-    expect(strengthOptions.some((option) => option.id === "body_part_split" && option.suitability === "not_recommended")).toBe(true);
+  it("keeps four- and five-day PPL recognisable and rolling", () => {
+    expect(buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 4, sequenceNumber: 1 })).toEqual(["push", "pull", "legs", "push"]);
+    expect(buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 4, sequenceNumber: 2 })).toEqual(["pull", "legs", "push", "pull"]);
+    expect(buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 5, sequenceNumber: 1 })).toEqual(["push", "pull", "legs", "push", "pull"]);
+    expect(buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 5, sequenceNumber: 2 })).toEqual(["legs", "push", "pull", "legs", "push"]);
   });
 
-  it("surfaces goal-aware framework wording in onboarding", () => {
-    const source = [
-      readFileSync("app/(protected)/onboarding.tsx", "utf8"),
-      readFileSync("src/domain/training/programme-framework-rules.ts", "utf8"),
-    ].join("\n");
-
-    expect(source).toContain("getFrameworkOptionsForGoal");
-    expect(source).toContain("ASC Recommended");
-    expect(source).toContain("Best fit");
-    expect(source).toContain("Not recommended");
-    expect(source).toContain("Bench/Squat/Deadlift");
-    expect(source).toContain("ASC chooses the best structure for your goal, schedule and progress.");
+  it("uses typed block morphs while retaining the athlete's preference", () => {
+    expect(resolveCanonicalFrameworkMorph({ goal: "strength", phase: "strength_specific", publicPreference: "upper_lower", sessionsPerWeek: 4 })).toMatchObject({ publicPreference: "upper_lower", internalFramework: "bench_squat_deadlift", deliveryStrategy: "lift_emphasis_rotation", sessionIdentity: "lift_emphasis_preserving_preference" });
+    expect(resolveCanonicalFrameworkMorph({ goal: "athletic_performance", phase: "athletic_power", publicPreference: "push_pull_legs", sessionsPerWeek: 4 })).toMatchObject({ publicPreference: "push_pull_legs", internalFramework: "push_pull_legs", deliveryStrategy: "athletic_asymmetric_rotation" });
+    expect(resolveCanonicalFrameworkMorph({ goal: "hypertrophy", phase: "hypertrophy_volume", publicPreference: "push_pull_legs", sessionsPerWeek: 5 })).toMatchObject({ internalFramework: "push_pull_legs", deliveryStrategy: "classic_push_pull_legs_rotation", sessionIdentity: "recognisable_preference" });
   });
 
-  it.each([
-    ["hypertrophy", hypertrophyFrameworks],
-    ["get_lean", hypertrophyFrameworks],
-    ["strength", strengthFrameworks],
-    ["athletic_performance", strengthFrameworks],
-    ["build_muscle_strength", strengthFrameworks],
-  ] as const)("returns correct allowed frameworks for %s", (goal, expected) => {
-    expect(getAllowedProgrammeFrameworks(goal)).toEqual(expected);
+  it("keeps onboarding free of internal framework choices", () => {
+    const source = readFileSync("app/(protected)/onboarding.tsx", "utf8");
+    expect(source).toContain("getSelectableFrameworkOptionsForGoal(goalId, daysPerWeek)");
+    expect(source).not.toContain("ASC Recommended");
+    expect(source).not.toContain("Body Part Split");
+    expect(source).not.toContain("Bench/Squat/Deadlift");
   });
 
-  it("supports every allowed framework from 2 to 6 sessions per week", () => {
-    const goals: ProgrammeFrameworkGoal[] = ["hypertrophy", "get_lean", "strength", "athletic_performance", "build_muscle_strength"];
-
-    for (const goal of goals) {
-      for (const framework of getAllowedProgrammeFrameworks(goal)) {
-        for (const sessionsPerWeek of [2, 3, 4, 5, 6]) {
-          const sequence = buildWeeklySessionSequence({ goal, framework, sessionsPerWeek });
-          expect(sequence).toHaveLength(sessionsPerWeek);
-        }
-      }
-    }
-  });
-
-  it("does not allow hypertrophy or get lean to use bench/squat/deadlift", () => {
-    expect(getAllowedProgrammeFrameworks("hypertrophy")).not.toContain("bench_squat_deadlift");
-    expect(getAllowedProgrammeFrameworks("get_lean")).not.toContain("bench_squat_deadlift");
-    expect(() => buildWeeklySessionSequence({ goal: "hypertrophy", framework: "bench_squat_deadlift", sessionsPerWeek: 3 })).toThrow(
-      /not supported/,
-    );
-    expect(() => buildWeeklySessionSequence({ goal: "get_lean", framework: "bench_squat_deadlift", sessionsPerWeek: 3 })).toThrow(
-      /not supported/,
-    );
-  });
-
-  it("does not allow strength-oriented goals to use chest/back/shoulders/arms/legs", () => {
-    for (const goal of ["strength", "athletic_performance", "build_muscle_strength"] as const) {
-      expect(getAllowedProgrammeFrameworks(goal)).not.toContain("chest_back_shoulders_arms_legs");
-      expect(() =>
-        buildWeeklySessionSequence({
-          goal,
-          framework: "chest_back_shoulders_arms_legs",
-          sessionsPerWeek: 5,
-        }),
-      ).toThrow(/not supported/);
-    }
-  });
-
-  it("returns the approved PPL sequences for 4 and 5 days", () => {
-    expect(buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 4 })).toEqual([
-      "push",
-      "pull",
-      "legs",
-      "full_body",
-    ]);
-    expect(buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 5 })).toEqual([
-      "push",
-      "pull",
-      "legs",
-      "upper",
-      "lower",
-    ]);
-  });
-
-  it("returns the approved 4-day chest/back/shoulders/arms/legs sequence", () => {
-    expect(buildWeeklySessionSequence({ goal: "hypertrophy", framework: "chest_back_shoulders_arms_legs", sessionsPerWeek: 4 })).toEqual([
-      "chest_back",
-      "shoulders_arms",
-      "legs",
-      "full_body",
-    ]);
-  });
-
-  it("returns approved strength framework sequences", () => {
-    expect(buildWeeklySessionSequence({ goal: "strength", framework: "bench_squat_deadlift", sessionsPerWeek: 2 })).toEqual([
-      "upper_strength",
-      "lower_strength",
-    ]);
-    expect(buildWeeklySessionSequence({ goal: "strength", framework: "bench_squat_deadlift", sessionsPerWeek: 6 })).toEqual([
-      "bench",
-      "squat",
-      "deadlift",
-      "bench",
-      "squat",
-      "deadlift",
-    ]);
-  });
-
-  it("rejects session counts outside 2 to 6", () => {
+  it("rejects invalid frequencies and remains deterministic", () => {
     expect(() => buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 1 })).toThrow(/2-6/);
-    expect(() => buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 7 })).toThrow(/2-6/);
-    expect(() => buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 3.5 })).toThrow(/2-6/);
-  });
-
-  it("returns deterministic copies that callers cannot mutate globally", () => {
-    const first = buildWeeklySessionSequence({ goal: "hypertrophy", framework: "upper_lower", sessionsPerWeek: 4 });
-    const second = buildWeeklySessionSequence({ goal: "hypertrophy", framework: "upper_lower", sessionsPerWeek: 4 });
-
-    expect(first).toEqual(["upper", "lower", "upper", "lower"]);
-    expect(second).toEqual(first);
-    first[0] = "full_body";
-    expect(buildWeeklySessionSequence({ goal: "hypertrophy", framework: "upper_lower", sessionsPerWeek: 4 })).toEqual([
-      "upper",
-      "lower",
-      "upper",
-      "lower",
-    ]);
-  });
-
-  it("keeps every framework sequence deterministic for 2 to 6 days", () => {
-    for (const framework of allFrameworks) {
-      const goal = framework === "bench_squat_deadlift" ? "strength" : framework === "chest_back_shoulders_arms_legs" ? "hypertrophy" : "strength";
-      for (const sessionsPerWeek of [2, 3, 4, 5, 6]) {
-        const first = buildWeeklySessionSequence({ goal, framework, sessionsPerWeek });
-        const second = buildWeeklySessionSequence({ goal, framework, sessionsPerWeek });
-        expect(second).toEqual(first);
-      }
-    }
+    const first = buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 5, sequenceNumber: 2 });
+    expect(buildWeeklySessionSequence({ goal: "hypertrophy", framework: "push_pull_legs", sessionsPerWeek: 5, sequenceNumber: 2 })).toEqual(first);
   });
 });
-
-function optionFor(
-  goal: Parameters<typeof getFrameworkOptionsForGoal>[0],
-  id: ReturnType<typeof getFrameworkOptionsForGoal>[number]["id"],
-) {
-  const option = getFrameworkOptionsForGoal(goal).find((item) => item.id === id);
-  if (!option) throw new Error(`Missing option ${id} for ${goal}`);
-  return option;
-}

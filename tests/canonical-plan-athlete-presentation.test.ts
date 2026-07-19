@@ -24,8 +24,8 @@ describe("athlete-facing canonical Plan presentation", () => {
     expect(plan.schedule).toHaveLength(5);
     expect(plan.schedule.map((session) => session.programmePosition)).toEqual([1, 2, 3, 4, 5]);
     expect(plan.schedule.map((session) => session.status)).toEqual(["next", "upcoming", "upcoming", "upcoming", "upcoming"]);
-    expect(plan.schedule[0]).toMatchObject({ name: "Bench and hypertrophy", exerciseCount: 4, workingSetCount: 11, statusLabel: "Next" });
-    expect(plan.schedule[0]!.preview.exercises.map((exercise) => exercise.name)).toEqual(["Bench Press", "Incline Dumbbell Press", "Cable Lateral Raise", "Rope Overhead Triceps Extension"]);
+    expect(plan.schedule[0]).toMatchObject({ name: "Push strength and hypertrophy", exerciseCount: 5, workingSetCount: 15, statusLabel: "Next" });
+    expect(plan.schedule[0]!.preview.exercises.map((exercise) => exercise.name)).toEqual(["Bench Press", "Decline Plate Loaded Press", "Chest Supported Row", "Rope Overhead Triceps Extension", "Cable Lateral Raise"]);
     expect(plan.schedule[0]!.preview.exercises[0]!.sets).toHaveLength(4);
     expect(plan.primaryAction).toMatchObject({ type: "open_planned_session", label: "Start next workout", planId: "plan-presentation-planned", planRevision: 0 });
     expect(after).toBe(before);

@@ -6,7 +6,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
 {
   "schemaVersion": "canonical_adaptive_planning_certification_v1",
   "strategy": "exhaustive goal × experience × frequency × onboarding-selectable framework; representative cross-owner interactions only where the input is actually executable",
-  "categoricalCases": 375,
+  "categoricalCases": 120,
   "allSupportedPairsCovered": true,
   "coveredGroups": [
     {
@@ -16,14 +16,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "frequency",
         "onboarding_framework"
       ],
-      "evidence": "375 exhaustive compatible constructions"
+      "evidence": "120 exhaustive compatible constructions"
     },
     {
       "dimensions": [
         "framework",
         "history_state"
       ],
-      "evidence": "ten paired five-day hypertrophy cases"
+      "evidence": "paired five-day PPL certifications"
     },
     {
       "dimensions": [
@@ -55,12 +55,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "reason": "not a production input; fail closed"
     },
     {
-      "input": "recovery_cardio_preference",
-      "reason": "recovery policy/Progress owner, not initial prescription authority"
-    },
-    {
       "input": "sport_workload",
-      "reason": "factual Progress evidence owner; absent from onboarding construction"
+      "reason": "factual Progress evidence refines rather than invents initial prescription"
     },
     {
       "input": "body_metrics",

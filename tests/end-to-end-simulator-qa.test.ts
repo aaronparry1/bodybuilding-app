@@ -111,7 +111,7 @@ describe("end-to-end simulator QA regression", () => {
     expect(dashboard.planningContext.microcycleLabel).toContain("Microcycle 1");
     expect(dashboard.thisWeek).toEqual(activePlan.currentMicrocycle?.sessionRoles);
     expect(dashboard.recommendationLabel).toBe("Log a few workouts first");
-    expect(dashboard.primaryActionLabel).toBe("Start Upper hypertrophy");
+    expect(dashboard.primaryActionLabel).toBe("Start Push hypertrophy A");
   });
 
   it("validates generated sessions after taxonomy fixes", () => {

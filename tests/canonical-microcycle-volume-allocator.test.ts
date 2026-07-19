@@ -83,11 +83,11 @@ describe("canonical microcycle volume allocator", () => {
     ["build_muscle", "beginner", 3, "full_body"],
     ["build_muscle", "intermediate", 3, "push_pull_legs"],
     ["build_muscle", "intermediate", 4, "upper_lower"],
-    ["build_strength", "advanced", 4, "bench_squat_deadlift"],
+    ["build_strength", "advanced", 4, "upper_lower"],
     ["build_muscle_and_strength", "beginner", 5, "let_app_choose"],
     ["build_muscle_and_strength", "advanced", 5, "let_app_choose"],
     ["athletic_performance", "intermediate", 2, "full_body"],
-    ["athletic_performance", "intermediate", 6, "upper_lower"],
+    ["athletic_performance", "intermediate", 6, "push_pull_legs"],
     ["get_leaner", "intermediate", 3, "full_body"],
     ["get_leaner", "intermediate", 5, "push_pull_legs"],
   ] as const)("retains goal/frequency/split-specific construction for %s %s %s-day %s", (macrocycleGoal, experienceLevel, daysPerWeek, preferredSplit) => {

@@ -9,11 +9,12 @@ import { resolveCanonicalProgression, resolveCanonicalRest, resolveCanonicalStop
 import { resolveCanonicalLoadPrescription } from "@/domain/training/canonical-load-resolution";
 import { validateCanonicalLoadPrescription, type CanonicalLoadEvidence, type CanonicalLoadPrescription } from "@/domain/training/canonical-load-prescription";
 import { withCanonicalCalibrationProtocol } from "@/domain/training/canonical-load-prescription";
-import { isStrictCanonicalAllocation, type CanonicalMicrocycleVolumeAllocation } from "@/domain/training/canonical-microcycle-volume-allocator";
+import { isStrictCanonicalAllocation, type AllocatedSlot, type CanonicalMicrocycleVolumeAllocation } from "@/domain/training/canonical-microcycle-volume-allocator";
 import { assessCanonicalExerciseRoleSuitability, type CanonicalExerciseRoleSuitabilityResult } from "@/domain/training/canonical-exercise-role-suitability";
 import { resolveCanonicalExactTarget } from "@/domain/training/canonical-exact-target-policy";
 import { parseCanonicalLimitation } from "@/domain/training/canonical-adaptive-planning-system";
 import { scoreExercisePreference, type ExercisePreferenceRecord } from "@/domain/training/exercise-preferences";
+import { selectSetMethod } from "@/domain/training/set-method-governance";
 
 export type CanonicalSessionConstructionInput = Readonly<{
   schemaVersion: "canonical_session_construction_input_v1";
@@ -29,7 +30,7 @@ export type CanonicalSessionConstructionInput = Readonly<{
 
 export type SessionBlueprint = Readonly<{ sessionId: string; role: string; purpose: string; slots: readonly Readonly<{ role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; index: number; reason: string }>[]; strengthAnchorRequired: boolean; specialState: string }>;
 export type PlannedSessionSlot = Readonly<{ id: string; index: number; role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; laneCandidates: readonly TrainingLane[]; preferredLane: TrainingLane; methods: readonly PrescriptionMethodFamily[]; reason: string }>;
-type CanonicalSessionSnapshotBase = Readonly<{ sessionId: string; operationalIdentity: string; role: string; planSessionIndex: number; slots: readonly Readonly<{ id: string; index: number; exerciseId: string; lane: TrainingLane; method: PrescriptionMethodFamily; settings: ProgressionSettings; targetReps: number; exactTargets?: readonly number[]; rest: CanonicalRestInstruction; progression: CanonicalProgressionRule; stopRule: CanonicalStopRule; loadingMode: string; prescribedLoad?: number; substitutionConstraints: readonly string[]; reason: string; selection?: Pick<CanonicalExerciseRoleSuitabilityResult, "policyId" | "suitability" | "reasons" | "repeatReason"> }>[]; provenance: Readonly<{ inputVersion: string; policyVersion: string; constructionVersion: string; evidenceVersion: string }> }>;
+type CanonicalSessionSnapshotBase = Readonly<{ sessionId: string; operationalIdentity: string; role: string; planSessionIndex: number; slots: readonly Readonly<{ id: string; index: number; exerciseId: string; lane: TrainingLane; method: PrescriptionMethodFamily; settings: ProgressionSettings; targetReps: number; exactTargets?: readonly number[]; exactTargetKinds?: readonly ("reps" | "amrap")[]; rest: CanonicalRestInstruction; progression: CanonicalProgressionRule; stopRule: CanonicalStopRule; loadingMode: string; prescribedLoad?: number; substitutionConstraints: readonly string[]; reason: string; selection?: Pick<CanonicalExerciseRoleSuitabilityResult, "policyId" | "suitability" | "reasons" | "repeatReason"> }>[]; provenance: Readonly<{ inputVersion: string; policyVersion: string; constructionVersion: string; evidenceVersion: string }> }>;
 export type CanonicalSessionSnapshotV2 = CanonicalSessionSnapshotBase & Readonly<{ schemaVersion: "canonical_session_snapshot_v2" }>;
 export type CanonicalSessionSnapshotV3 = Omit<CanonicalSessionSnapshotBase, "slots"> & Readonly<{ schemaVersion: "canonical_session_snapshot_v3"; slots: readonly (CanonicalSessionSnapshotBase["slots"][number] & Readonly<{ loadPrescription: CanonicalLoadPrescription }>)[] }>;
 export type CanonicalSessionSnapshot = CanonicalSessionSnapshotV2 | CanonicalSessionSnapshotV3;
@@ -121,12 +122,12 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
     if (!exercise) return { status: "blocked", reason: "no_suitable_exercise" };
     usedExerciseIds.add(exercise.id);
     const hasEstablishedLoad = Number.isFinite(input.progress.establishedLoads?.[exercise.id]);
-    const lane = slot.laneCandidates.find((candidate) => resolveCanonicalTargetEnvelope(input.mesocycle.policy, slot.constructionRole, candidate, hasEstablishedLoad, slot.methods[0]).status === "resolved");
+    const method = chooseCanonicalMethod(input, slot, allocatedSlot);
+    const lane = slot.laneCandidates.find((candidate) => resolveCanonicalTargetEnvelope(input.mesocycle.policy, slot.constructionRole, candidate, hasEstablishedLoad, method).status === "resolved");
     if (!lane) return { status: "blocked", reason: hasEstablishedLoad ? "no_valid_lane" : "established_load_required" };
-    const target = resolveCanonicalTargetEnvelope(input.mesocycle.policy, slot.constructionRole, lane, hasEstablishedLoad, slot.methods[0]);
+    const target = resolveCanonicalTargetEnvelope(input.mesocycle.policy, slot.constructionRole, lane, hasEstablishedLoad, method);
     if (target.status === "blocked") return { status: "blocked", reason: target.reason === "established_load_required" ? target.reason : "no_valid_method" };
     const allocatedSets = allocatedSlot?.workingSets;
-    const method = slot.methods[0]!;
     const exactResolution = allocatedSlot && selected ? resolveCanonicalExactTarget({ exercise, slot: allocatedSlot, envelope: target.envelope, policy: input.mesocycle.policy, lane, method, experience: input.athlete.experienceLevel }) : undefined;
     if (exactResolution?.status === "blocked") return { status: "blocked", reason: "no_valid_method" };
     const exact = exactResolution?.status === "resolved" ? exactResolution : undefined;
@@ -139,11 +140,21 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
     const stopRule = resolveCanonicalStopRule(input.mesocycle.policy, lane, slot.role, target.envelope.minReps);
     const loadPrescription = withCanonicalCalibrationProtocol(resolveCanonicalLoadPrescription({ exercise, equipment: input.athlete.equipment, lane, loadingMode: target.envelope.loadingMode, establishedLoad: input.progress.establishedLoads?.[exercise.id], evidence: input.progress.loadEvidence?.[exercise.id], increment: exercise.defaultLoadJump || 1, calibrationSupported: true }), targetReps, settings.requiredSets ?? settings.requiredWorkSets);
     if (validateCanonicalLoadPrescription(loadPrescription).status !== "valid") return { status: "blocked", reason: "incomplete_prescription" };
-    slots.push({ id: slot.id, index: slot.index, exerciseId: exercise.id, lane, method, settings, targetReps, exactTargets: exact?.targets, rest, progression, stopRule, loadingMode: target.envelope.loadingMode, prescribedLoad: input.progress.establishedLoads?.[exercise.id], substitutionConstraints: [...input.athlete.limitations], reason: slot.reason, selection: selectedResult ? { policyId: selectedResult.policyId, suitability: selectedResult.suitability, reasons: selectedResult.reasons, repeatReason: selectedResult.repeatReason } : undefined, loadPrescription } as CanonicalSessionSnapshotV3["slots"][number]);
+    slots.push({ id: slot.id, index: slot.index, exerciseId: exercise.id, lane, method, settings, targetReps, exactTargets: exact?.targets, exactTargetKinds: exact?.targetKinds, rest, progression, stopRule, loadingMode: target.envelope.loadingMode, prescribedLoad: input.progress.establishedLoads?.[exercise.id], substitutionConstraints: [...input.athlete.limitations], reason: slot.reason, selection: selectedResult ? { policyId: selectedResult.policyId, suitability: selectedResult.suitability, reasons: selectedResult.reasons, repeatReason: selectedResult.repeatReason } : undefined, loadPrescription } as CanonicalSessionSnapshotV3["slots"][number]);
     if (exercise.fatigueCost === "high") sessionHighFatigueSets += settings.requiredSets ?? settings.requiredWorkSets;
   }
   const snapshot: CanonicalSessionSnapshotV3 = { schemaVersion: "canonical_session_snapshot_v3", sessionId: blueprint.sessionId, operationalIdentity: input.operational.identity, role: blueprint.role, planSessionIndex: input.microcycle.planSessionIndex, slots, provenance: { inputVersion: input.schemaVersion, policyVersion: input.mesocycle.policy.schemaVersion, constructionVersion: input.operational.constructionVersion, evidenceVersion: input.progress.evidenceVersion } };
   return { status: "constructed", blueprint, slotPlan, snapshot };
+}
+
+function chooseCanonicalMethod(input: CanonicalSessionConstructionInput, slot: PlannedSessionSlot, allocated: AllocatedSlot | undefined): PrescriptionMethodFamily {
+  const governed = selectSetMethod({ mesocycleId: input.mesocycle.id, experience: input.athlete.experienceLevel, exerciseRole: slot.role, sessionRole: input.microcycle.sessionRole });
+  const mapping: Record<ReturnType<typeof selectSetMethod>, PrescriptionMethodFamily> = { exact_straight_sets: "straight_sets", top_set_backoffs: "back_off_sets", controlled_performance_set: "amrap", technical_repeated_sets: "straight_sets", output_controlled_sets: "dynamic_effort", five_three_one: "five_three_one", eight_across: "eight_across", boring_but_big: "bbb", ladder: "ladder", pyramid: "pyramid", clusters: "cluster", dynamic_effort: "dynamic_effort", max_effort: "max_effort" };
+  const method = mapping[governed];
+  const sets = allocated?.workingSets ?? 0;
+  const structureFits = method === "five_three_one" ? sets === 3 : method === "eight_across" ? sets === 8 : method === "bbb" ? sets === 5 : true;
+  const fatigueAllows = input.progress.readiness !== "restricted" && input.mesocycle.policy.specialState !== "deload" && input.mesocycle.policy.specialState !== "transition";
+  return structureFits && fatigueAllows && slot.methods.includes(method) ? method : "straight_sets";
 }
 
 function exercisePermittedByLimitations(exercise: Exercise, limitations: readonly string[]): boolean {

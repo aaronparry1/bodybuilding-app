@@ -2768,7 +2768,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "back_off_sets",
             "pyramid",
             "amrap",
-            "eight_across"
+            "eight_across",
+            "bbb"
           ],
           "prohibited": [],
           "conditional": [
@@ -3149,7 +3150,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "straight_sets",
             "back_off_sets",
             "pyramid",
-            "heavy_single_triple_five_backoffs"
+            "heavy_single_triple_five_backoffs",
+            "five_three_one",
+            "ladder"
           ],
           "prohibited": [],
           "conditional": []
@@ -4836,7 +4839,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "straight_sets",
             "back_off_sets",
             "pyramid",
-            "heavy_single_triple_five_backoffs"
+            "heavy_single_triple_five_backoffs",
+            "five_three_one",
+            "ladder"
           ],
           "prohibited": [],
           "conditional": [
@@ -5166,7 +5171,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "back_off_sets",
             "pyramid",
             "heavy_single_triple_five_backoffs",
-            "dynamic_effort"
+            "dynamic_effort",
+            "cluster"
           ],
           "prohibited": [],
           "conditional": [
@@ -5494,7 +5500,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "back_off_sets",
             "pyramid",
             "heavy_single_triple_five_backoffs",
-            "dynamic_effort"
+            "dynamic_effort",
+            "max_effort"
           ],
           "prohibited": [],
           "conditional": []
@@ -6906,7 +6913,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "permitted": [
             "straight_sets",
             "back_off_sets",
-            "pyramid"
+            "pyramid",
+            "cluster"
           ],
           "prohibited": [],
           "conditional": []

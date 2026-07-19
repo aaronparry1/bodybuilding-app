@@ -27,6 +27,7 @@ export function PlanDashboard({ projection, selectedSessionId, onSelectSession, 
       <SectionHeading title="This week" detail={`${projection.schedule.length} sessions`} />
       {projection.schedule.map((session) => <SessionRow key={session.id} session={session} selected={selected?.id === session.id} onPress={() => onSelectSession(selected?.id === session.id ? null : session.id)} />)}
     </View>
+    {projection.conditioning.length ? <View style={{ gap: spacing.md }}><SectionHeading title="Cardio & conditioning" detail={`${projection.conditioning.length} planned`} />{projection.conditioning.map((session) => <View key={session.id} style={{ padding: spacing.md, gap: spacing.xs, borderRadius: radius.lg, backgroundColor: colors.surfaceMuted, borderWidth: 1, borderColor: colors.lineSoft }}><Text style={{ ...type.label, color: colors.accent }}>{session.dayLabel}</Text><Text style={{ color: colors.text, fontSize: 16, fontWeight: "900" }}>{session.title}</Text><Text style={{ color: colors.textMuted }}>{session.prescription}</Text><Text style={{ color: colors.textSubtle, fontSize: 12 }}>{session.placement}</Text></View>)}</View> : null}
     {selected ? <SessionPreview session={selected} onClose={() => onSelectSession(null)} /> : null}
     <PhaseRoadmap projection={projection} />
   </>;

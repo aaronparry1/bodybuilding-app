@@ -59,6 +59,24 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "owner": "canonical plan reconstruction",
       "disposition": "future revision only; completed history preserved",
       "status": "application_contract_requires_explicit_user_command"
+    },
+    {
+      "id": "new_equipment_restriction",
+      "owner": "Session Construction",
+      "disposition": "future snapshots select only compatible catalogue exercises; recorded snapshots remain immutable",
+      "status": "covered"
+    },
+    {
+      "id": "framework_morph",
+      "owner": "Microcycle",
+      "disposition": "phase-specific delivery changes while the public preference remains linked and explained",
+      "status": "covered"
+    },
+    {
+      "id": "cardio_adherence_or_interference",
+      "owner": "Progress then Mesocycle",
+      "disposition": "record factual adherence; hold progression and review when lower-body recovery declines",
+      "status": "covered_by_bounded_policy"
     }
   ]
 }

@@ -7,7 +7,7 @@ import { assembleCanonicalActivePlan, compareCanonicalActivePlans, parseCanonica
 function fixture() {
   const macrocycle = createMacrocycle("build_muscle_and_strength", "intermediate", undefined, "2026-01-01T00:00:00.000Z");
   const mesocycle = selectMesocycles("powerbuilding", "intermediate")[0]!;
-  const microcycle = createMicrocycle({ parentMesocycleId: mesocycle.id, trainingDays: 5, split: "upper_lower" });
+  const microcycle = createMicrocycle({ parentMesocycleId: mesocycle.id, trainingDays: 5, split: "push_pull_legs" });
   return assembleCanonicalActivePlan({
     planId: "carrier-fixture",
     createdAt: "2026-01-01T00:00:00.000Z",
@@ -17,7 +17,7 @@ function fixture() {
     microcycle: { ...microcycle, id: "carrier-fixture:microcycle:1", constructionVersion: "microcycle_v1" },
     plannedSessions: microcycle.sessionRoles.map((role, planSessionIndex) => ({ id: `session-${planSessionIndex}`, microcycleId: "carrier-fixture:microcycle:1", planSessionIndex, role, kind: "planned" as const, status: "planned" as const, constructionVersion: "session_construction_v1", revision: 0, prescriptionSnapshot: { owner: "Session Construction", slots: [] } })),
     progress: { evidenceVersion: "progress_v1", revision: 0 },
-    constraints: { goal: "strength_hypertrophy", experienceLevel: "intermediate", daysPerWeek: 5, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell"], units: "kg" },
+    constraints: { goal: "strength_hypertrophy", experienceLevel: "intermediate", daysPerWeek: 5, preferredSplit: "push_pull_legs", equipment: ["barbell", "dumbbell"], units: "kg" },
   });
 }
 

@@ -7,7 +7,8 @@ import {
 } from "@/domain/training/event-planning";
 import {
   buildWeeklySessionSequence,
-  getFrameworkOptionsForGoal,
+  getCustomerFrameworksForFrequency,
+  getRecommendedCustomerFramework,
   type ProgrammeFrameworkGoal,
   type ProgrammeFrameworkId,
   type ProgrammeFrameworkSessionType,
@@ -204,6 +205,11 @@ export function resolveProgrammeSkeletonFramework({
   const mapped = frameworkPreferenceMap[frameworkPreference];
   if (!mapped || mapped === "asc_recommended") return recommendedFrameworkForGoal(goal, sessionsPerWeek);
 
+  if (
+    (mapped === "full_body" || mapped === "upper_lower" || mapped === "push_pull_legs") &&
+    !getCustomerFrameworksForFrequency(sessionsPerWeek).includes(mapped)
+  ) return recommendedFrameworkForGoal(goal, sessionsPerWeek);
+
   const frameworkGoal = frameworkGoalByTrainingGoal[goal];
   try {
     buildWeeklySessionSequence({ goal: frameworkGoal, framework: mapped, sessionsPerWeek });
@@ -214,23 +220,7 @@ export function resolveProgrammeSkeletonFramework({
 }
 
 function recommendedFrameworkForGoal(goal: TrainingGoalId, sessionsPerWeek: number): ProgrammeFrameworkId {
-  const bestFrameworks = getFrameworkOptionsForGoal(goal)
-    .filter((option) => option.id !== "asc_recommended" && option.suitability === "best")
-    .map((option) => frameworkPreferenceMap[option.id])
-    .filter((framework): framework is ProgrammeFrameworkId => Boolean(framework) && framework !== "asc_recommended");
-
-  const preferredBySchedule =
-    sessionsPerWeek <= 3
-      ? ["full_body", "upper_lower", "bench_squat_deadlift", "push_pull_legs"]
-      : sessionsPerWeek === 4
-        ? ["upper_lower", "full_body", "bench_squat_deadlift", "push_pull_legs"]
-        : ["push_pull_legs", "upper_lower", "bench_squat_deadlift", "full_body"];
-
-  return (
-    preferredBySchedule.find((framework): framework is ProgrammeFrameworkId => bestFrameworks.includes(framework as ProgrammeFrameworkId)) ??
-    bestFrameworks[0] ??
-    "upper_lower"
-  );
+  return getRecommendedCustomerFramework(goal, sessionsPerWeek) ?? "full_body";
 }
 
 function resolveCommitmentMode(commitment: ProgrammeSkeletonCommitmentInput): ProgrammeSkeletonMacroMode {
