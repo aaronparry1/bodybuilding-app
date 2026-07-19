@@ -4,13 +4,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
 
 ```json
 {
-  "schemaVersion": "canonical_dosage_evolution_certification_v1",
+  "schemaVersion": "canonical_dosage_evolution_certification_v2",
   "currentProductionInput": true,
   "commitmentMeaning": "days_per_week_only",
-  "currentAcceptanceOwner": "canonical_session_duration_policy_v1 validated by canonical active-plan application and enforced by canonical_microcycle_volume_policy_v3",
+  "currentAcceptanceOwner": "canonical_session_duration_policy_v2 validated by canonical active-plan application and enforced by canonical_microcycle_volume_policy_v4",
   "currentEstimatedRangeMinutes": [
-    44,
-    53
+    42,
+    65
   ],
   "currentMaximumMinutes": 90,
   "supportedMinutes": [
@@ -27,38 +27,93 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "sessions": [
         {
           "role": "Push hypertrophy A",
-          "exercises": 6,
-          "workingSets": 7,
-          "estimatedMinutes": 29,
-          "allEssentialSlotsRetained": true
+          "exercises": 4,
+          "workingSets": 8,
+          "estimatedMinutes": 27,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 300,
+            "workingSetExecution": 320,
+            "prescribedInterSetRest": 510,
+            "equipmentSetup": 120,
+            "exerciseTransitions": 90,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 40,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Pull hypertrophy B",
-          "exercises": 6,
-          "workingSets": 7,
-          "estimatedMinutes": 29,
-          "allEssentialSlotsRetained": true
+          "exercises": 4,
+          "workingSets": 8,
+          "estimatedMinutes": 27,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 300,
+            "workingSetExecution": 320,
+            "prescribedInterSetRest": 510,
+            "equipmentSetup": 120,
+            "exerciseTransitions": 90,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 40,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Legs hypertrophy C",
-          "exercises": 6,
-          "workingSets": 7,
+          "exercises": 4,
+          "workingSets": 8,
           "estimatedMinutes": 29,
-          "allEssentialSlotsRetained": true
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 300,
+            "workingSetExecution": 320,
+            "prescribedInterSetRest": 510,
+            "equipmentSetup": 120,
+            "exerciseTransitions": 90,
+            "unilateralOverhead": 70,
+            "calibrationOverhead": 40,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Push hypertrophy D",
-          "exercises": 6,
-          "workingSets": 7,
-          "estimatedMinutes": 29,
-          "allEssentialSlotsRetained": true
+          "exercises": 4,
+          "workingSets": 8,
+          "estimatedMinutes": 27,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 300,
+            "workingSetExecution": 320,
+            "prescribedInterSetRest": 510,
+            "equipmentSetup": 120,
+            "exerciseTransitions": 90,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 40,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Pull hypertrophy E",
-          "exercises": 6,
-          "workingSets": 7,
-          "estimatedMinutes": 29,
-          "allEssentialSlotsRetained": true
+          "exercises": 4,
+          "workingSets": 8,
+          "estimatedMinutes": 27,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 300,
+            "workingSetExecution": 320,
+            "prescribedInterSetRest": 510,
+            "equipmentSetup": 120,
+            "exerciseTransitions": 90,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 40,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         }
       ],
       "maximumObservedMinutes": 29
@@ -70,40 +125,95 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         {
           "role": "Push hypertrophy A",
           "exercises": 6,
-          "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "workingSets": 14,
+          "estimatedMinutes": 45,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 390,
+            "workingSetExecution": 560,
+            "prescribedInterSetRest": 1080,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Pull hypertrophy B",
           "exercises": 6,
-          "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "workingSets": 13,
+          "estimatedMinutes": 43,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 520,
+            "prescribedInterSetRest": 990,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Legs hypertrophy C",
           "exercises": 6,
           "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "estimatedMinutes": 42,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 480,
+            "prescribedInterSetRest": 810,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 140,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Push hypertrophy D",
-          "exercises": 6,
-          "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "exercises": 5,
+          "workingSets": 13,
+          "estimatedMinutes": 42,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 360,
+            "workingSetExecution": 520,
+            "prescribedInterSetRest": 1080,
+            "equipmentSetup": 150,
+            "exerciseTransitions": 120,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 50,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Pull hypertrophy E",
           "exercises": 6,
-          "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "workingSets": 13,
+          "estimatedMinutes": 43,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 520,
+            "prescribedInterSetRest": 990,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         }
       ],
-      "maximumObservedMinutes": 44
+      "maximumObservedMinutes": 45
     },
     {
       "availableSessionMinutes": 60,
@@ -112,40 +222,95 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         {
           "role": "Push hypertrophy A",
           "exercises": 6,
-          "workingSets": 13,
-          "estimatedMinutes": 47,
-          "allEssentialSlotsRetained": true
+          "workingSets": 18,
+          "estimatedMinutes": 54,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 390,
+            "workingSetExecution": 720,
+            "prescribedInterSetRest": 1500,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Pull hypertrophy B",
           "exercises": 6,
-          "workingSets": 14,
-          "estimatedMinutes": 50,
-          "allEssentialSlotsRetained": true
+          "workingSets": 18,
+          "estimatedMinutes": 55,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 720,
+            "prescribedInterSetRest": 1500,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Legs hypertrophy C",
           "exercises": 6,
-          "workingSets": 15,
-          "estimatedMinutes": 53,
-          "allEssentialSlotsRetained": true
+          "workingSets": 17,
+          "estimatedMinutes": 59,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 680,
+            "prescribedInterSetRest": 1560,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 210,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Push hypertrophy D",
-          "exercises": 6,
-          "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "exercises": 5,
+          "workingSets": 13,
+          "estimatedMinutes": 42,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 360,
+            "workingSetExecution": 520,
+            "prescribedInterSetRest": 1080,
+            "equipmentSetup": 150,
+            "exerciseTransitions": 120,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 50,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Pull hypertrophy E",
           "exercises": 6,
-          "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "workingSets": 16,
+          "estimatedMinutes": 51,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 640,
+            "prescribedInterSetRest": 1320,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         }
       ],
-      "maximumObservedMinutes": 53
+      "maximumObservedMinutes": 59
     },
     {
       "availableSessionMinutes": 75,
@@ -154,40 +319,95 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         {
           "role": "Push hypertrophy A",
           "exercises": 6,
-          "workingSets": 13,
-          "estimatedMinutes": 47,
-          "allEssentialSlotsRetained": true
+          "workingSets": 18,
+          "estimatedMinutes": 54,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 390,
+            "workingSetExecution": 720,
+            "prescribedInterSetRest": 1500,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Pull hypertrophy B",
           "exercises": 6,
-          "workingSets": 14,
-          "estimatedMinutes": 50,
-          "allEssentialSlotsRetained": true
+          "workingSets": 18,
+          "estimatedMinutes": 55,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 720,
+            "prescribedInterSetRest": 1500,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Legs hypertrophy C",
           "exercises": 6,
-          "workingSets": 15,
-          "estimatedMinutes": 53,
-          "allEssentialSlotsRetained": true
+          "workingSets": 20,
+          "estimatedMinutes": 65,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 800,
+            "prescribedInterSetRest": 1830,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 210,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Push hypertrophy D",
-          "exercises": 6,
-          "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "exercises": 5,
+          "workingSets": 13,
+          "estimatedMinutes": 42,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 360,
+            "workingSetExecution": 520,
+            "prescribedInterSetRest": 1080,
+            "equipmentSetup": 150,
+            "exerciseTransitions": 120,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 50,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Pull hypertrophy E",
           "exercises": 6,
-          "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "workingSets": 16,
+          "estimatedMinutes": 51,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 640,
+            "prescribedInterSetRest": 1320,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         }
       ],
-      "maximumObservedMinutes": 53
+      "maximumObservedMinutes": 65
     },
     {
       "availableSessionMinutes": 90,
@@ -196,45 +416,100 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         {
           "role": "Push hypertrophy A",
           "exercises": 6,
-          "workingSets": 13,
-          "estimatedMinutes": 47,
-          "allEssentialSlotsRetained": true
+          "workingSets": 18,
+          "estimatedMinutes": 54,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 390,
+            "workingSetExecution": 720,
+            "prescribedInterSetRest": 1500,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Pull hypertrophy B",
           "exercises": 6,
-          "workingSets": 14,
-          "estimatedMinutes": 50,
-          "allEssentialSlotsRetained": true
+          "workingSets": 18,
+          "estimatedMinutes": 55,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 720,
+            "prescribedInterSetRest": 1500,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Legs hypertrophy C",
           "exercises": 6,
-          "workingSets": 15,
-          "estimatedMinutes": 53,
-          "allEssentialSlotsRetained": true
+          "workingSets": 20,
+          "estimatedMinutes": 65,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 800,
+            "prescribedInterSetRest": 1830,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 210,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Push hypertrophy D",
-          "exercises": 6,
-          "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "exercises": 5,
+          "workingSets": 13,
+          "estimatedMinutes": 42,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 360,
+            "workingSetExecution": 520,
+            "prescribedInterSetRest": 1080,
+            "equipmentSetup": 150,
+            "exerciseTransitions": 120,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 50,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         },
         {
           "role": "Pull hypertrophy E",
           "exercises": 6,
-          "workingSets": 12,
-          "estimatedMinutes": 44,
-          "allEssentialSlotsRetained": true
+          "workingSets": 16,
+          "estimatedMinutes": 51,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 640,
+            "prescribedInterSetRest": 1320,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
         }
       ],
-      "maximumObservedMinutes": 53
+      "maximumObservedMinutes": 65
     }
   ],
   "userSpecificLimitClaimed": true,
   "decision": "implemented_as_typed_canonical_input",
   "reconstruction": "Future snapshots are regenerated atomically; recorded references and lineage are preserved; active attempts and stale revisions fail closed.",
-  "coverageRule": "Every planned stimulus slot retains at least one exact working set. Time-constrained dosage gaps are exposed explicitly rather than silently deleting a muscle region."
+  "coverageRule": "Every retained hypertrophy exercise has at least two exact working sets. Time-constrained omissions and dosage gaps are exposed explicitly rather than hidden as token work."
 }
 ```

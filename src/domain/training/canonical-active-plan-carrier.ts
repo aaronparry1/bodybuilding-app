@@ -7,7 +7,7 @@ import { validateCanonicalLoadPrescription } from "@/domain/training/canonical-l
 import type { CanonicalCardioPrescription } from "@/domain/training/canonical-cardio-prescription";
 import type { RecoveryCardioPreference } from "@/domain/training/plan-setup";
 import type { CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
-import type { CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
+import { isCanonicalStartingVolumeContext, type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
 import { resolveCanonicalSessionDuration } from "@/domain/training/canonical-session-duration";
 
 /** Persisted migration target. This module stores owner outputs; it makes no training decisions. */
@@ -152,6 +152,7 @@ export function validateCanonicalActivePlan(value: unknown): CanonicalCarrierVal
   }
   if (!candidate.progress || typeof candidate.progress !== "object" || typeof candidate.progress.evidenceVersion !== "string" || typeof candidate.progress.revision !== "number") return { status: "invalid", reason: "invalid_progress_reference", path: "progress" };
   if (candidate.constraints?.availableSessionMinutes !== undefined && resolveCanonicalSessionDuration(candidate.constraints.availableSessionMinutes).status !== "valid") return { status: "invalid", reason: "invalid_progress_reference", path: "constraints.availableSessionMinutes" };
+  if (candidate.constraints?.startingVolumeContext !== undefined && !isCanonicalStartingVolumeContext(candidate.constraints.startingVolumeContext)) return { status: "invalid", reason: "invalid_progress_reference", path: "constraints.startingVolumeContext" };
   if (candidate.conditioning && (candidate.conditioning.schemaVersion !== "canonical_cardio_prescription_v1" || candidate.conditioning.policyId !== "canonical_concurrent_training_policy_v1" || !Array.isArray(candidate.conditioning.sessions) || candidate.conditioning.sessions.length !== candidate.conditioning.weeklyFrequency)) return { status: "invalid", reason: "invalid_progress_reference", path: "conditioning" };
   if (candidate.planningRationale && (candidate.planningRationale.schemaVersion !== "canonical_planning_rationale_v1" || !candidate.planningRationale.goalStrategyId || !Array.isArray(candidate.planningRationale.rotationReasons) || !Array.isArray(candidate.planningRationale.sessionReasons) || !Array.isArray(candidate.planningRationale.changeReasons))) return { status: "invalid", reason: "invalid_progress_reference", path: "planningRationale" };
   if (candidate.progress.revision !== candidate.revision) return { status: "invalid", reason: "invalid_progress_reference", path: "progress.revision" };

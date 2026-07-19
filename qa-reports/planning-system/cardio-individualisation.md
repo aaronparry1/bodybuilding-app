@@ -4,7 +4,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
 
 ```json
 {
-  "schemaVersion": "canonical_dosage_evolution_certification_v1",
+  "schemaVersion": "canonical_dosage_evolution_certification_v2",
   "cases": [
     {
       "id": "hypertrophy-desired",

@@ -4,7 +4,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
 
 ```json
 {
-  "schemaVersion": "canonical_dosage_evolution_certification_v1",
+  "schemaVersion": "canonical_dosage_evolution_certification_v2",
   "rotationPolicy": {
     "sequenceNumber": 1,
     "rotationCursor": 0,
@@ -106,17 +106,46 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-bench-press",
             "exercise": "Bench Press",
             "purpose": "high-priority horizontal press",
-            "workingSets": 2,
+            "workingSets": 3,
             "exactTargets": [
+              8,
               8,
               8
             ],
             "exactTargetKinds": [
               "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 8,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 8 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 150,
             "directMuscles": [
               "chest"
@@ -126,13 +155,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "anterior_delts"
             ],
             "fatigueClass": "high",
+            "stimulusToFatigueRationale": "Priority anchor with bounded exact sets, reps and rest; not repeated as redundant high-fatigue work.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
           {
             "exerciseId": "ex-incline-dumbbell-press",
             "exercise": "Incline Dumbbell Press",
-            "purpose": "second-angle chest stimulus",
+            "purpose": "chest work in a complementary press path",
             "workingSets": 2,
             "exactTargets": [
               10,
@@ -144,6 +174,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "chest"
@@ -153,6 +210,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "triceps"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -160,8 +218,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-machine-shoulder-press",
             "exercise": "Machine Shoulder Press",
             "purpose": "vertical pressing stimulus",
-            "workingSets": 3,
+            "workingSets": 4,
             "exactTargets": [
+              10,
               10,
               10,
               10
@@ -169,10 +228,38 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exactTargetKinds": [
               "reps",
               "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 4,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "anterior_delts"
@@ -181,6 +268,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "triceps"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -188,11 +276,67 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-cable-lateral-raise",
             "exercise": "Cable Lateral Raise",
             "purpose": "lateral-delt stimulus",
-            "workingSets": 3,
+            "workingSets": 4,
             "exactTargets": [
               15,
               15,
+              15,
               15
+            ],
+            "exactTargetKinds": [
+              "reps",
+              "reps",
+              "reps",
+              "reps"
+            ],
+            "method": "straight_sets",
+            "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 15,
+                "workingSets": 4,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 15 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
+            "restSeconds": 75,
+            "directMuscles": [
+              "lateral_delts"
+            ],
+            "meaningfulSecondaryMuscles": [],
+            "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
+            "progression": "rep_progression",
+            "stopRule": "change_target"
+          },
+          {
+            "exerciseId": "ex-cable-rope-overhead-extension",
+            "exercise": "Rope Overhead Triceps Extension",
+            "purpose": "lengthened elbow-extension work",
+            "workingSets": 3,
+            "exactTargets": [
+              12,
+              12,
+              12
             ],
             "exactTargetKinds": [
               "reps",
@@ -201,19 +345,47 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
-              "lateral_delts"
+              "triceps"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
           {
-            "exerciseId": "ex-cable-rope-overhead-extension",
-            "exercise": "Rope Overhead Triceps Extension",
-            "purpose": "lengthened elbow-extension work",
+            "exerciseId": "ex-close-neutral-pushdown",
+            "exercise": "Close Neutral Pushdown",
+            "purpose": "shortened-range triceps finish",
             "workingSets": 2,
             "exactTargets": [
               12,
@@ -225,50 +397,75 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "triceps"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "low",
-            "progression": "rep_progression",
-            "stopRule": "change_target"
-          },
-          {
-            "exerciseId": "ex-close-neutral-pushdown",
-            "exercise": "Close Neutral Pushdown",
-            "purpose": "shortened-range triceps finish",
-            "workingSets": 1,
-            "exactTargets": [
-              12
-            ],
-            "exactTargetKinds": [
-              "reps"
-            ],
-            "method": "straight_sets",
-            "loadState": "calibration_required",
-            "restSeconds": 75,
-            "directMuscles": [
-              "triceps"
-            ],
-            "meaningfulSecondaryMuscles": [],
-            "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           }
         ],
-        "workingSets": 13,
-        "estimatedMinutes": 47,
-        "localFatigue": {
-          "chest": 4,
-          "anterior_delts": 3,
-          "lateral_delts": 3,
-          "triceps": 3
+        "workingSets": 18,
+        "estimatedMinutes": 54,
+        "durationBreakdown": {
+          "generalWarmup": 240,
+          "liftSpecificRamp": 390,
+          "workingSetExecution": 720,
+          "prescribedInterSetRest": 1500,
+          "equipmentSetup": 180,
+          "exerciseTransitions": 150,
+          "unilateralOverhead": 0,
+          "calibrationOverhead": 60,
+          "methodOverhead": 0
         },
-        "systemicFatigueUnits": 22,
+        "durationAssumptions": [
+          "general_warmup_included",
+          "lift_specific_ramps_included",
+          "prescribed_or_role_owned_rest_included",
+          "set_execution_and_unilateral_time_included",
+          "equipment_setup_and_transitions_included",
+          "calibration_and_method_overhead_included"
+        ],
+        "localFatigue": {
+          "chest": 5,
+          "anterior_delts": 4,
+          "lateral_delts": 4,
+          "triceps": 5
+        },
+        "systemicFatigueUnits": 30,
         "meaningfulSecondarySets": {
-          "triceps": 7,
-          "anterior_delts": 4
+          "triceps": 9,
+          "anterior_delts": 5
         }
       },
       {
@@ -280,17 +477,46 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-chest-supported-row",
             "exercise": "Chest Supported Row",
             "purpose": "supported horizontal-pull anchor",
-            "workingSets": 2,
+            "workingSets": 3,
             "exactTargets": [
+              12,
               12,
               12
             ],
             "exactTargetKinds": [
               "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "upper_back"
@@ -300,6 +526,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "rear_delts"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -320,6 +547,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "lats"
@@ -328,13 +582,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "biceps"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
           {
             "exerciseId": "ex-dorian-yates-row-machine",
             "exercise": "Dorian Yates Row Machine",
-            "purpose": "second-angle upper-back stimulus",
+            "purpose": "upper-back work in a complementary supported row pattern",
             "workingSets": 2,
             "exactTargets": [
               10,
@@ -346,6 +601,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "upper_back"
@@ -355,6 +637,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "rear_delts"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -362,8 +645,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-cable-rear-delt-fly",
             "exercise": "Cable Rear Delt Fly",
             "purpose": "rear-delt and scapular work",
-            "workingSets": 3,
+            "workingSets": 4,
             "exactTargets": [
+              15,
               15,
               15,
               15
@@ -371,10 +655,38 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exactTargetKinds": [
               "reps",
               "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 15,
+                "workingSets": 4,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 15 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "rear_delts"
@@ -383,6 +695,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "upper_back"
             ],
             "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -390,8 +703,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-bayesian-curl",
             "exercise": "Bayesian Curl",
             "purpose": "lengthened elbow-flexor work",
-            "workingSets": 3,
+            "workingSets": 4,
             "exactTargets": [
+              12,
               12,
               12,
               12
@@ -399,32 +713,90 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exactTargetKinds": [
               "reps",
               "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 4,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "biceps"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
           {
             "exerciseId": "ex-lat-pulldown-machine",
             "exercise": "Lat Pulldown Machine",
-            "purpose": "second-angle lat stimulus",
-            "workingSets": 1,
+            "purpose": "lat work in a complementary supported grip",
+            "workingSets": 2,
             "exactTargets": [
+              10,
               10
             ],
             "exactTargetKinds": [
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "lats"
@@ -433,23 +805,43 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "biceps"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           }
         ],
-        "workingSets": 14,
-        "estimatedMinutes": 50,
-        "localFatigue": {
-          "upper_back": 4,
-          "lats": 4,
-          "rear_delts": 3,
-          "biceps": 3
+        "workingSets": 18,
+        "estimatedMinutes": 55,
+        "durationBreakdown": {
+          "generalWarmup": 240,
+          "liftSpecificRamp": 420,
+          "workingSetExecution": 720,
+          "prescribedInterSetRest": 1500,
+          "equipmentSetup": 180,
+          "exerciseTransitions": 150,
+          "unilateralOverhead": 0,
+          "calibrationOverhead": 60,
+          "methodOverhead": 0
         },
-        "systemicFatigueUnits": 22,
-        "meaningfulSecondarySets": {
-          "biceps": 8,
+        "durationAssumptions": [
+          "general_warmup_included",
+          "lift_specific_ramps_included",
+          "prescribed_or_role_owned_rest_included",
+          "set_execution_and_unilateral_time_included",
+          "equipment_setup_and_transitions_included",
+          "calibration_and_method_overhead_included"
+        ],
+        "localFatigue": {
+          "upper_back": 5,
+          "lats": 5,
           "rear_delts": 4,
-          "upper_back": 3
+          "biceps": 4
+        },
+        "systemicFatigueUnits": 28,
+        "meaningfulSecondarySets": {
+          "biceps": 10,
+          "rear_delts": 5,
+          "upper_back": 4
         }
       },
       {
@@ -461,17 +853,48 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-hack-squat-machine",
             "exercise": "Hack Squat Machine",
             "purpose": "knee-dominant anchor",
-            "workingSets": 2,
+            "workingSets": 4,
             "exactTargets": [
+              12,
+              12,
               12,
               12
             ],
             "exactTargetKinds": [
               "reps",
+              "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 4,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "quadriceps"
@@ -480,6 +903,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "hip_extension"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -498,12 +922,40 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "quadriceps"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -511,17 +963,46 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-stiff-leg-deadlift",
             "exercise": "Stiff-Leg Deadlift",
             "purpose": "hip-extension support",
-            "workingSets": 2,
+            "workingSets": 3,
             "exactTargets": [
+              10,
               10,
               10
             ],
             "exactTargetKinds": [
               "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "hip_extension"
@@ -530,6 +1011,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "upper_back"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -552,12 +1034,40 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 4,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "hamstrings_knee_flexion"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -565,23 +1075,53 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-hip-thrust-machine",
             "exercise": "Hip Thrust Machine",
             "purpose": "shortened hip-extension stimulus",
-            "workingSets": 2,
+            "workingSets": 3,
             "exactTargets": [
+              10,
               10,
               10
             ],
             "exactTargetKinds": [
               "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "hip_extension"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -589,8 +1129,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-donkey-calf-raise",
             "exercise": "Donkey Calf Raise",
             "purpose": "calf work",
-            "workingSets": 3,
+            "workingSets": 4,
             "exactTargets": [
+              15,
               15,
               15,
               15
@@ -598,32 +1139,80 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exactTargetKinds": [
               "reps",
               "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 15,
+                "workingSets": 4,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 15 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "calves"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           }
         ],
-        "workingSets": 15,
-        "estimatedMinutes": 53,
-        "localFatigue": {
-          "quadriceps": 4,
-          "hip_extension": 4,
-          "hamstrings_knee_flexion": 4,
-          "calves": 3
+        "workingSets": 20,
+        "estimatedMinutes": 65,
+        "durationBreakdown": {
+          "generalWarmup": 240,
+          "liftSpecificRamp": 420,
+          "workingSetExecution": 800,
+          "prescribedInterSetRest": 1830,
+          "equipmentSetup": 180,
+          "exerciseTransitions": 150,
+          "unilateralOverhead": 210,
+          "calibrationOverhead": 60,
+          "methodOverhead": 0
         },
-        "systemicFatigueUnits": 23,
+        "durationAssumptions": [
+          "general_warmup_included",
+          "lift_specific_ramps_included",
+          "prescribed_or_role_owned_rest_included",
+          "set_execution_and_unilateral_time_included",
+          "equipment_setup_and_transitions_included",
+          "calibration_and_method_overhead_included"
+        ],
+        "localFatigue": {
+          "quadriceps": 6,
+          "hip_extension": 6,
+          "hamstrings_knee_flexion": 4,
+          "calves": 4
+        },
+        "systemicFatigueUnits": 32,
         "meaningfulSecondarySets": {
-          "hip_extension": 2,
-          "upper_back": 2
+          "hip_extension": 4,
+          "upper_back": 3
         }
       },
       {
@@ -635,17 +1224,46 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-incline-barbell-bench",
             "exercise": "Incline Barbell Bench",
             "purpose": "high-priority horizontal press",
-            "workingSets": 2,
+            "workingSets": 3,
             "exactTargets": [
+              8,
               8,
               8
             ],
             "exactTargetKinds": [
               "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 8,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 8 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 150,
             "directMuscles": [
               "chest"
@@ -655,22 +1273,52 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "anterior_delts"
             ],
             "fatigueClass": "high",
+            "stimulusToFatigueRationale": "Priority anchor with bounded exact sets, reps and rest; not repeated as redundant high-fatigue work.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
           {
             "exerciseId": "ex-decline-plate-loaded-press",
             "exercise": "Decline Plate Loaded Press",
-            "purpose": "second-angle chest stimulus",
-            "workingSets": 1,
+            "purpose": "chest work in a complementary press path",
+            "workingSets": 2,
             "exactTargets": [
+              10,
               10
             ],
             "exactTargetKinds": [
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "chest"
@@ -679,6 +1327,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "triceps"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -699,6 +1348,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "anterior_delts"
@@ -707,6 +1383,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "triceps"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -727,12 +1404,40 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 15,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 15 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "lateral_delts"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -751,50 +1456,75 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "triceps"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "low",
-            "progression": "rep_progression",
-            "stopRule": "change_target"
-          },
-          {
-            "exerciseId": "ex-machine-triceps-extension",
-            "exercise": "Machine Tricep Extension",
-            "purpose": "shortened-range triceps finish",
-            "workingSets": 1,
-            "exactTargets": [
-              12
-            ],
-            "exactTargetKinds": [
-              "reps"
-            ],
-            "method": "straight_sets",
-            "loadState": "calibration_required",
-            "restSeconds": 75,
-            "directMuscles": [
-              "triceps"
-            ],
-            "meaningfulSecondaryMuscles": [],
-            "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           }
         ],
-        "workingSets": 12,
-        "estimatedMinutes": 44,
+        "workingSets": 13,
+        "estimatedMinutes": 42,
+        "durationBreakdown": {
+          "generalWarmup": 240,
+          "liftSpecificRamp": 360,
+          "workingSetExecution": 520,
+          "prescribedInterSetRest": 1080,
+          "equipmentSetup": 150,
+          "exerciseTransitions": 120,
+          "unilateralOverhead": 0,
+          "calibrationOverhead": 50,
+          "methodOverhead": 0
+        },
+        "durationAssumptions": [
+          "general_warmup_included",
+          "lift_specific_ramps_included",
+          "prescribed_or_role_owned_rest_included",
+          "set_execution_and_unilateral_time_included",
+          "equipment_setup_and_transitions_included",
+          "calibration_and_method_overhead_included"
+        ],
         "localFatigue": {
-          "chest": 3,
+          "chest": 5,
           "anterior_delts": 3,
           "lateral_delts": 3,
-          "triceps": 3
+          "triceps": 2
         },
-        "systemicFatigueUnits": 20,
+        "systemicFatigueUnits": 24,
         "meaningfulSecondarySets": {
-          "triceps": 6,
-          "anterior_delts": 2
+          "triceps": 8,
+          "anterior_delts": 3
         }
       },
       {
@@ -806,17 +1536,46 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-high-row-plate-loaded",
             "exercise": "High Row Plate Loaded",
             "purpose": "supported horizontal-pull anchor",
-            "workingSets": 2,
+            "workingSets": 3,
             "exactTargets": [
+              12,
               12,
               12
             ],
             "exactTargetKinds": [
               "reps",
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "upper_back"
@@ -826,6 +1585,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "rear_delts"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -833,6 +1593,62 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-lat-pulldown-narrow",
             "exercise": "Lat Pulldown Narrow",
             "purpose": "vertical-pull lat stimulus",
+            "workingSets": 3,
+            "exactTargets": [
+              10,
+              10,
+              10
+            ],
+            "exactTargetKinds": [
+              "reps",
+              "reps",
+              "reps"
+            ],
+            "method": "straight_sets",
+            "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
+            "restSeconds": 120,
+            "directMuscles": [
+              "lats"
+            ],
+            "meaningfulSecondaryMuscles": [
+              "biceps"
+            ],
+            "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
+            "progression": "rep_progression",
+            "stopRule": "change_target"
+          },
+          {
+            "exerciseId": "ex-low-row-plate-loaded",
+            "exercise": "Low Row Plate Loaded",
+            "purpose": "upper-back work in a complementary supported row pattern",
             "workingSets": 2,
             "exactTargets": [
               10,
@@ -844,30 +1660,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
-            "restSeconds": 120,
-            "directMuscles": [
-              "lats"
-            ],
-            "meaningfulSecondaryMuscles": [
-              "biceps"
-            ],
-            "fatigueClass": "moderate",
-            "progression": "rep_progression",
-            "stopRule": "change_target"
-          },
-          {
-            "exerciseId": "ex-low-row-plate-loaded",
-            "exercise": "Low Row Plate Loaded",
-            "purpose": "second-angle upper-back stimulus",
-            "workingSets": 1,
-            "exactTargets": [
-              10
-            ],
-            "exactTargetKinds": [
-              "reps"
-            ],
-            "method": "straight_sets",
-            "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "upper_back"
@@ -876,6 +1695,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "biceps"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -896,6 +1716,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 15,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 15 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "rear_delts"
@@ -904,6 +1751,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "upper_back"
             ],
             "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -924,28 +1772,85 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "biceps"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
           {
             "exerciseId": "ex-lat-pulldown-neutral-close",
             "exercise": "Lat Pulldown Neutral Close",
-            "purpose": "second-angle lat stimulus",
-            "workingSets": 1,
+            "purpose": "lat work in a complementary supported grip",
+            "workingSets": 2,
             "exactTargets": [
+              10,
               10
             ],
             "exactTargetKinds": [
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "lats"
@@ -954,22 +1859,42 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "biceps"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           }
         ],
-        "workingSets": 12,
-        "estimatedMinutes": 44,
+        "workingSets": 16,
+        "estimatedMinutes": 51,
+        "durationBreakdown": {
+          "generalWarmup": 240,
+          "liftSpecificRamp": 420,
+          "workingSetExecution": 640,
+          "prescribedInterSetRest": 1320,
+          "equipmentSetup": 180,
+          "exerciseTransitions": 150,
+          "unilateralOverhead": 0,
+          "calibrationOverhead": 60,
+          "methodOverhead": 0
+        },
+        "durationAssumptions": [
+          "general_warmup_included",
+          "lift_specific_ramps_included",
+          "prescribed_or_role_owned_rest_included",
+          "set_execution_and_unilateral_time_included",
+          "equipment_setup_and_transitions_included",
+          "calibration_and_method_overhead_included"
+        ],
         "localFatigue": {
-          "upper_back": 3,
-          "lats": 3,
+          "upper_back": 5,
+          "lats": 5,
           "rear_delts": 3,
           "biceps": 3
         },
-        "systemicFatigueUnits": 18,
+        "systemicFatigueUnits": 26,
         "meaningfulSecondarySets": {
-          "biceps": 6,
-          "rear_delts": 2,
+          "biceps": 10,
+          "rear_delts": 3,
           "upper_back": 3
         }
       },
@@ -979,8 +1904,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "purpose": "Establish reproducible exercise, load and recovery baselines",
         "exercises": [
           {
-            "exerciseId": "ex-safety-squat-bar-good-morning",
-            "exercise": "Safety Squat Bar Good Morning",
+            "exerciseId": "ex-stiff-leg-deadlift",
+            "exercise": "Stiff-Leg Deadlift",
             "purpose": "moderate-fatigue hinge-led posterior-chain anchor",
             "workingSets": 2,
             "exactTargets": [
@@ -993,6 +1918,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "hip_extension"
@@ -1001,6 +1953,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "upper_back"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -1019,6 +1972,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "quadriceps"
@@ -1027,6 +2007,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "hip_extension"
             ],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -1034,6 +2015,60 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-kneeling-leg-curl",
             "exercise": "Kneeling Leg Curl",
             "purpose": "knee-flexion hamstring work",
+            "workingSets": 3,
+            "exactTargets": [
+              12,
+              12,
+              12
+            ],
+            "exactTargetKinds": [
+              "reps",
+              "reps",
+              "reps"
+            ],
+            "method": "straight_sets",
+            "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
+            "restSeconds": 75,
+            "directMuscles": [
+              "hamstrings_knee_flexion"
+            ],
+            "meaningfulSecondaryMuscles": [],
+            "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
+            "progression": "rep_progression",
+            "stopRule": "change_target"
+          },
+          {
+            "exerciseId": "ex-leg-extension",
+            "exercise": "Leg Extension",
+            "purpose": "low-systemic-cost quadriceps work",
             "workingSets": 2,
             "exactTargets": [
               12,
@@ -1045,34 +2080,40 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
-            "restSeconds": 75,
-            "directMuscles": [
-              "hamstrings_knee_flexion"
-            ],
-            "meaningfulSecondaryMuscles": [],
-            "fatigueClass": "low",
-            "progression": "rep_progression",
-            "stopRule": "change_target"
-          },
-          {
-            "exerciseId": "ex-leg-extension",
-            "exercise": "Leg Extension",
-            "purpose": "low-systemic-cost quadriceps work",
-            "workingSets": 1,
-            "exactTargets": [
-              12
-            ],
-            "exactTargetKinds": [
-              "reps"
-            ],
-            "method": "straight_sets",
-            "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "quadriceps"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -1080,21 +2121,51 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-hip-thrust-machine",
             "exercise": "Hip Thrust Machine",
             "purpose": "shortened hip-extension stimulus",
-            "workingSets": 1,
+            "workingSets": 2,
             "exactTargets": [
+              10,
               10
             ],
             "exactTargetKinds": [
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 10,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 10 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "hip_extension"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -1115,12 +2186,40 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 15,
+                "workingSets": 3,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 15 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 75,
             "directMuscles": [
               "calves"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "low",
+            "stimulusToFatigueRationale": "Low-systemic-cost direct accessory work used only to meet an owned regional dose.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           },
@@ -1128,65 +2227,114 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exerciseId": "ex-cable-crunch",
             "exercise": "Cable Crunch",
             "purpose": "trunk work",
-            "workingSets": 1,
+            "workingSets": 2,
             "exactTargets": [
+              12,
               12
             ],
             "exactTargetKinds": [
+              "reps",
               "reps"
             ],
             "method": "straight_sets",
             "loadState": "calibration_required",
+            "loadPrescription": {
+              "schemaVersion": "canonical_load_prescription_v1",
+              "state": "calibration_required",
+              "loadingMode": "rep_progression",
+              "instruction": "calibrate a reproducible starting load",
+              "reason": "load_evidence_unavailable",
+              "evidenceStatus": "missing",
+              "protocol": {
+                "schemaVersion": "canonical_load_calibration_protocol_v1",
+                "targetReps": 12,
+                "workingSets": 2,
+                "warmupAndRampExcludedFromWorkingVolume": true,
+                "startingInstruction": "Before working sets, begin with the lightest load you can control confidently for the exact target and leave at least three good reps in reserve.",
+                "safeAdjustment": "Use warm-up/ramp attempts to increase by one available equipment increment; stop increasing if technique, range or rep speed becomes inconsistent.",
+                "successCriteria": "Use the first load that permits 12 controlled reps with stable technique and at least two good reps in reserve.",
+                "laterWorkingSets": "Use that provisional load for the prescribed working sets; reduce by one increment if the stop rule triggers. Warm-up/ramp attempts do not count as working sets.",
+                "evidenceRetention": {
+                  "persistCompletedWorkingSetEvidence": true,
+                  "reuseWhileFreshAndCompatible": true,
+                  "recalibrateOnlyWhen": [
+                    "missing",
+                    "stale",
+                    "incompatible"
+                  ]
+                }
+              }
+            },
             "restSeconds": 120,
             "directMuscles": [
               "core"
             ],
             "meaningfulSecondaryMuscles": [],
             "fatigueClass": "moderate",
+            "stimulusToFatigueRationale": "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor.",
             "progression": "rep_progression",
             "stopRule": "change_target"
           }
         ],
-        "workingSets": 12,
-        "estimatedMinutes": 44,
-        "localFatigue": {
-          "hip_extension": 3,
-          "quadriceps": 3,
-          "hamstrings_knee_flexion": 2,
-          "calves": 3,
-          "core": 1
+        "workingSets": 16,
+        "estimatedMinutes": 48,
+        "durationBreakdown": {
+          "generalWarmup": 240,
+          "liftSpecificRamp": 420,
+          "workingSetExecution": 640,
+          "prescribedInterSetRest": 1020,
+          "equipmentSetup": 210,
+          "exerciseTransitions": 180,
+          "unilateralOverhead": 70,
+          "calibrationOverhead": 70,
+          "methodOverhead": 0
         },
-        "systemicFatigueUnits": 18,
+        "durationAssumptions": [
+          "general_warmup_included",
+          "lift_specific_ramps_included",
+          "prescribed_or_role_owned_rest_included",
+          "set_execution_and_unilateral_time_included",
+          "equipment_setup_and_transitions_included",
+          "calibration_and_method_overhead_included"
+        ],
+        "localFatigue": {
+          "hip_extension": 4,
+          "quadriceps": 4,
+          "hamstrings_knee_flexion": 3,
+          "calves": 3,
+          "core": 2
+        },
+        "systemicFatigueUnits": 24,
         "meaningfulSecondarySets": {
           "upper_back": 2,
           "hip_extension": 2
         }
       }
     ],
-    "totalWorkingSets": 78,
-    "estimatedMinutes": 282,
+    "totalWorkingSets": 101,
+    "estimatedMinutes": 315,
     "directSets": {
-      "chest": 7,
-      "anterior_delts": 6,
-      "lateral_delts": 6,
-      "triceps": 6,
-      "upper_back": 7,
-      "lats": 7,
-      "rear_delts": 6,
-      "biceps": 6,
-      "quadriceps": 7,
-      "hip_extension": 7,
-      "hamstrings_knee_flexion": 6,
-      "calves": 6,
-      "core": 1
+      "chest": 10,
+      "anterior_delts": 7,
+      "lateral_delts": 7,
+      "triceps": 7,
+      "upper_back": 10,
+      "lats": 10,
+      "rear_delts": 7,
+      "biceps": 7,
+      "quadriceps": 10,
+      "hip_extension": 10,
+      "hamstrings_knee_flexion": 7,
+      "calves": 7,
+      "core": 2
     },
     "meaningfulSecondarySets": {
-      "triceps": 13,
-      "anterior_delts": 6,
-      "biceps": 14,
-      "rear_delts": 6,
-      "upper_back": 10,
-      "hip_extension": 4
+      "triceps": 17,
+      "anterior_delts": 8,
+      "biceps": 20,
+      "rear_delts": 8,
+      "upper_back": 12,
+      "hip_extension": 6
     },
     "frequency": {
       "chest": 2,
@@ -1203,7 +2351,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "calves": 2,
       "core": 1
     },
-    "systemicFatigueUnits": 123,
+    "systemicFatigueUnits": 164,
     "recoverySpacing": {
       "chest": {
         "rotationExposures": 2,
@@ -1365,8 +2513,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "ex-decline-plate-loaded-press",
         "ex-plate-loaded-shoulder-press-machine",
         "ex-lateral-raise-plate-loaded",
-        "ex-ez-bar-pushdown",
-        "ex-machine-triceps-extension"
+        "ex-ez-bar-pushdown"
       ],
       "requiredRegions": [
         "chest",
@@ -1410,6 +2557,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "firstRole": "Legs hypertrophy C",
       "secondRole": "Legs hypertrophy F",
       "stableExercises": [
+        "ex-stiff-leg-deadlift",
         "ex-kneeling-leg-curl",
         "ex-hip-thrust-machine",
         "ex-donkey-calf-raise"
@@ -1417,8 +2565,6 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "variedExercises": [
         "ex-hack-squat-machine",
         "ex-belt-squat",
-        "ex-stiff-leg-deadlift",
-        "ex-safety-squat-bar-good-morning",
         "ex-walking-lunge",
         "ex-leg-extension",
         "ex-cable-crunch"

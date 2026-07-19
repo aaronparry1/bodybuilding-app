@@ -4,7 +4,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
 
 ```json
 {
-  "schemaVersion": "canonical_dosage_evolution_certification_v1",
+  "schemaVersion": "canonical_dosage_evolution_certification_v2",
   "certifiedBaseline": {
     "files": 348,
     "tests": 2072,
@@ -20,9 +20,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     "tests": 2080,
     "commit": "1ab62df921f3e38fac4fa052a33f09f654a761e5"
   },
+  "correctionStart": {
+    "files": 351,
+    "tests": 2088,
+    "commit": "cd91bea3a916e4c7ff824455c560aea0d599e61a"
+  },
   "finalDiscovery": {
     "files": 351,
-    "tests": 2088
+    "tests": 2090
   },
   "filesAddedAtTaskStart": [
     "tests/canonical-final-adaptive-planning.test.ts"
@@ -94,6 +99,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     "canonical dosage, rotation, method evolution and cardio certification > never prescribes cardio against an explicit off preference or conflicting sport workload",
     "canonical dosage, rotation, method evolution and cardio certification > uses typed session duration and passes every adversarial dosage quality gate"
   ],
+  "individualTestsAddedByCurrentCorrection": [
+    "canonical per-session available-time planning > calibrates only future estimates from at least three comparable completed durations",
+    "app settings > normalizes persisted recent-training facts without conflating experience and history"
+  ],
   "renamedOrConsolidated": [
     {
       "source": "2 complete-planning tests",
@@ -128,7 +137,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     "taskStartToFinalFiles": "349 + 1 added - 0 deleted = 350",
     "taskStartToFinalTests": "2070 + 10 added - 0 deleted = 2080",
     "adversarialCorrectionFiles": "350 + 1 added - 0 deleted = 351",
-    "adversarialCorrectionTests": "2080 + 8 added - 0 deleted = 2088"
+    "adversarialCorrectionTests": "2080 + 8 added - 0 deleted = 2088",
+    "currentCorrectionTests": "2088 + 2 added - 0 deleted = 2090"
   },
   "lostCoverageWithoutReplacement": []
 }

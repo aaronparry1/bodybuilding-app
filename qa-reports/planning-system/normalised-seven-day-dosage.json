@@ -1,31 +1,31 @@
 {
-  "schemaVersion": "canonical_dosage_evolution_certification_v1",
+  "schemaVersion": "canonical_dosage_evolution_certification_v2",
   "basis": "complete_six_session_rotation_scaled_by_five_lifting_sessions_per_seven_days",
   "completeRotation": {
-    "totalWorkingSets": 78,
-    "estimatedMinutes": 282,
+    "totalWorkingSets": 101,
+    "estimatedMinutes": 315,
     "directSets": {
-      "chest": 7,
-      "anterior_delts": 6,
-      "lateral_delts": 6,
-      "triceps": 6,
-      "upper_back": 7,
-      "lats": 7,
-      "rear_delts": 6,
-      "biceps": 6,
-      "quadriceps": 7,
-      "hip_extension": 7,
-      "hamstrings_knee_flexion": 6,
-      "calves": 6,
-      "core": 1
+      "chest": 10,
+      "anterior_delts": 7,
+      "lateral_delts": 7,
+      "triceps": 7,
+      "upper_back": 10,
+      "lats": 10,
+      "rear_delts": 7,
+      "biceps": 7,
+      "quadriceps": 10,
+      "hip_extension": 10,
+      "hamstrings_knee_flexion": 7,
+      "calves": 7,
+      "core": 2
     },
     "meaningfulSecondarySets": {
-      "triceps": 13,
-      "anterior_delts": 6,
-      "biceps": 14,
-      "rear_delts": 6,
-      "upper_back": 10,
-      "hip_extension": 4
+      "triceps": 17,
+      "anterior_delts": 8,
+      "biceps": 20,
+      "rear_delts": 8,
+      "upper_back": 12,
+      "hip_extension": 6
     },
     "frequency": {
       "chest": 2,
@@ -42,33 +42,33 @@
       "calves": 2,
       "core": 1
     },
-    "systemicFatigueUnits": 123
+    "systemicFatigueUnits": 164
   },
   "averageSevenDays": {
-    "totalWorkingSets": 65,
-    "estimatedMinutes": 235,
+    "totalWorkingSets": 84.17,
+    "estimatedMinutes": 262.5,
     "directSets": {
-      "chest": 5.83,
-      "anterior_delts": 5,
-      "lateral_delts": 5,
-      "triceps": 5,
-      "upper_back": 5.83,
-      "lats": 5.83,
-      "rear_delts": 5,
-      "biceps": 5,
-      "quadriceps": 5.83,
-      "hip_extension": 5.83,
-      "hamstrings_knee_flexion": 5,
-      "calves": 5,
-      "core": 0.83
+      "chest": 8.33,
+      "anterior_delts": 5.83,
+      "lateral_delts": 5.83,
+      "triceps": 5.83,
+      "upper_back": 8.33,
+      "lats": 8.33,
+      "rear_delts": 5.83,
+      "biceps": 5.83,
+      "quadriceps": 8.33,
+      "hip_extension": 8.33,
+      "hamstrings_knee_flexion": 5.83,
+      "calves": 5.83,
+      "core": 1.67
     },
     "meaningfulSecondarySets": {
-      "triceps": 10.83,
-      "anterior_delts": 5,
-      "biceps": 11.67,
-      "rear_delts": 5,
-      "upper_back": 8.33,
-      "hip_extension": 3.33
+      "triceps": 14.17,
+      "anterior_delts": 6.67,
+      "biceps": 16.67,
+      "rear_delts": 6.67,
+      "upper_back": 10,
+      "hip_extension": 5
     },
     "frequency": {
       "chest": 1.67,
@@ -85,10 +85,11 @@
       "calves": 1.67,
       "core": 0.83
     },
-    "systemicFatigueUnits": 102.5,
+    "systemicFatigueUnits": 136.67,
     "cardioMinutes": 40,
-    "totalTrainingMinutes": 275
+    "totalTrainingMinutes": 302.5
   },
+  "secondaryAccountingRule": "Meaningful secondary work is counted as whole programmed-set exposures from exercise metadata. Decimal values are rotation-to-calendar averages only, never fractional direct-set credit.",
   "calendarSlices": [
     {
       "calendarSlice": 1,
@@ -104,29 +105,29 @@
         "pull": 2,
         "legs": 1
       },
-      "totalWorkingSets": 66,
-      "estimatedMinutes": 238,
+      "totalWorkingSets": 85,
+      "estimatedMinutes": 267,
       "directSets": {
-        "chest": 7,
-        "anterior_delts": 6,
-        "lateral_delts": 6,
-        "triceps": 6,
-        "upper_back": 7,
-        "lats": 7,
-        "rear_delts": 6,
-        "biceps": 6,
-        "quadriceps": 4,
-        "hip_extension": 4,
+        "chest": 10,
+        "anterior_delts": 7,
+        "lateral_delts": 7,
+        "triceps": 7,
+        "upper_back": 10,
+        "lats": 10,
+        "rear_delts": 7,
+        "biceps": 7,
+        "quadriceps": 6,
+        "hip_extension": 6,
         "hamstrings_knee_flexion": 4,
-        "calves": 3
+        "calves": 4
       },
       "meaningfulSecondarySets": {
-        "triceps": 13,
-        "anterior_delts": 6,
-        "biceps": 14,
-        "rear_delts": 6,
-        "upper_back": 8,
-        "hip_extension": 2
+        "triceps": 17,
+        "anterior_delts": 8,
+        "biceps": 20,
+        "rear_delts": 8,
+        "upper_back": 10,
+        "hip_extension": 4
       },
       "frequency": {
         "chest": 2,
@@ -143,7 +144,7 @@
         "calves": 1,
         "core": 0
       },
-      "systemicFatigueUnits": 105
+      "systemicFatigueUnits": 140
     },
     {
       "calendarSlice": 2,
@@ -159,30 +160,30 @@
         "pull": 1,
         "legs": 2
       },
-      "totalWorkingSets": 66,
-      "estimatedMinutes": 238,
+      "totalWorkingSets": 85,
+      "estimatedMinutes": 264,
       "directSets": {
-        "hip_extension": 7,
-        "quadriceps": 7,
-        "hamstrings_knee_flexion": 6,
-        "calves": 6,
-        "core": 1,
-        "chest": 7,
-        "anterior_delts": 6,
-        "lateral_delts": 6,
-        "triceps": 6,
-        "upper_back": 4,
-        "lats": 4,
-        "rear_delts": 3,
-        "biceps": 3
+        "hip_extension": 10,
+        "quadriceps": 10,
+        "hamstrings_knee_flexion": 7,
+        "calves": 7,
+        "core": 2,
+        "chest": 10,
+        "anterior_delts": 7,
+        "lateral_delts": 7,
+        "triceps": 7,
+        "upper_back": 5,
+        "lats": 5,
+        "rear_delts": 4,
+        "biceps": 4
       },
       "meaningfulSecondarySets": {
-        "upper_back": 7,
-        "hip_extension": 4,
-        "triceps": 13,
-        "anterior_delts": 6,
-        "biceps": 8,
-        "rear_delts": 4
+        "upper_back": 9,
+        "hip_extension": 6,
+        "triceps": 17,
+        "anterior_delts": 8,
+        "biceps": 10,
+        "rear_delts": 5
       },
       "frequency": {
         "chest": 2,
@@ -199,7 +200,7 @@
         "calves": 2,
         "core": 1
       },
-      "systemicFatigueUnits": 105
+      "systemicFatigueUnits": 138
     },
     {
       "calendarSlice": 3,
@@ -215,30 +216,30 @@
         "pull": 2,
         "legs": 2
       },
-      "totalWorkingSets": 66,
-      "estimatedMinutes": 238,
+      "totalWorkingSets": 88,
+      "estimatedMinutes": 273,
       "directSets": {
-        "upper_back": 7,
-        "lats": 7,
-        "rear_delts": 6,
-        "biceps": 6,
-        "hip_extension": 7,
-        "quadriceps": 7,
-        "hamstrings_knee_flexion": 6,
-        "calves": 6,
-        "core": 1,
-        "chest": 4,
-        "anterior_delts": 3,
-        "lateral_delts": 3,
-        "triceps": 3
+        "upper_back": 10,
+        "lats": 10,
+        "rear_delts": 7,
+        "biceps": 7,
+        "hip_extension": 10,
+        "quadriceps": 10,
+        "hamstrings_knee_flexion": 7,
+        "calves": 7,
+        "core": 2,
+        "chest": 5,
+        "anterior_delts": 4,
+        "lateral_delts": 4,
+        "triceps": 5
       },
       "meaningfulSecondarySets": {
-        "biceps": 14,
-        "rear_delts": 6,
-        "upper_back": 10,
-        "hip_extension": 4,
-        "triceps": 7,
-        "anterior_delts": 4
+        "biceps": 20,
+        "rear_delts": 8,
+        "upper_back": 12,
+        "hip_extension": 6,
+        "triceps": 9,
+        "anterior_delts": 5
       },
       "frequency": {
         "chest": 1,
@@ -255,7 +256,7 @@
         "calves": 2,
         "core": 1
       },
-      "systemicFatigueUnits": 103
+      "systemicFatigueUnits": 140
     }
   ],
   "balanceProof": {
@@ -283,22 +284,22 @@
     },
     "lowerBody": {
       "quadriceps": {
-        "averageDirectSets": 5.83,
+        "averageDirectSets": 8.33,
         "averageFrequency": 1.67,
         "authorisedFloor": 6
       },
       "hamstrings_knee_flexion": {
-        "averageDirectSets": 5,
+        "averageDirectSets": 5.83,
         "averageFrequency": 1.67,
         "authorisedFloor": 5
       },
       "hip_extension": {
-        "averageDirectSets": 5.83,
+        "averageDirectSets": 8.33,
         "averageFrequency": 1.67,
         "authorisedFloor": 6
       },
       "calves": {
-        "averageDirectSets": 5,
+        "averageDirectSets": 5.83,
         "averageFrequency": 1.67,
         "authorisedFloor": 5
       }

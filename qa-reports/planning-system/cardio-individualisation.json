@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "canonical_dosage_evolution_certification_v1",
+  "schemaVersion": "canonical_dosage_evolution_certification_v2",
   "cases": [
     {
       "id": "hypertrophy-desired",

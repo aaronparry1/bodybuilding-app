@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { constructCanonicalActivePlanFromCanonicalInputs } from "@/application/training/canonical-active-plan-construction";
 import { buildCanonicalDosageEvolutionArtifacts } from "@/domain/training/canonical-dosage-evolution-certification";
 import { resolveCanonicalCardioPrescription } from "@/domain/training/canonical-cardio-prescription";
-import { canonicalHypertrophyLandmark, resolveCanonicalHypertrophyStartingVolume } from "@/domain/training/canonical-hypertrophy-volume-policy";
+import { canonicalHypertrophyLandmark, defaultCanonicalStartingVolumeContext, resolveCanonicalHypertrophyStartingVolume } from "@/domain/training/canonical-hypertrophy-volume-policy";
 import { exerciseLibrary } from "@/domain/training/presets";
 
 const artifacts = buildCanonicalDosageEvolutionArtifacts();
@@ -17,6 +17,9 @@ describe("canonical dosage, rotation, method evolution and cardio certification"
     expect(rotation.complementaryPairQuality.every((pair) => pair.completeCoverage && !pair.renamedDuplicate)).toBe(true);
     expect(rotation.complementaryPairQuality.find((pair) => pair.id === "Push A/D")?.stableExercises).toEqual([]);
     expect(rotation.complementaryPairQuality.find((pair) => pair.id === "Pull B/E")?.stableExercises).toEqual([]);
+    expect(rotation.completeRotation.directSets).toMatchObject({ chest: 10, lats: 10, upper_back: 10, quadriceps: 10, hip_extension: 10 });
+    expect(rotation.completeRotation.meaningfulSecondarySets.chest ?? 0).toBe(0);
+    expect(Object.values(rotation.completeRotation.frequency).every((value) => Number.isInteger(value))).toBe(true);
   });
 
   it("constructs Legs F through real Session Construction as a complementary hinge-led session", () => {
@@ -28,6 +31,7 @@ describe("canonical dosage, rotation, method evolution and cardio certification"
     expect(session.role).toBe("Legs hypertrophy F");
     expect(snapshot.slots.map((slot: any) => slot.reason)).toEqual(expect.arrayContaining(["moderate-fatigue hinge-led posterior-chain anchor", "single-leg knee-dominant hypertrophy", "trunk work"]));
     expect(snapshot.slots).toHaveLength(7);
+    expect(snapshot.slots[0].exerciseId).not.toMatch(/good-morning/);
     expect(snapshot.slots.some((slot: any) => slot.exerciseId === "ex-deadlift")).toBe(false);
     for (const slot of snapshot.slots) {
       if (slot.loadPrescription.state !== "calibration_required") continue;
@@ -39,32 +43,38 @@ describe("canonical dosage, rotation, method evolution and cardio certification"
 
   it("normalises five lifting days from the complete rotation and keeps every lower-body region above its floor", () => {
     const dosage = artifacts["normalised-seven-day-dosage"];
-    expect(dosage.completeRotation.totalWorkingSets).toBe(78);
-    expect(dosage.averageSevenDays.totalWorkingSets).toBe(65);
+    expect(dosage.completeRotation.totalWorkingSets).toBe(101);
+    expect(dosage.averageSevenDays.totalWorkingSets).toBe(84.17);
     expect(dosage.averageSevenDays.totalWorkingSets).toBeCloseTo(dosage.completeRotation.totalWorkingSets * 5 / 6, 2);
     expect(dosage.balanceProof.chronicLowerUnderexposureAbsent).toBe(true);
+    expect(dosage.averageSevenDays.directSets).toMatchObject({ chest: 8.33, lats: 8.33, upper_back: 8.33, quadriceps: 8.33, hip_extension: 8.33 });
     expect(dosage.calendarSlices.map((slice) => slice.distribution)).toEqual([{ push: 2, pull: 2, legs: 1 }, { push: 2, pull: 1, legs: 2 }, { push: 1, pull: 2, legs: 2 }]);
   });
 
   it("requires productive history and demonstrated capacity before an upper starting dose", () => {
-    const ordinary = resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region: "chest", context: { recovery: "ordinary", history: "none", workCapacity: "not_demonstrated", concurrentSport: "none" } });
-    const unsupportedHigh = resolveCanonicalHypertrophyStartingVolume({ experience: "advanced", region: "chest", context: { recovery: "high", history: "none", workCapacity: "demonstrated_high", concurrentSport: "none" } });
-    const supportedHigh = resolveCanonicalHypertrophyStartingVolume({ experience: "advanced", region: "chest", context: { recovery: "high", history: "established_productive", workCapacity: "demonstrated_high", concurrentSport: "none" } });
+    const ordinary = resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region: "chest", context: defaultCanonicalStartingVolumeContext(5) });
+    const unsupportedHigh = resolveCanonicalHypertrophyStartingVolume({ experience: "advanced", region: "chest", context: { ...defaultCanonicalStartingVolumeContext(5), recovery: "high", recentSessionWorkload: "high", workCapacity: "demonstrated_high" } });
+    const supportedHigh = resolveCanonicalHypertrophyStartingVolume({ experience: "advanced", region: "chest", context: { ...defaultCanonicalStartingVolumeContext(5), recovery: "high", recentSessionWorkload: "high", history: "established_productive", loadConfidence: "established", dosageConfidence: "canonical_productive_history", workCapacity: "demonstrated_high" } });
     expect(ordinary.calibrationRequired).toBe(true);
     expect(unsupportedHigh.startingDirectSets).toBeLessThan(canonicalHypertrophyLandmark("advanced", "chest").maximumAuthorisedStarting);
     expect(supportedHigh.startingDirectSets).toBeGreaterThan(unsupportedHigh.startingDirectSets);
     expect(supportedHigh.startingDirectSets).toBeLessThanOrEqual(canonicalHypertrophyLandmark("advanced", "chest").maximumAuthorisedStarting);
+    expect(canonicalHypertrophyLandmark("intermediate", "chest").maximumRecoverableAuthorisation).toBe(16);
+    expect(artifacts["starting-volume-matrix"].sourceEvidence).toHaveLength(3);
+    expect(artifacts["starting-volume-matrix"].sourceEvidence.find((item) => "printedPages" in item)?.limitation).toContain("do not define a universal weekly regional dose");
   });
 
-  it("replaces the contradictory 95/101 claims with one executable muscle-specific start", () => {
+  it("replaces the minimum-floor overcorrection with one executable muscle-specific start", () => {
     const audit = artifacts["ninety-five-set-start-audit"];
-    expect(audit.firstCalendarSliceWorkingSets).toBe(66);
-    expect(audit.completeRotationWorkingSets).toBe(78);
-    expect(audit.averageSevenDayWorkingSets).toBe(65);
+    expect(audit.firstCalendarSliceWorkingSets).toBe(85);
+    expect(audit.completeRotationWorkingSets).toBe(101);
+    expect(audit.averageSevenDayWorkingSets).toBe(84.17);
     expect(audit.demonstratedTolerance).toBe(false);
     expect(audit.retained).toBe(false);
-    expect(audit.classification).toBe("muscle_specific_calibration_floor_reconciled_to_discrete_rotation");
-    expect(audit.contradictionResolved).toMatchObject({ previousRepresentativeRawRotation: 116, previousRepresentativeNormalisedSevenDays: 96.7, previousMatrixTotal: 101 });
+    expect(audit.classification).toBe("experience_and_recent_training_baseline_reconciled_to_discrete_rotation");
+    expect(audit.contradictionResolved).toMatchObject({ previousRepresentativeRawRotation: 78, previousRepresentativeNormalisedSevenDays: 65, previousMatrixTotal: 65 });
+    expect(audit.muscleSpecificComparison.chest.startingDirectSets).toBe(8);
+    expect(audit.muscleSpecificComparison.chest.reasonCodes).toContain("missing_app_history_lowers_dosage_confidence_not_experience");
     expect(audit.muscleSpecificComparison.chest.averageDirectSets).toBeLessThanOrEqual(audit.muscleSpecificComparison.chest.authorisedCeiling);
     expect(audit.excessiveDetection).toContain("three comparable observations required before any addition");
   });
@@ -84,13 +94,26 @@ describe("canonical dosage, rotation, method evolution and cardio certification"
     expect(simulation.safeguards.noCalendarOnlyDeload).toBe(true);
     expect(simulation.pathways.find((path) => path.id === "F_one_poor_workout")?.result).toMatchObject({ disposition: "retain", setDelta: 0 });
     expect(simulation.pathways.find((path) => path.id === "G_persistent_stagnation")?.result).toMatchObject({ disposition: "reallocate_one_set", setDelta: 0 });
-    expect(simulation.inputSensitivityCases.map((item) => item.id)).toEqual(["beginner_no_history", "beginner_productive_history", "intermediate_no_history", "intermediate_productive_history", "advanced_no_history", "advanced_productive_history", "advanced_high_demonstrated_tolerance", "intermediate_poor_recovery", "intermediate_concurrent_sport", "intermediate_30_minutes"]);
+    expect(simulation.inputSensitivityCases.map((item) => item.id)).toEqual(["beginner_ordinary", "intermediate_current_new_app", "intermediate_short_layoff", "intermediate_extended_layoff", "intermediate_poor_recovery", "intermediate_established_productive", "advanced_current_new_app", "intermediate_concurrent_sport", "intermediate_30_minutes", "intermediate_45_minutes", "intermediate_60_minutes", "intermediate_75_minutes", "intermediate_90_minutes"]);
     const byId = Object.fromEntries(simulation.inputSensitivityCases.map((item) => [item.id, item]));
     const owned = (id: keyof typeof byId) => { const item = byId[id]; expect(item.status).toBe("constructed"); if (item.status !== "constructed") throw new Error(`adaptive case failed: ${String(id)}`); return item.ownedDifferences; };
-    expect(owned("beginner_productive_history").totalWorkingSets).toBeGreaterThan(owned("beginner_no_history").totalWorkingSets);
-    expect(owned("intermediate_productive_history").totalWorkingSets).toBeGreaterThan(owned("intermediate_no_history").totalWorkingSets);
-    expect(owned("advanced_no_history").totalWorkingSets).toBeGreaterThanOrEqual(owned("intermediate_no_history").totalWorkingSets);
+    expect(owned("intermediate_current_new_app").totalWorkingSets).toBeGreaterThan(owned("beginner_ordinary").totalWorkingSets);
+    expect(owned("intermediate_current_new_app").totalWorkingSets).toBeGreaterThan(owned("intermediate_short_layoff").totalWorkingSets);
+    expect(owned("intermediate_short_layoff").totalWorkingSets).toBeGreaterThan(owned("intermediate_extended_layoff").totalWorkingSets);
+    expect(owned("intermediate_established_productive").totalWorkingSets).toBeGreaterThan(owned("intermediate_current_new_app").totalWorkingSets);
+    expect(owned("advanced_current_new_app").totalWorkingSets).toBeGreaterThan(owned("intermediate_current_new_app").totalWorkingSets);
+    expect(owned("intermediate_concurrent_sport").directSets.quadriceps ?? 0).toBeLessThan(owned("intermediate_current_new_app").directSets.quadriceps ?? 0);
     expect(owned("intermediate_30_minutes").durationConstrainedSessions.length).toBeGreaterThan(0);
+    expect(owned("intermediate_45_minutes").totalWorkingSets).toBeGreaterThan(owned("intermediate_30_minutes").totalWorkingSets);
+    expect(owned("intermediate_60_minutes").totalWorkingSets).toBeLessThanOrEqual(owned("intermediate_90_minutes").totalWorkingSets);
+    expect(owned("intermediate_extended_layoff").equalityExplanation).toContain("extended-layoff re-entry");
+    expect(owned("intermediate_poor_recovery").recoveryRestrictionApplied).toBe(true);
+    expect(owned("intermediate_90_minutes").equalityExplanation).toContain("does not authorise extra volume");
+    expect(simulation.representative.rotations.every((rotation) => rotation.callerAuthoredResultFlags === false && rotation.canonicalEvidence.length > 0)).toBe(true);
+    expect(simulation.representative.completeMesocycleDemonstrated).toBe(true);
+    expect(simulation.representative.rotations).toHaveLength(6);
+    expect(simulation.representative.rotations.find((rotation) => rotation.state === "local_fatigue_correction")?.volumeResult.disposition).toMatch(/remove/);
+    expect(simulation.representative.rotations.at(-1)?.response.exit).toBe("deload_or_transition_review_required_by_canonical_evidence");
   });
 
   it("individualises eight cardio profiles and exposes their recovery-budget effect", () => {

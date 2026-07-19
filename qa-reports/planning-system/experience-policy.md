@@ -41,27 +41,27 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     {
       "id": "beginner-hypertrophy-2",
       "experience": "beginner",
-      "totalWorkingSets": 22
+      "totalWorkingSets": 27
     },
     {
       "id": "intermediate-hypertrophy-3",
       "experience": "intermediate",
-      "totalWorkingSets": 33
+      "totalWorkingSets": 42
     },
     {
       "id": "intermediate-hypertrophy-4",
       "experience": "intermediate",
-      "totalWorkingSets": 55
+      "totalWorkingSets": 70
     },
     {
       "id": "intermediate-hypertrophy-5",
       "experience": "intermediate",
-      "totalWorkingSets": 66
+      "totalWorkingSets": 85
     },
     {
       "id": "intermediate-hypertrophy-6",
       "experience": "intermediate",
-      "totalWorkingSets": 66
+      "totalWorkingSets": 84
     },
     {
       "id": "beginner-strength-3",
@@ -91,17 +91,17 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     {
       "id": "getting-lean-recovery-boundary",
       "experience": "intermediate",
-      "totalWorkingSets": 55
+      "totalWorkingSets": 70
     },
     {
       "id": "limited-dumbbells",
       "experience": "intermediate",
-      "totalWorkingSets": 55
+      "totalWorkingSets": 70
     },
     {
       "id": "limited-machines",
       "experience": "intermediate",
-      "totalWorkingSets": 57
+      "totalWorkingSets": 72
     },
     {
       "id": "event-strength",
@@ -111,22 +111,22 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     {
       "id": "established-loads",
       "experience": "intermediate",
-      "totalWorkingSets": 98
+      "totalWorkingSets": 95
     },
     {
       "id": "no-load-history",
       "experience": "intermediate",
-      "totalWorkingSets": 66
+      "totalWorkingSets": 85
     },
     {
       "id": "exercise-limitation",
       "experience": "intermediate",
-      "totalWorkingSets": 55
+      "totalWorkingSets": 70
     },
     {
       "id": "short-session-30",
       "experience": "intermediate",
-      "totalWorkingSets": 21
+      "totalWorkingSets": 18
     }
   ]
 }

@@ -3,6 +3,8 @@ import { changeCanonicalSessionDuration, createCanonicalActivePlan } from "@/app
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { constructCanonicalActivePlanFromCanonicalInputs } from "@/application/training/canonical-active-plan-construction";
 import { canonicalSessionDurationOptions, resolveCanonicalSessionDuration } from "@/domain/training/canonical-session-duration";
+import { calibrateCanonicalSessionDurationEstimate } from "@/domain/training/canonical-session-duration";
+import { allocateCanonicalMicrocycleVolume } from "@/domain/training/canonical-microcycle-volume-allocator";
 import { exerciseLibrary } from "@/domain/training/presets";
 
 const equipment = ["barbell", "dumbbell", "machine", "cable", "bodyweight"] as const;
@@ -12,24 +14,31 @@ describe("canonical per-session available-time planning", () => {
 
   it("accepts only the five typed durations", () => {
     expect(canonicalSessionDurationOptions).toEqual([30, 45, 60, 75, 90]);
-    expect(resolveCanonicalSessionDuration(44)).toEqual({ status: "invalid", policyId: "canonical_session_duration_policy_v1", reason: "unsupported_session_duration", customerGuidance: "Choose 30, 45, 60, 75 or 90 minutes per workout." });
+    expect(resolveCanonicalSessionDuration(44)).toEqual({ status: "invalid", policyId: "canonical_session_duration_policy_v2", reason: "unsupported_session_duration", customerGuidance: "Choose 30, 45, 60, 75 or 90 minutes per workout." });
   });
 
   it.each(canonicalSessionDurationOptions)("constructs or explicitly constrains supported %s-minute programmes across frequency and experience", (availableSessionMinutes) => {
     for (const experienceLevel of ["beginner", "intermediate", "advanced"] as const) {
       for (const daysPerWeek of [2, 3, 4, 5, 6] as const) {
         const result = constructCanonicalActivePlanFromCanonicalInputs({ planId: `duration:${availableSessionMinutes}:${experienceLevel}:${daysPerWeek}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel, daysPerWeek, preferredSplit: "let_app_choose", equipment, units: "kg", availableSessionMinutes, exercises: exerciseLibrary, history: [] });
-        expect(result.status, result.status === "constructed" ? undefined : result.reason).toBe("constructed");
+        expect(result.status, result.status === "constructed" ? undefined : `${result.reason} (${experienceLevel}/${daysPerWeek}d/${availableSessionMinutes}m)`).toBe("constructed");
         if (result.status !== "constructed") continue;
         expect(result.carrier.constraints.availableSessionMinutes).toBe(availableSessionMinutes);
-        for (const session of result.carrier.plannedSessions) {
+        const allocation = allocateCanonicalMicrocycleVolume({ macrocycleGoal: "build_muscle", mesocycleId: result.carrier.mesocycle.id, mesocyclePurpose: result.carrier.mesocycle.output.adaptation, microcyclePriority: result.carrier.microcycle.output.priority, microcycleSequence: result.carrier.microcycle.output.sequenceNumber, experience: experienceLevel, frequency: daysPerWeek, split: "let_app_choose", equipment, recoveryRestricted: false, establishedLoadExerciseIds: [], sessionRoles: result.carrier.microcycle.output.sessionRoles, sessionTypes: result.carrier.microcycle.output.sessionTypes, startingVolumeContext: result.carrier.constraints.startingVolumeContext, availableSessionMinutes });
+        expect(allocation.durationConstraint.model).toBe("component_duration_v2");
+        expect(allocation.estimatedSessionMinutes.every((minutes) => minutes <= availableSessionMinutes)).toBe(true);
+        for (const [index, session] of result.carrier.plannedSessions.entries()) {
           const slots = (session.prescriptionSnapshot as { slots: Array<{ settings: { requiredSets?: number; requiredWorkSets: number } }> }).slots;
-          const workingSets = slots.reduce((sum, slot) => sum + (slot.settings.requiredSets ?? slot.settings.requiredWorkSets), 0);
-          expect(8 + workingSets * 3).toBeLessThanOrEqual(availableSessionMinutes);
-          expect(slots.every((slot) => (slot.settings.requiredSets ?? slot.settings.requiredWorkSets) >= 1)).toBe(true);
+          expect(allocation.durationEstimates[index]?.assumptions).toContain("prescribed_or_role_owned_rest_included");
+          expect(slots.every((slot) => (slot.settings.requiredSets ?? slot.settings.requiredWorkSets) >= 2)).toBe(true);
         }
       }
     }
+  });
+
+  it("calibrates only future estimates from at least three comparable completed durations", () => {
+    expect(calibrateCanonicalSessionDurationEstimate({ predictedMinutes: 60, comparableObservedMinutes: [70, 72] })).toMatchObject({ status: "not_available", calibratedFutureMinutes: 60, completedHistoryRewritten: false });
+    expect(calibrateCanonicalSessionDurationEstimate({ predictedMinutes: 60, comparableObservedMinutes: [66, 72, 69] })).toMatchObject({ status: "calibrated", comparableCompletedObservations: 3, multiplier: 1.15, calibratedFutureMinutes: 69, completedHistoryRewritten: false });
   });
 
   it("atomically reconstructs future sessions and preserves recorded references", () => {

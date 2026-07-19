@@ -13,7 +13,7 @@ import { CANONICAL_EXACT_TARGET_POLICY_ID } from "@/domain/training/canonical-ex
 import type { PreferredSplit, TrainingSetupGoal } from "@/domain/training/plan-setup";
 import type { TrainingGoalId } from "@/domain/training/training-goals";
 import { CANONICAL_ADAPTIVE_PLANNING_SYSTEM_VERSION, canonicalGoalStrategies, canonicalPlanningAuthority, canonicalPlanningInputRegistry, canonicalPlanningPrecedence } from "@/domain/training/canonical-adaptive-planning-system";
-import { canonicalHypertrophyVolumePolicy } from "@/domain/training/canonical-hypertrophy-volume-policy";
+import { canonicalHypertrophyVolumePolicy, defaultCanonicalStartingVolumeContext, type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
 import { CANONICAL_CARDIO_PRESCRIPTION_VERSION } from "@/domain/training/canonical-cardio-prescription";
 import { customerFrameworkFrequencyPolicy, getCustomerFrameworksForFrequency, resolveCanonicalFrameworkMorph } from "@/domain/training/programme-framework-rules";
 import { buildCanonicalDosageEvolutionArtifacts } from "@/domain/training/canonical-dosage-evolution-certification";
@@ -92,7 +92,7 @@ export function constructGoldenProgramme(testCase: CanonicalGoldenCase) {
     limitations: testCase.limitation ? [testCase.limitation] : undefined,
     establishedLoads,
     loadEvidence,
-    startingVolumeContext: testCase.establishedHistory ? { recovery: "ordinary", history: "established_productive", workCapacity: "not_demonstrated", concurrentSport: "none" } : undefined,
+    startingVolumeContext: testCase.establishedHistory ? establishedProductiveContext() : undefined,
     exercises: exerciseLibrary,
   });
   if (result.status !== "constructed") return { id: testCase.id, label: testCase.label, status: "failed" as const, reason: result.reason, note: testCase.note };
@@ -113,7 +113,7 @@ export function constructGoldenProgramme(testCase: CanonicalGoldenCase) {
     sessionRoles: carrier.microcycle.output.sessionRoles,
     sessionTypes: carrier.microcycle.output.sessionTypes,
     availableSessionMinutes: testCase.availableSessionMinutes,
-    startingVolumeContext: testCase.establishedHistory ? { recovery: "ordinary", history: "established_productive", workCapacity: "not_demonstrated", concurrentSport: "none" } : undefined,
+    startingVolumeContext: testCase.establishedHistory ? establishedProductiveContext() : undefined,
   });
   const certification = certifyCanonicalConstructedMicrocycle({ allocation, sessions: snapshots, exercises: exerciseLibrary });
   const exerciseById = new Map(exerciseLibrary.map((exercise) => [exercise.id, exercise]));
@@ -299,3 +299,4 @@ function goalForEngine(engine: "hypertrophy" | "powerbuilding" | "strength" | "a
 function frameworkGoal(goal: TrainingSetupGoal): "hypertrophy" | "get_lean" | "strength" | "athletic_performance" | "build_muscle_strength" { return goal === "build_muscle" ? "hypertrophy" : goal === "get_leaner" ? "get_lean" : goal === "build_muscle_and_strength" ? "build_muscle_strength" : goal === "athletic_performance" ? "athletic_performance" : "strength"; }
 function representativePhase(goal: TrainingSetupGoal): string { return goal === "build_muscle" ? "hypertrophy_volume" : goal === "get_leaner" ? "hypertrophy_base" : goal === "build_muscle_and_strength" ? "powerbuilding_intensification" : goal === "athletic_performance" ? "athletic_power" : "strength_specific"; }
 function loadEvidenceFor(exerciseId: string): CanonicalLoadEvidence { return { evidenceId: `cert-load-${exerciseId}`, evidenceVersion: "canonical_progress_evidence_v1", athleteId: "synthetic-certification-athlete", exerciseId, observedLoad: 50, observedReps: 8, baseUnit: "kg", freshnessVersion: 1, calibrationStatus: "established" }; }
+function establishedProductiveContext(): CanonicalStartingVolumeContext { return { ...defaultCanonicalStartingVolumeContext(5), history: "established_productive", loadConfidence: "established", dosageConfidence: "canonical_productive_history" }; }

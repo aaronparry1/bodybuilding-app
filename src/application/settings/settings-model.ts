@@ -11,6 +11,7 @@ import {
   type LoadIncrementProfile,
 } from "@/domain/training/load-increment-strategy";
 import { normalizeCanonicalSessionDuration, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
+import { defaultCanonicalStartingVolumeContext, normalizeCanonicalStartingVolumeContext, type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
 
 export interface AppSettings {
   onboardingCompleted: boolean;
@@ -29,6 +30,7 @@ export interface AppSettings {
   trainingGoal: ProgrammeGoal;
   experienceLevel: ExperienceLevel;
   availableSessionMinutes: CanonicalSessionDurationMinutes;
+  startingVolumeContext: CanonicalStartingVolumeContext;
 }
 
 export const defaultAppSettings: AppSettings = {
@@ -45,6 +47,7 @@ export const defaultAppSettings: AppSettings = {
   trainingGoal: "hypertrophy",
   experienceLevel: "intermediate",
   availableSessionMinutes: 75,
+  startingVolumeContext: defaultCanonicalStartingVolumeContext(3),
 };
 
 export function normalizeAppSettings(settings: AppSettings): AppSettings {
@@ -62,6 +65,7 @@ export function normalizeAppSettings(settings: AppSettings): AppSettings {
     loadIncrementProfile: normalizeLoadIncrementProfile(merged.loadIncrementProfile),
     capacityFocus: normalizeCapacityFocusSettings(merged.capacityFocus),
     availableSessionMinutes: normalizeCanonicalSessionDuration(merged.availableSessionMinutes),
+    startingVolumeContext: normalizeCanonicalStartingVolumeContext(merged.startingVolumeContext, 3),
   };
 }
 

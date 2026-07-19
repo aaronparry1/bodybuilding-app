@@ -13,8 +13,8 @@ import { canonicalGoalStrategies, validateCanonicalPlanningActivation } from "@/
 import type { ExercisePreferenceRecord } from "@/domain/training/exercise-preferences";
 import { resolveCanonicalCardioPrescription } from "@/domain/training/canonical-cardio-prescription";
 import type { RecoveryCardioPreference } from "@/domain/training/plan-setup";
-import type { CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
-import { normalizeCanonicalSessionDuration, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
+import { defaultCanonicalStartingVolumeContext, type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
+import { estimateCanonicalSessionDuration, normalizeCanonicalSessionDuration, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
 
 export type CanonicalConstructionInput = Readonly<{ planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: Parameters<typeof createMacrocycle>[0]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: Parameters<typeof createMicrocycle>[0]["split"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; recoveryCardioPreference?: RecoveryCardioPreference; availableSessionMinutes?: CanonicalSessionDurationMinutes; startingVolumeContext?: CanonicalStartingVolumeContext; microcycleSequenceNumber?: number; plannedSessions: readonly CanonicalPlannedSessionSnapshot[] }>;
 export type CanonicalConstructionResult = Readonly<{ status: "constructed"; carrier: CanonicalActivePlanCarrier } | { status: "invalid_input" | "no_initial_mesocycle" | "session_role_mismatch" | "carrier_validation_failed"; reason: string }>;
@@ -34,15 +34,11 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
   const policyResult = resolveMesocyclePrescriptionPolicy(mesocycle.id, { goal: input.macrocycleGoal });
   if (policyResult.status !== "resolved") return { status: "no_initial_mesocycle", reason: policyResult.reason };
   const microcycle = createMicrocycle({ parentMesocycleId: mesocycle.id, trainingDays: input.daysPerWeek, split: input.preferredSplit, sequenceNumber: input.microcycleSequenceNumber });
-  const startingVolumeContext: CanonicalStartingVolumeContext = input.startingVolumeContext ?? {
-    recovery: "ordinary",
-    // A history count is not evidence that the work was comparable,
-    // productive or tolerated. Only an explicit canonical evidence result may
-    // authorise a retained-history or demonstrated-capacity start.
-    history: "none",
-    workCapacity: "not_demonstrated",
-    concurrentSport: "none",
-  };
+  // Older callers without the new intake receive a provisional declared-
+  // training baseline. Missing app history still requires load calibration,
+  // but is not treated as beginner/detrained status or low work capacity.
+  const startingVolumeContext: CanonicalStartingVolumeContext = input.startingVolumeContext
+    ?? defaultCanonicalStartingVolumeContext(input.daysPerWeek);
   const availableSessionMinutes = normalizeCanonicalSessionDuration(input.availableSessionMinutes);
   const allocation = allocateCanonicalMicrocycleVolume({
     macrocycleGoal: input.macrocycleGoal,
@@ -54,7 +50,7 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
     frequency: input.daysPerWeek,
     split: input.preferredSplit,
     equipment: effectiveEquipment,
-    recoveryRestricted: false,
+    recoveryRestricted: startingVolumeContext.recovery === "low_acceptable",
     establishedLoadExerciseIds: Object.keys(input.establishedLoads ?? {}).sort(),
     sessionRoles: microcycle.sessionRoles,
     sessionTypes: microcycle.sessionTypes,
@@ -80,6 +76,14 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
     const identity = resolveCanonicalSessionIdentity(sessionInput);
     const constructed = constructCanonicalSession({ ...sessionInput, microcycle: { ...sessionInput.microcycle, sessionId: identity }, operational: { ...sessionInput.operational, identity } });
     if (constructed.status !== "constructed") return { status: "carrier_validation_failed", reason: `session_${index}:${constructed.reason}` };
+    if (constructed.snapshot.schemaVersion !== "canonical_session_snapshot_v3") return { status: "carrier_validation_failed", reason: `session_${index}:current_construction_requires_v3_snapshot` };
+    const allocated = allocation.slots.filter((slot) => slot.sessionIndex === index);
+    const exactDuration = estimateCanonicalSessionDuration(constructed.snapshot.slots.map((slot) => {
+      const source = allocated.find((entry) => entry.order === slot.index);
+      if (!source) throw new Error(`duration_slot_linkage_missing:${index}:${slot.index}`);
+      return { constructionRole: source.constructionRole, workingSets: slot.settings.requiredSets ?? slot.settings.requiredWorkSets, movementPatterns: source.movementPatterns, method: slot.method, prescribedRestSeconds: slot.rest.seconds, loadConfidence: slot.loadPrescription.state === "established" ? "established" as const : "calibration_required" as const };
+    }), startingVolumeContext.loadConfidence);
+    if (exactDuration.minutes > availableSessionMinutes) return { status: "carrier_validation_failed", reason: `session_${index}:exact_duration_exceeds_${availableSessionMinutes}_minutes` };
     for (const slot of constructed.snapshot.slots) weeklyExerciseUsage[slot.exerciseId] = (weeklyExerciseUsage[slot.exerciseId] ?? 0) + 1;
     sessions.push({ id: identity, microcycleId, planSessionIndex: index, role, kind: "planned", status: "planned", constructionVersion: "canonical_plan_v3", revision: 0, prescriptionSnapshot: constructed.snapshot });
   }

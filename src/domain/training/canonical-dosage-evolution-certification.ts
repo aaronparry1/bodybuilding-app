@@ -3,7 +3,8 @@ import { certifyCanonicalConstructedMicrocycle } from "@/domain/training/canonic
 import { resolveCanonicalExactTarget } from "@/domain/training/canonical-exact-target-policy";
 import { resolveCanonicalCardioPrescription } from "@/domain/training/canonical-cardio-prescription";
 import { allocateCanonicalMicrocycleVolume, type AllocatedSlot } from "@/domain/training/canonical-microcycle-volume-allocator";
-import { canonicalHypertrophyLandmark, resolveCanonicalHypertrophyStartingVolume, resolveCanonicalHypertrophyVolumeProgression, type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
+import { canonicalHypertrophyLandmark, defaultCanonicalStartingVolumeContext, deriveCanonicalHypertrophyVolumeEvidence, resolveCanonicalHypertrophyStartingVolume, resolveCanonicalHypertrophyVolumeProgression, type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
+import { validateCanonicalProgressEvidence, type CanonicalProgressEvidence } from "@/domain/training/canonical-progress-evidence";
 import type { CanonicalSessionSnapshotV3 } from "@/domain/training/canonical-session-construction-pipeline";
 import { mesocycleById, type MesocycleId } from "@/domain/training/mesocycle-library";
 import { resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-prescription-policy";
@@ -13,7 +14,7 @@ import { exerciseLibrary } from "@/domain/training/presets";
 import { selectSetMethod, setMethodExplanation } from "@/domain/training/set-method-governance";
 import { canonicalSessionDurationOptions } from "@/domain/training/canonical-session-duration";
 
-export const CANONICAL_DOSAGE_EVOLUTION_CERTIFICATION_VERSION = "canonical_dosage_evolution_certification_v1" as const;
+export const CANONICAL_DOSAGE_EVOLUTION_CERTIFICATION_VERSION = "canonical_dosage_evolution_certification_v2" as const;
 const FULL_GYM = ["barbell", "dumbbell", "machine", "cable", "bodyweight"] as const;
 const CREATED_AT = "2026-07-19T08:00:00.000Z";
 const regions: readonly CanonicalStimulusRegion[] = ["chest", "lats", "upper_back", "anterior_delts", "lateral_delts", "rear_delts", "triceps", "biceps", "quadriceps", "hamstrings_knee_flexion", "hip_extension", "calves", "core"];
@@ -61,6 +62,7 @@ export function buildCanonicalDosageEvolutionArtifacts() {
     basis: "complete_six_session_rotation_scaled_by_five_lifting_sessions_per_seven_days",
     completeRotation: fullRotation,
     averageSevenDays: { ...normalised, cardioMinutes: cardio.recoveryBudget.cardioMinutes, totalTrainingMinutes: round(normalised.estimatedMinutes + cardio.recoveryBudget.cardioMinutes) },
+    secondaryAccountingRule: "Meaningful secondary work is counted as whole programmed-set exposures from exercise metadata. Decimal values are rotation-to-calendar averages only, never fractional direct-set credit.",
     calendarSlices,
     balanceProof: {
       threeSliceDistributions: calendarSlices.map((slice) => slice.distribution),
@@ -71,19 +73,28 @@ export function buildCanonicalDosageEvolutionArtifacts() {
     },
   };
   const startingRows = buildStartingVolumeRows();
-  const startingVolumeArtifact = { schemaVersion: CANONICAL_DOSAGE_EVOLUTION_CERTIFICATION_VERSION, policyId: "canonical_hypertrophy_volume_policy_v1", rows: startingRows };
+  const startingVolumeArtifact = {
+    schemaVersion: CANONICAL_DOSAGE_EVOLUTION_CERTIFICATION_VERSION,
+    policyId: "canonical_hypertrophy_volume_policy_v2",
+    sourceEvidence: [
+      { source: "docs/evidence-based-prescription-model.md", section: "Weekly volume targets", paraphrasedRule: "Experience-specific direct-set ranges differ for major, small and core regions; volume increases require evidence.", supportedFields: ["target", "maximumRecoverableAuthorisation"], limitation: "Product policy range, not a demonstrated individual MRV." },
+      { source: "docs/evidence-based-prescription-model.md", section: "Session volume targets", paraphrasedRule: "Primary, secondary, isolation and core roles own useful multi-set session prescriptions.", supportedFields: ["starting", "maximumAuthorisedStarting", "no_token_work"], limitation: "Discrete session allocation may differ from the normalized weekly target by rounding." },
+      { source: "canonical-policy-source-corpus/13-Chad-Waterbury-s-Programs.pdf", printedPages: "1-2", paraphrasedRule: "Published hypertrophy examples specify exercise-level sets, reps, rest and planned progression rather than decorative exercise counts.", supportedFields: ["exact_set_rep_rest_execution", "planned_progression"], limitation: "Example programmes support executable prescription structure; they do not define a universal weekly regional dose." },
+    ],
+    rows: startingRows,
+  };
   const audit95 = {
     schemaVersion: CANONICAL_DOSAGE_EVOLUTION_CERTIFICATION_VERSION,
     firstCalendarSliceWorkingSets: first.totalWorkingSets,
     completeRotationWorkingSets: fullRotation.totalWorkingSets,
     averageSevenDayWorkingSets: normalised.totalWorkingSets,
-    userFactsAuthorisingStart: ["goal:build_muscle", "experience:intermediate", "commitment:five_lifting_days", "framework:push_pull_legs", "equipment:full_gym", "recovery:no_restriction_evidence_at_construction", "history:no_comparable_completed_work", "load_state:calibration_required"],
+    userFactsAuthorisingStart: ["goal:build_muscle", "experience:intermediate", "recent_training:five_days_moderate_workload", "continuity:currently_training", "commitment:five_lifting_days", "framework:push_pull_legs", "equipment:full_gym", "recovery:ordinary", "history:no_comparable_completed_work", "load_state:calibration_required", "dosage_confidence:declared_recent_training"],
     demonstratedTolerance: false,
     expectedRecoverability: "provisional_only; session duration and muscle-specific dosage are bounded, but completed comparable work must confirm tolerance before any increase",
-    classification: "muscle_specific_calibration_floor_reconciled_to_discrete_rotation",
+    classification: "experience_and_recent_training_baseline_reconciled_to_discrete_rotation",
     retained: false,
-    rationale: "The former 95-set slice and 101-set matrix were generated by independent heuristics. Production now resolves each muscle from the canonical starting policy, scales that target across the complete six-session rotation, rounds once to whole sets, and distributes those sets into exact slots. The corrected no-history start is 78 raw rotation sets, 66 in the first calendar slice and 65 normalised sets per seven days; no unproven capacity uplift is applied.",
-    contradictionResolved: { previousRepresentativeRawRotation: 116, previousRepresentativeNormalisedSevenDays: 96.7, previousMatrixTotal: 101, cause: "per-slot experience heuristic and reporting-only muscle matrix had no executable reconciliation", authoritativeOwner: "canonical_hypertrophy_volume_policy_v1 -> canonical_microcycle_volume_policy_v3 discrete allocation" },
+    rationale: `Production resolves each region from declared experience, recent training, continuity, recovery, sport and retained evidence, then allocates once across the complete six-session rotation. Missing app history keeps loads in calibration and progression confidence low; it does not force a minimum-volume floor. This case produces ${fullRotation.totalWorkingSets} raw rotation sets, ${first.totalWorkingSets} in the first calendar slice and ${normalised.totalWorkingSets} normalised sets per seven days without padding to a global total.`,
+    contradictionResolved: { previousRepresentativeRawRotation: 78, previousRepresentativeNormalisedSevenDays: 65, previousMatrixTotal: 65, cause: "missing app history was incorrectly used as detraining and low-capacity evidence", authoritativeOwner: "canonical_hypertrophy_volume_policy_v2 -> canonical_microcycle_volume_policy_v4 discrete allocation" },
     excessiveDetection: ["three comparable observations required before any addition", "local drop-off removes one affected-region set first", "repeated local failure can remove two without crossing the starting floor", "systemic fatigue blocks additions and requires stress-reduction review"],
     firstChanges: ["hold all additions", "reduce one local low-benefit set when the affected region shows confirmed drop-off", "review systemic stress before any broad dosage change"],
     muscleSpecificComparison: Object.fromEntries(regions.map((region) => [region, { averageDirectSets: normalised.directSets[region] ?? 0, ...resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region, context: context("ordinary", "none") }) }])),
@@ -95,7 +106,7 @@ export function buildCanonicalDosageEvolutionArtifacts() {
     schemaVersion: CANONICAL_DOSAGE_EVOLUTION_CERTIFICATION_VERSION,
     currentProductionInput: true,
     commitmentMeaning: "days_per_week_only",
-    currentAcceptanceOwner: "canonical_session_duration_policy_v1 validated by canonical active-plan application and enforced by canonical_microcycle_volume_policy_v3",
+    currentAcceptanceOwner: "canonical_session_duration_policy_v2 validated by canonical active-plan application and enforced by canonical_microcycle_volume_policy_v4",
     currentEstimatedRangeMinutes: [Math.min(...completeSessions.map((session) => session.estimatedMinutes)), Math.max(...completeSessions.map((session) => session.estimatedMinutes))],
     currentMaximumMinutes: 90,
     supportedMinutes: canonicalSessionDurationOptions,
@@ -103,7 +114,7 @@ export function buildCanonicalDosageEvolutionArtifacts() {
     userSpecificLimitClaimed: true,
     decision: "implemented_as_typed_canonical_input",
     reconstruction: "Future snapshots are regenerated atomically; recorded references and lineage are preserved; active attempts and stale revisions fail closed.",
-    coverageRule: "Every planned stimulus slot retains at least one exact working set. Time-constrained dosage gaps are exposed explicitly rather than silently deleting a muscle region.",
+    coverageRule: "Every retained hypertrophy exercise has at least two exact working sets. Time-constrained omissions and dosage gaps are exposed explicitly rather than hidden as token work.",
   };
   const qualityGates = buildQualityGates({ completeSessions, fullRotation, normalised, cardioIndividualisation, methodEvolution, audit95, durationDecision });
   return {
@@ -124,10 +135,11 @@ function buildDurationExamples() {
   return canonicalSessionDurationOptions.map((availableSessionMinutes) => {
     const result = constructCanonicalActivePlanFromCanonicalInputs({ planId: `duration-evidence:${availableSessionMinutes}`, createdAt: CREATED_AT, updatedAt: CREATED_AT, goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 5, preferredSplit: "push_pull_legs", equipment: FULL_GYM, units: "kg", availableSessionMinutes, exercises: exerciseLibrary });
     if (result.status !== "constructed") return { availableSessionMinutes, status: "fail_closed" as const, reason: result.reason };
-    const sessions = result.carrier.plannedSessions.map((session) => {
+    const allocation = allocateCanonicalMicrocycleVolume({ macrocycleGoal: "build_muscle", mesocycleId: result.carrier.mesocycle.id, mesocyclePurpose: result.carrier.mesocycle.output.adaptation, microcyclePriority: result.carrier.microcycle.output.priority, microcycleSequence: result.carrier.microcycle.output.sequenceNumber, experience: "intermediate", frequency: 5, split: "push_pull_legs", equipment: FULL_GYM, recoveryRestricted: false, establishedLoadExerciseIds: [], sessionRoles: result.carrier.microcycle.output.sessionRoles, sessionTypes: result.carrier.microcycle.output.sessionTypes, startingVolumeContext: result.carrier.constraints.startingVolumeContext, availableSessionMinutes });
+    const sessions = result.carrier.plannedSessions.map((session, index) => {
       const snapshot = session.prescriptionSnapshot as CanonicalSessionSnapshotV3;
       const workingSets = snapshot.slots.reduce((sum, slot) => sum + (slot.settings.requiredSets ?? slot.settings.requiredWorkSets), 0);
-      return { role: session.role, exercises: snapshot.slots.length, workingSets, estimatedMinutes: 8 + workingSets * 3, allEssentialSlotsRetained: snapshot.slots.every((slot) => (slot.settings.requiredSets ?? slot.settings.requiredWorkSets) >= 1) };
+      return { role: session.role, exercises: snapshot.slots.length, workingSets, estimatedMinutes: allocation.estimatedSessionMinutes[index]!, durationBreakdown: allocation.durationEstimates[index]!.breakdownSeconds, allRetainedExercisesUseful: snapshot.slots.every((slot) => (slot.settings.requiredSets ?? slot.settings.requiredWorkSets) >= 2) };
     });
     return { availableSessionMinutes, status: "constructed" as const, sessions, maximumObservedMinutes: Math.max(...sessions.map((session) => session.estimatedMinutes)) };
   });
@@ -199,7 +211,8 @@ function buildTestDiscoveryReconciliation() {
     certifiedBaseline: { files: 348, tests: 2072, commit: "a538d197f57e91e3f8a48a070a75e01132a8e917" },
     taskStart: { files: 349, tests: 2070, commit: "730952658effff5d04817e9fef1d1221e8293bb9" },
     adversarialCorrectionStart: { files: 350, tests: 2080, commit: "1ab62df921f3e38fac4fa052a33f09f654a761e5" },
-    finalDiscovery: { files: 351, tests: 2088 },
+    correctionStart: { files: 351, tests: 2088, commit: "cd91bea3a916e4c7ff824455c560aea0d599e61a" },
+    finalDiscovery: { files: 351, tests: 2090 },
     filesAddedAtTaskStart: ["tests/canonical-final-adaptive-planning.test.ts"],
     filesDeletedAtTaskStart: [],
     filesAddedByThisTask: ["tests/canonical-dosage-evolution-certification.test.ts"],
@@ -207,6 +220,10 @@ function buildTestDiscoveryReconciliation() {
     individualTestsRemovedAtTaskStart: removed,
     individualTestsAddedAtTaskStart: addedBeforeThisTask,
     individualTestsAddedByThisTask: addedByThisTask,
+    individualTestsAddedByCurrentCorrection: [
+      "canonical per-session available-time planning > calibrates only future estimates from at least three comparable completed durations",
+      "app settings > normalizes persisted recent-training facts without conflating experience and history",
+    ],
     renamedOrConsolidated: [
       { source: "2 complete-planning tests", replacement: "2 exact public-framework/dense-PPL planning tests", status: "stronger_equivalent" },
       { source: "2 allocator strategy cases", replacement: "2 currently selectable framework cases plus exhaustive matrix", status: "renamed_for_new_public_contract" },
@@ -222,6 +239,7 @@ function buildTestDiscoveryReconciliation() {
       taskStartToFinalTests: "2070 + 10 added - 0 deleted = 2080",
       adversarialCorrectionFiles: "350 + 1 added - 0 deleted = 351",
       adversarialCorrectionTests: "2080 + 8 added - 0 deleted = 2088",
+      currentCorrectionTests: "2088 + 2 added - 0 deleted = 2090",
     },
     lostCoverageWithoutReplacement: [],
   };
@@ -240,11 +258,11 @@ function constructSlice(sequenceNumber: number) {
     const exerciseRows = snapshot.slots.map((slot) => {
       const allocated = allocation.slots.find((entry) => entry.sessionIndex === sessionIndex && entry.order === slot.index)!;
       const exercise = exerciseById.get(slot.exerciseId)!;
-      return { exerciseId: exercise.id, exercise: exercise.name, purpose: allocated.purpose, workingSets: slot.settings.requiredSets ?? slot.settings.requiredWorkSets, exactTargets: slot.exactTargets ?? Array.from({ length: slot.settings.requiredSets ?? 0 }, () => slot.targetReps), exactTargetKinds: slot.exactTargetKinds ?? [], method: slot.method, loadState: slot.loadPrescription.state, restSeconds: slot.rest.seconds, directMuscles: exercise.stimulusProfile?.direct ?? [], meaningfulSecondaryMuscles: exercise.stimulusProfile?.meaningfulSecondary ?? [], fatigueClass: exercise.fatigueCost, progression: slot.progression.rule, stopRule: slot.stopRule.action };
+      return { exerciseId: exercise.id, exercise: exercise.name, purpose: allocated.purpose, workingSets: slot.settings.requiredSets ?? slot.settings.requiredWorkSets, exactTargets: slot.exactTargets ?? Array.from({ length: slot.settings.requiredSets ?? 0 }, () => slot.targetReps), exactTargetKinds: slot.exactTargetKinds ?? [], method: slot.method, loadState: slot.loadPrescription.state, loadPrescription: slot.loadPrescription, restSeconds: slot.rest.seconds, directMuscles: exercise.stimulusProfile?.direct ?? [], meaningfulSecondaryMuscles: exercise.stimulusProfile?.meaningfulSecondary ?? [], fatigueClass: exercise.fatigueCost, stimulusToFatigueRationale: exercise.fatigueCost === "high" ? "Priority anchor with bounded exact sets, reps and rest; not repeated as redundant high-fatigue work." : exercise.fatigueCost === "moderate" ? "Stable direct stimulus with less systemic cost than the primary high-fatigue anchor." : "Low-systemic-cost direct accessory work used only to meet an owned regional dose.", progression: slot.progression.rule, stopRule: slot.stopRule.action };
     });
     const directSets = aggregateExerciseStimulus(exerciseRows, "directMuscles");
     const secondarySets = aggregateExerciseStimulus(exerciseRows, "meaningfulSecondaryMuscles");
-    return { role: snapshot.role, calendarDayOffset: carrier.microcycle.output.sessionDayOffsets[sessionIndex], purpose: carrier.mesocycle.output.adaptation, exercises: exerciseRows, workingSets: allocation.sessionWorkingSets[sessionIndex]!, estimatedMinutes: allocation.estimatedSessionMinutes[sessionIndex]!, localFatigue: directSets, systemicFatigueUnits: certification.fatigueUnits.perSession[sessionIndex]!, meaningfulSecondarySets: secondarySets };
+    return { role: snapshot.role, calendarDayOffset: carrier.microcycle.output.sessionDayOffsets[sessionIndex], purpose: carrier.mesocycle.output.adaptation, exercises: exerciseRows, workingSets: allocation.sessionWorkingSets[sessionIndex]!, estimatedMinutes: allocation.estimatedSessionMinutes[sessionIndex]!, durationBreakdown: allocation.durationEstimates[sessionIndex]!.breakdownSeconds, durationAssumptions: allocation.durationEstimates[sessionIndex]!.assumptions, localFatigue: directSets, systemicFatigueUnits: certification.fatigueUnits.perSession[sessionIndex]!, meaningfulSecondarySets: secondarySets };
   });
   return { sessions, totalWorkingSets: allocation.totalWorkingSets, dayOffsets: carrier.microcycle.output.sessionDayOffsets, conditioning: carrier.conditioning, rotationPolicy: { sequenceNumber, rotationCursor: carrier.microcycle.output.rotationCursor, scheduleMode: carrier.microcycle.output.scheduleMode, logicalRotation: carrier.microcycle.output.logicalRotation } };
 }
@@ -273,7 +291,7 @@ function buildStartingVolumeRows() {
   return (["beginner", "intermediate", "advanced"] as const).flatMap((experience) => profiles.map((profile) => {
     const muscles = Object.fromEntries(regions.map((region) => [region, resolveCanonicalHypertrophyStartingVolume({ experience, region, context: profile.context })]));
     const totalDirectSets = Object.values(muscles).reduce((sum, entry) => sum + entry.startingDirectSets, 0);
-    return { experience, profile: profile.id, context: profile.context, frequency: Object.fromEntries(regions.map((region) => [region, region === "core" ? 0.83 : 1.67])), muscles, totalDirectSets, expectedSessionMinutes: round(8 + totalDirectSets / 5 * 3), reason: profile.context.history === "none" ? "calibration_start_without_tolerance_claim" : profile.context.workCapacity === "demonstrated_high" && profile.context.recovery === "high" ? "upper_start_requires_productive_history_and_high_capacity" : "middle_start_with_retained_productive_history" };
+    return { experience, profile: profile.id, context: profile.context, frequency: Object.fromEntries(regions.map((region) => [region, region === "core" ? 0.83 : 1.67])), muscles, totalDirectSets, expectedSessionMinutes: "resolved_after_exact_slot_allocation", reason: profile.context.history === "none" ? "declared_recent_training_start_with_load_calibration" : profile.context.workCapacity === "demonstrated_high" && profile.context.recovery === "high" ? "upper_start_requires_productive_history_and_high_capacity" : "productive_history_supports_bounded_start" };
   }));
 }
 
@@ -303,40 +321,104 @@ function methodExample(id: string, mesocycleId: MesocycleId, experience: Experie
 }
 
 function buildMesocycleSimulation(first: NonNullable<ReturnType<typeof constructSlice>>, fullRotation: ReturnType<typeof aggregateSessions>) {
-  const baseEvidence = { comparableObservations: 3, recovery: "acceptable" as const, repeatedSignal: false };
   const original = first.rotationPolicy;
   const microcycle = reflowCanonicalMicrocycleAfterMissedSession({ ...createMicrocycleFromFirst(first), sequenceNumber: 1 }, 3, 2);
+  const evaluate = (id: string, region: CanonicalStimulusRegion, currentDirectSets: number, records: readonly CanonicalProgressEvidence[], options: Readonly<{ sourceRegionAtOrAboveTarget?: boolean; destinationBelowTarget?: boolean }> = {}) => {
+    const derived = deriveCanonicalHypertrophyVolumeEvidence({ region, records, ...options });
+    return { id, evidenceIds: derived.evidenceIds, derivedEvidence: derived.evidence, current: currentDirectSets, result: resolveCanonicalHypertrophyVolumeProgression({ experience: "intermediate", region, currentDirectSets, evidence: derived.evidence }) };
+  };
   const pathways = [
-    { id: "A_productive_progress", evidence: { ...baseEvidence, performance: "improving" as const }, current: 8, result: resolveCanonicalHypertrophyVolumeProgression({ experience: "intermediate", region: "chest", currentDirectSets: 8, evidence: { ...baseEvidence, performance: "improving" } }), outcome: "one local set may be added only while below target; exercises retained" },
-    { id: "B_local_muscle_underdose", evidence: { ...baseEvidence, performance: "stable" as const }, current: 7, result: resolveCanonicalHypertrophyVolumeProgression({ experience: "intermediate", region: "lats", currentDirectSets: 7, evidence: { ...baseEvidence, performance: "stable" } }), outcome: "one lat set; unrelated muscles unchanged" },
-    { id: "C_local_excess_fatigue", evidence: { ...baseEvidence, performance: "drop_off" as const, recovery: "local_fatigue" as const, repeatedSignal: true }, current: 10, result: resolveCanonicalHypertrophyVolumeProgression({ experience: "intermediate", region: "triceps", currentDirectSets: 10, evidence: { ...baseEvidence, performance: "drop_off", recovery: "local_fatigue", repeatedSignal: true } }), outcome: "bounded local reduction; floor retained" },
-    { id: "D_systemic_fatigue", evidence: { ...baseEvidence, performance: "stable" as const, recovery: "systemic_fatigue" as const }, current: 10, result: resolveCanonicalHypertrophyVolumeProgression({ experience: "intermediate", region: "quadriceps", currentDirectSets: 10, evidence: { ...baseEvidence, performance: "stable", recovery: "systemic_fatigue" } }), outcome: "no local addition; stress-reduction review, not calendar deload" },
-    { id: "E_missed_session", evidence: { missedIndex: 3, delayDays: 2 }, result: { rolesPreserved: microcycle.sessionRoles.map((role) => role), progressionState: microcycle.progressionState, scheduleMode: microcycle.scheduleMode }, outcome: "rotation reflows without reset or invented deload" },
-    { id: "F_one_poor_workout", evidence: { comparableObservations: 1, performance: "drop_off" as const, recovery: "acceptable" as const, repeatedSignal: false }, current: 10, result: resolveCanonicalHypertrophyVolumeProgression({ experience: "intermediate", region: "chest", currentDirectSets: 10, evidence: { comparableObservations: 1, performance: "drop_off", recovery: "acceptable", repeatedSignal: false } }), outcome: "retain; one workout cannot rewrite dosage" },
-    { id: "G_persistent_stagnation", evidence: { ...baseEvidence, performance: "stagnating" as const, sourceRegionAtOrAboveTarget: true, destinationBelowTarget: true }, current: 10, result: resolveCanonicalHypertrophyVolumeProgression({ experience: "intermediate", region: "chest", currentDirectSets: 10, evidence: { ...baseEvidence, performance: "stagnating", sourceRegionAtOrAboveTarget: true, destinationBelowTarget: true } }), outcome: "reallocate one set; no uncontrolled total escalation" },
+    { ...evaluate("A_productive_progress", "chest", 7, performedEvidence("chest", [100, 104, 108])), outcome: "one local set may be added only while below target; exercises retained" },
+    { ...evaluate("B_local_muscle_underdose", "lats", 7, performedEvidence("lats", [100, 100, 100])), outcome: "one lat set; unrelated muscles unchanged" },
+    { ...evaluate("C_local_excess_fatigue", "triceps", 10, performedEvidence("triceps", [100, 92, 84], { dropOffIndexes: [1, 2], localFatigue: true })), outcome: "bounded local reduction; floor retained" },
+    { ...evaluate("D_systemic_fatigue", "quadriceps", 10, performedEvidence("quadriceps", [100, 100, 100], { systemicFatigue: true })), outcome: "no local addition; stress-reduction review, not calendar deload" },
+    { id: "E_missed_session", evidenceIds: ["mesocycle:missed-session:3"], derivedEvidence: { missedIndex: 3, delayDays: 2, source: "canonical_completion_evidence" }, result: { rolesPreserved: microcycle.sessionRoles.map((role) => role), progressionState: microcycle.progressionState, scheduleMode: microcycle.scheduleMode }, outcome: "rotation reflows without reset or invented deload" },
+    { ...evaluate("F_one_poor_workout", "chest", 10, performedEvidence("chest", [90], { dropOffIndexes: [0] })), outcome: "retain; one workout cannot rewrite dosage" },
+    { ...evaluate("G_persistent_stagnation", "chest", 10, performedEvidence("chest", [100, 100, 100], { progressionStalled: true }), { sourceRegionAtOrAboveTarget: true, destinationBelowTarget: true }), outcome: "reallocate one set; no uncontrolled total escalation" },
   ];
   const sessionPrescription = first.sessions.map((session) => ({ role: session.role, exercises: session.exercises.map((exercise) => ({ exercise: exercise.exercise, exactTargets: exercise.exactTargets, method: exercise.method, loadState: exercise.loadState, progression: exercise.progression, stopRule: exercise.stopRule })) }));
   const rotations = [
-    { rotation: 1, state: "calibration", exercises: sessionPrescription, muscleDosage: fullRotation.directSets, loadProgression: "establish canonical load evidence; missing loads remain calibration_required", volumeChange: 0, recovery: "ordinary", repDropOff: "none", decision: "retain", exit: "continue until credible comparable baselines exist" },
-    { rotation: 2, state: "evidence_accumulation", exercises: sessionPrescription, muscleDosage: fullRotation.directSets, loadProgression: "rep progression inside the immutable target before any load revision", volumeChange: 0, recovery: "ordinary", repDropOff: "none", decision: "retain while fewer than three comparable observations exist", exit: "continue" },
-    { rotation: 3, state: "first_eligible_bounded_decision", exercises: sessionPrescription, muscleDosage: fullRotation.directSets, loadProgression: "Session Construction alone may author a future exact load after persisted Progress evidence", volumeChange: "one affected-region set only when the productive-below-target rule resolves", recovery: "acceptable required", repDropOff: "local drop-off prevents addition", decision: "add_one_set, retain or bounded local reduction by evidence", exit: "consolidate/review if systemic fatigue appears" },
-    { rotation: 4, state: "continue_or_review", exercises: sessionPrescription, muscleDosage: fullRotation.directSets, loadProgression: "retain productive exercises and progress exact targets; substitute only a canonical suitability-valid equivalent", volumeChange: "no automatic increase", recovery: "fresh factual state", repDropOff: "repeated local drop-off can remove two while preserving floor", decision: "continue, local adjustment, or systemic review", exit: "deload/transition only through Mesocycle/Progress decision, never elapsed days alone" },
-  ];
-  return { schemaVersion: CANONICAL_DOSAGE_EVOLUTION_CERTIFICATION_VERSION, representative: { experience: "intermediate", goal: "build_muscle", startingRotation: sessionPrescription, startingDosage: fullRotation.directSets, retainedExercisesRule: "retain suitable exercises while comparable evidence is being established", substitutionRule: "only a suitability-valid canonical equivalent; recorded sessions remain immutable", rotations, originalRotation: original }, inputSensitivityCases: buildAdaptiveInputCases(), pathways, safeguards: { noAutomaticWeeklyAddition: true, notPermanentlyAtMinimum: pathways.some((path) => path.result && "disposition" in path.result && path.result.disposition === "add_one_set"), noSingleBadWorkoutRewrite: pathways.find((path) => path.id === "F_one_poor_workout")?.result, noCalendarOnlyDeload: true, ceilings: Object.fromEntries(regions.map((region) => [region, canonicalHypertrophyLandmark("intermediate", region).target.max])), absencePreservesSequence: microcycle.sessionRoles.map((role) => role) } };
+    mesocycleRotation(1, "calibration", performedEvidence("chest", [100]), { calibration: "completed_for_observed_exercises", load: "established evidence retained for future Session Construction", reps: "baseline exact targets completed", volume: "retain", recovery: "ordinary", exercise: "retain", cardio: "easy recovery prescription retained", exit: "continue_insufficient_comparable_evidence" }),
+    mesocycleRotation(2, "rep_progression", performedEvidence("chest", [100, 104]), { calibration: "established", load: "unchanged while rep target progresses", reps: "completed reps improved inside target", volume: "retain", recovery: "ordinary", exercise: "retain", cardio: "no interference signal", exit: "continue_two_comparable_observations" }),
+    mesocycleRotation(3, "bounded_local_progression", performedEvidence("chest", [100, 104, 108]), { calibration: "established", load: "numeric load progression remains Session Construction-owned; no caller-authored future load", reps: "three improving observations", volume: "add_one_set_only_if_region_below_target", recovery: "acceptable", exercise: "retain", cardio: "no interference signal", exit: "continue_or_consolidate" }),
+    mesocycleRotation(4, "local_fatigue_correction", performedEvidence("triceps", [100, 91, 84], { dropOffIndexes: [1, 2], localFatigue: true }), { calibration: "established", load: "hold while local fatigue resolves", reps: "repeated local drop-off recorded", volume: "remove_two_only_when_starting_floor_is_preserved", recovery: "local_fatigue", exercise: "retain stable exercises; substitution requires canonical suitability", cardio: "retain easy work only if it does not worsen recovery", exit: "continue_after_bounded_local_correction" }),
+    mesocycleRotation(5, "consolidation", performedEvidence("chest", [104, 105, 105]), { calibration: "established", load: "hold exact future construction until evidence authorises change", reps: "stable comparable performance", volume: "retain_inside_productive_target", recovery: "ordinary", exercise: "retain", cardio: "retain without progression", exit: "review_mesocycle_outcome" }),
+    mesocycleRotation(6, "systemic_review", performedEvidence("quadriceps", [100, 100, 98], { systemicFatigue: true }), { calibration: "established", load: "hold progression", reps: "stable_to_slight_drop", volume: "no automatic addition; stress-reduction review", recovery: "systemic_fatigue", exercise: "retain_or_suitability_valid_substitution_only", cardio: "hold progression and review lower-body interaction", exit: "deload_or_transition_review_required_by_canonical_evidence" }),
+  ].map((rotation) => ({ ...rotation, exactPrescription: sessionPrescription, prescribedDirectDosage: fullRotation.directSets }));
+  return { schemaVersion: CANONICAL_DOSAGE_EVOLUTION_CERTIFICATION_VERSION, representative: { experience: "intermediate", goal: "build_muscle", startingRotation: sessionPrescription, startingDosage: fullRotation.directSets, retainedExercisesRule: "retain suitable exercises while comparable evidence is being established", substitutionRule: "only a suitability-valid canonical equivalent; recorded sessions remain immutable", rotations, originalRotation: original, completeMesocycleDemonstrated: rotations.length === 6 }, inputSensitivityCases: buildAdaptiveInputCases(), pathways, safeguards: { noAutomaticWeeklyAddition: true, notPermanentlyAtMinimum: pathways.some((path) => path.result && "disposition" in path.result && path.result.disposition === "add_one_set"), noSingleBadWorkoutRewrite: pathways.find((path) => path.id === "F_one_poor_workout")?.result, noCalendarOnlyDeload: true, ceilings: Object.fromEntries(regions.map((region) => [region, canonicalHypertrophyLandmark("intermediate", region).maximumRecoverableAuthorisation])), absencePreservesSequence: microcycle.sessionRoles.map((role) => role) } };
+}
+
+function performedEvidence(
+  region: CanonicalStimulusRegion,
+  performanceIndices: readonly number[],
+  options: Readonly<{ dropOffIndexes?: readonly number[]; localFatigue?: boolean; systemicFatigue?: boolean; progressionStalled?: boolean }> = {},
+): CanonicalProgressEvidence[] {
+  const performance = performanceIndices.map((performanceIndex, index): CanonicalProgressEvidence => ({
+    schemaVersion: "canonical_progress_evidence_v1",
+    evidenceId: `mesocycle:${region}:performed:${index + 1}`,
+    planId: "dosage-cert-sequence-1",
+    planRevision: 0,
+    macrocycleId: "dosage-cert-sequence-1:macrocycle",
+    mesocycleId: "hypertrophy_calibration",
+    microcycleId: "dosage-cert-sequence-1:microcycle:1",
+    sessionId: `recorded:${region}:${index + 1}`,
+    slotId: `slot:${region}`,
+    athleteId: "synthetic-certification-athlete",
+    observedAt: `2026-07-${String(index + 1).padStart(2, "0")}T12:00:00.000Z`,
+    source: `canonical-ledger:recorded:${region}:${index + 1}`,
+    kind: "performance",
+    observations: { region, completed: true, comparable: true, performanceIndex, dropOff: options.dropOffIndexes?.includes(index) ?? false, progressionStalled: options.progressionStalled ?? false, prescribedHistoryImmutable: true },
+    evidenceVersion: "progress_v1",
+  }));
+  if (options.localFatigue || options.systemicFatigue) performance.push({
+    schemaVersion: "canonical_progress_evidence_v1",
+    evidenceId: `mesocycle:${region}:readiness:${options.systemicFatigue ? "systemic" : "local"}`,
+    planId: "dosage-cert-sequence-1",
+    planRevision: 0,
+    macrocycleId: "dosage-cert-sequence-1:macrocycle",
+    mesocycleId: "hypertrophy_calibration",
+    microcycleId: "dosage-cert-sequence-1:microcycle:1",
+    athleteId: "synthetic-certification-athlete",
+    observedAt: "2026-07-20T12:00:00.000Z",
+    source: "canonical-progress:readiness",
+    kind: "readiness",
+    observations: { region, recovery: options.systemicFatigue ? "systemic_fatigue" : "local_fatigue", systemicFatigue: options.systemicFatigue ?? false, localFatigue: options.localFatigue ?? false },
+    evidenceVersion: "progress_v1",
+  });
+  for (const record of performance) {
+    const validation = validateCanonicalProgressEvidence(record);
+    if (validation.status !== "valid") throw new Error(`invalid_mesocycle_performed_evidence:${record.evidenceId}:${validation.reason}`);
+  }
+  return performance;
+}
+
+function mesocycleRotation(
+  rotation: number,
+  state: string,
+  evidence: readonly CanonicalProgressEvidence[],
+  response: Readonly<{ calibration: string; load: string; reps: string; volume: string; recovery: string; exercise: string; cardio: string; exit: string }>,
+) {
+  const region = String(evidence.find((item) => item.kind === "performance")?.observations.region ?? "chest") as CanonicalStimulusRegion;
+  const derived = deriveCanonicalHypertrophyVolumeEvidence({ region, records: evidence });
+  const volumeResult = resolveCanonicalHypertrophyVolumeProgression({ experience: "intermediate", region, currentDirectSets: region === "quadriceps" ? 10 : 7, evidence: derived.evidence });
+  return { rotation, state, canonicalEvidence: evidence, evidenceIds: derived.evidenceIds, derivedEvidence: derived.evidence, volumeResult, response, decisionSource: "canonical_performed_and_readiness_evidence", callerAuthoredResultFlags: false, historyRewritten: false };
 }
 
 function buildAdaptiveInputCases() {
   const cases = [
-    ["beginner_no_history", "beginner", context("ordinary", "none"), 75],
-    ["beginner_productive_history", "beginner", context("ordinary", "established_productive"), 75],
-    ["intermediate_no_history", "intermediate", context("ordinary", "none"), 75],
-    ["intermediate_productive_history", "intermediate", context("ordinary", "established_productive"), 75],
-    ["advanced_no_history", "advanced", context("ordinary", "none"), 75],
-    ["advanced_productive_history", "advanced", context("ordinary", "established_productive"), 75],
-    ["advanced_high_demonstrated_tolerance", "advanced", context("high", "established_productive", "demonstrated_high"), 90],
-    ["intermediate_poor_recovery", "intermediate", context("low_acceptable", "established_productive"), 75],
-    ["intermediate_concurrent_sport", "intermediate", context("ordinary", "established_productive", "not_demonstrated", "lower_body_loading"), 75],
+    ["beginner_ordinary", "beginner", context("ordinary", "none"), 75],
+    ["intermediate_current_new_app", "intermediate", context("ordinary", "none"), 75],
+    ["intermediate_short_layoff", "intermediate", { ...context("ordinary", "none", "not_demonstrated", "none", "short_layoff"), recentTrainingDaysPerWeek: 1, recentSessionWorkload: "light" as const }, 75],
+    ["intermediate_extended_layoff", "intermediate", { ...context("ordinary", "none", "not_demonstrated", "none", "extended_layoff"), recentTrainingDaysPerWeek: 0, recentSessionWorkload: "light" as const }, 75],
+    ["intermediate_poor_recovery", "intermediate", context("low_acceptable", "none"), 75],
+    ["intermediate_established_productive", "intermediate", context("ordinary", "established_productive"), 75],
+    ["advanced_current_new_app", "advanced", context("ordinary", "none"), 75],
+    ["intermediate_concurrent_sport", "intermediate", context("ordinary", "none", "not_demonstrated", "lower_body_loading"), 75],
     ["intermediate_30_minutes", "intermediate", context("ordinary", "none"), 30],
+    ["intermediate_45_minutes", "intermediate", context("ordinary", "none"), 45],
+    ["intermediate_60_minutes", "intermediate", context("ordinary", "none"), 60],
+    ["intermediate_75_minutes", "intermediate", context("ordinary", "none"), 75],
+    ["intermediate_90_minutes", "intermediate", context("ordinary", "none"), 90],
   ] as const;
   return cases.map(([id, experienceLevel, startingVolumeContext, availableSessionMinutes]) => {
     const result = constructCanonicalActivePlanFromCanonicalInputs({ planId: `adaptive:${id}`, createdAt: CREATED_AT, updatedAt: CREATED_AT, goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel, daysPerWeek: 5, preferredSplit: "push_pull_legs", equipment: FULL_GYM, units: "kg", recoveryCardioPreference: "recommended", startingVolumeContext, availableSessionMinutes, exercises: exerciseLibrary });
@@ -356,10 +438,20 @@ function buildAdaptiveInputCases() {
         frequency: result.carrier.microcycle.output.trainingDays,
         cardio: result.carrier.conditioning,
         sessions: snapshots.map((snapshot) => ({ role: snapshot.role, exercises: snapshot.slots.map((slot) => ({ exerciseId: slot.exerciseId, sets: slot.settings.requiredSets ?? slot.settings.requiredWorkSets, exactReps: slot.exactTargets ?? [slot.targetReps], loadState: slot.loadPrescription.state, restSeconds: slot.rest.seconds, method: slot.method })) })),
+        recoveryRestrictionApplied: startingVolumeContext.recovery === "low_acceptable",
+        equalityExplanation: adaptiveEqualityExplanation(id),
       },
       rationale: Object.values(allocation.startingDosage.policyTargets).length ? Object.values(startingVolumeContext).map(String) : ["non_hypertrophy_policy"],
     };
   });
+}
+
+function adaptiveEqualityExplanation(id: string): string | null {
+  if (id === "intermediate_poor_recovery") return "The discrete direct-set total may equal the extended-layoff case, but it is owned by recovery restriction rather than continuity re-entry. No extra difference is invented after both resolve to the same useful multi-set floor.";
+  if (id === "intermediate_extended_layoff") return "The discrete direct-set total may equal the poor-recovery case, but this case is owned by extended-layoff re-entry while recovery remains ordinary.";
+  if (id === "intermediate_90_minutes") return "The full experience-and-recent-training starting dose already fits inside 75 minutes. Additional available time alone does not authorise extra volume.";
+  if (id === "intermediate_75_minutes") return "The full owned starting dose first fits without duration omissions here; 90 minutes correctly retains it because spare time is not progression evidence.";
+  return null;
 }
 
 function buildCardioIndividualisation() {
@@ -378,14 +470,27 @@ function buildCardioIndividualisation() {
 }
 
 function buildQualityGates(input: Readonly<{ completeSessions: readonly SessionSummary[]; fullRotation: ReturnType<typeof aggregateSessions>; normalised: ReturnType<typeof scaleAccounting>; cardioIndividualisation: ReturnType<typeof buildCardioIndividualisation>; methodEvolution: ReturnType<typeof buildMethodEvolution>; audit95: Record<string, unknown>; durationDecision: Record<string, unknown> }>) {
+  const currentIntermediate = context("ordinary", "none");
+  const majorRegions = ["chest", "lats", "upper_back", "quadriceps", "hip_extension"] as const;
+  const allExercises = input.completeSessions.flatMap((session) => session.exercises);
   const gates = [
     gate("muscle_specific_justification", regions.every((region) => region in input.normalised.directSets)),
-    gate("representative_dosage_reconciles_to_policy_after_discrete_rounding", regions.every((region) => Math.abs((input.normalised.directSets[region] ?? 0) - resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region, context: context("ordinary", "none") }).startingDirectSets) <= 0.2)),
+    gate("representative_dosage_reconciles_to_policy_after_discrete_rounding", regions.every((region) => Math.abs((input.normalised.directSets[region] ?? 0) - resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region, context: context("ordinary", "none") }).startingDirectSets) <= 0.51)),
     gate("upper_start_requires_evidence", resolveCanonicalHypertrophyStartingVolume({ experience: "advanced", region: "chest", context: context("high", "none", "demonstrated_high") }).startingDirectSets < canonicalHypertrophyLandmark("advanced", "chest").maximumAuthorisedStarting),
     gate("complete_six_session_rotation", input.completeSessions.length === 6),
     gate("rolling_not_single_slice", input.fullRotation.totalWorkingSets > 0 && input.normalised.totalWorkingSets > 0),
     gate("method_structure_evolves_with_purpose", input.methodEvolution.indefiniteIdenticalStructureAbsent),
     gate("typed_session_duration_respected", input.completeSessions.every((session) => session.estimatedMinutes <= 75)),
+    gate("duration_model_includes_material_work", input.completeSessions.every((session) => ["general_warmup_included", "lift_specific_ramps_included", "prescribed_or_role_owned_rest_included", "set_execution_and_unilateral_time_included", "equipment_setup_and_transitions_included", "calibration_and_method_overhead_included"].every((assumption) => session.durationAssumptions.includes(assumption)))),
+    gate("ordinary_intermediate_major_regions_not_at_unjustified_floor", majorRegions.every((region) => (input.normalised.directSets[region] ?? 0) + 0.2 >= resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region, context: currentIntermediate }).startingDirectSets)),
+    gate("missing_history_preserves_declared_intermediate_baseline", resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region: "chest", context: currentIntermediate }).retainedHistoryEffect === "declared_training_baseline"),
+    gate("no_athlete_facing_placeholders", allExercises.every((exercise) => !/(second (lat|triceps|biceps) angle|placeholder|tbd)/i.test(exercise.purpose))),
+    gate("no_token_exercises", allExercises.every((exercise) => exercise.workingSets >= 2)),
+    gate("direct_coverage_not_disguised_by_secondary_work", majorRegions.every((region) => (input.normalised.directSets[region] ?? 0) + 0.2 >= canonicalHypertrophyLandmark("intermediate", region).target.min)),
+    gate("every_set_has_exact_executable_target", allExercises.every((exercise) => exercise.exactTargets.length === exercise.workingSets && Boolean(exercise.loadPrescription) && exercise.restSeconds > 0 && Boolean(exercise.progression) && Boolean(exercise.stopRule))),
+    gate("experience_materially_changes_owned_dosage", resolveCanonicalHypertrophyStartingVolume({ experience: "beginner", region: "chest", context: currentIntermediate }).startingDirectSets < resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region: "chest", context: currentIntermediate }).startingDirectSets && resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region: "chest", context: currentIntermediate }).startingDirectSets < resolveCanonicalHypertrophyStartingVolume({ experience: "advanced", region: "chest", context: currentIntermediate }).startingDirectSets),
+    gate("recent_training_and_continuity_materially_change_owned_dosage", resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region: "chest", context: { ...currentIntermediate, continuity: "short_layoff", dosageConfidence: "low_after_layoff" } }).startingDirectSets < resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region: "chest", context: currentIntermediate }).startingDirectSets),
+    gate("load_confidence_does_not_rewrite_dosage_confidence", resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region: "chest", context: { ...currentIntermediate, loadConfidence: "established" } }).startingDirectSets === resolveCanonicalHypertrophyStartingVolume({ experience: "intermediate", region: "chest", context: currentIntermediate }).startingDirectSets),
     gate("same_role_sessions_are_complementary", [[0, 3], [1, 4], [2, 5]].every(([a, b]) => input.completeSessions[a]!.exercises.map((exercise) => exercise.exerciseId).join("|") !== input.completeSessions[b]!.exercises.map((exercise) => exercise.exerciseId).join("|"))),
     gate("high_fatigue_prescriptions_use_bounded_reps_and_rest", input.completeSessions.flatMap((session) => session.exercises).filter((exercise) => exercise.fatigueClass === "high").every((exercise) => exercise.exactTargets.every((target) => target <= 8) && exercise.restSeconds >= 150)),
     gate("no_unexplained_repeated_exercise", input.completeSessions.every((session) => new Set(session.exercises.map((exercise) => exercise.exerciseId)).size === session.exercises.length)),
@@ -407,7 +512,18 @@ function createMicrocycleFromFirst(first: NonNullable<ReturnType<typeof construc
 function slot(role: AllocatedSlot["exerciseRole"], constructionRole: AllocatedSlot["constructionRole"], workingSets: number, exercise: Exercise): AllocatedSlot { return { sessionIndex: 0, sessionRole: "certification", order: 0, exerciseRole: role, constructionRole, muscles: exercise.primaryMuscles, requiredStimuli: exercise.stimulusProfile?.direct ?? [], purpose: "method certification", movementPatterns: [exercise.movementPattern], primaryLift: exercise.primaryLift, liftExposure: exercise.primaryLift ? constructionRole === "primary" ? "primary" : "secondary_variation" : undefined, repeatPolicy: "stable_primary_practice", workingSets }; }
 function methodFromGovernance(mesocycleId: MesocycleId, experience: ExperienceLevel, role: AllocatedSlot["exerciseRole"], expected: string) { const selected = selectSetMethod({ mesocycleId, experience, exerciseRole: role, sessionRole: "certification" }); return { selected, mapsToExpected: ((selected === "exact_straight_sets" || selected === "technical_repeated_sets") && expected === "straight_sets") || (selected === "top_set_backoffs" && expected === "back_off_sets") || (selected === "controlled_performance_set" && expected === "amrap") || (selected === "pyramid" && expected === "pyramid") || (selected === "boring_but_big" && expected === "bbb") }; }
 function methodToGoverned(method: string): Parameters<typeof setMethodExplanation>[0] { const map: Record<string, Parameters<typeof setMethodExplanation>[0]> = { straight_sets: "exact_straight_sets", back_off_sets: "top_set_backoffs", amrap: "controlled_performance_set", bbb: "boring_but_big" }; return map[method] ?? method as Parameters<typeof setMethodExplanation>[0]; }
-function context(recovery: CanonicalStartingVolumeContext["recovery"], history: CanonicalStartingVolumeContext["history"], workCapacity: CanonicalStartingVolumeContext["workCapacity"] = "not_demonstrated", concurrentSport: CanonicalStartingVolumeContext["concurrentSport"] = "none"): CanonicalStartingVolumeContext { return { recovery, history, workCapacity, concurrentSport }; }
+function context(recovery: CanonicalStartingVolumeContext["recovery"], history: CanonicalStartingVolumeContext["history"], workCapacity: CanonicalStartingVolumeContext["workCapacity"] = "not_demonstrated", concurrentSport: CanonicalStartingVolumeContext["concurrentSport"] = "none", continuity: CanonicalStartingVolumeContext["continuity"] = "currently_training"): CanonicalStartingVolumeContext {
+  return {
+    ...defaultCanonicalStartingVolumeContext(5),
+    recovery,
+    history,
+    workCapacity,
+    concurrentSport,
+    continuity,
+    loadConfidence: history === "established_productive" ? "established" : "calibration_required",
+    dosageConfidence: history === "established_productive" ? "canonical_productive_history" : continuity === "currently_training" ? "declared_recent_training" : "low_after_layoff",
+  };
+}
 function countTypes(roles: readonly string[]) { return { push: roles.filter((role) => role.startsWith("Push")).length, pull: roles.filter((role) => role.startsWith("Pull")).length, legs: roles.filter((role) => role.startsWith("Legs")).length }; }
 function aggregateExerciseStimulus(exercises: readonly Readonly<{ workingSets: number; directMuscles: readonly CanonicalStimulusRegion[]; meaningfulSecondaryMuscles: readonly CanonicalStimulusRegion[] }>[], key: "directMuscles" | "meaningfulSecondaryMuscles") { const output: Record<string, number> = {}; for (const exercise of exercises) for (const region of exercise[key]) output[region] = (output[region] ?? 0) + exercise.workingSets; return output; }
 function complementaryPair(id: string, first: SessionSummary, second: SessionSummary, required: readonly string[]) { const firstExercises = first.exercises.map((exercise) => exercise.exerciseId); const secondExercises = second.exercises.map((exercise) => exercise.exerciseId); const covered = new Set([...Object.keys(first.localFatigue), ...Object.keys(second.localFatigue)]); return { id, firstRole: first.role, secondRole: second.role, stableExercises: firstExercises.filter((exercise) => secondExercises.includes(exercise)), variedExercises: [...new Set([...firstExercises, ...secondExercises])].filter((exercise) => !(firstExercises.includes(exercise) && secondExercises.includes(exercise))), requiredRegions: required, completeCoverage: required.every((region) => covered.has(region)), renamedDuplicate: firstExercises.join("|") === secondExercises.join("|") }; }

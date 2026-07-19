@@ -67,11 +67,12 @@ describe("final canonical adaptive-planning product rules", () => {
     if (result.status !== "constructed") return;
     expect(result.rotation.publicFrameworkPreference).toBe("push_pull_legs");
     expect(result.sessions.map((session) => session.role)).toEqual(["Push hypertrophy A", "Pull hypertrophy B", "Legs hypertrophy C", "Push hypertrophy D", "Pull hypertrophy E"]);
-    expect(result.sessions.every((session) => session.exercises.length >= 6)).toBe(true);
-    expect(result.sessions.every((session) => session.exercises.every((exercise) => exercise.exactReps.length === exercise.workingSets))).toBe(true);
-    // This calendar slice is now the executable result of the muscle-specific
-    // no-history start, not the removed per-slot 95-set heuristic.
-    expect(result.accounting.totalWorkingSets).toBe(66);
+    expect(result.sessions.every((session) => session.exercises.length >= 5)).toBe(true);
+    expect(result.sessions.every((session) => session.exercises.every((exercise) => (exercise.workingSets ?? 0) >= 2))).toBe(true);
+    expect(result.sessions.every((session) => session.exercises.every((exercise) => exercise.exactReps.length === (exercise.workingSets ?? 0)))).toBe(true);
+    // Missing app history leaves loads in calibration; it does not erase the
+    // declared intermediate's current-training dosage baseline.
+    expect(result.accounting.totalWorkingSets).toBe(85);
     expect(result.accounting.totalWorkingSets).toBeGreaterThan(49);
     expect(result.sessions.flatMap((session) => session.exercises).some((exercise) => exercise.loadState === "calibration_required")).toBe(true);
   });
@@ -113,6 +114,10 @@ describe("final canonical adaptive-planning product rules", () => {
     const source = readFileSync(new URL("../app/(protected)/onboarding.tsx", import.meta.url), "utf8");
     expect(source).not.toMatch(/ASC Recommended|Body-Part Split|Bench\/Squat\/Deadlift|asc_recommended|body_part_split|bench_squat_deadlift/);
     expect(source).toContain("trainingExperiences.map");
+    expect(source).toContain('recent_training: "What has your recent training looked like?"');
+    expect(source).toContain("Recent training days");
+    expect(source).toContain("Sport outside the gym");
+    expect(source).toContain("startingVolumeContext");
     expect(readFileSync(new URL("../src/domain/training/training-experience.ts", import.meta.url), "utf8")).toContain('id: "advanced"');
   });
 });

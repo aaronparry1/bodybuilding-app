@@ -26,8 +26,9 @@ import type { TrainingGoalId } from "@/domain/training/training-goals";
 import { AppScreen, HeroPanel, PremiumCard, PrimaryButton, SecondaryButton } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
 import { canonicalSessionDurationOptions, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
+import { type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
 
-type StepKey = "goal" | "commitment" | "event" | "schedule" | "duration" | "split" | "experience" | "recovery" | "review";
+type StepKey = "goal" | "commitment" | "event" | "schedule" | "duration" | "split" | "experience" | "recent_training" | "recovery" | "review";
 
 const goalOptions: Array<{ value: TrainingSetupGoal; label: string; detail: string }> = [
   { value: "build_muscle", label: "Hypertrophy", detail: "Build muscle with productive volume and steady performance." },
@@ -61,6 +62,29 @@ const unitOptions: Array<{ value: UnitSystem; label: string; detail: string }> =
   { value: "lb", label: "Pounds", detail: "Use pounds for workout loads and progression displays." },
 ];
 
+const continuityOptions: Array<{ value: CanonicalStartingVolumeContext["continuity"]; label: string; detail: string }> = [
+  { value: "currently_training", label: "Yes — I’m training consistently", detail: "Use my recent routine as a provisional starting point while ASC learns my completed training." },
+  { value: "short_layoff", label: "I’ve had a short break", detail: "A break of roughly one to six weeks. Keep my experience, but ease the first weeks back." },
+  { value: "extended_layoff", label: "I’ve been away for longer", detail: "More than six weeks without consistent lifting. Use a lower re-entry dose without relabelling my experience." },
+];
+
+const recentWorkloadOptions: Array<{ value: CanonicalStartingVolumeContext["recentSessionWorkload"]; label: string; detail: string }> = [
+  { value: "light", label: "Light", detail: "Usually a few main movements or shorter, lower-volume sessions." },
+  { value: "moderate", label: "Moderate", detail: "A normal full workout with several useful exercises and working sets." },
+  { value: "high", label: "High", detail: "Longer or higher-volume sessions that I have been recovering from consistently." },
+];
+
+const perceivedRecoveryOptions: Array<{ value: CanonicalStartingVolumeContext["recovery"]; label: string; detail: string }> = [
+  { value: "low_acceptable", label: "Recovery is limited", detail: "I often carry fatigue or need extra time to recover." },
+  { value: "ordinary", label: "Recovery is generally good", detail: "I usually feel ready for the next planned session." },
+  { value: "high", label: "I recover very well", detail: "Recent training has been consistent and I reliably tolerate the workload." },
+];
+
+const concurrentSportOptions: Array<{ value: CanonicalStartingVolumeContext["concurrentSport"]; label: string; detail: string }> = [
+  { value: "none", label: "No regular lower-body sport", detail: "Your lifting plan owns the resistance-training recovery budget." },
+  { value: "lower_body_loading", label: "Yes — regular sport or running", detail: "Account for meaningful lower-body loading outside the gym." },
+];
+
 export default function OnboardingScreen() {
   const { settings, updateSettings } = useAppSettings();
   const [stepIndex, setStepIndex] = useState(0);
@@ -74,11 +98,16 @@ export default function OnboardingScreen() {
   const [preferredSplit, setPreferredSplit] = useState<PreferredSplit>("push_pull_legs");
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(settings.experienceLevel);
   const [recoveryCardioPreference, setRecoveryCardioPreference] = useState<RecoveryCardioPreference>(settings.recoveryCardioPreference);
+  const [continuity, setContinuity] = useState<CanonicalStartingVolumeContext["continuity"]>(settings.startingVolumeContext.continuity);
+  const [recentTrainingDaysPerWeek, setRecentTrainingDaysPerWeek] = useState<CanonicalStartingVolumeContext["recentTrainingDaysPerWeek"]>(settings.startingVolumeContext.recentTrainingDaysPerWeek);
+  const [recentSessionWorkload, setRecentSessionWorkload] = useState<CanonicalStartingVolumeContext["recentSessionWorkload"]>(settings.startingVolumeContext.recentSessionWorkload);
+  const [perceivedRecovery, setPerceivedRecovery] = useState<CanonicalStartingVolumeContext["recovery"]>(settings.startingVolumeContext.recovery);
+  const [concurrentSport, setConcurrentSport] = useState<CanonicalStartingVolumeContext["concurrentSport"]>(settings.startingVolumeContext.concurrentSport);
 
   const steps = useMemo(() => {
     const next: StepKey[] = ["goal", "commitment"];
     if (commitmentType === "event_driven") next.push("event");
-    next.push("schedule", "duration", "split", "experience", "recovery", "review");
+    next.push("schedule", "duration", "split", "experience", "recent_training", "recovery", "review");
     return next;
   }, [commitmentType]);
   const step = steps[Math.min(stepIndex, steps.length - 1)] ?? "goal";
@@ -115,6 +144,18 @@ export default function OnboardingScreen() {
 
   const finish = () => {
     const now = new Date().toISOString();
+    const startingVolumeContext: CanonicalStartingVolumeContext = {
+      continuity,
+      recentTrainingDaysPerWeek,
+      recentSessionWorkload,
+      recentSessionDurationMinutes: recentSessionWorkload === "light" ? 45 : recentSessionWorkload === "high" ? 90 : 60,
+      recovery: perceivedRecovery,
+      history: "none",
+      workCapacity: "not_demonstrated",
+      concurrentSport,
+      loadConfidence: "calibration_required",
+      dosageConfidence: continuity === "currently_training" ? "declared_recent_training" : "low_after_layoff",
+    };
     const state = canonicalActivePlanState.create({
       planId: `canonical-plan:${now}`,
       createdAt: now,
@@ -129,6 +170,7 @@ export default function OnboardingScreen() {
       units: unit,
       recoveryCardioPreference,
       availableSessionMinutes,
+      startingVolumeContext,
       exercises: exerciseLibrary,
     });
     if (state.hydration !== "hydrated") return;
@@ -138,6 +180,7 @@ export default function OnboardingScreen() {
       experienceLevel,
       recoveryCardioPreference,
       availableSessionMinutes,
+      startingVolumeContext,
       onboardingCompleted: true,
     });
     router.replace("/(protected)");
@@ -188,6 +231,31 @@ export default function OnboardingScreen() {
           onSelect={setExperienceLevel}
         />
       ) : null}
+      {step === "recent_training" ? (
+        <View style={{ gap: spacing.lg }}>
+          <OptionList<CanonicalStartingVolumeContext["continuity"]> options={continuityOptions} selected={continuity} onSelect={setContinuity} />
+          <PremiumCard>
+            <Text selectable style={{ ...type.label, color: colors.textSubtle }}>Recent training days</Text>
+            <OptionList<CanonicalStartingVolumeContext["recentTrainingDaysPerWeek"]>
+              options={([0, 1, 2, 3, 4, 5, 6, 7] as const).map((days) => ({ value: days, label: `${days} ${days === 1 ? "day" : "days"} per week`, detail: days === 0 ? "No consistent lifting recently." : "Your actual recent average, not your intended schedule." }))}
+              selected={recentTrainingDaysPerWeek}
+              onSelect={setRecentTrainingDaysPerWeek}
+            />
+          </PremiumCard>
+          <PremiumCard>
+            <Text selectable style={{ ...type.label, color: colors.textSubtle }}>Typical recent workout</Text>
+            <OptionList<CanonicalStartingVolumeContext["recentSessionWorkload"]> options={recentWorkloadOptions} selected={recentSessionWorkload} onSelect={setRecentSessionWorkload} />
+          </PremiumCard>
+          <PremiumCard>
+            <Text selectable style={{ ...type.label, color: colors.textSubtle }}>How have you been recovering?</Text>
+            <OptionList<CanonicalStartingVolumeContext["recovery"]> options={perceivedRecoveryOptions} selected={perceivedRecovery} onSelect={setPerceivedRecovery} />
+          </PremiumCard>
+          <PremiumCard>
+            <Text selectable style={{ ...type.label, color: colors.textSubtle }}>Sport outside the gym</Text>
+            <OptionList<CanonicalStartingVolumeContext["concurrentSport"]> options={concurrentSportOptions} selected={concurrentSport} onSelect={setConcurrentSport} />
+          </PremiumCard>
+        </View>
+      ) : null}
       {step === "recovery" ? (
         <OptionList<RecoveryCardioPreference> options={recoveryCardioOptions} selected={recoveryCardioPreference} onSelect={setRecoveryCardioPreference} />
       ) : null}
@@ -199,6 +267,7 @@ export default function OnboardingScreen() {
           availableSessionMinutes={availableSessionMinutes}
           framework={labelFor(splitOptions, preferredSplit)}
           experience={labelForExperience(experienceLevel)}
+          recentTraining={`${labelFor(continuityOptions, continuity)} · ${recentTrainingDaysPerWeek} days/week · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`}
           recoveryCapacity={labelFor(recoveryCardioOptions, recoveryCardioPreference)}
           unit={unit}
           unitLabel={labelFor(unitOptions, unit)}
@@ -263,6 +332,7 @@ function ReviewPanel({
   availableSessionMinutes,
   framework,
   experience,
+  recentTraining,
   recoveryCapacity,
   unit,
   unitLabel,
@@ -274,6 +344,7 @@ function ReviewPanel({
   availableSessionMinutes: CanonicalSessionDurationMinutes;
   framework: string;
   experience: string;
+  recentTraining: string;
   recoveryCapacity: string;
   unit: UnitSystem;
   unitLabel: string;
@@ -295,6 +366,7 @@ function ReviewPanel({
           <SummaryRow label="Workout length" value={`${availableSessionMinutes} minutes`} />
           <SummaryRow label="Framework" value={framework} />
           <SummaryRow label="Experience" value={experience} />
+          <SummaryRow label="Recent training" value={recentTraining} />
           <SummaryRow label="Recovery & Capacity" value={recoveryCapacity} />
           <SummaryRow label="Units" value={unitLabel} />
         </View>
@@ -379,6 +451,7 @@ function titleForStep(step: StepKey): string {
     duration: "How much time do you have for each workout?",
     split: "Preferred split",
     experience: "How would you describe your lifting experience?",
+    recent_training: "What has your recent training looked like?",
     recovery: "Recovery & Cardio",
     review: "Your Programme",
   };
@@ -393,6 +466,7 @@ function subtitleForStep(step: StepKey): string {
   if (step === "experience") {
     return "This helps ASC choose an appropriate starting coaching strategy. It will continue learning from your training over time.";
   }
+  if (step === "recent_training") return "This is separate from experience. It helps ASC choose a realistic first dose while load calibration and completed training build confidence.";
   if (step === "review") return "Confirm your setup before ASC builds your first programme.";
   return "Build the year. Autoregulate the workout.";
 }

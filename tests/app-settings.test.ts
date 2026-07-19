@@ -55,6 +55,24 @@ describe("app settings", () => {
     expect(settings.recoveryCardioPreference).toBe("recommended");
   });
 
+  it("normalizes persisted recent-training facts without conflating experience and history", () => {
+    const settings = normalizeAppSettings({
+      ...defaultAppSettings,
+      experienceLevel: "advanced",
+      startingVolumeContext: {
+        ...defaultAppSettings.startingVolumeContext,
+        continuity: "currently_training",
+        recentTrainingDaysPerWeek: 5,
+        recentSessionWorkload: "high",
+        history: "none",
+        loadConfidence: "calibration_required",
+        dosageConfidence: "declared_recent_training",
+      },
+    });
+    expect(settings.experienceLevel).toBe("advanced");
+    expect(settings.startingVolumeContext).toMatchObject({ continuity: "currently_training", recentTrainingDaysPerWeek: 5, recentSessionWorkload: "high", history: "none", loadConfidence: "calibration_required", dosageConfidence: "declared_recent_training" });
+  });
+
   it("turns user settings into progression defaults", () => {
     const progressionSettings = progressionSettingsFromAppSettings({
       ...defaultAppSettings,
