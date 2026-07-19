@@ -12,6 +12,7 @@ import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-p
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
 import { exerciseLibrary } from "@/domain/training/presets";
+import type { CanonicalLoadEvidence } from "@/domain/training/canonical-load-prescription";
 
 export const CANONICAL_FIVE_DAY_FIXTURE_CREATED_AT = "2026-01-01T00:00:00.000Z";
 export const canonicalFiveDayFixtureProfile = {
@@ -61,7 +62,7 @@ export function applyCanonicalHomeVisualState(
   }
   if (state === "planned" || state === "rest_day") return created.model;
 
-  const active = startFirstPlannedSession(planId, now);
+  const active = startFirstPlannedSession(planId, now, state === "completed" ? 45 : 1);
   const work = recordPrescribedWork(planId, active, state === "completed");
   if (state === "paused") {
     const currentRevision = requireModel(planId, state).revision;
@@ -150,7 +151,7 @@ export function applyCanonicalProgressVisualState(
 
 function applyComparableProgressHistory(planId: string, exposures: number, loadStepKg: number) {
   resetCanonicalHomeVisualState();
-  const created = canonicalActivePlanState.create(canonicalFiveDayFixtureInput(planId));
+  const created = canonicalActivePlanState.create(canonicalProgressFixtureInput(planId));
   if (created.hydration !== "hydrated" || !created.model) throw new Error(`canonical_progress_visual_plan_failed:${created.error ?? created.hydration}`);
   const repositoryPlan = canonicalActivePlanV2Repository.get();
   if (repositoryPlan.status !== "saved") throw new Error("canonical_progress_visual_carrier_unavailable");
@@ -159,9 +160,14 @@ function applyComparableProgressHistory(planId: string, exposures: number, loadS
   const snapshot = planned.prescriptionSnapshot;
   const firstSlot = Array.isArray(snapshot.slots) ? (snapshot.slots as Array<Record<string, unknown>>)[0] : undefined;
   if (!firstSlot) throw new Error("canonical_progress_visual_slot_unavailable");
-  const settings = (firstSlot.settings ?? {}) as Record<string, unknown>;
-  const exactTargets = Array.isArray(firstSlot.exactTargets) ? firstSlot.exactTargets.map(Number) : [];
-  const requiredSets = Number(settings.requiredWorkSets ?? settings.requiredSets ?? 0);
+  const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
+  const prescribed = slots.flatMap((slot) => {
+    const settings = (slot.settings ?? {}) as Record<string, unknown>;
+    const exactTargets = Array.isArray(slot.exactTargets) ? slot.exactTargets.map(Number) : [];
+    const requiredSets = Number(settings.requiredWorkSets ?? settings.requiredSets ?? 0);
+    return Array.from({ length: requiredSets }, (_, setIndex) => ({ slot, setOrder: setIndex + 1, reps: exactTargets[setIndex] ?? Number(slot.targetReps ?? 6) }));
+  });
+  const durationMinutes = Math.max(45, prescribed.length * 3 + slots.length * 4);
   const references = [];
 
   for (let index = 0; index < exposures; index += 1) {
@@ -189,28 +195,33 @@ function applyComparableProgressHistory(planId: string, exposures: number, loadS
     const started = canonicalRecordedSessionLedger.append(recordedSessionId, { eventId: `${recordedSessionId}:started`, aggregateId: recordedSessionId, expectedVersion: 0, type: "started", occurredAt: startedAt, operationId: `${recordedSessionId}:start`, payload: {} });
     if (started.status !== "saved") throw new Error(`canonical_progress_visual_start_failed:${started.status}`);
     let ledgerVersion = started.session!.version;
-    for (let setIndex = 0; setIndex < requiredSets; setIndex += 1) {
+    for (let setIndex = 0; setIndex < prescribed.length; setIndex += 1) {
+      const performed = prescribed[setIndex]!;
+      const slot = performed.slot;
+      const loadPrescription = (slot.loadPrescription ?? {}) as Record<string, unknown>;
+      const isComparisonExercise = String(slot.id) === String(firstSlot.id);
+      const load = loadPrescription.state === "bodyweight" ? 0 : Number(loadPrescription.prescribedBaseLoad ?? 60) + (isComparisonExercise ? index * loadStepKg : 0);
       const work = recordCanonicalPerformedWork({
         planId,
         expectedPlanRevision: repositoryPlan.carrier.revision,
         recordedSessionId,
         expectedLedgerVersion: ledgerVersion,
         operationId: `${recordedSessionId}:work:${setIndex + 1}`,
-        occurredAt: offsetIso(startedAt, (setIndex + 1) * 60_000),
+        occurredAt: offsetIso(startedAt, Math.round(((setIndex + 1) / (prescribed.length + 1)) * durationMinutes * 60_000)),
         provenance: "design_qa_progress_visual",
-        slotId: String(firstSlot.id),
-        exerciseId: String(firstSlot.exerciseId),
-        setId: `${String(firstSlot.id)}:comparison:${index + 1}:${setIndex + 1}`,
-        setOrder: setIndex + 1,
-        reps: exactTargets[setIndex] ?? Number(firstSlot.targetReps ?? 6),
-        load: 60 + index * loadStepKg,
+        slotId: String(slot.id),
+        exerciseId: String(slot.exerciseId),
+        setId: `${String(slot.id)}:comparison:${index + 1}:${performed.setOrder}`,
+        setOrder: performed.setOrder,
+        reps: performed.reps,
+        load,
         unit: "kg",
         completion: "complete",
       });
       if (work.status !== "applied" || work.ledgerVersion === undefined) throw new Error(`canonical_progress_visual_work_failed:${work.reason}`);
       ledgerVersion = work.ledgerVersion;
     }
-    const completedAt = offsetIso(startedAt, 45 * 60_000);
+    const completedAt = offsetIso(startedAt, durationMinutes * 60_000);
     completeActiveSession(planId, recordedSessionId, repositoryPlan.carrier.revision, ledgerVersion, completedAt, `comparison-${index + 1}`);
     const aggregate = canonicalRecordedSessionLedger.get(recordedSessionId);
     if (aggregate.status !== "found" || aggregate.session.status !== "completed") throw new Error("canonical_progress_visual_completion_unavailable");
@@ -230,7 +241,7 @@ function resetCanonicalHomeVisualState(): void {
   canonicalRestTimerRepository.clear();
 }
 
-function startFirstPlannedSession(planId: string, at: string): Readonly<{ recordedSessionId: string; planRevision: number }> {
+function startFirstPlannedSession(planId: string, at: string, elapsedMinutes = 1): Readonly<{ recordedSessionId: string; planRevision: number }> {
   const model = requireModel(planId, "planned");
   const next = model.nextSession;
   const session = next ? model.plannedSessions.find((candidate) => candidate.id === next.id) : null;
@@ -241,7 +252,7 @@ function startFirstPlannedSession(planId: string, at: string): Readonly<{ record
     plannedSessionId: next.id,
     expectedPrescriptionHash: prescriptionHash(session.snapshot),
     operationId: `${planId}:start:${session.planSessionIndex}`,
-    startedAt: offsetIso(at, -60_000),
+    startedAt: offsetIso(at, -elapsedMinutes * 60_000),
     provenance: "design_qa_home_visual",
   });
   if (!started.recordedSessionId || started.planRevision === undefined || !["started", "already_started"].includes(started.status)) {
@@ -318,4 +329,22 @@ function requireModel(planId: string, state: CanonicalHomeVisualState | Canonica
 
 function offsetIso(value: string, milliseconds: number): string {
   return new Date(Date.parse(value) + milliseconds).toISOString();
+}
+
+function canonicalProgressFixtureInput(planId: string) {
+  const athleteId = "design-qa-athlete";
+  const established = exerciseLibrary.filter((exercise) => exercise.kind !== "bodyweight");
+  const establishedLoads = Object.fromEntries(established.map((exercise) => [exercise.id, 60]));
+  const loadEvidence = Object.fromEntries(established.map((exercise): [string, CanonicalLoadEvidence] => [exercise.id, {
+    evidenceId: `${planId}:established-load:${exercise.id}`,
+    evidenceVersion: "canonical_load_evidence_v1",
+    athleteId,
+    exerciseId: exercise.id,
+    observedLoad: 60,
+    observedReps: 6,
+    baseUnit: "kg",
+    freshnessVersion: 1,
+    calibrationStatus: "established",
+  }]));
+  return { ...canonicalFiveDayFixtureInput(planId), establishedLoads, loadEvidence };
 }

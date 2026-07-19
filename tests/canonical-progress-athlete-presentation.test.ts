@@ -4,6 +4,7 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import { projectCanonicalProgressPresentation, readCanonicalProgressPresentation } from "@/application/training/canonical-progress-presentation";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
+import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 
 const now = Date.parse("2026-07-18T12:00:00.000Z");
 
@@ -31,7 +32,9 @@ describe("athlete-facing canonical Progress presentation", () => {
     expect(progress.status).toBe("early");
     expect(progress.overview).toMatchObject({ completedWorkouts: 1 });
     expect(progress.recentTraining).toHaveLength(1);
-    expect(progress.recentTraining[0]!.detail).toContain("11 working sets");
+    expect(progress.recentTraining[0]!.detail).toBe("11 of 11 working sets completed · 45 min");
+    expect(progress.overview).toMatchObject({ completedSummary: "1 workout completed", recentConsistency: "Trained 1 of the last 4 weeks", phaseProgress: "1 session this phase" });
+    expect(progress.overview?.guidance).toBe("Keep training—your first reliable trends will appear after 2 more comparable workouts.");
     expect(progress.trend).toBeUndefined();
     expect(progress.overview?.statusLabel).toBeUndefined();
   });
@@ -43,7 +46,11 @@ describe("athlete-facing canonical Progress presentation", () => {
     expect(progress.overview).toMatchObject({ completedWorkouts: 3, statusLabel: "Training consistently" });
     expect(progress.progressionHighlight).toBeUndefined();
     expect(progress.trend?.observations).toHaveLength(3);
-    expect(progress.trend?.summary).toBe("Bench Press estimated 1RM held at 70 kg across 3 completed workouts.");
+    expect(progress.trend).toMatchObject({ direction: "stable", metric: "e1rm", summary: "Bench Press is holding steady at 70 kg estimated 1RM across 3 completed workouts." });
+    expect(progress.overview).toMatchObject({ completedSummary: "3 workouts completed", recentConsistency: "Trained 3 of the last 4 weeks", phaseProgress: "3 sessions this phase" });
+    expect(progress.overview?.calculationDisclosure).toContain("3 completed workouts and 3 comparable exercise observations");
+    expect(progress.recentTraining.every((session) => session.detail.startsWith("11 of 11 working sets completed · "))).toBe(true);
+    expect(progress.recentTraining.every((session) => session.action.label === "View workout")).toBe(true);
     expect(new Set(progress.recentTraining.map((session) => session.id)).size).toBe(progress.recentTraining.length);
   });
 
@@ -68,6 +75,7 @@ describe("athlete-facing canonical Progress presentation", () => {
     expect(progress.overview?.statusLabel).toBeUndefined();
     expect(progress.trend).toBeUndefined();
     expect(progress.progressionHighlight?.exerciseName).toBe("Bench Press");
+    expect(progress.overview?.guidance).toBe("Keep training—your first reliable trends will appear after another comparable workout.");
   });
 
   it("excludes incompatible loading modes from PR comparison", () => {
@@ -113,6 +121,40 @@ describe("athlete-facing canonical Progress presentation", () => {
     expect(progress.trend).toBeUndefined();
   });
 
+  it("does not calculate estimated 1RM from calibration-only or invalid-effort work", () => {
+    applyCanonicalProgressVisualState("established", { planId: "progress-estimate-guard" });
+    const model = canonicalActivePlanState.getReadModel()!;
+    const records = canonicalRecordedSessionLedger.exportPlan(model.planId);
+    const calibration = records.map((record) => ({
+      ...record,
+      session: { ...record.session, prescriptionSnapshot: replaceLoadState(record.session.prescriptionSnapshot, "calibration_required") },
+    }));
+    const calibrationProjection = projectCanonicalProgressPresentation({ status: "ready", plan: model, completedAggregates: calibration, evidence: canonicalProgressEvidenceRepository.list(model.planId), now });
+    expect(calibrationProjection.trend?.metric).not.toBe("e1rm");
+    const invalidEffort = records.map((record) => ({ ...record, events: record.events.map((event) => event.type === "performance" ? { ...event, payload: { ...event.payload, effort: 99 } } : event) }));
+    const invalidEffortProjection = projectCanonicalProgressPresentation({ status: "ready", plan: model, completedAggregates: invalidEffort, evidence: canonicalProgressEvidenceRepository.list(model.planId), now });
+    expect(invalidEffortProjection.trend?.metric).not.toBe("e1rm");
+    expect(JSON.stringify([calibrationProjection.trend, invalidEffortProjection.trend])).not.toMatch(/Estimated 1RM/i);
+  });
+
+  it("builds completed visual history with every prescribed set and plausible fake-clock duration", () => {
+    applyCanonicalProgressVisualState("established", { planId: "progress-fixture-integrity" });
+    const records = canonicalRecordedSessionLedger.exportPlan("progress-fixture-integrity");
+    expect(records).toHaveLength(3);
+    for (const record of records) {
+      const slots = Array.isArray(record.session.prescriptionSnapshot.slots) ? record.session.prescriptionSnapshot.slots as Array<Record<string, unknown>> : [];
+      const prescribed = slots.reduce((sum, slot) => { const settings = (slot.settings ?? {}) as Record<string, unknown>; return sum + Number(settings.requiredWorkSets ?? settings.requiredSets ?? 0); }, 0);
+      const performed = effectiveCanonicalPerformedWork(record.events);
+      const completedAt = record.events.find((event) => event.type === "completed")?.occurredAt;
+      expect(record.session.status).toBe("completed");
+      expect(prescribed).toBe(11);
+      expect(performed).toHaveLength(prescribed);
+      expect(performed.every((event) => event.payload.completion === "complete")).toBe(true);
+      expect((Date.parse(completedAt!) - Date.parse(record.session.startedAt!)) / 60_000).toBeGreaterThanOrEqual(45);
+      expect(performed.every((event) => Date.parse(event.occurredAt) > Date.parse(record.session.startedAt!) && Date.parse(event.occurredAt) < Date.parse(completedAt!))).toBe(true);
+    }
+  });
+
   it("does not duplicate an achievement after canonical state hydration", () => {
     applyCanonicalProgressVisualState("genuine_pr", { planId: "progress-relaunch" });
     const before = readCanonicalProgressPresentation({ now }).progressionHighlight;
@@ -141,6 +183,11 @@ describe("athlete-facing canonical Progress presentation", () => {
 function replaceLoadingMode(snapshot: Readonly<Record<string, unknown>>, loadingMode: string): Readonly<Record<string, unknown>> {
   const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
   return { ...snapshot, slots: slots.map((slot) => ({ ...slot, loadPrescription: { ...((slot.loadPrescription ?? {}) as Record<string, unknown>), loadingMode } })) };
+}
+
+function replaceLoadState(snapshot: Readonly<Record<string, unknown>>, state: string): Readonly<Record<string, unknown>> {
+  const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
+  return { ...snapshot, slots: slots.map((slot) => ({ ...slot, loadPrescription: { ...((slot.loadPrescription ?? {}) as Record<string, unknown>), state } })) };
 }
 
 function displayText(value: unknown): string {

@@ -23,11 +23,13 @@ export type CanonicalProgressPresentation = Readonly<{
   nextWorkout?: Readonly<{ id: string; title: string; detail: string; action: CanonicalProgressPresentationAction }>;
   overview?: Readonly<{
     completedWorkouts: number;
+    completedSummary: string;
     recentConsistency: string;
     phase: string;
     phaseProgress: string;
     statusLabel?: string;
-    statusExplanation: string;
+    guidance?: string;
+    calculationDisclosure: string;
   }>;
   progressionHighlight?: Readonly<{
     exerciseId: string;
@@ -44,6 +46,7 @@ export type CanonicalProgressPresentation = Readonly<{
     exerciseName: string;
     metric: "reps" | "load" | "e1rm" | "volume";
     unit: string;
+    direction: "stable" | "changing";
     windowLabel: string;
     observations: readonly Readonly<{ sessionId: string; label: string; value: number }>[];
     summary: string;
@@ -143,27 +146,35 @@ export function projectCanonicalProgressPresentation(input: Readonly<{
   const comparableCount = comparableExposureCount(observations);
   const established = completed.length >= PROGRESS_STATUS_MINIMUM_COMPLETED_SESSIONS && comparableCount >= PROGRESS_TREND_MINIMUM_COMPARABLE_OBSERVATIONS && Boolean(trend);
   const status = established ? "established" as const : "early" as const;
-  const currentCycleCompleted = completed.filter((aggregate) => aggregate.session.microcycleId === plan.microcycle.id).length;
+  const currentPhaseCompleted = completed.filter((aggregate) => aggregate.session.mesocycleId === plan.mesocycle.id).length;
   const recentTraining = sorted.slice(0, 5).map((aggregate) => {
     const work = effectiveCanonicalPerformedWork(aggregate.events).filter(validWork);
     const duration = durationMinutes(aggregate);
-    return { id: aggregate.session.recordedSessionId, title: sessionRoleDisplayName(aggregate.session.role), detail: `${work.length} working sets${duration ? ` · ${duration} min` : ""}`, completedAt: completionTime(aggregate), action: { type: "open_history" as const, label: `Open ${sessionRoleDisplayName(aggregate.session.role)}`, sessionId: aggregate.session.recordedSessionId } };
+    const prescribed = prescribedWorkingSets(aggregate.session.prescriptionSnapshot as Record<string, unknown>);
+    const effective = effectiveCanonicalPerformedWork(aggregate.events);
+    const partial = effective.filter((event) => event.payload.completion === "partial").length;
+    const missed = effective.filter((event) => event.payload.completion === "missed").length;
+    const completion = prescribed > 0 ? `${work.length} of ${prescribed} working sets completed` : `${work.length} working sets completed`;
+    const exceptions = [partial ? `${partial} ${plural(partial, "partial set")}` : "", missed ? `${missed} ${plural(missed, "missed set")}` : ""].filter(Boolean).join(" · ");
+    return { id: aggregate.session.recordedSessionId, title: sessionRoleDisplayName(aggregate.session.role), detail: `${completion}${exceptions ? ` · ${exceptions}` : ""}${duration ? ` · ${duration} min` : ""}`, completedAt: completionTime(aggregate), action: { type: "open_history" as const, label: "View workout", sessionId: aggregate.session.recordedSessionId } };
   });
   const statusAllowed = established && !pending && freshness === "current";
   const improving = trend ? trend.observations.at(-1)!.value > trend.observations[0]!.value : false;
   const overview = {
     completedWorkouts: completed.length,
+    completedSummary: `${completed.length} ${plural(completed.length, "workout")} completed`,
     recentConsistency: consistencyLabel(completed, input.now ?? Date.now()),
     phase: mesocyclePurposeDisplayName(plan.mesocycle.definitionId ?? plan.mesocycle.purpose),
-    phaseProgress: `${Math.min(currentCycleCompleted, plan.microcycle.trainingDays)} of ${plan.microcycle.trainingDays} sessions completed this week`,
+    phaseProgress: `${currentPhaseCompleted} ${plural(currentPhaseCompleted, "session")} this phase`,
     ...(statusAllowed ? { statusLabel: improving ? "Building momentum" : "Training consistently" } : {}),
-    statusExplanation: statusAllowed ? "Based on at least three completed workouts and three comparable exercise observations." : "More comparable completed training is needed before a reliable status or trend is shown.",
+    ...(!statusAllowed ? { guidance: progressGuidance({ completed: completed.length, comparable: comparableCount, pending, freshness }) } : {}),
+    calculationDisclosure: calculationDisclosure(completed.length, comparableCount),
   };
   return {
     contractVersion: CANONICAL_PROGRESS_PRESENTATION_VERSION,
     status,
     title: "Progress",
-    subtitle: established ? "See what your recent training supports." : "Your completed work is recorded. Reliable trends appear after more comparable training.",
+    subtitle: established ? "See what your recent training supports." : "See what your completed training supports so far.",
     ...(nextWorkout ? { nextWorkout } : {}),
     overview,
     ...(highlight ? { progressionHighlight: highlight } : {}),
@@ -188,13 +199,17 @@ function exerciseObservations(aggregate: Aggregate): ExerciseObservation[] {
     if (!slot) return [];
     const loadPrescription = object(slot.loadPrescription);
     const loadingMode = String(loadPrescription.loadingMode ?? slot.loadingMode ?? "unavailable");
+    const loadState = String(loadPrescription.state ?? loadingMode);
     const loads = events.map((event) => number(event.payload.load)).filter((value): value is number => value !== null && value >= 0);
     const reps = events.map((event) => number(event.payload.reps)).filter((value): value is number => value !== null && value > 0);
     if (!reps.length || !loads.length) return [];
     const repsByLoad = new Map<number, number>();
     events.forEach((event) => { const load = number(event.payload.load); const rep = number(event.payload.reps); if (load !== null && rep !== null) repsByLoad.set(load, Math.max(repsByLoad.get(load) ?? 0, rep)); });
-    const bestE1rmKg = events.map((event) => e1rm(number(event.payload.load), number(event.payload.reps))).filter((value): value is number => value !== null).sort((a, b) => b - a)[0] ?? null;
-    return [{ sessionId: aggregate.session.recordedSessionId, completedAt: completionTime(aggregate), exerciseId, exerciseName: exerciseDisplayName(exerciseId), loadingMode, unit: "kg" as const, bestLoadKg: Math.max(...loads), bestReps: Math.max(...reps), bestE1rmKg, volumeKg: events.reduce((sum, event) => sum + (number(event.payload.load) ?? 0) * (number(event.payload.reps) ?? 0), 0), repsByLoad }];
+    const estimateEligible = loadState === "established" && !/bodyweight|assisted|autoregulated|calibration|unavailable/i.test(`${loadState}:${loadingMode}`);
+    const bestE1rmKg = estimateEligible
+      ? events.filter(validEstimateEffort).map((event) => e1rm(number(event.payload.load), number(event.payload.reps))).filter((value): value is number => value !== null).sort((a, b) => b - a)[0] ?? null
+      : null;
+    return [{ sessionId: aggregate.session.recordedSessionId, completedAt: completionTime(aggregate), exerciseId, exerciseName: exerciseDisplayName(exerciseId), loadingMode: `${loadingMode}:${loadState}`, unit: "kg" as const, bestLoadKg: Math.max(...loads), bestReps: Math.max(...reps), bestE1rmKg, volumeKg: events.reduce((sum, event) => sum + (number(event.payload.load) ?? 0) * (number(event.payload.reps) ?? 0), 0), repsByLoad }];
   });
 }
 
@@ -240,10 +255,11 @@ function strongestTrend(observations: readonly ExerciseObservation[], displayUni
   const unit = metric === "reps" ? "reps" : displayUnit;
   const points = group.map((item, index) => ({ sessionId: item.sessionId, label: `${index + 1}`, value: metric === "e1rm" ? displayLoadFromBaseKg(item.bestE1rmKg!, displayUnit) : metric === "reps" ? item.bestReps : displayLoadFromBaseKg(item.volumeKg, displayUnit) }));
   const metricLabel = metric === "e1rm" ? "estimated 1RM" : metric === "reps" ? "reps" : "training volume";
-  const summary = points[0]!.value === points.at(-1)!.value
-    ? `${group[0]!.exerciseName} ${metricLabel} held at ${formatNumber(points[0]!.value)} ${unit} across ${points.length} completed workouts.`
+  const direction = points.every((point) => point.value === points[0]!.value) ? "stable" as const : "changing" as const;
+  const summary = direction === "stable"
+    ? `${group[0]!.exerciseName} is holding steady at ${formatNumber(points[0]!.value)} ${unit}${metric === "e1rm" ? " estimated 1RM" : ` ${metricLabel}`} across ${points.length} completed workouts.`
     : `${group[0]!.exerciseName} ${metricLabel} moved from ${formatNumber(points[0]!.value)} to ${formatNumber(points.at(-1)!.value)} ${unit} across ${points.length} completed workouts.`;
-  return { exerciseId: group[0]!.exerciseId, exerciseName: group[0]!.exerciseName, metric, unit, windowLabel: `Last ${points.length} comparable workouts`, observations: points, summary };
+  return { exerciseId: group[0]!.exerciseId, exerciseName: group[0]!.exerciseName, metric, unit, direction, windowLabel: `Last ${points.length} comparable workouts`, observations: points, summary };
 }
 
 function highlightBase(observation: ExerciseObservation, category: "reps" | "load" | "e1rm" | "volume", previous: string, current: string, improvement: string) {
@@ -260,10 +276,25 @@ function comparableExposureCount(observations: readonly ExerciseObservation[]): 
 function validWork(event: CanonicalEffectivePerformedWork): boolean { return event.payload.completion === "complete" && (number(event.payload.reps) ?? 0) > 0; }
 function hasCompletionEvidence(evidence: readonly CanonicalProgressEvidence[], sessionId: string): boolean { return evidence.some((item) => item.sessionId === sessionId && item.kind === "completion"); }
 function evidenceFreshness(aggregates: readonly Aggregate[], now: number): "current" | "stale" { const latest = Math.max(...aggregates.map((aggregate) => Date.parse(completionTime(aggregate)))); return Number.isFinite(latest) && now - latest <= 42 * 86_400_000 ? "current" : "stale"; }
-function consistencyLabel(aggregates: readonly Aggregate[], now: number): string { const recent = aggregates.filter((aggregate) => now - Date.parse(completionTime(aggregate)) <= 28 * 86_400_000).length; return `${recent} completed in the last 4 weeks`; }
+function consistencyLabel(aggregates: readonly Aggregate[], now: number): string {
+  const weeks = new Set(aggregates.flatMap((aggregate) => { const completed = Date.parse(completionTime(aggregate)); const age = now - completed; return Number.isFinite(completed) && age >= 0 && age < 28 * 86_400_000 ? [Math.floor(age / (7 * 86_400_000))] : []; }));
+  return `Trained ${weeks.size} of the last 4 weeks`;
+}
 function completionTime(aggregate: Aggregate): string { return aggregate.events.findLast((event) => event.type === "completed" || event.type === "historical")?.occurredAt ?? aggregate.session.startedAt ?? aggregate.session.createdAt; }
 function durationMinutes(aggregate: Aggregate): number | null { if (!aggregate.session.startedAt) return null; const value = Date.parse(completionTime(aggregate)) - Date.parse(aggregate.session.startedAt); return Number.isFinite(value) && value > 0 ? Math.max(1, Math.round(value / 60_000)) : null; }
 function scheduleDetail(snapshot: Readonly<Record<string, unknown>>): string { const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : []; const sets = slots.reduce((sum, slot) => sum + Number(object(slot.settings).requiredWorkSets ?? object(slot.settings).requiredSets ?? 0), 0); return `${slots.length} exercises · ${sets} working sets`; }
+function prescribedWorkingSets(snapshot: Readonly<Record<string, unknown>>): number { const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : []; return slots.reduce((sum, slot) => sum + Number(object(slot.settings).requiredWorkSets ?? object(slot.settings).requiredSets ?? 0), 0); }
+function progressGuidance(input: Readonly<{ completed: number; comparable: number; pending: boolean; freshness: "current" | "stale" }>): string {
+  if (input.pending) return "Your latest workout is still being checked. Your progress will update when it is ready.";
+  if (input.freshness === "stale") return "Complete another comparable workout to refresh your progress.";
+  const remaining = Math.max(PROGRESS_STATUS_MINIMUM_COMPLETED_SESSIONS - input.completed, PROGRESS_TREND_MINIMUM_COMPARABLE_OBSERVATIONS - input.comparable, 0);
+  return remaining === 1
+    ? "Keep training—your first reliable trends will appear after another comparable workout."
+    : `Keep training—your first reliable trends will appear after ${remaining} more comparable workouts.`;
+}
+function calculationDisclosure(completed: number, comparable: number): string { return `You have ${completed} completed ${plural(completed, "workout")} and ${comparable} comparable ${plural(comparable, "exercise observation")}. Reliable status and trends require at least ${PROGRESS_STATUS_MINIMUM_COMPLETED_SESSIONS} completed workouts and ${PROGRESS_TREND_MINIMUM_COMPARABLE_OBSERVATIONS} observations of the same exercise and loading mode.`; }
+function validEstimateEffort(event: CanonicalEffectivePerformedWork): boolean { const effort = event.payload.effort; return effort === undefined || (typeof effort === "number" && Number.isFinite(effort) && effort >= 0 && effort <= 10); }
+function plural(count: number, singular: string): string { return count === 1 ? singular : `${singular}s`; }
 function e1rm(load: number | null, reps: number | null): number | null { if (load === null || reps === null || load <= 0 || reps <= 0 || reps > 12) return null; return Math.round(load * (1 + Math.min(reps, 10) / 36) * 10) / 10; }
 function formatLoad(baseKg: number, unit: "kg" | "lb"): string { return `${formatNumber(displayLoadFromBaseKg(baseKg, unit))} ${unit}`; }
 function formatNumber(value: number): string { return Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.0$/, ""); }
