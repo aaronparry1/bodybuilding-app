@@ -13,10 +13,10 @@
 - Meaningful secondary stimulus sets (reported separately): triceps 14 · anterior_delts 11 · biceps 18 · rear_delts 9 · upper_back 6 · quadriceps 6 · hip_extension 4
 - Actual movement exposures: horizontal_push 4 · horizontal_pull 4 · isolation 10 · hinge 2 · vertical_pull 2 · squat 2 · hip_thrust 1
 - Lift exposures: bench primary 2, secondary variation 0 · squat primary 1, secondary variation 0 · deadlift primary 2, secondary variation 0
-- Session working sets: 15 / 14 / 14 / 15 / 14 (total 72)
+- Current calendar-slice working sets by session: 15 / 14 / 14 / 15 / 14 (calendar-slice total 72 working sets)
 - Estimated minutes: 49 / 46 / 51 / 49 / 46
-- Fatigue units: 29 / 26 / 28 / 29 / 26 (total 138); overlap flags: more_than_three_primary_sessions
-- Selected-exercise fatigue units: 29 / 26 / 28 / 29 / 26 (total 138)
+- Current calendar-slice fatigue units by session: 29 / 26 / 28 / 29 / 26 (calendar-slice total 138); overlap flags: more_than_three_primary_sessions
+- Current calendar-slice selected-exercise fatigue units by session: 29 / 26 / 28 / 29 / 26 (calendar-slice total 138)
 - Repeated exercises: ex-bench-press ×2 (stable_primary_practice) · ex-deadlift ×2 (stable_primary_practice)
 - Certification checks: exact_working_sets_resolved · session_volume_has_meaningful_work · available_session_duration_respected · slot_targets_resolved · strength_assistance_transfer_explained
 - Certification failures: none

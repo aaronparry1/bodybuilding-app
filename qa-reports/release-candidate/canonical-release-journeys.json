@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "canonical_release_candidate_journeys_v1",
+  "generatedFromHead": "fc9c80cbf774e022ccd9f865503255896d0c7f61",
+  "journeys": [
+    {
+      "id": "A_fresh_install_training_lifecycle",
+      "status": "covered_by_composed_persisted_tests",
+      "testFiles": [
+        "tests/onboarding-final-screen.test.ts",
+        "tests/canonical-physical-journey.test.ts",
+        "tests/canonical-home-projection.test.ts",
+        "tests/canonical-plan-presentation.test.ts",
+        "tests/canonical-progress-athlete-presentation.test.ts"
+      ],
+      "assertions": [
+        "onboarding commits one canonical active plan",
+        "Home and Plan open the same canonical planned-session identity",
+        "every prescribed working set is recorded through the canonical ledger",
+        "completed work can be edited before completion",
+        "rest timer pauses, resumes and clears at completion",
+        "completion retry is idempotent",
+        "completed history contains exactly one recorded session and Progress evidence exists",
+        "the next session is a different canonical identity"
+      ]
+    },
+    {
+      "id": "B_existing_user_reconciliation",
+      "status": "passed",
+      "testFiles": [
+        "tests/canonical-release-reconciliation.test.ts"
+      ],
+      "assertions": [
+        "historical four-day and five-day canonical plans keep their frequency",
+        "pre-target-reps and pre-duration future prescriptions are reconstructed",
+        "completed canonical ledger history remains byte-identical",
+        "only future Session Construction snapshots are regenerated",
+        "repeated launch performs no additional write"
+      ]
+    },
+    {
+      "id": "C_session_duration_change",
+      "status": "safety_deviation_from_requested_application",
+      "testFiles": [
+        "tests/canonical-session-duration-planning.test.ts",
+        "tests/canonical-release-duration-matrix.test.ts"
+      ],
+      "assertions": [
+        "the representative five-day PPL programme rejects 60-to-45 because both settings leave chronic rolling-coverage gaps",
+        "the rejected change performs no write and preserves completed history",
+        "a viable 90-to-75 change reconstructs future snapshots atomically and preserves completed history",
+        "all duration outputs label session, calendar-slice, complete-rotation and normalized-seven-day quantities"
+      ],
+      "customerGuidance": "Choose a longer workout or restart setup with fewer training days when the selected duration cannot preserve required rolling coverage."
+    },
+    {
+      "id": "D_recovery_and_adaptation",
+      "status": "bounded_canonical_behavior_certified",
+      "testFiles": [
+        "tests/canonical-dosage-evolution-certification.test.ts",
+        "tests/canonical-load-intervention-evaluator.test.ts",
+        "tests/canonical-progress-decision-production.test.ts",
+        "tests/canonical-progress-recovery-intervention-application.test.ts"
+      ],
+      "assertions": [
+        "comparable evidence can progress reps inside the immutable prescription envelope",
+        "local fatigue permits only bounded muscle-specific correction",
+        "systemic fatigue creates persisted review-only recovery intervention",
+        "automatic numeric load adjustment remains manual-review-required because no approved numeric policy authority exists",
+        "Progress emits no exact future prescription and performs no uncontrolled plan mutation"
+      ]
+    },
+    {
+      "id": "E_failure_and_retry",
+      "status": "passed",
+      "testFiles": [
+        "tests/canonical-repository-failure-injection.test.ts",
+        "tests/canonical-release-reconciliation.test.ts",
+        "tests/canonical-session-duration-planning.test.ts",
+        "tests/canonical-progress-decision-production.test.ts"
+      ],
+      "assertions": [
+        "write failure leaves the previous valid record committed",
+        "stale revisions fail closed",
+        "incompatible or missing active attempts enter customer-safe recovery",
+        "interrupted reconstruction is retryable without partial mutation",
+        "completed history and immutable attempts remain preserved"
+      ]
+    }
+  ]
+}

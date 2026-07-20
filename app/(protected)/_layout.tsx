@@ -7,6 +7,7 @@ import { useAuth } from "@/application/auth/auth-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { getActiveDesignQaFixture, subscribeDesignQaFixture } from "@/application/design-qa/design-qa-fixtures";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { reconcileCanonicalReleaseState, type CanonicalReleaseReconciliationResult } from "@/application/training/canonical-release-reconciliation";
 import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/runtime/app-environment";
 import { colors, spacing } from "@/ui/theme";
 
@@ -16,12 +17,22 @@ export default function ProtectedLayout() {
   const { settings } = useAppSettings();
   const segments = useSegments();
   const { qaChrome } = useGlobalSearchParams<{ qaChrome?: string }>();
-  const [activeFixture, setActiveFixture] = useState(() => getActiveDesignQaFixture());
+  const designQaRuntimeAvailable = isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested();
+  const [activeFixture, setActiveFixture] = useState(() => designQaRuntimeAvailable ? getActiveDesignQaFixture() : null);
+  const [reconciliation, setReconciliation] = useState<CanonicalReleaseReconciliationResult | null>(null);
   const isOnboardingRoute = segments.includes("onboarding");
-  const showDesignQaChrome = Boolean(activeFixture) && qaChrome === "1" && isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested();
+  const showDesignQaChrome = Boolean(activeFixture) && qaChrome === "1" && designQaRuntimeAvailable;
 
-  useEffect(() => subscribeDesignQaFixture(() => setActiveFixture(getActiveDesignQaFixture())), []);
-  useEffect(() => { canonicalActivePlanState.hydrate(); }, []);
+  useEffect(() => {
+    if (!designQaRuntimeAvailable) { setActiveFixture(null); return; }
+    return subscribeDesignQaFixture(() => setActiveFixture(getActiveDesignQaFixture()));
+  }, [designQaRuntimeAvailable]);
+  useEffect(() => {
+    if (activeFixture) { canonicalActivePlanState.hydrate(); return; }
+    const result = reconcileCanonicalReleaseState({ onboardingCompleted: settings.onboardingCompleted, updatedAt: new Date().toISOString() });
+    setReconciliation(result);
+    if (result.status === "ready" || result.status === "reconstructed") canonicalActivePlanState.hydrate();
+  }, [activeFixture, settings.onboardingCompleted]);
 
   if (isLoading) {
     return (
@@ -32,9 +43,14 @@ export default function ProtectedLayout() {
   }
 
   if (!user && !isOfflineMode) return <Redirect href="/(auth)" />;
+  if (!activeFixture && reconciliation === null) return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.background }}><ActivityIndicator color={colors.accent} /></View>;
   // The protected tabs are never a substitute for onboarding. A stale carrier from an
   // interrupted setup may exist, but it must not make the old plan visible or startable.
   if (!settings.onboardingCompleted && !isOnboardingRoute && !activeFixture) return <Redirect href="/(protected)/onboarding" />;
+  if (settings.onboardingCompleted && !activeFixture && reconciliation?.status === "setup_required" && !isOnboardingRoute) return <Redirect href="/(protected)/onboarding" />;
+  if (settings.onboardingCompleted && !activeFixture && reconciliation && ["recovery_required", "retry_required", "infeasible"].includes(reconciliation.status) && !isOnboardingRoute) {
+    return <View style={{ flex: 1, justifyContent: "center", backgroundColor: colors.background, padding: spacing.xl, gap: spacing.md }}><Text accessibilityRole="header" style={{ color: colors.text, fontSize: 24, fontWeight: "900" }}>Training needs a safe refresh</Text><Text style={{ color: colors.textMuted, fontSize: 16, lineHeight: 23 }}>{reconciliation.customerGuidance ?? "Your recorded history has not been changed. Try again before starting another workout."}</Text></View>;
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>

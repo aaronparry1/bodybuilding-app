@@ -103,6 +103,7 @@ export default function OnboardingScreen() {
   const [recentSessionWorkload, setRecentSessionWorkload] = useState<CanonicalStartingVolumeContext["recentSessionWorkload"]>(settings.startingVolumeContext.recentSessionWorkload);
   const [perceivedRecovery, setPerceivedRecovery] = useState<CanonicalStartingVolumeContext["recovery"]>(settings.startingVolumeContext.recovery);
   const [concurrentSport, setConcurrentSport] = useState<CanonicalStartingVolumeContext["concurrentSport"]>(settings.startingVolumeContext.concurrentSport);
+  const [creationError, setCreationError] = useState<string | null>(null);
 
   const steps = useMemo(() => {
     const next: StepKey[] = ["goal", "commitment"];
@@ -143,6 +144,7 @@ export default function OnboardingScreen() {
   };
 
   const finish = () => {
+    setCreationError(null);
     const now = new Date().toISOString();
     const startingVolumeContext: CanonicalStartingVolumeContext = {
       continuity,
@@ -156,7 +158,7 @@ export default function OnboardingScreen() {
       loadConfidence: "calibration_required",
       dosageConfidence: continuity === "currently_training" ? "declared_recent_training" : "low_after_layoff",
     };
-    const state = canonicalActivePlanState.create({
+    const committed = canonicalActivePlanState.completeOnboarding({
       planId: `canonical-plan:${now}`,
       createdAt: now,
       updatedAt: now,
@@ -173,7 +175,13 @@ export default function OnboardingScreen() {
       startingVolumeContext,
       exercises: exerciseLibrary,
     });
-    if (state.hydration !== "hydrated") return;
+    if (committed.status !== "saved") {
+      const durationFailure = committed.reason.includes("chronic_volume_floor_unmet");
+      setCreationError(durationFailure
+        ? `This ${availableSessionMinutes}-minute, ${daysPerWeek}-day schedule cannot retain the required rolling training coverage. Choose longer workouts or fewer training days.`
+        : "Your programme could not be saved safely. Nothing was changed; review your choices and try again.");
+      return;
+    }
     updateSettings({
       unit,
       trainingGoal: programmeGoalForSetup(setupGoal, experienceLevel),
@@ -259,6 +267,7 @@ export default function OnboardingScreen() {
       {step === "recovery" ? (
         <OptionList<RecoveryCardioPreference> options={recoveryCardioOptions} selected={recoveryCardioPreference} onSelect={setRecoveryCardioPreference} />
       ) : null}
+      {creationError ? <PremiumCard><Text accessibilityRole="alert" style={{ color: colors.danger, ...type.body }}>{creationError}</Text></PremiumCard> : null}
       {step === "review" ? (
         <ReviewPanel
           goal={labelFor(goalOptions, setupGoal)}

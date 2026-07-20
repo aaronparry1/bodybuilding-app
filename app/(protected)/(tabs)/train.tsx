@@ -436,7 +436,7 @@ function TrainShell({ insets, presentation, onClose, children }: Readonly<{ inse
       <Pressable accessibilityRole="button" accessibilityLabel="Close workout" hitSlop={8} onPress={onClose} style={({ pressed }) => [styles.headerControl, pressed && styles.pressed]}><Text style={styles.closeGlyph}>×</Text></Pressable>
       <View style={styles.headerTitleArea}>
         <Text numberOfLines={1} ellipsizeMode="tail" style={styles.headerTitle}>{presentation.title}</Text>
-        <Text style={styles.headerMeta}>{formatElapsed(presentation.elapsedSeconds)} · {presentation.completedSets}/{presentation.totalSets} sets</Text>
+        <Text style={styles.headerMeta}>{formatElapsed(presentation.elapsedSeconds)} · {presentation.completedSets}/{presentation.totalSets} current-session working sets</Text>
       </View>
       <View style={styles.headerPercent}><Text style={styles.headerPercentText}>{presentation.progressPercent}%</Text></View>
     </View>

@@ -68,6 +68,11 @@ export type CanonicalMicrocycleVolumeAllocationInput = Readonly<{
   sessionTypes?: readonly ProgrammeFrameworkSessionType[];
   startingVolumeContext?: CanonicalStartingVolumeContext;
   availableSessionMinutes?: CanonicalSessionDurationMinutes;
+  /** Construction passes this explicitly so callers that predate the
+   * duration choice keep their certified default rather than being treated as
+   * if the athlete selected it. Direct duration audits infer it from the
+   * supplied duration. */
+  enforceCompleteRollingCoverage?: boolean;
 }>;
 export type CanonicalMicrocycleVolumeAllocation = Readonly<{
   schemaVersion: "canonical_microcycle_volume_allocation_v1";
@@ -87,7 +92,21 @@ export type CanonicalMicrocycleVolumeAllocation = Readonly<{
   sessionWorkingSets: readonly number[];
   estimatedSessionMinutes: readonly number[];
   durationEstimates: readonly CanonicalSessionDurationEstimate[];
-  durationConstraint: Readonly<{ minutes: CanonicalSessionDurationMinutes; model: "component_duration_v2"; constrainedSessionIndexes: readonly number[]; omittedStimuli: readonly CanonicalStimulusRegion[]; unmetStartingTargets: readonly CanonicalStimulusRegion[] }>;
+  durationConstraint: Readonly<{
+    minutes: CanonicalSessionDurationMinutes;
+    model: "component_duration_v2";
+    constrainedSessionIndexes: readonly number[];
+    completeRotationConstrainedSessionIndexes: readonly number[];
+    omittedStimuli: readonly CanonicalStimulusRegion[];
+    omittedStimuliBySession: readonly Readonly<{ sessionIndex: number; sessionRole: string; stimuli: readonly CanonicalStimulusRegion[] }>[];
+    completeRotationDirectSets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>;
+    normalizedSevenDayDirectSets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>;
+    unmetStartingTargets: readonly CanonicalStimulusRegion[];
+    durationInducedUnmetTargets: readonly CanonicalStimulusRegion[];
+    recoveryByStimulus: readonly Readonly<{ stimulus: CanonicalStimulusRegion; recoveredInSessionRoles: readonly string[]; normalizedSevenDayDirectSets: number; authorisedFloor: number; status: "recovered_later" | "chronically_below_floor" }>[];
+    feasibility: "viable" | "infeasible";
+    customerGuidance?: string;
+  }>;
   startingDosage: Readonly<{ context: CanonicalStartingVolumeContext; policyTargets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>; rotationNormalisation: "calendar_microcycle" | "six_session_rotation_at_five_sessions_per_week"; rounding: "nearest_whole_set_then_proportional_discrete_allocation" }>;
   fatigue: Readonly<{ perSession: readonly number[]; weeklyUnits: number; overlapFlags: readonly string[] }>;
   certification: Readonly<{ status: "passed" | "failed"; checks: readonly string[]; failures: readonly string[] }>;
@@ -158,6 +177,7 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
     }
     slots = applyCanonicalStartingDosage(input, slots, policyTargets);
   }
+  const unconstrainedCalendarSlots = slots.map((entry) => ({ ...entry }));
 
   const duration = resolveCanonicalSessionDuration(normalizeCanonicalSessionDuration(input.availableSessionMinutes));
   if (duration.status !== "valid") throw new Error("canonical_session_duration_normalisation_failed");
@@ -192,15 +212,33 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
         return [region, { min: isRollingPpl(input) || constrainedSessionIndexes.length > 0 ? Math.min(policyMinimum, directSets[stimulus] ?? policyMinimum) : policyMinimum, max: landmark.target.max }];
       }))
       : Object.fromEntries(Object.entries(directSets).map(([region, sets]) => [region, { min: Math.max(1, Number(sets) - Math.max(1, Math.floor(Number(sets) * 0.2))), max: Number(sets) + Math.max(2, Math.ceil(Number(sets) * 0.35)) }]));
-  const dosageComparison = isRollingPpl(input)
-    ? directSetsForSlots(constrainSlotsToDuration(buildCanonicalRollingPplDosage(input, policyTargets), rollingPplRoles.length, duration.minutes, startingContext.loadConfidence, hypertrophy).slots)
-    : directSets;
+  const rollingConstraint = isRollingPpl(input)
+    ? constrainSlotsToDuration(buildCanonicalRollingPplDosage(input, policyTargets), rollingPplRoles.length, duration.minutes, startingContext.loadConfidence, hypertrophy)
+    : null;
+  const dosageComparison = rollingConstraint ? directSetsForSlots(rollingConstraint.slots) : directSets;
+  const unconstrainedDosageComparison = isRollingPpl(input)
+    ? directSetsForSlots(buildCanonicalRollingPplDosage(input, policyTargets))
+    : directSetsForSlots(unconstrainedCalendarSlots);
   const dosageScale = isRollingPpl(input) ? 5 / 6 : 1;
   const unmetStartingTargets = hypertrophy ? Object.entries(policyTargets).filter(([region, target]) => {
     const actual = Number(dosageComparison[region as CanonicalStimulusRegion] ?? 0) * dosageScale;
     return actual + 0.51 < Number(target);
   }).map(([region]) => region as CanonicalStimulusRegion) : [];
-  const checks = certify(input, profile, slots, directSets, sessionWorkingSets, estimatedSessionMinutes, primaryLiftExposures, duration.minutes, policyTargets, constrainedSessionIndexes.length > 0);
+  const durationInducedUnmetTargets = unmetStartingTargets.filter((region) => Number(unconstrainedDosageComparison[region] ?? 0) * dosageScale + 0.51 >= Number(policyTargets[region] ?? 0));
+  const completeRollingCoverageRequired = isRollingPpl(input)
+    && (input.enforceCompleteRollingCoverage ?? input.availableSessionMinutes !== undefined);
+  const enforcedDurationGaps = completeRollingCoverageRequired ? durationInducedUnmetTargets : [];
+  const normalizedSevenDayDirectSets = Object.fromEntries(Object.entries(dosageComparison).map(([region, sets]) => [region, roundDosage(Number(sets) * dosageScale)])) as Partial<Record<CanonicalStimulusRegion, number>>;
+  const durationOmissionSource = rollingConstraint ?? constrained;
+  const durationRoles = rollingConstraint ? rollingPplRoles : input.sessionRoles;
+  const recoveredStimuli = new Set(durationOmissionSource.omittedStimuliBySession.flatMap((entry) => entry.stimuli));
+  const recoveryByStimulus = [...recoveredStimuli].sort().map((stimulus) => {
+    const recoveredInSessionRoles = [...new Set(durationOmissionSource.slots.filter((slot) => slot.requiredStimuli.includes(stimulus)).map((slot) => durationRoles[slot.sessionIndex] ?? `Session ${slot.sessionIndex + 1}`))];
+    const normalizedSets = Number(normalizedSevenDayDirectSets[stimulus] ?? 0);
+    const floor = Number(policyTargets[stimulus] ?? 0);
+    return { stimulus, recoveredInSessionRoles, normalizedSevenDayDirectSets: normalizedSets, authorisedFloor: floor, status: normalizedSets + 0.51 >= floor ? "recovered_later" as const : "chronically_below_floor" as const };
+  });
+  const checks = certify(input, profile, slots, directSets, sessionWorkingSets, estimatedSessionMinutes, primaryLiftExposures, duration.minutes, policyTargets, constrainedSessionIndexes.length > 0, enforcedDurationGaps);
   return {
     schemaVersion: "canonical_microcycle_volume_allocation_v1",
     policyId: canonicalMicrocycleVolumePolicy.policyId,
@@ -219,7 +257,21 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
     sessionWorkingSets,
     estimatedSessionMinutes,
     durationEstimates,
-    durationConstraint: { minutes: duration.minutes, model: "component_duration_v2", constrainedSessionIndexes, omittedStimuli: constrained.omittedStimuli, unmetStartingTargets },
+    durationConstraint: {
+      minutes: duration.minutes,
+      model: "component_duration_v2",
+      constrainedSessionIndexes,
+      completeRotationConstrainedSessionIndexes: durationOmissionSource.constrainedSessionIndexes,
+      omittedStimuli: durationOmissionSource.omittedStimuli,
+      omittedStimuliBySession: durationOmissionSource.omittedStimuliBySession.map((entry) => ({ ...entry, sessionRole: durationRoles[entry.sessionIndex] ?? `Session ${entry.sessionIndex + 1}` })),
+      completeRotationDirectSets: dosageComparison,
+      normalizedSevenDayDirectSets,
+      unmetStartingTargets,
+      durationInducedUnmetTargets,
+      recoveryByStimulus,
+      feasibility: enforcedDurationGaps.length ? "infeasible" : "viable",
+      ...(enforcedDurationGaps.length ? { customerGuidance: `This ${duration.minutes}-minute, ${input.frequency}-day schedule cannot retain the authorised starting coverage for ${humanList(enforcedDurationGaps)}. Choose longer workouts or a lower training frequency.` } : {}),
+    },
     startingDosage: { context: startingContext, policyTargets, rotationNormalisation: isRollingPpl(input) ? "six_session_rotation_at_five_sessions_per_week" : "calendar_microcycle", rounding: "nearest_whole_set_then_proportional_discrete_allocation" },
     fatigue: { perSession: perSessionFatigue, weeklyUnits: perSessionFatigue.reduce((sum, units) => sum + units, 0), overlapFlags: profile === "powerbuilding_five_day_v1" || input.macrocycleGoal === "build_strength" || input.macrocycleGoal === "build_muscle_and_strength" ? detectCanonicalMicrocycleOverlap(slots) : [] },
     certification: { status: checks.failures.length ? "failed" : "passed", checks: checks.passed, failures: checks.failures },
@@ -314,10 +366,11 @@ function constrainSlotsToDuration(
   availableMinutes: CanonicalSessionDurationMinutes,
   loadConfidence: CanonicalStartingVolumeContext["loadConfidence"],
   hypertrophy: boolean,
-): Readonly<{ slots: AllocatedSlot[]; constrainedSessionIndexes: number[]; omittedStimuli: CanonicalStimulusRegion[] }> {
+): Readonly<{ slots: AllocatedSlot[]; constrainedSessionIndexes: number[]; omittedStimuli: CanonicalStimulusRegion[]; omittedStimuliBySession: Array<{ sessionIndex: number; stimuli: CanonicalStimulusRegion[] }> }> {
   let slots = source.map((entry) => ({ ...entry }));
   const constrainedSessionIndexes: number[] = [];
   const omittedStimuli: CanonicalStimulusRegion[] = [];
+  const omittedBySession = new Map<number, Set<CanonicalStimulusRegion>>();
   for (let sessionIndex = 0; sessionIndex < sessionCount; sessionIndex += 1) {
     const estimated = () => estimateCanonicalSessionDuration(slots.filter((entry) => entry.sessionIndex === sessionIndex), loadConfidence).minutes;
     if (estimated() <= availableMinutes) continue;
@@ -340,11 +393,24 @@ function constrainSlotsToDuration(
           return Number(bCoveredElsewhere) - Number(aCoveredElsewhere) || roleReductionPriority(a.constructionRole) - roleReductionPriority(b.constructionRole) || b.order - a.order;
         })[0];
       if (!removable) break;
-      omittedStimuli.push(...removable.requiredStimuli.filter((region) => (regionCounts.get(region) ?? 0) <= 1));
+      const newlyOmitted = removable.requiredStimuli.filter((region) => (regionCounts.get(region) ?? 0) <= 1);
+      omittedStimuli.push(...newlyOmitted);
+      const localOmissions = omittedBySession.get(sessionIndex) ?? new Set<CanonicalStimulusRegion>();
+      // The release evidence needs every stimulus removed from this session,
+      // even when another retained slot still supplies part of that stimulus.
+      // `omittedStimuli` above deliberately keeps its older meaning: only a
+      // stimulus that disappeared completely from the local session.
+      removable.requiredStimuli.forEach((region) => localOmissions.add(region));
+      omittedBySession.set(sessionIndex, localOmissions);
       slots = slots.filter((candidate) => !(candidate.sessionIndex === removable.sessionIndex && candidate.order === removable.order));
     }
   }
-  return { slots, constrainedSessionIndexes, omittedStimuli: Array.from(new Set(omittedStimuli)).sort() };
+  return {
+    slots,
+    constrainedSessionIndexes,
+    omittedStimuli: Array.from(new Set(omittedStimuli)).sort(),
+    omittedStimuliBySession: [...omittedBySession.entries()].sort(([a], [b]) => a - b).map(([sessionIndex, stimuli]) => ({ sessionIndex, stimuli: [...stimuli].sort() })),
+  };
 }
 function directSetsForSlots(slots: readonly AllocatedSlot[]): Partial<Record<CanonicalStimulusRegion, number>> {
   const direct: Partial<Record<CanonicalStimulusRegion, number>> = {};
@@ -593,7 +659,7 @@ function inferSessionType(role: string): ProgrammeFrameworkSessionType {
   return "full_body";
 }
 
-function certify(input: CanonicalMicrocycleVolumeAllocationInput, profile: CanonicalMicrocycleAllocationProfile, slots: readonly AllocatedSlot[], direct: Partial<Record<CanonicalStimulusRegion, number>>, sessionSets: readonly number[], durations: readonly number[], lifts: CanonicalMicrocycleVolumeAllocation["primaryLiftExposures"], availableMinutes: CanonicalSessionDurationMinutes, policyTargets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>, durationConstrained: boolean): { passed: string[]; failures: string[] } {
+function certify(input: CanonicalMicrocycleVolumeAllocationInput, profile: CanonicalMicrocycleAllocationProfile, slots: readonly AllocatedSlot[], direct: Partial<Record<CanonicalStimulusRegion, number>>, sessionSets: readonly number[], durations: readonly number[], lifts: CanonicalMicrocycleVolumeAllocation["primaryLiftExposures"], availableMinutes: CanonicalSessionDurationMinutes, policyTargets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>, durationConstrained: boolean, unmetStartingTargets: readonly CanonicalStimulusRegion[]): { passed: string[]; failures: string[] } {
   const failures: string[] = [];
   const passed: string[] = [];
   check(slots.length > 0 && slots.every((entry) => Number.isInteger(entry.workingSets) && entry.workingSets >= 1), "exact_working_sets_resolved", "invalid_set_allocation", passed, failures);
@@ -601,6 +667,7 @@ function certify(input: CanonicalMicrocycleVolumeAllocationInput, profile: Canon
   const hypertrophy = input.macrocycleGoal === "build_muscle" || input.macrocycleGoal === "get_leaner";
   const hypertrophyPpl = hypertrophy && ppl;
   if (hypertrophy) check(slots.every((entry) => entry.workingSets >= 2), "no_token_hypertrophy_exercises", "token_hypertrophy_exercise", passed, failures);
+  if (hypertrophy) check(unmetStartingTargets.length === 0, "complete_rotation_meets_normalized_seven_day_starting_floor", `chronic_volume_floor_unmet:${unmetStartingTargets.join("|")}`, passed, failures);
   // The component-duration model is the owned upper bound. Retaining the old
   // unexplained universal 20/28-set ceiling would create a second authority
   // that conflicts with frequency, experience and the selected duration.
@@ -666,3 +733,5 @@ export function detectCanonicalMicrocycleOverlap(slots: readonly AllocatedSlot[]
 function fatigueWeight(role: AllocatedSlot["constructionRole"]): number { return role === "primary" ? 3 : role === "secondary" ? 2 : 1; }
 function isExactFiveDayProfile(roles: readonly string[]): boolean { return roles.length === requiredFiveDayRoles.length && roles.every((role, index) => role === requiredFiveDayRoles[index]); }
 function check(condition: boolean, pass: string, failure: string, passed: string[], failures: string[]): void { (condition ? passed : failures).push(condition ? pass : failure); }
+function roundDosage(value: number): number { return Math.round(value * 100) / 100; }
+function humanList(regions: readonly CanonicalStimulusRegion[]): string { return regions.map((region) => region.replaceAll("_", " ")).join(", "); }

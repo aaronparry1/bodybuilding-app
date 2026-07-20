@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "canonical_persisted_reconciliation_matrix_v1",
+  "reconciliationVersion": "canonical_release_reconciliation_v1",
+  "rules": {
+    "completedCanonicalHistory": "preserved byte-for-byte in the canonical ledger",
+    "futureAuthority": "only current Session Construction v3 future snapshots may become actionable",
+    "activeAttempt": "resumable only when its immutable snapshot, hash, plan and cycle linkage agree",
+    "atomicity": "one carrier CAS; no ledger rewrite",
+    "idempotency": "a repeated successful reconciliation performs no second write"
+  },
+  "cases": [
+    { "id": "no_onboarding", "startingState": "onboarding incomplete with or without a stale carrier", "result": "onboarding_required", "planVisible": false, "historyResult": "unchanged", "futureResult": "not activated" },
+    { "id": "onboarding_complete_no_plan", "startingState": "onboarding complete, canonical carrier missing", "result": "setup_required", "planVisible": false, "historyResult": "unchanged", "futureResult": "none fabricated" },
+    { "id": "old_four_day_plan", "startingState": "validated canonical four-day carrier with historical future construction", "result": "reconstructed", "planVisible": true, "historyResult": "references and ledger unchanged", "futureResult": "current v3 only" },
+    { "id": "old_five_day_plan", "startingState": "validated canonical five-day carrier with historical future construction", "result": "reconstructed", "planVisible": true, "historyResult": "references and ledger unchanged", "futureResult": "current v3 only" },
+    { "id": "pre_target_reps", "startingState": "validated carrier whose future slot lacks targetReps", "result": "reconstructed", "planVisible": true, "historyResult": "unchanged", "futureResult": "targetReps persisted by Session Construction" },
+    { "id": "pre_duration", "startingState": "validated carrier without an explicit duration constraint", "result": "reconstructed", "planVisible": true, "historyResult": "unchanged", "futureResult": "current duration persisted" },
+    { "id": "old_calibration_required", "startingState": "current v3 immutable calibration-required prescription", "result": "ready", "planVisible": true, "historyResult": "unchanged", "futureResult": "calibration remains explicit; never zero" },
+    { "id": "old_active_attempt", "startingState": "compatible started ledger attempt plus historical future construction", "result": "reconstructed", "planVisible": true, "historyResult": "active aggregate byte-identical and resumable", "futureResult": "only future sessions regenerated" },
+    { "id": "paused_attempt", "startingState": "compatible paused ledger attempt plus historical future construction", "result": "reconstructed", "planVisible": true, "historyResult": "paused aggregate byte-identical and resumable", "futureResult": "only future sessions regenerated" },
+    { "id": "corrupt_attempt", "startingState": "missing or mismatched active aggregate", "result": "recovery_required", "planVisible": false, "historyResult": "unchanged for recovery", "futureResult": "not activated" },
+    { "id": "completed_history_no_plan", "startingState": "canonical completed ledger records but no active carrier", "result": "setup_required", "planVisible": false, "historyResult": "ledger retained; no history fabricated or attached to a different plan", "futureResult": "none fabricated" },
+    { "id": "completed_history_stale_future", "startingState": "completed canonical references plus historical future construction", "result": "reconstructed", "planVisible": true, "historyResult": "ledger export byte-identical", "futureResult": "current v3 only" }
+  ]
+}

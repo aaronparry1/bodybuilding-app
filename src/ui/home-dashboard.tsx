@@ -46,7 +46,7 @@ function WorkoutAtAGlance({ primary }: Readonly<{ primary: CanonicalHomePrimary 
     {workout.lifecycle === "active" || workout.lifecycle === "paused" ? <View accessibilityRole="progressbar" accessibilityLabel={`${workout.progressPercent}% of working sets complete`} style={{ height: 4, borderRadius: radius.pill, overflow: "hidden", backgroundColor: colors.backgroundElevated }}><View style={{ width: `${workout.progressPercent}%`, height: "100%", backgroundColor: colors.accent }} /></View> : null}
     <View style={{ flexDirection: "row", gap: spacing.sm }}>
       <Metric label="Exercises" value={String(workout.exerciseCount)} />
-      <Metric label={workout.completedSetCount ? "Sets done" : "Work sets"} value={workout.completedSetCount ? `${workout.completedSetCount}/${workout.workingSetCount}` : String(workout.workingSetCount)} />
+      <Metric label={workout.completedSetCount ? "Working sets completed" : "Current session working sets"} value={workout.completedSetCount ? `${workout.completedSetCount}/${workout.workingSetCount}` : String(workout.workingSetCount)} />
       <Metric label="Estimate" value={workout.estimatedDurationMinutes ? `${workout.estimatedDurationMinutes}m` : "—"} />
     </View>
     {workout.exercisePreview.length ? <Text numberOfLines={2} style={{ color: colors.textMuted, fontSize: 13, lineHeight: 19 }}>{workout.exercisePreview.join(" · ")}{remainingExercises ? ` · +${remainingExercises} more` : ""}</Text> : null}

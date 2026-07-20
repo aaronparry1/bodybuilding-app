@@ -1512,6 +1512,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "checks": [
             "exact_working_sets_resolved",
             "no_token_hypertrophy_exercises",
+            "complete_rotation_meets_normalized_seven_day_starting_floor",
             "session_volume_has_meaningful_work",
             "available_session_duration_respected",
             "slot_targets_resolved",
@@ -3125,6 +3126,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "checks": [
             "exact_working_sets_resolved",
             "no_token_hypertrophy_exercises",
+            "complete_rotation_meets_normalized_seven_day_starting_floor",
             "session_volume_has_meaningful_work",
             "available_session_duration_respected",
             "slot_targets_resolved",

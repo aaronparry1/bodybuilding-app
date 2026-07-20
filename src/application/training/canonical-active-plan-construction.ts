@@ -56,6 +56,7 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
     sessionTypes: microcycle.sessionTypes,
     startingVolumeContext,
     availableSessionMinutes,
+    enforceCompleteRollingCoverage: input.availableSessionMinutes !== undefined,
   });
   if (allocation.certification.status !== "passed") return { status: "carrier_validation_failed", reason: `microcycle_allocation:${allocation.certification.failures.join(",")}` };
   const microcycleId = `${input.planId}:microcycle:${microcycle.sequenceNumber}`;
@@ -84,8 +85,9 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
       return { constructionRole: source.constructionRole, workingSets: slot.settings.requiredSets ?? slot.settings.requiredWorkSets, movementPatterns: source.movementPatterns, method: slot.method, prescribedRestSeconds: slot.rest.seconds, loadConfidence: slot.loadPrescription.state === "established" ? "established" as const : "calibration_required" as const };
     }), startingVolumeContext.loadConfidence);
     if (exactDuration.minutes > availableSessionMinutes) return { status: "carrier_validation_failed", reason: `session_${index}:exact_duration_exceeds_${availableSessionMinutes}_minutes` };
-    for (const slot of constructed.snapshot.slots) weeklyExerciseUsage[slot.exerciseId] = (weeklyExerciseUsage[slot.exerciseId] ?? 0) + 1;
-    sessions.push({ id: identity, microcycleId, planSessionIndex: index, role, kind: "planned", status: "planned", constructionVersion: "canonical_plan_v3", revision: 0, prescriptionSnapshot: constructed.snapshot });
+    const snapshot = { ...constructed.snapshot, estimatedDurationMinutes: exactDuration.minutes };
+    for (const slot of snapshot.slots) weeklyExerciseUsage[slot.exerciseId] = (weeklyExerciseUsage[slot.exerciseId] ?? 0) + 1;
+    sessions.push({ id: identity, microcycleId, planSessionIndex: index, role, kind: "planned", status: "planned", constructionVersion: "canonical_plan_v3", revision: 0, prescriptionSnapshot: snapshot });
   }
   const constructedCertification = certifyCanonicalConstructedMicrocycle({ allocation, sessions: sessions.map((session) => session.prescriptionSnapshot as import("@/domain/training/canonical-session-construction-pipeline").CanonicalSessionSnapshotV3), exercises: input.exercises });
   if (constructedCertification.status !== "passed") return { status: "carrier_validation_failed", reason: `constructed_microcycle:${constructedCertification.failures.join(",")}` };

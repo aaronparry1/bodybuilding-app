@@ -103,9 +103,12 @@ describe("canonical dosage, rotation, method evolution and cardio certification"
     expect(owned("intermediate_established_productive").totalWorkingSets).toBeGreaterThan(owned("intermediate_current_new_app").totalWorkingSets);
     expect(owned("advanced_current_new_app").totalWorkingSets).toBeGreaterThan(owned("intermediate_current_new_app").totalWorkingSets);
     expect(owned("intermediate_concurrent_sport").directSets.quadriceps ?? 0).toBeLessThan(owned("intermediate_current_new_app").directSets.quadriceps ?? 0);
-    expect(owned("intermediate_30_minutes").durationConstrainedSessions.length).toBeGreaterThan(0);
-    expect(owned("intermediate_45_minutes").totalWorkingSets).toBeGreaterThan(owned("intermediate_30_minutes").totalWorkingSets);
-    expect(owned("intermediate_60_minutes").totalWorkingSets).toBeLessThanOrEqual(owned("intermediate_90_minutes").totalWorkingSets);
+    for (const minutes of [30, 45, 60] as const) {
+      const item = byId[`intermediate_${minutes}_minutes`];
+      expect(item).toMatchObject({ status: "fail_closed" });
+      if (item.status === "fail_closed") expect(item.reason).toContain("chronic_volume_floor_unmet");
+    }
+    expect(owned("intermediate_75_minutes").totalWorkingSets).toBe(owned("intermediate_90_minutes").totalWorkingSets);
     expect(owned("intermediate_extended_layoff").equalityExplanation).toContain("extended-layoff re-entry");
     expect(owned("intermediate_poor_recovery").recoveryRestrictionApplied).toBe(true);
     expect(owned("intermediate_90_minutes").equalityExplanation).toContain("does not authorise extra volume");
@@ -135,7 +138,8 @@ describe("canonical dosage, rotation, method evolution and cardio certification"
 
   it("uses typed session duration and passes every adversarial dosage quality gate", () => {
     expect(artifacts["session-duration-decision"]).toMatchObject({ currentProductionInput: true, commitmentMeaning: "days_per_week_only", userSpecificLimitClaimed: true, decision: "implemented_as_typed_canonical_input", supportedMinutes: [30, 45, 60, 75, 90] });
-    expect(artifacts["session-duration-decision"].representativeCases.every((item) => item.status === "constructed" && item.maximumObservedMinutes <= item.availableSessionMinutes)).toBe(true);
+    expect(artifacts["session-duration-decision"].representativeCases.map((item) => item.status)).toEqual(["fail_closed", "fail_closed", "fail_closed", "constructed", "constructed"]);
+    expect(artifacts["session-duration-decision"].representativeCases.every((item) => item.status === "fail_closed" ? item.reason.includes("chronic_volume_floor_unmet") : item.maximumObservedMinutes <= item.availableSessionMinutes)).toBe(true);
     expect(artifacts["dosage-quality-gate-coverage"].allPassed).toBe(true);
     expect(artifacts["dosage-quality-gate-coverage"].gates.every((gate) => gate.status === "passed")).toBe(true);
   });

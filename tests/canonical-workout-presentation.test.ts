@@ -5,6 +5,7 @@ const snapshot = {
   schemaVersion: "canonical_session_snapshot_v3",
   sessionId: "planned:1",
   role: "Bench and hypertrophy",
+  estimatedDurationMinutes: 8,
   slots: [{ id: "slot:bench", index: 0, exerciseId: "ex-bench-press", method: "straight_sets", loadingMode: "established", prescribedLoad: 80, settings: { requiredSets: 3, repRange: { min: 6, max: 8 } }, rest: { seconds: 120 } }],
 };
 
@@ -13,6 +14,7 @@ describe("canonical workout presentation", () => {
     const planned = projectCanonicalWorkoutPresentation({ session: null, snapshot });
     expect(planned.title).toBe("Bench and hypertrophy");
     expect(planned.totalSets).toBe(3);
+    expect(planned.estimatedDurationMinutes).toBe(8);
     expect(planned.exercises[0]?.sets.map((set) => [set.target, set.loadLabel, set.restSeconds, set.state])).toEqual([["6 reps", "80 kg", 120, "current"], ["6 reps", "80 kg", 120, "upcoming"], ["6 reps", "80 kg", 120, "upcoming"]]);
     expect(JSON.stringify(planned)).not.toMatch(/straight_sets|ex-bench|canonical_session/);
   });

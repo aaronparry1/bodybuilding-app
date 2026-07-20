@@ -156,7 +156,10 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
   const totalSets = exercises.reduce((sum, exercise) => sum + exercise.sets.length, 0);
   const completedSets = exercises.reduce((sum, exercise) => sum + exercise.sets.filter((set) => set.state === "completed").length, 0);
   const lifecycle = input.session ? input.session.status === "started" ? "active" : input.session.status === "paused" ? "paused" : input.session.status === "completed" ? "completed" : "unavailable" : "planned";
-  const estimatedDurationMinutes = totalSets ? Math.max(1, Math.round((totalSets * 60 + exercises.reduce((sum, exercise) => sum + exercise.sets.reduce((setSum, set) => setSum + set.restSeconds, 0), 0)) / 60)) : null;
+  const constructedDurationMinutes = numberOrNull(input.snapshot.estimatedDurationMinutes);
+  const estimatedDurationMinutes = constructedDurationMinutes && constructedDurationMinutes > 0
+    ? Math.round(constructedDurationMinutes)
+    : totalSets ? Math.max(1, Math.round((totalSets * 60 + exercises.reduce((sum, exercise) => sum + exercise.sets.reduce((setSum, set) => setSum + set.restSeconds, 0), 0)) / 60)) : null;
   const elapsedSeconds = input.session ? activeElapsedSeconds(input.session, events, input.now ?? Date.now()) : 0;
   return {
     id: input.session?.recordedSessionId ?? String(input.snapshot.sessionId ?? "planned-workout"),

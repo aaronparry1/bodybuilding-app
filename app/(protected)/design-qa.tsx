@@ -1,7 +1,7 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Text, View } from "react-native";
-import { getAppEnvironment, isV2CoachingQaRequested } from "@/application/runtime/app-environment";
+import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested, isV2CoachingQaRequested } from "@/application/runtime/app-environment";
 import {
   applyDesignQaFixture,
   applyCanonicalHomeVisualPreview,
@@ -18,6 +18,11 @@ import { colors, spacing, type } from "@/ui/theme";
 
 export default function DesignQaScreen() {
   const environment = getAppEnvironment();
+  if (!isDesignQaModeAvailable(environment) || !isDesignQaModeRequested()) return <Redirect href="/(protected)/(tabs)" />;
+  return <DesignQaContent environment={environment} />;
+}
+
+function DesignQaContent({ environment }: { environment: ReturnType<typeof getAppEnvironment> }) {
   const { clear, fixture } = useLocalSearchParams<{ clear?: string; fixture?: string }>();
   const [activeFixture, setActiveFixture] = useState(() => getActiveDesignQaFixture());
   const [error, setError] = useState<string | null>(null);

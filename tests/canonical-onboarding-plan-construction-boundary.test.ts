@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 describe("canonical onboarding plan construction boundary", () => {
   it("coordinates canonical creation without legacy construction or persistence", () => {
     const source = readFileSync(resolve(process.cwd(), "app/(protected)/onboarding.tsx"), "utf8");
-    expect(source).toContain("canonicalActivePlanState.create");
+    expect(source).toContain("canonicalActivePlanState.completeOnboarding");
     expect(source).not.toContain("createActiveTrainingPlan");
     expect(source).not.toContain("annual-planner");
     expect(source).not.toContain("activeTrainingPlanRepository");

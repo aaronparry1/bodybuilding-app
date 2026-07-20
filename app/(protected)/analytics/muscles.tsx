@@ -13,7 +13,7 @@ export default function MuscleAnalyticsScreen() {
   return (
     <Screen>
       <ScreenHeader
-        eyebrow="Volume"
+        eyebrow="Completed work"
         title="Muscle Analytics"
         subtitle="Weekly sets versus target ranges. Neglected muscles cannot hide here."
       />
@@ -27,7 +27,7 @@ export default function MuscleAnalyticsScreen() {
             <View style={{ width: `${Math.max(4, Math.min(100, (volume.sets / maxSets) * 100))}%`, height: 8, backgroundColor: colors.success }} />
           </View>
           <Text selectable style={{ ...type.body, color: colors.textMuted }}>
-            {volume.sets} completed sets this week · canonical ledger
+            {volume.sets} completed working sets this week · canonical ledger
           </Text>
         </PremiumCard>
       ))}

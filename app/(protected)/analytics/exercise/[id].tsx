@@ -28,7 +28,7 @@ export default function ExerciseAnalyticsScreen() {
 
       <View style={{ flexDirection: "row", gap: spacing.sm }}>
         <StatTile label="Frequency" value={`${analytics.frequency}`} />
-        <StatTile label="Sets" value={`${analytics.totalSets}`} />
+        <StatTile label="Completed working sets" value={`${analytics.totalSets}`} />
         <StatTile label="Recorded sessions" value={`${analytics.frequency}`} />
       </View>
       <PremiumCard tone="locked">
