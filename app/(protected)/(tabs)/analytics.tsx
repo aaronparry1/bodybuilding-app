@@ -1,19 +1,11 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { usePremiumAccess, PremiumRequiredScreen } from "@/application/billing/premium-access";
-import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/runtime/app-environment";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import type { CanonicalProgressPresentationAction } from "@/application/training/canonical-progress-presentation";
 import { ProgressDashboard } from "@/ui/progress-dashboard";
 import { useCanonicalProgressPresentation } from "@/ui/canonical-training-presentation-hooks";
 import { AppScreen } from "@/ui/primitives";
-
-type ProgressPreview = "recoverable_error" | "storage_error" | "empty";
-
-function qaPreview(value: string | undefined): ProgressPreview | undefined {
-  if (!isDesignQaModeAvailable(getAppEnvironment()) || !isDesignQaModeRequested()) return undefined;
-  return ["recoverable_error", "storage_error", "empty"].includes(value ?? "") ? value as ProgressPreview : undefined;
-}
 
 export default function ProgressScreen() {
   const premium = usePremiumAccess();
@@ -23,8 +15,7 @@ export default function ProgressScreen() {
 
 function CanonicalProgressContent() {
   const { settings } = useAppSettings();
-  const { qaProgressPreview } = useLocalSearchParams<{ qaProgressPreview?: string }>();
-  const projection = useCanonicalProgressPresentation({ displayUnit: settings.unit, previewStatus: qaPreview(qaProgressPreview) });
+  const projection = useCanonicalProgressPresentation({ displayUnit: settings.unit });
   const onAction = (action: CanonicalProgressPresentationAction) => {
     if (action.type === "retry") { canonicalActivePlanState.refresh(); return; }
     if (action.type === "setup_plan") { router.push("/(protected)/onboarding"); return; }

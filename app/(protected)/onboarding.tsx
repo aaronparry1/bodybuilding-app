@@ -23,7 +23,7 @@ import {
 import { trainingExperiences } from "@/domain/training/training-experience";
 import { deriveTrainingFrequency, trainingFrequencyOptions, type TrainingDaysPerWeek } from "@/domain/training/training-frequency";
 import type { TrainingGoalId } from "@/domain/training/training-goals";
-import { AppScreen, HeroPanel, PremiumCard, PrimaryButton, SecondaryButton } from "@/ui/primitives";
+import { AppScreen, HeroPanel, PremiumCard, PrimaryButton, SecondaryButton, stableUiIdentifier } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
 import { canonicalSessionDurationOptions, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
 import { type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
@@ -310,6 +310,10 @@ function OptionList<T extends string | number>({
         return (
           <Pressable
             key={String(option.value)}
+            accessibilityLabel={option.label}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+            testID={stableUiIdentifier("option", option.value)}
             onPress={() => onSelect(option.value)}
             style={{
               borderRadius: radius.lg,

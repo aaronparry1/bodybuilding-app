@@ -303,10 +303,6 @@ export function enqueueLocalDataForAutomaticSync(
   return queue.count();
 }
 
-function isDesignQaFixtureSessionLike(session: WorkoutSession): boolean {
-  return session.userId === "design-qa-fixture" || Boolean(session.notes?.includes("Design QA fixture"));
-}
-
 export async function syncLocalDataForUser(
   userId: string,
   subscription: SubscriptionState = { status: "active", provider: "mock" },

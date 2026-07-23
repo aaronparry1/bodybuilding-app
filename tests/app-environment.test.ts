@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { isDesignQaModeAvailable, isInternalRuntime, normalizeAppEnvironment } from "@/application/runtime/app-environment-core";
+import { isInternalRuntime, normalizeAppEnvironment } from "@/application/runtime/app-environment-core";
 
 describe("app environment", () => {
   it("normalizes known app environments", () => {
@@ -15,9 +15,9 @@ describe("app environment", () => {
   });
 
   it("only allows Design QA Mode outside production", () => {
-    expect(isDesignQaModeAvailable("development")).toBe(true);
-    expect(isDesignQaModeAvailable("staging")).toBe(true);
-    expect(isDesignQaModeAvailable("production")).toBe(false);
+    expect(isInternalRuntime("development")).toBe(true);
+    expect(isInternalRuntime("staging")).toBe(true);
+    expect(isInternalRuntime("production")).toBe(false);
   });
 
   it("treats only non-production builds as internal runtime", () => {

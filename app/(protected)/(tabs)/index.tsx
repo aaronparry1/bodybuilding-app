@@ -1,17 +1,13 @@
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView } from "react-native";
 import { canonicalActivePlanState, type CanonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { projectCanonicalHome, readCanonicalHomeProjection, type CanonicalHomeAction, type CanonicalHomeProjection } from "@/application/training/canonical-home-projection";
 import { useAppSettings } from "@/application/settings/app-settings";
-import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/runtime/app-environment";
 import { HomeDashboard } from "@/ui/home-dashboard";
 import { AppScreen } from "@/ui/primitives";
 
-function readHome(state: CanonicalActivePlanState, displayUnit: "kg" | "lb", qaPreview?: string): CanonicalHomeProjection {
-  const qaPreviewAvailable = isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested();
-  if (qaPreviewAvailable && qaPreview === "storage_error") return projectCanonicalHome({ status: "error", model: null });
-  if (qaPreviewAvailable && qaPreview === "rest_day" && state.model) return projectCanonicalHome({ status: "ready", model: { ...state.model, plannedSessions: [], nextSession: null }, now: 0 });
+function readHome(state: CanonicalActivePlanState, displayUnit: "kg" | "lb"): CanonicalHomeProjection {
   if (state.hydration === "empty") return projectCanonicalHome({ status: "empty", model: null });
   if (state.hydration === "error") return projectCanonicalHome({ status: "error", model: null });
   if (!state.model) return projectCanonicalHome({ status: "hydrating", model: null });
@@ -20,7 +16,6 @@ function readHome(state: CanonicalActivePlanState, displayUnit: "kg" | "lb", qaP
 
 export default function HomeScreen() {
   const { settings } = useAppSettings();
-  const { qaHomePreview } = useLocalSearchParams<{ qaHomePreview?: string }>();
   const scrollRef = useRef<ScrollView>(null);
   const [state, setState] = useState<CanonicalActivePlanState>(canonicalActivePlanState.getState());
   useEffect(() => {
@@ -30,7 +25,7 @@ export default function HomeScreen() {
   useFocusEffect(useCallback(() => {
     requestAnimationFrame(() => scrollRef.current?.scrollTo({ y: 0, animated: false }));
   }, []));
-  const home = readHome(state, settings.unit, qaHomePreview);
+  const home = readHome(state, settings.unit);
 
   const onAction = (action: CanonicalHomeAction) => {
     if (action.type === "retry_storage") { canonicalActivePlanState.refresh(); return; }

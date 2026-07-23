@@ -5,10 +5,6 @@ export function normalizeAppEnvironment(value?: string | null): AppEnvironment {
   return "development";
 }
 
-export function isDesignQaModeAvailable(environment: AppEnvironment) {
-  return environment !== "production";
-}
-
 export function isInternalRuntime(environment: AppEnvironment) {
   return environment !== "production";
 }

@@ -9,5 +9,5 @@
     },
     "types": ["vitest/globals"]
   },
-  "include": ["app", "src", "tests", "*.ts", "*.tsx"]
+  "include": ["app", "app-production", "src", "tests", "*.ts", "*.tsx"]
 }

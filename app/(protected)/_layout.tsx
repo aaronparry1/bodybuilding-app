@@ -8,7 +8,8 @@ import { useAppSettings } from "@/application/settings/app-settings";
 import { getActiveDesignQaFixture, subscribeDesignQaFixture } from "@/application/design-qa/design-qa-fixtures";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { reconcileCanonicalReleaseState, type CanonicalReleaseReconciliationResult } from "@/application/training/canonical-release-reconciliation";
-import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/runtime/app-environment";
+import { getAppEnvironment } from "@/application/runtime/app-environment";
+import { isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/design-qa/design-qa-runtime";
 import { colors, spacing } from "@/ui/theme";
 
 export default function ProtectedLayout() {

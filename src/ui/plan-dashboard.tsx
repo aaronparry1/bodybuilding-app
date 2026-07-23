@@ -1,7 +1,7 @@
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
 import { Pressable, Text, View } from "react-native";
 import type { CanonicalPlanPresentation, CanonicalPlanPresentationAction, CanonicalPlanSessionPresentation, CanonicalPlanSessionStatus } from "@/application/training/canonical-plan-presentation";
-import { DetailToggle, EmptyActionState, Pill, PrimaryButton } from "@/ui/primitives";
+import { DetailToggle, EmptyActionState, Pill, PrimaryButton, stableUiIdentifier } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
 
 export function PlanDashboard({ projection, selectedSessionId, onSelectSession, onAction, guideAction }: Readonly<{
@@ -16,8 +16,8 @@ export function PlanDashboard({ projection, selectedSessionId, onSelectSession, 
   return <>
     <View style={{ flexDirection: "row", alignItems: "flex-start", gap: spacing.md }}>
       <View style={{ flex: 1, gap: spacing.xs }}>
-        <Text selectable style={{ ...type.title, color: colors.text }}>Plan</Text>
-        <Text selectable style={{ ...type.body, color: colors.textMuted }}>{projection.subtitle}</Text>
+        <Text selectable maxFontSizeMultiplier={2} style={{ ...type.title, color: colors.text }}>Plan</Text>
+        <Text selectable maxFontSizeMultiplier={2} style={{ ...type.body, color: colors.textMuted }}>{projection.subtitle}</Text>
       </View>
       {guideAction}
     </View>
@@ -37,13 +37,13 @@ function ProgrammeContext({ projection }: Readonly<{ projection: CanonicalPlanPr
   const programme = projection.programme!;
   return <View style={{ padding: spacing.lg, gap: spacing.md, borderRadius: radius.lg, backgroundColor: colors.surfaceMuted, borderWidth: 1, borderColor: colors.lineSoft }}>
     <View style={{ gap: spacing.xs }}>
-      <Text style={{ ...type.label, color: colors.accent, textTransform: "uppercase", letterSpacing: 0.7 }}>{programme.focus}</Text>
-      <Text selectable style={{ ...type.display, color: colors.text }}>{programme.phase}</Text>
-      <Text selectable style={{ ...type.body, color: colors.textMuted }}>{programme.phasePurpose}</Text>
+      <Text maxFontSizeMultiplier={2} style={{ ...type.label, color: colors.accent, textTransform: "uppercase", letterSpacing: 0.7 }}>{programme.focus}</Text>
+      <Text selectable maxFontSizeMultiplier={2} style={{ ...type.display, color: colors.text }}>{programme.phase}</Text>
+      <Text selectable maxFontSizeMultiplier={2} style={{ ...type.body, color: colors.textMuted }}>{programme.phasePurpose}</Text>
     </View>
     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: spacing.md }}>
       <Pill label={programme.week} tone="accent" />
-      <Text selectable style={{ color: colors.textMuted, fontSize: 13, fontWeight: "700", textAlign: "right", flex: 1 }}>{programme.progressLabel}</Text>
+      <Text selectable maxFontSizeMultiplier={2} style={{ color: colors.textMuted, fontSize: 13, fontWeight: "700", textAlign: "right", flex: 1 }}>{programme.progressLabel}</Text>
     </View>
     <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: programme.progressPercent }} style={{ height: 4, borderRadius: radius.pill, backgroundColor: colors.lineSoft, overflow: "hidden" }}>
       <View style={{ height: "100%", width: `${programme.progressPercent}%`, borderRadius: radius.pill, backgroundColor: colors.accent }} />
@@ -53,19 +53,19 @@ function ProgrammeContext({ projection }: Readonly<{ projection: CanonicalPlanPr
 
 function SessionRow({ session, selected, onPress }: Readonly<{ session: CanonicalPlanSessionPresentation; selected: boolean; onPress(): void }>) {
   const tone = session.status === "completed" ? colors.success : session.status === "active" || session.status === "paused" || session.status === "next" ? colors.accent : colors.textSubtle;
-  return <Pressable accessibilityRole="button" accessibilityLabel={`${session.dayLabel}, ${session.name}, ${session.statusLabel}. Open workout preview.`} accessibilityState={{ expanded: selected }} onPress={onPress} style={({ pressed }) => ({ padding: spacing.md, gap: spacing.sm, borderRadius: radius.lg, borderWidth: 1, borderColor: selected ? tone : colors.lineSoft, backgroundColor: pressed || selected ? colors.surfaceSoft : colors.surfaceMuted, opacity: pressed ? 0.86 : 1 })}>
+  return <Pressable testID={stableUiIdentifier("action", `plan-session-${session.programmePosition}`)} accessibilityRole="button" accessibilityLabel={`${session.dayLabel}, ${session.name}, ${session.statusLabel}. Open workout preview.`} accessibilityState={{ expanded: selected }} onPress={onPress} style={({ pressed }) => ({ padding: spacing.md, gap: spacing.sm, borderRadius: radius.lg, borderWidth: 1, borderColor: selected ? tone : colors.lineSoft, backgroundColor: pressed || selected ? colors.surfaceSoft : colors.surfaceMuted, opacity: pressed ? 0.86 : 1 })}>
     <View style={{ flexDirection: "row", alignItems: "flex-start", gap: spacing.md }}>
       <View style={{ width: 28, height: 28, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: session.status === "completed" ? colors.successSoft : session.status === "upcoming" ? colors.backgroundElevated : colors.accentSoft }}><StatusIcon status={session.status} color={tone} /></View>
       <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.sm }}>
-          <Text selectable style={{ color: colors.textSubtle, fontSize: 11, fontWeight: "800", textTransform: "uppercase" }}>{session.dayLabel}</Text>
-          <Text selectable style={{ color: tone, fontSize: 11, fontWeight: "900" }}>{session.statusLabel}</Text>
+          <Text selectable maxFontSizeMultiplier={2} style={{ color: colors.textSubtle, fontSize: 11, fontWeight: "800", textTransform: "uppercase" }}>{session.dayLabel}</Text>
+          <Text selectable maxFontSizeMultiplier={2} style={{ color: tone, fontSize: 11, fontWeight: "900" }}>{session.statusLabel}</Text>
         </View>
-        <Text selectable style={{ color: colors.text, fontSize: 17, lineHeight: 22, fontWeight: "900" }}>{session.name}</Text>
-        <Text selectable style={{ color: colors.textMuted, fontSize: 13, lineHeight: 18 }}>{session.purpose}</Text>
+        <Text selectable maxFontSizeMultiplier={2} style={{ color: colors.text, fontSize: 17, lineHeight: 22, fontWeight: "900" }}>{session.name}</Text>
+        <Text selectable maxFontSizeMultiplier={2} style={{ color: colors.textMuted, fontSize: 13, lineHeight: 18 }}>{session.purpose}</Text>
       </View>
     </View>
-    <Text selectable style={{ color: colors.textSubtle, fontSize: 12, lineHeight: 17 }}>{session.emphasis}</Text>
+    <Text selectable maxFontSizeMultiplier={2} style={{ color: colors.textSubtle, fontSize: 12, lineHeight: 17 }}>{session.emphasis}</Text>
     <View style={{ flexDirection: "row", gap: spacing.md }}>
       <SessionMeta value={`${session.exerciseCount}`} label="exercises" />
       <SessionMeta value={`${session.workingSetCount}`} label="work sets" />
@@ -77,7 +77,7 @@ function SessionRow({ session, selected, onPress }: Readonly<{ session: Canonica
 function SessionPreview({ session, onClose }: Readonly<{ session: CanonicalPlanSessionPresentation; onClose(): void }>) {
   return <View style={{ gap: spacing.lg, paddingTop: spacing.xl, borderTopWidth: 1, borderTopColor: colors.lineSoft }}>
     <View style={{ flexDirection: "row", alignItems: "flex-start", gap: spacing.md }}>
-      <View style={{ flex: 1, gap: spacing.xs }}><Text style={{ ...type.label, color: colors.accent, textTransform: "uppercase" }}>Workout preview</Text><Text selectable style={{ ...type.section, color: colors.text }}>{session.preview.title}</Text><Text selectable style={{ ...type.body, color: colors.textMuted }}>{session.preview.purpose}</Text></View>
+      <View style={{ flex: 1, gap: spacing.xs }}><Text testID="plan-workout-preview" style={{ ...type.label, color: colors.accent, textTransform: "uppercase" }}>Workout preview</Text><Text selectable style={{ ...type.section, color: colors.text }}>{session.preview.title}</Text><Text selectable style={{ ...type.body, color: colors.textMuted }}>{session.preview.purpose}</Text></View>
       <Pressable accessibilityRole="button" accessibilityLabel="Close workout preview" onPress={onClose} style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center", borderRadius: radius.pill, borderWidth: 1, borderColor: colors.line }}><SymbolView name={{ ios: "xmark", android: "close", web: "close" }} size={17} tintColor={colors.text} /></Pressable>
     </View>
     {session.preview.exercises.map((exercise) => <View key={exercise.id} style={{ gap: spacing.sm, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.lineSoft }}>
@@ -112,5 +112,5 @@ function StatusIcon({ status, color }: Readonly<{ status: CanonicalPlanSessionSt
   return <SymbolView name={names[status]} size={18} tintColor={color} weight="semibold" />;
 }
 
-function SessionMeta({ value, label }: Readonly<{ value: string; label: string }>) { return <View style={{ flex: 1, gap: 1 }}><Text style={{ color: colors.text, fontSize: 14, fontWeight: "900" }}>{value}</Text><Text style={{ color: colors.textSubtle, fontSize: 10, fontWeight: "700", textTransform: "uppercase" }}>{label}</Text></View>; }
-function SectionHeading({ title, detail }: Readonly<{ title: string; detail: string }>) { return <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", gap: spacing.md }}><Text style={{ ...type.section, color: colors.text }}>{title}</Text><Text style={{ color: colors.textSubtle, fontSize: 11, textAlign: "right" }}>{detail}</Text></View>; }
+function SessionMeta({ value, label }: Readonly<{ value: string; label: string }>) { return <View style={{ flex: 1, gap: 1 }}><Text maxFontSizeMultiplier={2} style={{ color: colors.text, fontSize: 14, fontWeight: "900" }}>{value}</Text><Text maxFontSizeMultiplier={2} style={{ color: colors.textSubtle, fontSize: 10, fontWeight: "700", textTransform: "uppercase" }}>{label}</Text></View>; }
+function SectionHeading({ title, detail }: Readonly<{ title: string; detail: string }>) { return <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", gap: spacing.md }}><Text maxFontSizeMultiplier={2} style={{ ...type.section, color: colors.text }}>{title}</Text><Text maxFontSizeMultiplier={2} style={{ color: colors.textSubtle, fontSize: 11, textAlign: "right" }}>{detail}</Text></View>; }

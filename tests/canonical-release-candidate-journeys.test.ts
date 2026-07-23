@@ -7,7 +7,7 @@ describe("canonical release candidate journey evidence", () => {
       schemaVersion: string;
       journeys: Array<{ id: string; status: string; testFiles: string[]; assertions: string[] }>;
     };
-    expect(artifact.schemaVersion).toBe("canonical_release_candidate_journeys_v1");
+    expect(artifact.schemaVersion).toBe("canonical_release_candidate_journeys_v2");
     expect(artifact.journeys.map((journey) => journey.id)).toEqual([
       "A_fresh_install_training_lifecycle",
       "B_existing_user_reconciliation",
@@ -17,7 +17,8 @@ describe("canonical release candidate journey evidence", () => {
     ]);
     expect(new Set(artifact.journeys.map((journey) => journey.id)).size).toBe(5);
     expect(artifact.journeys.every((journey) => journey.testFiles.length > 0 && journey.assertions.length > 0)).toBe(true);
-    expect(artifact.journeys.find((journey) => journey.id === "C_session_duration_change")).toMatchObject({ status: "safety_deviation_from_requested_application" });
+    expect(artifact.journeys.find((journey) => journey.id === "A_fresh_install_training_lifecycle")).toMatchObject({ status: "passed_on_native_modern_and_narrow" });
+    expect(artifact.journeys.find((journey) => journey.id === "C_session_duration_change")).toMatchObject({ status: "passed_with_supported_and_fail_closed_branches" });
     expect(artifact.journeys.find((journey) => journey.id === "D_recovery_and_adaptation")?.assertions).toContain("automatic numeric load adjustment remains manual-review-required because no approved numeric policy authority exists");
   });
 });

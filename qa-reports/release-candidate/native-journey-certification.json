@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "canonical_native_release_candidate_journey_v1",
+  "modern": {
+    "device": "iPhone 17 Pro",
+    "deviceId": "06EEA722-8702-40AC-81FC-53E92D205303",
+    "runtime": "iOS 26.5 (23F77)",
+    "dynamicType": "standard",
+    "resultBundle": "/tmp/ASC-RC-modern-final3.xcresult",
+    "test": "ReleaseCandidateJourneyUITests/testFreshInstallSixtyMinuteJourneyAndRecovery()",
+    "status": "passed",
+    "durationSeconds": 192.392,
+    "screenshots": 15
+  },
+  "narrowAccessibility": {
+    "device": "iPhone SE (3rd generation)",
+    "deviceId": "82648A77-F13E-47DE-9D7B-349B6FA2062F",
+    "runtime": "iOS 26.5 (23F77)",
+    "dynamicType": "accessibility-extra-extra-extra-large",
+    "resultBundle": "/tmp/ASC-RC-narrow-final11.xcresult",
+    "test": "ReleaseCandidateJourneyUITests/testFreshInstallSixtyMinuteJourneyAndRecovery()",
+    "status": "passed",
+    "durationSeconds": 425.712,
+    "screenshots": 15
+  },
+  "persistenceRecovery": [
+    {
+      "id": "stale_future",
+      "resultBundle": "/tmp/asc-ios-persistence-results/stale_future.xcresult",
+      "status": "passed"
+    },
+    {
+      "id": "stale_future_idempotent",
+      "resultBundle": "/tmp/asc-ios-persistence-results/stale_future_idempotent.xcresult",
+      "status": "passed"
+    },
+    {
+      "id": "corrupt_plan",
+      "resultBundle": "/tmp/asc-ios-persistence-results/corrupt_plan.xcresult",
+      "status": "passed"
+    },
+    {
+      "id": "incompatible_attempt",
+      "resultBundle": "/tmp/asc-ios-persistence-results/incompatible_attempt.xcresult",
+      "status": "passed"
+    }
+  ],
+  "automation": {
+    "owner": "repository-owned XCUITest target",
+    "manualClicks": 0,
+    "productionFixtureBackdoor": false,
+    "persistenceFixtureOwner": "UI-test bundle",
+    "productionPayloadContainsTestBundle": false
+  }
+}

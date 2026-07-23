@@ -126,7 +126,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     {
       "id": "short-session-30",
       "experience": "intermediate",
-      "totalWorkingSets": 18
+      "totalWorkingSets": 21
     }
   ]
 }

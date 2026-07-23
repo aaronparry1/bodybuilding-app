@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "canonical_native_performance_smoke_v1",
+  "scope": "basic automated release-candidate interaction smoke; not comprehensive profiling",
+  "evidence": {
+    "modernJourneyResult": "/tmp/ASC-RC-modern-final3.xcresult",
+    "narrowJourneyResult": "/tmp/ASC-RC-narrow-final11.xcresult",
+    "modernJourneyDurationSeconds": 192.392,
+    "narrowJourneyDurationSeconds": 425.712,
+    "modernTimeoutFailures": 0,
+    "narrowTimeoutFailures": 0,
+    "nativeExceptions": 0,
+    "uncaughtApplicationErrors": 0
+  },
+  "actionsObserved": [
+    "cold launch and onboarding",
+    "Home and Plan navigation",
+    "workout preview and opening Train",
+    "completing and editing a set",
+    "starting, pausing, resuming, extending and skipping the rest timer",
+    "pausing, leaving and resuming Train",
+    "discard confirmation and safe restart",
+    "workout completion and Progress projection",
+    "termination and persistence restore",
+    "Settings duration reconstruction"
+  ],
+  "obviousRegressionGate": {
+    "visibleStallsCausingAutomationTimeout": false,
+    "repeatedWholeStoreSerializationDemonstrated": false,
+    "uncontrolledLedgerRescanDemonstrated": false,
+    "excessiveRerenderDemonstrated": false,
+    "monotonicMemoryGrowthDemonstrated": false,
+    "status": "passed"
+  },
+  "limitations": [
+    "XCUITest activity duration includes deliberate waits, typing delays and screenshots, so total test time is not an interaction latency benchmark.",
+    "No Instruments allocation trace or React commit profile was captured in this release gate.",
+    "This evidence rejects obvious native interaction regressions only; it does not certify long-lived-account performance or absence of memory leaks."
+  ]
+}

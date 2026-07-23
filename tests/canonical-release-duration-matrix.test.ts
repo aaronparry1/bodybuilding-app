@@ -16,7 +16,7 @@ function matrix() {
   const microcycle = createMicrocycle({ parentMesocycleId: mesocycle.id, trainingDays: 5, split: "push_pull_legs" });
   return canonicalSessionDurationOptions.map((minutes) => {
     const allocation = allocateCanonicalMicrocycleVolume({ macrocycleGoal: "build_muscle", mesocycleId: mesocycle.id, mesocyclePurpose: mesocycle.adaptation, microcyclePriority: microcycle.priority, microcycleSequence: microcycle.sequenceNumber, experience: "intermediate", frequency: 5, split: "push_pull_legs", equipment, recoveryRestricted: false, establishedLoadExerciseIds: [], sessionRoles: microcycle.sessionRoles, sessionTypes: microcycle.sessionTypes, startingVolumeContext, availableSessionMinutes: minutes });
-    return { minutes, calendarSliceWorkingSets: allocation.totalWorkingSets, sessions: allocation.sessionWorkingSets.map((workingSets, index) => ({ role: microcycle.sessionRoles[index], workingSets, estimatedMinutes: allocation.estimatedSessionMinutes[index] })), durationConstraint: allocation.durationConstraint, certification: allocation.certification };
+    return { minutes, calendarSliceWorkingSets: allocation.totalWorkingSets, slots: allocation.slots, sessions: allocation.sessionWorkingSets.map((workingSets, index) => ({ role: microcycle.sessionRoles[index], workingSets, estimatedMinutes: allocation.estimatedSessionMinutes[index] })), durationConstraint: allocation.durationConstraint, certification: allocation.certification };
   });
 }
 
@@ -46,6 +46,7 @@ function releaseArtifact() {
       completeRotationDirectSets: entry.durationConstraint.completeRotationDirectSets,
       normalizedSevenDayDirectSets: entry.durationConstraint.normalizedSevenDayDirectSets,
       omittedStimuliByCompleteRotationSession: entry.durationConstraint.omittedStimuliBySession,
+      redistributions: entry.durationConstraint.redistributions,
       recoveredLater: entry.durationConstraint.recoveryByStimulus,
       durationInducedUnmetTargets: entry.durationConstraint.durationInducedUnmetTargets,
       customerGuidance: entry.durationConstraint.customerGuidance ?? null,
@@ -71,6 +72,22 @@ describe("release duration rolling-coverage matrix", () => {
       expect(entry.durationConstraint.normalizedSevenDayDirectSets).toBeDefined();
       expect(entry.certification.status).toBe(entry.durationConstraint.durationInducedUnmetTargets.length ? "failed" : "passed");
     }
+    const sixtyMinutes = output.find((entry) => entry.minutes === 60)!;
+    expect(sixtyMinutes.durationConstraint.feasibility).toBe("viable");
+    expect(sixtyMinutes.durationConstraint.durationInducedUnmetTargets).toEqual([]);
+    expect(sixtyMinutes.durationConstraint.redistributions.map((entry) => entry.stimulus).sort()).toEqual([
+      "calves",
+      "hamstrings_knee_flexion",
+    ]);
+    expect(sixtyMinutes.durationConstraint.redistributions.every((entry) => entry.recoveredWorkingSets >= 1)).toBe(true);
+    expect(sixtyMinutes.slots.every((slot) => slot.workingSets >= 2)).toBe(true);
+    const ninetyMinutes = output.find((entry) => entry.minutes === 90)!;
+    const primarySignature = (entry: typeof sixtyMinutes) => entry.slots
+      .filter((slot) => slot.constructionRole === "primary")
+      .map((slot) => ({ sessionIndex: slot.sessionIndex, purpose: slot.purpose, workingSets: slot.workingSets }));
+    expect(primarySignature(sixtyMinutes)).toEqual(primarySignature(ninetyMinutes));
+    expect(output.filter((entry) => entry.minutes >= 60).every((entry) => entry.durationConstraint.feasibility === "viable")).toBe(true);
+    expect(output.filter((entry) => entry.minutes < 60).every((entry) => entry.durationConstraint.feasibility === "infeasible" && Boolean(entry.durationConstraint.customerGuidance))).toBe(true);
     expect(artifact).toEqual(generated);
   });
 });

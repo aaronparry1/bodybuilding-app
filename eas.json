@@ -5,7 +5,6 @@
   },
   "build": {
     "development": {
-      "developmentClient": true,
       "distribution": "internal",
       "channel": "development",
       "autoIncrement": true,
@@ -27,7 +26,6 @@
       }
     },
     "profiling-development": {
-      "developmentClient": true,
       "distribution": "internal",
       "channel": "profiling-development",
       "env": {
@@ -92,7 +90,9 @@
         "EXPO_PUBLIC_ASC_V3_SHADOW_MODE": "false"
       },
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "m-medium",
+        "scheme": "AdaptiveStrengthCoach",
+        "buildConfiguration": "Release"
       },
       "android": {
         "buildType": "app-bundle"

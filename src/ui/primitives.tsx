@@ -1,6 +1,6 @@
 import { useState, type ReactNode, type RefObject } from "react";
 import type { PressableProps } from "react-native";
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, InputAccessoryView, Keyboard, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getTabScreenBottomPadding } from "@/ui/layout";
@@ -112,6 +112,7 @@ export function PrimaryButton({
   compact,
   accessibilityLabel,
   accessibilityRole,
+  testID,
   ...pressableProps
 }: {
   label: string;
@@ -125,6 +126,7 @@ export function PrimaryButton({
       onPress={onPress}
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityRole={accessibilityRole ?? "button"}
+      testID={testID ?? stableUiIdentifier("action", label)}
       {...pressableProps}
       style={({ pressed }) => ({
         minHeight: compact ? 44 : 54,
@@ -151,6 +153,7 @@ export function SecondaryButton({
   compact,
   accessibilityLabel,
   accessibilityRole,
+  testID,
   ...pressableProps
 }: {
   label: string;
@@ -164,6 +167,7 @@ export function SecondaryButton({
       onPress={onPress}
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityRole={accessibilityRole ?? "button"}
+      testID={testID ?? stableUiIdentifier("action", label)}
       {...pressableProps}
       style={({ pressed }) => ({
         minHeight: compact ? 42 : 50,
@@ -194,12 +198,14 @@ export function GhostButton({
   label,
   onPress,
   disabled,
+  testID,
   ...pressableProps
 }: { label: string; onPress(): void; disabled?: boolean } & Omit<PressableProps, "style" | "children" | "disabled" | "onPress">) {
   return (
     <Pressable
       disabled={disabled}
       onPress={onPress}
+      testID={testID ?? stableUiIdentifier("action", label)}
       {...pressableProps}
       style={{ minHeight: 42, justifyContent: "center", opacity: disabled ? 0.45 : 1 }}
     >
@@ -270,6 +276,7 @@ export function AppInput({
   placeholder,
   secureTextEntry,
   multiline,
+  testID,
 }: {
   label: string;
   value: string;
@@ -278,7 +285,11 @@ export function AppInput({
   placeholder?: string;
   secureTextEntry?: boolean;
   multiline?: boolean;
+  testID?: string;
 }) {
+  const inputID = testID ?? stableUiIdentifier("input", label);
+  const numericInput = keyboardType === "number-pad" || keyboardType === "decimal-pad";
+  const accessoryID = `${inputID}-keyboard-accessory`;
   return (
     <View style={{ gap: spacing.sm }}>
       <Text selectable style={{ ...type.label, color: colors.textMuted }}>
@@ -293,6 +304,8 @@ export function AppInput({
         placeholder={placeholder}
         placeholderTextColor={colors.textSubtle}
         secureTextEntry={secureTextEntry}
+        testID={inputID}
+        inputAccessoryViewID={numericInput && Platform.OS === "ios" ? accessoryID : undefined}
         value={value}
         style={{
           minHeight: multiline ? 104 : 52,
@@ -308,8 +321,22 @@ export function AppInput({
           textAlignVertical: multiline ? "top" : "center",
         }}
       />
+      {numericInput && Platform.OS === "ios" ? (
+        <InputAccessoryView nativeID={accessoryID}>
+          <View style={{ minHeight: 44, alignItems: "flex-end", justifyContent: "center", paddingHorizontal: spacing.md, backgroundColor: colors.surface }}>
+            <Pressable testID={`${inputID}-done`} accessibilityRole="button" accessibilityLabel="Done" onPress={Keyboard.dismiss} style={({ pressed }) => ({ minWidth: 56, minHeight: 44, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.65 : 1 })}>
+              <Text style={{ color: colors.accent, fontSize: 16, fontWeight: "800" }}>Done</Text>
+            </Pressable>
+          </View>
+        </InputAccessoryView>
+      ) : null}
     </View>
   );
+}
+
+export function stableUiIdentifier(kind: "action" | "input" | "option", value: string | number): string {
+  const slug = String(value).trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return `${kind}-${slug || "unnamed"}`;
 }
 
 export function StatTile({ label, value, detail }: { label: string; value: string; detail?: string }) {
@@ -475,6 +502,7 @@ export function AppScreen({
     <ScrollView
       ref={scrollRef}
       contentInsetAdjustmentBehavior="automatic"
+      keyboardDismissMode="interactive"
       keyboardShouldPersistTaps="handled"
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={{ paddingHorizontal: shellTokens.pageHorizontal, paddingTop: spacing.lg, paddingBottom: bottomPadding, gap: spacing.xxl }}

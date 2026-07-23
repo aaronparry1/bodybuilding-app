@@ -6193,7 +6193,7 @@
         "availableSessionMinutes": 75
       },
       "ownedDifferences": {
-        "totalWorkingSets": 109,
+        "totalWorkingSets": 110,
         "directSets": {
           "chest": 12,
           "anterior_delts": 10,
@@ -6206,7 +6206,7 @@
           "quadriceps": 7,
           "hip_extension": 6,
           "hamstrings_knee_flexion": 6,
-          "calves": 4
+          "calves": 5
         },
         "policyTargets": {
           "chest": 10,
@@ -6506,11 +6506,17 @@
                 "loadState": "calibration_required",
                 "restSeconds": 120,
                 "method": "straight_sets"
-              },
+              }
+            ]
+          },
+          {
+            "role": "Push hypertrophy D",
+            "exercises": [
               {
                 "exerciseId": "ex-donkey-calf-raise",
-                "sets": 4,
+                "sets": 5,
                 "exactReps": [
+                  15,
                   15,
                   15,
                   15,
@@ -6519,12 +6525,7 @@
                 "loadState": "calibration_required",
                 "restSeconds": 75,
                 "method": "straight_sets"
-              }
-            ]
-          },
-          {
-            "role": "Push hypertrophy D",
-            "exercises": [
+              },
               {
                 "exerciseId": "ex-incline-barbell-bench",
                 "sets": 3,
@@ -7229,8 +7230,7 @@
     },
     {
       "id": "intermediate_60_minutes",
-      "status": "fail_closed",
-      "reason": "microcycle_allocation:chronic_volume_floor_unmet:hamstrings_knee_flexion|calves",
+      "status": "constructed",
       "typedInputs": {
         "experienceLevel": "intermediate",
         "startingVolumeContext": {
@@ -7246,7 +7246,479 @@
           "dosageConfidence": "declared_recent_training"
         },
         "availableSessionMinutes": 60
-      }
+      },
+      "ownedDifferences": {
+        "totalWorkingSets": 85,
+        "directSets": {
+          "chest": 10,
+          "anterior_delts": 7,
+          "lateral_delts": 7,
+          "triceps": 7,
+          "upper_back": 10,
+          "lats": 10,
+          "rear_delts": 7,
+          "biceps": 7,
+          "quadriceps": 6,
+          "hip_extension": 6,
+          "hamstrings_knee_flexion": 4,
+          "calves": 4
+        },
+        "policyTargets": {
+          "chest": 8,
+          "anterior_delts": 6,
+          "lateral_delts": 6,
+          "triceps": 6,
+          "upper_back": 8,
+          "lats": 8,
+          "rear_delts": 6,
+          "biceps": 6,
+          "quadriceps": 8,
+          "hip_extension": 8,
+          "hamstrings_knee_flexion": 6,
+          "calves": 6
+        },
+        "durationConstrainedSessions": [
+          2
+        ],
+        "unmetStartingTargets": [],
+        "frequency": 5,
+        "cardio": {
+          "schemaVersion": "canonical_cardio_prescription_v1",
+          "policyId": "canonical_concurrent_training_policy_v1",
+          "preference": "recommended",
+          "status": "active",
+          "goal": "build_muscle",
+          "sessions": [
+            {
+              "id": "adaptive:intermediate_60_minutes:cardio:1",
+              "dayOffset": 3,
+              "kind": "recovery_cardio",
+              "modality": "incline_walk",
+              "durationMinutes": 20,
+              "intensity": "easy_zone_2",
+              "placement": "recovery_day",
+              "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+              "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+            },
+            {
+              "id": "adaptive:intermediate_60_minutes:cardio:2",
+              "dayOffset": 6,
+              "kind": "recovery_cardio",
+              "modality": "cycle",
+              "durationMinutes": 20,
+              "intensity": "easy_zone_2",
+              "placement": "recovery_day",
+              "progression": "After three completed, well-tolerated sessions, add five minutes to one session; do not add intensity and duration together.",
+              "stopOrAdjust": "Stop for pain, dizziness or unusual breathlessness; hold progression and review if lower-body performance or recovery declines."
+            }
+          ],
+          "weeklyFrequency": 2,
+          "rationaleCodes": [
+            "recovery_capacity",
+            "hypertrophy_stimulus_preserved",
+            "ordinary_recovery_start"
+          ],
+          "interferenceRules": [
+            "cardio_never_changes_lifting_session_count",
+            "hard_conditioning_not_before_priority_lower_session",
+            "progress_requires_completed_tolerated_evidence"
+          ],
+          "recoveryBudget": {
+            "cardioMinutes": 40,
+            "intervalWorkMinutes": 0,
+            "concurrentSportSessions": 0,
+            "lowerBodyInterference": "low",
+            "resistanceDosageAdjustment": "none"
+          }
+        },
+        "sessions": [
+          {
+            "role": "Push hypertrophy A",
+            "exercises": [
+              {
+                "exerciseId": "ex-bench-press",
+                "sets": 3,
+                "exactReps": [
+                  8,
+                  8,
+                  8
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 150,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-incline-dumbbell-press",
+                "sets": 2,
+                "exactReps": [
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-machine-shoulder-press",
+                "sets": 4,
+                "exactReps": [
+                  10,
+                  10,
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-cable-lateral-raise",
+                "sets": 4,
+                "exactReps": [
+                  15,
+                  15,
+                  15,
+                  15
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-cable-rope-overhead-extension",
+                "sets": 3,
+                "exactReps": [
+                  12,
+                  12,
+                  12
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-close-neutral-pushdown",
+                "sets": 2,
+                "exactReps": [
+                  12,
+                  12
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              }
+            ]
+          },
+          {
+            "role": "Pull hypertrophy B",
+            "exercises": [
+              {
+                "exerciseId": "ex-chest-supported-row",
+                "sets": 3,
+                "exactReps": [
+                  12,
+                  12,
+                  12
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-lat-pulldown",
+                "sets": 3,
+                "exactReps": [
+                  10,
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-dorian-yates-row-machine",
+                "sets": 2,
+                "exactReps": [
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-cable-rear-delt-fly",
+                "sets": 4,
+                "exactReps": [
+                  15,
+                  15,
+                  15,
+                  15
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-bayesian-curl",
+                "sets": 4,
+                "exactReps": [
+                  12,
+                  12,
+                  12,
+                  12
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-lat-pulldown-machine",
+                "sets": 2,
+                "exactReps": [
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              }
+            ]
+          },
+          {
+            "role": "Legs hypertrophy C",
+            "exercises": [
+              {
+                "exerciseId": "ex-hack-squat-machine",
+                "sets": 4,
+                "exactReps": [
+                  12,
+                  12,
+                  12,
+                  12
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-belt-squat",
+                "sets": 2,
+                "exactReps": [
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-stiff-leg-deadlift",
+                "sets": 3,
+                "exactReps": [
+                  10,
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-kneeling-leg-curl",
+                "sets": 4,
+                "exactReps": [
+                  12,
+                  12,
+                  12,
+                  12
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-hip-thrust-machine",
+                "sets": 3,
+                "exactReps": [
+                  10,
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              }
+            ]
+          },
+          {
+            "role": "Push hypertrophy D",
+            "exercises": [
+              {
+                "exerciseId": "ex-donkey-calf-raise",
+                "sets": 4,
+                "exactReps": [
+                  15,
+                  15,
+                  15,
+                  15
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-incline-barbell-bench",
+                "sets": 3,
+                "exactReps": [
+                  8,
+                  8,
+                  8
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 150,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-decline-plate-loaded-press",
+                "sets": 2,
+                "exactReps": [
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-plate-loaded-shoulder-press-machine",
+                "sets": 3,
+                "exactReps": [
+                  10,
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-lateral-raise-plate-loaded",
+                "sets": 3,
+                "exactReps": [
+                  15,
+                  15,
+                  15
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-ez-bar-pushdown",
+                "sets": 2,
+                "exactReps": [
+                  12,
+                  12
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              }
+            ]
+          },
+          {
+            "role": "Pull hypertrophy E",
+            "exercises": [
+              {
+                "exerciseId": "ex-high-row-plate-loaded",
+                "sets": 3,
+                "exactReps": [
+                  12,
+                  12,
+                  12
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-lat-pulldown-narrow",
+                "sets": 3,
+                "exactReps": [
+                  10,
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-low-row-plate-loaded",
+                "sets": 2,
+                "exactReps": [
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-rear-delt-machine",
+                "sets": 3,
+                "exactReps": [
+                  15,
+                  15,
+                  15
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-cable-curl",
+                "sets": 3,
+                "exactReps": [
+                  12,
+                  12,
+                  12
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 75,
+                "method": "straight_sets"
+              },
+              {
+                "exerciseId": "ex-lat-pulldown-neutral-close",
+                "sets": 2,
+                "exactReps": [
+                  10,
+                  10
+                ],
+                "loadState": "calibration_required",
+                "restSeconds": 120,
+                "method": "straight_sets"
+              }
+            ]
+          }
+        ],
+        "recoveryRestrictionApplied": false,
+        "equalityExplanation": null
+      },
+      "rationale": [
+        "currently_training",
+        "5",
+        "moderate",
+        "60",
+        "ordinary",
+        "none",
+        "not_demonstrated",
+        "none",
+        "calibration_required",
+        "declared_recent_training"
+      ]
     },
     {
       "id": "intermediate_75_minutes",

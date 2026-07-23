@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { isDesignQaModeAvailable } from "@/application/runtime/app-environment-core";
+import { isInternalRuntime } from "@/application/runtime/app-environment-core";
 
 const settingsSource = () => readFileSync("app/(protected)/settings.tsx", "utf8");
 const capacityFocusSource = () => readFileSync("app/(protected)/capacity-focus.tsx", "utf8");
@@ -97,7 +97,7 @@ describe("settings simplification", () => {
   it("gates diagnostics and Design QA behind dev or staging tools", () => {
     const source = settingsSource();
 
-    expect(isDesignQaModeAvailable("production")).toBe(false);
+    expect(isInternalRuntime("production")).toBe(false);
     expect(source).toContain("showDevTools");
     expect(source).toContain('href="/(protected)/diagnostics"');
     expect(source).toContain('href="/(protected)/design-qa"');

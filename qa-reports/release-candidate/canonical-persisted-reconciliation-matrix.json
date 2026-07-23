@@ -8,6 +8,18 @@
     "atomicity": "one carrier CAS; no ledger rewrite",
     "idempotency": "a repeated successful reconciliation performs no second write"
   },
+  "nativeHarness": {
+    "fixtureOwner": "ios/AdaptiveStrengthCoachUITests/Fixtures/prepare_persisted_state.py",
+    "productionPersistenceCodeUsed": true,
+    "productionPayloadContainsFixtureHarness": false,
+    "results": {
+      "completedHistoryWithStaleFuture": "passed",
+      "secondLaunchIdempotency": "passed",
+      "corruptPlanRecovery": "passed",
+      "incompatibleAttemptRecovery": "passed",
+      "freshInstallAndCompletedWorkoutRelaunch": "passed"
+    }
+  },
   "cases": [
     { "id": "no_onboarding", "startingState": "onboarding incomplete with or without a stale carrier", "result": "onboarding_required", "planVisible": false, "historyResult": "unchanged", "futureResult": "not activated" },
     { "id": "onboarding_complete_no_plan", "startingState": "onboarding complete, canonical carrier missing", "result": "setup_required", "planVisible": false, "historyResult": "unchanged", "futureResult": "none fabricated" },

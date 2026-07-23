@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "canonical_production_payload_scan_evidence_v1",
+  "productionEntry": {
+    "routerRoot": "app-production",
+    "qaRouterRoot": "app",
+    "compileTimeSeparated": true
+  },
+  "web": {
+    "path": "/tmp/asc-rc-web-export",
+    "scannedFiles": 27,
+    "findings": [],
+    "status": "passed"
+  },
+  "nativeArchive": {
+    "path": "/tmp/AdaptiveStrengthCoachRC-archive10.xcarchive/Products/Applications/AdaptiveStrengthCoach.app",
+    "scannedFiles": 104,
+    "findings": [],
+    "status": "passed"
+  },
+  "forbiddenFamilies": [
+    "Design-QA fixtures and route identifiers",
+    "preview-only fixture identities and athlete data",
+    "QA banners and development menu copy",
+    "EXDevLauncher and EXDevMenu",
+    "expo-dev-client",
+    "ordinary-v2 preview authority"
+  ],
+  "qaBuildAvailability": "retained through the non-production app router and Design-QA runtime"
+}

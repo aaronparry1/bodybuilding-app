@@ -20946,14 +20946,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 0,
           "role": "Full Body hypertrophy A",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 6,
-          "estimatedMinutes": 26,
+          "workingSets": 7,
+          "estimatedMinutes": 30,
           "dosageAssessment": {
             "exerciseCount": 3,
-            "workingSets": 6,
+            "workingSets": 7,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "3 owned movement/muscle slots supply 6 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "3 owned movement/muscle slots supply 7 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
@@ -20969,12 +20969,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "adductors"
               ],
               "exerciseFatigue": "high",
-              "workingSets": 2,
+              "workingSets": 3,
               "exactReps": [
+                8,
                 8,
                 8
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps"
               ],
@@ -21075,14 +21077,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 2,
           "role": "Full Body hypertrophy B",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 6,
-          "estimatedMinutes": 24,
+          "workingSets": 7,
+          "estimatedMinutes": 28,
           "dosageAssessment": {
             "exerciseCount": 3,
-            "workingSets": 6,
+            "workingSets": 7,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "3 owned movement/muscle slots supply 6 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "3 owned movement/muscle slots supply 7 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
@@ -21137,12 +21139,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 2,
+              "workingSets": 3,
               "exactReps": [
+                10,
                 10,
                 10
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps"
               ],
@@ -21206,14 +21210,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 4,
           "role": "Full Body hypertrophy C",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
-          "workingSets": 6,
-          "estimatedMinutes": 26,
+          "workingSets": 7,
+          "estimatedMinutes": 29,
           "dosageAssessment": {
             "exerciseCount": 3,
-            "workingSets": 6,
+            "workingSets": 7,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "3 owned movement/muscle slots supply 6 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "3 owned movement/muscle slots supply 7 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
@@ -21268,12 +21272,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "shoulders"
               ],
               "exerciseFatigue": "moderate",
-              "workingSets": 2,
+              "workingSets": 3,
               "exactReps": [
+                10,
                 10,
                 10
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps"
               ],
@@ -21336,20 +21342,20 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       ],
       "accounting": {
         "directSets": {
-          "quadriceps": 4,
-          "chest": 6,
+          "quadriceps": 5,
+          "chest": 8,
           "upper_back": 4,
           "hip_extension": 2,
           "lats": 2
         },
         "meaningfulSecondarySets": {
-          "hip_extension": 4,
-          "triceps": 6,
+          "hip_extension": 5,
+          "triceps": 8,
           "biceps": 6,
           "rear_delts": 4,
           "upper_back": 4,
           "quadriceps": 2,
-          "anterior_delts": 4
+          "anterior_delts": 6
         },
         "muscleFrequency": {
           "chest": 3,
@@ -21380,24 +21386,24 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondaryVariation": 0
           }
         },
-        "totalWorkingSets": 18,
+        "totalWorkingSets": 21,
         "perSessionWorkingSets": [
-          6,
-          6,
-          6
+          7,
+          7,
+          7
         ],
         "perSessionEstimatedMinutes": [
-          26,
-          24,
-          26
+          30,
+          28,
+          29
         ],
         "fatigueUnits": {
           "perSession": [
-            14,
-            14,
-            14
+            17,
+            16,
+            16
           ],
-          "weeklyUnits": 42,
+          "weeklyUnits": 49,
           "overlapFlags": []
         },
         "repeatedExercises": []

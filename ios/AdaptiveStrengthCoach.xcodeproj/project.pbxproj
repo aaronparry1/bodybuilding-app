@@ -13,8 +13,20 @@
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		57C6E6EC237E80A3CE4FFB15 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5AD8145835D889255D256EAD /* PrivacyInfo.xcprivacy */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		E3F3853AE30A87321C27CA55 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FE77224417F26608B33DB15 /* Foundation.framework */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		F2C066EE20044F8CA2BAF7CF /* ReleaseCandidateJourneyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5F9848AD60EC4DAE46399E1 /* ReleaseCandidateJourneyUITests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C4DFF4517E8637DC35731911 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
+			remoteInfo = AdaptiveStrengthCoach;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		13B07F961A680F5B00A75B9A /* AdaptiveStrengthCoach.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AdaptiveStrengthCoach.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -23,9 +35,12 @@
 		2193BC5891240EDD408C101F /* Pods-AdaptiveStrengthCoach.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdaptiveStrengthCoach.debug.xcconfig"; path = "Target Support Files/Pods-AdaptiveStrengthCoach/Pods-AdaptiveStrengthCoach.debug.xcconfig"; sourceTree = "<group>"; };
 		3F967B08CA33F407E00C0A47 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-AdaptiveStrengthCoach/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		5AD8145835D889255D256EAD /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = AdaptiveStrengthCoach/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		5DE464FA07F7E933F4F9D2FE /* AdaptiveStrengthCoachUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdaptiveStrengthCoachUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8FE77224417F26608B33DB15 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = AdaptiveStrengthCoach/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		CA120F19134A60ED26F001EE /* Pods-AdaptiveStrengthCoach.debugprofiling.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdaptiveStrengthCoach.debugprofiling.xcconfig"; path = "Target Support Files/Pods-AdaptiveStrengthCoach/Pods-AdaptiveStrengthCoach.debugprofiling.xcconfig"; sourceTree = "<group>"; };
+		D5F9848AD60EC4DAE46399E1 /* ReleaseCandidateJourneyUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReleaseCandidateJourneyUITests.swift; sourceTree = "<group>"; };
 		DFBA70371A8C5AD6BEDFCEB8 /* Pods-AdaptiveStrengthCoach.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdaptiveStrengthCoach.release.xcconfig"; path = "Target Support Files/Pods-AdaptiveStrengthCoach/Pods-AdaptiveStrengthCoach.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F04D8F18D340995CB604B967 /* libPods-AdaptiveStrengthCoach.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AdaptiveStrengthCoach.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -39,6 +54,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				395872634A5CB692BA81C786 /* libPods-AdaptiveStrengthCoach.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8E9D567D006CD0D825CE4C92 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3F3853AE30A87321C27CA55 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,11 +82,21 @@
 			name = AdaptiveStrengthCoach;
 			sourceTree = "<group>";
 		};
+		29AFABC56610E19E4753F37E /* AdaptiveStrengthCoachUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D5F9848AD60EC4DAE46399E1 /* ReleaseCandidateJourneyUITests.swift */,
+			);
+			name = AdaptiveStrengthCoachUITests;
+			path = AdaptiveStrengthCoachUITests;
+			sourceTree = "<group>";
+		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				F04D8F18D340995CB604B967 /* libPods-AdaptiveStrengthCoach.a */,
+				BE29A1F0FD4C715055E58E49 /* iOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -92,6 +125,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				A7CD15B3504523FF6FECA721 /* Pods */,
 				7FF9C0880488C6899A2D98F2 /* ExpoModulesProviders */,
+				29AFABC56610E19E4753F37E /* AdaptiveStrengthCoachUITests */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -102,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* AdaptiveStrengthCoach.app */,
+				5DE464FA07F7E933F4F9D2FE /* AdaptiveStrengthCoachUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -134,6 +169,14 @@
 			path = AdaptiveStrengthCoach/Supporting;
 			sourceTree = "<group>";
 		};
+		BE29A1F0FD4C715055E58E49 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				8FE77224417F26608B33DB15 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -158,6 +201,24 @@
 			productName = AdaptiveStrengthCoach;
 			productReference = 13B07F961A680F5B00A75B9A /* AdaptiveStrengthCoach.app */;
 			productType = "com.apple.product-type.application";
+		};
+		1F363A3D4C2F296715E3A65A /* AdaptiveStrengthCoachUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B995BA0489D0172562155D0 /* Build configuration list for PBXNativeTarget "AdaptiveStrengthCoachUITests" */;
+			buildPhases = (
+				B3DAED93A4F875042EA14F33 /* Sources */,
+				8E9D567D006CD0D825CE4C92 /* Frameworks */,
+				434EFFDE49FB648CF6F38565 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				96974E484C69F1DA060B72A3 /* PBXTargetDependency */,
+			);
+			name = AdaptiveStrengthCoachUITests;
+			productName = AdaptiveStrengthCoachUITests;
+			productReference = 5DE464FA07F7E933F4F9D2FE /* AdaptiveStrengthCoachUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
@@ -186,6 +247,7 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* AdaptiveStrengthCoach */,
+				1F363A3D4C2F296715E3A65A /* AdaptiveStrengthCoachUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -199,6 +261,13 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				57C6E6EC237E80A3CE4FFB15 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		434EFFDE49FB648CF6F38565 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,8 +350,6 @@
 				"${PODS_CONFIGURATION_BUILD_DIR}/RevenueCat/RevenueCat.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/RevenueCatUI/RevenueCat_RevenueCatUI.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/boost/boost_privacy.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/expo-dev-launcher/EXDevLauncher.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/expo-dev-menu/EXDevMenu.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/glog/glog_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/react-native-view-shot/RNViewShotPrivacyInfo.bundle",
 			);
@@ -298,8 +365,6 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RevenueCat.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RevenueCat_RevenueCatUI.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/boost_privacy.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXDevLauncher.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXDevMenu.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/glog_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RNViewShotPrivacyInfo.bundle",
 			);
@@ -344,7 +409,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B3DAED93A4F875042EA14F33 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F2C066EE20044F8CA2BAF7CF /* ReleaseCandidateJourneyUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		96974E484C69F1DA060B72A3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AdaptiveStrengthCoach;
+			target = 13B07F861A680F5B00A75B9A /* AdaptiveStrengthCoach */;
+			targetProxy = C4DFF4517E8637DC35731911 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
@@ -356,7 +438,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AdaptiveStrengthCoach/AdaptiveStrengthCoach.entitlements;
-			CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -369,7 +451,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.4;
-			MARKETING_VERSION = 1.0.13;
+				MARKETING_VERSION = 1.0.14;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -394,7 +476,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AdaptiveStrengthCoach/AdaptiveStrengthCoach.entitlements;
-			CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				INFOPLIST_FILE = AdaptiveStrengthCoach/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -402,7 +484,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.4;
-			MARKETING_VERSION = 1.0.13;
+				MARKETING_VERSION = 1.0.14;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -414,6 +496,23 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		5A3BE9AC9A00EE5DE14095A6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aaronparry.adaptivestrengthcoach.uitests;
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = AdaptiveStrengthCoach;
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -549,6 +648,39 @@
 			};
 			name = Release;
 		};
+		84791BF77F137A5A63AB58C8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aaronparry.adaptivestrengthcoach.uitests;
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = AdaptiveStrengthCoach;
+			};
+			name = Debug;
+		};
+		9BA3415DD7E6A4D324116E33 /* DebugProfiling */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aaronparry.adaptivestrengthcoach.uitests;
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = AdaptiveStrengthCoach;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = DebugProfiling;
+		};
 		DQA00000000000000000001 /* DebugProfiling */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CA120F19134A60ED26F001EE /* Pods-AdaptiveStrengthCoach.debugprofiling.xcconfig */;
@@ -558,7 +690,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AdaptiveStrengthCoach/AdaptiveStrengthCoach.entitlements;
-			CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				INFOPLIST_FILE = AdaptiveStrengthCoach/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Adaptive Strength QA";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
@@ -566,7 +698,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-			MARKETING_VERSION = 1.0.13;
+				MARKETING_VERSION = 1.0.14;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -623,6 +755,16 @@
 				13B07F941A680F5B00A75B9A /* Debug */,
 				DQA00000000000000000001 /* DebugProfiling */,
 				13B07F951A680F5B00A75B9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B995BA0489D0172562155D0 /* Build configuration list for PBXNativeTarget "AdaptiveStrengthCoachUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A3BE9AC9A00EE5DE14095A6 /* Release */,
+				84791BF77F137A5A63AB58C8 /* Debug */,
+				9BA3415DD7E6A4D324116E33 /* DebugProfiling */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

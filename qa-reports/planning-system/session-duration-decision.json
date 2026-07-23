@@ -28,8 +28,100 @@
     },
     {
       "availableSessionMinutes": 60,
-      "status": "fail_closed",
-      "reason": "microcycle_allocation:chronic_volume_floor_unmet:hamstrings_knee_flexion|calves"
+      "status": "constructed",
+      "sessions": [
+        {
+          "role": "Push hypertrophy A",
+          "exercises": 6,
+          "workingSets": 18,
+          "estimatedMinutes": 54,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 390,
+            "workingSetExecution": 720,
+            "prescribedInterSetRest": 1500,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
+        },
+        {
+          "role": "Pull hypertrophy B",
+          "exercises": 6,
+          "workingSets": 18,
+          "estimatedMinutes": 55,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 720,
+            "prescribedInterSetRest": 1500,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
+        },
+        {
+          "role": "Legs hypertrophy C",
+          "exercises": 5,
+          "workingSets": 16,
+          "estimatedMinutes": 56,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 390,
+            "workingSetExecution": 640,
+            "prescribedInterSetRest": 1560,
+            "equipmentSetup": 150,
+            "exerciseTransitions": 120,
+            "unilateralOverhead": 210,
+            "calibrationOverhead": 50,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
+        },
+        {
+          "role": "Push hypertrophy D",
+          "exercises": 6,
+          "workingSets": 17,
+          "estimatedMinutes": 51,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 390,
+            "workingSetExecution": 680,
+            "prescribedInterSetRest": 1350,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
+        },
+        {
+          "role": "Pull hypertrophy E",
+          "exercises": 6,
+          "workingSets": 16,
+          "estimatedMinutes": 51,
+          "durationBreakdown": {
+            "generalWarmup": 240,
+            "liftSpecificRamp": 420,
+            "workingSetExecution": 640,
+            "prescribedInterSetRest": 1320,
+            "equipmentSetup": 180,
+            "exerciseTransitions": 150,
+            "unilateralOverhead": 0,
+            "calibrationOverhead": 60,
+            "methodOverhead": 0
+          },
+          "allRetainedExercisesUseful": true
+        }
+      ],
+      "maximumObservedMinutes": 56
     },
     {
       "availableSessionMinutes": 75,

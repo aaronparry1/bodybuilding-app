@@ -1,10 +1,10 @@
-import { isDesignQaModeAvailable, type AppEnvironment } from "@/application/runtime/app-environment-core";
+import { isInternalRuntime, type AppEnvironment } from "@/application/runtime/app-environment-core";
 
 const internalDiagnosticPattern =
   /(EXPO_PUBLIC_|APP_ENV|SUPABASE|REVENUECAT|API key|env|environment variable|configuration|configured|offering|product IDs?|bundle ID|package name)/i;
 
 export function shouldShowDeveloperDiagnostics(environment: AppEnvironment): boolean {
-  return isDesignQaModeAvailable(environment);
+  return isInternalRuntime(environment);
 }
 
 export function customerSafeServiceMessage(

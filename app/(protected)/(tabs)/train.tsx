@@ -3,6 +3,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AccessibilityInfo,
   BackHandler,
+  InputAccessoryView,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -54,7 +56,7 @@ import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-
 import { useSubscription } from "@/application/billing/subscription-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { hapticFeedback } from "@/application/training/haptic-feedback";
-import { AppScreen, PrimaryButton, SecondaryButton } from "@/ui/primitives";
+import { AppScreen, PrimaryButton, SecondaryButton, stableUiIdentifier } from "@/ui/primitives";
 import { colors, type } from "@/ui/theme";
 
 type RouteParams = Readonly<{
@@ -64,11 +66,12 @@ type RouteParams = Readonly<{
   recordedSessionId?: string;
   action?: string;
   lifecycle?: string;
-  qaEndConfirm?: string;
 }>;
 type SetValues = Readonly<{ reps: string; load: string }>;
 type EditState = Readonly<{ setId: string; reps: string; load: string }>;
 type TrainModal = "close" | "discard" | "finish" | null;
+
+const TRAIN_NUMERIC_KEYBOARD_ACCESSORY_ID = "train-numeric-keyboard-accessory";
 
 const TRAIN = {
   background: "#05070A",
@@ -130,12 +133,15 @@ function CanonicalTrainExperience() {
     revision: Number(params.planRevision),
     plannedSessionId: params.plannedSessionId ? String(params.plannedSessionId) : undefined,
     recordedSessionId: params.recordedSessionId ? String(params.recordedSessionId) : undefined,
-  }), [params.planId, params.planRevision, params.plannedSessionId, params.recordedSessionId]);
+    lifecycle: params.lifecycle ? String(params.lifecycle) : undefined,
+  }), [params.lifecycle, params.planId, params.planRevision, params.plannedSessionId, params.recordedSessionId]);
 
   useEffect(() => {
-    const nextRecordedId = route.recordedSessionId ?? plan?.activeRecordedSession?.recordedSessionId;
-    if (nextRecordedId && nextRecordedId !== recordedId) setRecordedId(nextRecordedId);
-  }, [plan?.activeRecordedSession?.recordedSessionId, recordedId, route.recordedSessionId]);
+    const nextRecordedId = route.lifecycle === "start"
+      ? plan?.activeRecordedSession?.recordedSessionId ?? undefined
+      : route.recordedSessionId ?? plan?.activeRecordedSession?.recordedSessionId ?? undefined;
+    if (nextRecordedId !== recordedId) setRecordedId(nextRecordedId);
+  }, [plan?.activeRecordedSession?.recordedSessionId, recordedId, route.lifecycle, route.recordedSessionId]);
 
   const aggregate = recordedId ? canonicalRecordedSessionLedger.get(recordedId) : { status: "not_found" as const };
   const plannedId = route.plannedSessionId ?? plan?.nextSession?.id;
@@ -186,10 +192,6 @@ function CanonicalTrainExperience() {
     });
     return () => listener.remove();
   }, [aggregate.status === "found" ? aggregate.session.status : "missing"]);
-
-  useEffect(() => {
-    if (params.qaEndConfirm === "1" && presentation?.finishAllowed) setModal("finish");
-  }, [params.qaEndConfirm, presentation?.finishAllowed]);
 
   const openPlanned = () => {
     if (!plan || !plannedId || plan.revision !== (Number.isInteger(route.revision) ? route.revision : plan.revision)) {
@@ -399,7 +401,7 @@ function CanonicalTrainExperience() {
 
   return <TrainShell insets={insets} presentation={presentation} onClose={() => setModal("close")}>
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex} keyboardVerticalOffset={0}>
-      <ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" contentContainerStyle={[styles.content, { paddingBottom: Math.max(insets.bottom, 16) + 108 }]}>
+      <ScrollView ref={scrollRef} automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" contentContainerStyle={[styles.content, { paddingBottom: Math.max(insets.bottom, 16) + 108 }]}>
         {paused ? <PausedBanner busy={busy} onResume={resume} /> : null}
         {restTimer && restTimer.state !== "skipped" ? <RestPanel timer={restTimer} seconds={restSeconds} nextInstruction={lastInstruction ?? null} onAction={restAction} /> : null}
         <ExerciseRail exercises={presentation.exercises} activeId={activeExercise?.id ?? ""} onSelect={setActiveExerciseId} />
@@ -426,6 +428,7 @@ function CanonicalTrainExperience() {
         {message ? <Text accessibilityLiveRegion="polite" style={styles.message}>{message}</Text> : null}
       </ScrollView>
     </KeyboardAvoidingView>
+    {Platform.OS === "ios" ? <InputAccessoryView nativeID={TRAIN_NUMERIC_KEYBOARD_ACCESSORY_ID}><View style={styles.keyboardAccessory}><Pressable testID="train-keyboard-done" accessibilityRole="button" accessibilityLabel="Done" onPress={Keyboard.dismiss} style={({ pressed }) => [styles.keyboardDone, pressed && styles.pressed]}><Text maxFontSizeMultiplier={1.4} style={styles.keyboardDoneText}>Done</Text></Pressable></View></InputAccessoryView> : null}
     <TrainActionModal modal={modal} reduceMotion={reduceMotion} busy={busy} onContinue={() => setModal(null)} onPauseLeave={pauseAndLeave} onRequestDiscard={() => setModal("discard")} onDiscard={discard} onFinish={finish} />
   </TrainShell>;
 }
@@ -433,12 +436,12 @@ function CanonicalTrainExperience() {
 function TrainShell({ insets, presentation, onClose, children }: Readonly<{ insets: { top: number; bottom: number }; presentation: WorkoutPresentation; onClose(): void; children: React.ReactNode }>) {
   return <View style={[styles.shell, { paddingTop: insets.top }]}>
     <View style={styles.header}>
-      <Pressable accessibilityRole="button" accessibilityLabel="Close workout" hitSlop={8} onPress={onClose} style={({ pressed }) => [styles.headerControl, pressed && styles.pressed]}><Text style={styles.closeGlyph}>×</Text></Pressable>
+      <Pressable testID="train-close" accessibilityRole="button" accessibilityLabel="Close workout" hitSlop={8} onPress={onClose} style={({ pressed }) => [styles.headerControl, pressed && styles.pressed]}><Text maxFontSizeMultiplier={1.25} style={styles.closeGlyph}>×</Text></Pressable>
       <View style={styles.headerTitleArea}>
-        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.headerTitle}>{presentation.title}</Text>
-        <Text style={styles.headerMeta}>{formatElapsed(presentation.elapsedSeconds)} · {presentation.completedSets}/{presentation.totalSets} current-session working sets</Text>
+        <Text maxFontSizeMultiplier={1.35} numberOfLines={1} ellipsizeMode="tail" style={styles.headerTitle}>{presentation.title}</Text>
+        <Text accessibilityLabel={`${formatElapsed(presentation.elapsedSeconds)} elapsed. ${presentation.completedSets} of ${presentation.totalSets} current-session working sets complete.`} maxFontSizeMultiplier={1.25} numberOfLines={1} ellipsizeMode="tail" style={styles.headerMeta}>{formatElapsed(presentation.elapsedSeconds)} · {presentation.completedSets} of {presentation.totalSets} sets</Text>
       </View>
-      <View style={styles.headerPercent}><Text style={styles.headerPercentText}>{presentation.progressPercent}%</Text></View>
+      <View style={styles.headerPercent}><Text maxFontSizeMultiplier={1.25} numberOfLines={1} style={styles.headerPercentText}>{presentation.progressPercent}%</Text></View>
     </View>
     <View accessibilityRole="progressbar" accessibilityLabel={`${presentation.progressPercent}% of working sets complete`} style={styles.progressTrack}><View style={[styles.progressFill, { width: `${presentation.progressPercent}%` }]} /></View>
     <View style={styles.flex}>{children}</View>
@@ -465,7 +468,7 @@ function WorkoutPreview({ presentation, busy, onStart, message }: Readonly<{ pre
         <Text style={styles.smallMuted}>{exercise.sets[0]?.loadLabel} · {exercise.sets[0]?.restSeconds}s rest · {exercise.method}</Text>
       </View>
     </View>)}</View>
-    <Pressable accessibilityRole="button" accessibilityLabel="Start workout" disabled={busy} onPress={onStart} style={({ pressed }) => [styles.primaryAction, pressed && styles.primaryActionPressed, busy && styles.disabled]}><Text numberOfLines={1} style={styles.primaryActionText}>{busy ? "Starting…" : "Start workout"}</Text></Pressable>
+    <Pressable testID="train-start" accessibilityRole="button" accessibilityLabel="Start workout" disabled={busy} onPress={onStart} style={({ pressed }) => [styles.primaryAction, pressed && styles.primaryActionPressed, busy && styles.disabled]}><Text numberOfLines={1} style={styles.primaryActionText}>{busy ? "Starting…" : "Start workout"}</Text></Pressable>
     {message ? <Text style={styles.message}>{message}</Text> : null}
   </ScrollView>;
 }
@@ -474,7 +477,7 @@ function ExerciseRail({ exercises, activeId, onSelect }: Readonly<{ exercises: r
   return <View style={styles.exerciseRail} accessibilityRole="tablist">{exercises.map((exercise) => {
     const completed = exercise.sets.every((set) => set.state === "completed");
     const active = exercise.id === activeId;
-    return <Pressable key={exercise.id} accessibilityRole="tab" accessibilityState={{ selected: active }} accessibilityLabel={`Exercise ${exercise.order} of ${exercises.length}, ${exercise.name}, ${completed ? "completed" : active ? "current" : "upcoming"}`} onPress={() => onSelect(exercise.id)} style={({ pressed }) => [styles.exerciseTab, active && styles.exerciseTabActive, pressed && styles.pressed]}>
+    return <Pressable key={exercise.id} testID={`train-exercise-${exercise.order}`} accessibilityRole="tab" accessibilityState={{ selected: active }} accessibilityLabel={`Exercise ${exercise.order} of ${exercises.length}, ${exercise.name}, ${completed ? "completed" : active ? "current" : "upcoming"}`} onPress={() => onSelect(exercise.id)} style={({ pressed }) => [styles.exerciseTab, active && styles.exerciseTabActive, pressed && styles.pressed]}>
       <Text style={[styles.exerciseTabIndex, completed && styles.successText]}>{completed ? "✓" : exercise.order}</Text>
       <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.exerciseTabName, active && styles.accentText]}>{exercise.name}</Text>
     </Pressable>;
@@ -520,17 +523,17 @@ function ActiveExerciseCard(props: Readonly<{
       <Text style={styles.body}>{calibration.instruction}</Text>
       <Text style={styles.smallMuted}>{calibration.rampInstruction}</Text>
       <View style={styles.calibrationInputs}>
-        <Field label="Successful reps" value={draft.reps} unit="reps" keyboardType="number-pad" error={props.fieldError === "reps"} onChange={(reps) => props.setCalibrationDraft({ ...draft, reps })} />
-        <Field label="Successful load" value={draft.load} unit={props.displayUnit} keyboardType="decimal-pad" error={props.fieldError === "load"} onChange={(load) => props.setCalibrationDraft({ ...draft, load })} />
+        <Field testID="train-calibration-reps" label="Successful reps" value={draft.reps} unit="reps" keyboardType="number-pad" error={props.fieldError === "reps"} onChange={(reps) => props.setCalibrationDraft({ ...draft, reps })} />
+        <Field testID="train-calibration-load" label="Successful load" value={draft.load} unit={props.displayUnit} keyboardType="decimal-pad" error={props.fieldError === "load"} onChange={(load) => props.setCalibrationDraft({ ...draft, load })} />
       </View>
-      <Pressable accessibilityRole="button" accessibilityLabel={`Confirm starting load for ${exercise.name}`} onPress={props.onConfirmCalibration} style={({ pressed }) => [styles.calibrationAction, pressed && styles.primaryActionPressed]}><Text numberOfLines={1} style={styles.calibrationActionText}>Confirm starting load</Text></Pressable>
+      <Pressable testID="train-confirm-calibration" accessibilityRole="button" accessibilityLabel={`Confirm starting load for ${exercise.name}`} onPress={props.onConfirmCalibration} style={({ pressed }) => [styles.calibrationAction, pressed && styles.primaryActionPressed]}><Text numberOfLines={1} style={styles.calibrationActionText}>Confirm starting load</Text></Pressable>
       <Text style={styles.tinyMuted}>Ramp attempts are not counted as working sets.</Text>
     </View> : calibration && props.calibrationConfirmed ? <View style={styles.calibrationReady}><Text style={styles.successText}>✓ Starting load ready</Text><Text style={styles.smallMuted}>Complete the working sets below; valid evidence is retained for compatible sessions.</Text></View> : null}
     <View style={styles.setHeader}>
-      <Text style={[styles.columnLabel, { width: props.layout.setWidth }]}>Set</Text>
-      <Text style={[styles.columnLabel, styles.flex]}>Reps</Text>
-      <Text style={[styles.columnLabel, styles.loadColumn]}>Load</Text>
-      <Text style={[styles.columnLabel, { width: props.layout.doneWidth, textAlign: "center" }]}>Done</Text>
+      <Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.columnLabel, { width: props.layout.setWidth }]}>Set</Text>
+      <Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.columnLabel, styles.flex]}>Reps</Text>
+      <Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.columnLabel, styles.loadColumn]}>Load</Text>
+      <Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.columnLabel, { width: props.layout.doneWidth, textAlign: "center" }]}>Done</Text>
     </View>
     <View style={{ gap: props.layout.rowGap }}>{exercise.sets.map((set) => {
       const current = set.id === firstIncomplete?.id;
@@ -539,10 +542,10 @@ function ActiveExerciseCard(props: Readonly<{
       const editing = props.editState?.setId === set.id;
       return <View key={set.id} style={[styles.setBlock, current && styles.setBlockCurrent, completed && styles.setBlockCompleted]}>
         <View style={styles.setRow}>
-          <View style={[styles.setIdentity, { width: props.layout.setWidth }]}><Text style={styles.setNumber}>{set.number}</Text><Text style={[styles.setStateText, current && styles.accentText, completed && styles.successText]}>{completed ? "Done" : current ? "Now" : "Next"}</Text></View>
-          {completed && !editing ? <Text style={[styles.completedValue, styles.flex]}>{set.actualReps} reps</Text> : <TextInput accessibilityLabel={`Actual reps for set ${set.number} of ${exercise.name}`} keyboardType="number-pad" returnKeyType="next" editable={!props.paused && !completed} selectTextOnFocus value={editing ? props.editState!.reps : values.reps} onChangeText={(reps) => editing ? props.setEditState({ ...props.editState!, reps }) : props.setSetValues((currentValues) => ({ ...currentValues, [set.id]: { ...values, reps } }))} style={[styles.compactInput, styles.flex, props.fieldError === "reps" && current && styles.inputError, (completed && !editing) && styles.lockedInput]} />}
-          {set.loadSemantic === "bodyweight" ? <View style={styles.bodyweightCell}><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={styles.bodyweightText}>Bodyweight</Text></View> : completed && !editing ? <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={[styles.completedValue, styles.loadColumn]}>{set.actualLoad} {set.unit}</Text> : set.loadSemantic === "unavailable" ? <View style={styles.loadColumn}><Text numberOfLines={2} style={styles.unavailableText}>Unavailable</Text></View> : <View style={styles.loadInputWrap}><TextInput accessibilityLabel={`${set.loadInputLabel} for set ${set.number} of ${exercise.name}, ${props.displayUnit}`} keyboardType="decimal-pad" returnKeyType="done" editable={!props.paused && !completed} selectTextOnFocus value={editing ? props.editState!.load : values.load} onChangeText={(load) => editing ? props.setEditState({ ...props.editState!, load }) : props.setSetValues((currentValues) => ({ ...currentValues, [set.id]: { ...values, load } }))} style={[styles.compactInput, styles.loadInput, props.fieldError === "load" && current && styles.inputError]} /><Text style={styles.unitLabel}>{props.displayUnit}</Text></View>}
-          <Pressable accessibilityRole="button" accessibilityLabel={completed ? `Set ${set.number} completed; edit available below` : `Complete set ${set.number} of ${exercise.name}`} accessibilityState={{ disabled: completed || !current || props.paused }} disabled={completed || !current || props.paused || (calibration?.required && !props.calibrationConfirmed) || set.loadSemantic === "unavailable"} onPress={() => props.onComplete(set)} style={({ pressed }) => [styles.doneControl, completed && styles.doneControlComplete, (!current || props.paused) && styles.doneControlUpcoming, pressed && styles.doneControlPressed]}><Text numberOfLines={1} style={[styles.doneGlyph, completed && styles.doneGlyphComplete]}>{completed ? "✓" : "✓"}</Text></Pressable>
+          <View style={[styles.setIdentity, { width: props.layout.setWidth }]}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={styles.setNumber}>{set.number}</Text><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.setStateText, current && styles.accentText, completed && styles.successText]}>{completed ? "Done" : current ? "Now" : "Next"}</Text></View>
+          {completed && !editing ? <Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75} style={[styles.completedValue, styles.flex]}>{set.actualReps} reps</Text> : <NumericTextInput testID={`train-reps-${exercise.order}-${set.number}`} accessibilityLabel={`Actual reps for set ${set.number} of ${exercise.name}`} keyboardType="number-pad" returnKeyType="next" editable={!props.paused && (!completed || editing)} selectTextOnFocus value={editing ? props.editState!.reps : values.reps} onChangeText={(reps) => editing ? props.setEditState({ ...props.editState!, reps }) : props.setSetValues((currentValues) => ({ ...currentValues, [set.id]: { ...values, reps } }))} style={[styles.compactInput, styles.flex, props.fieldError === "reps" && current && styles.inputError, (completed && !editing) && styles.lockedInput]} />}
+          {set.loadSemantic === "bodyweight" ? <View style={styles.bodyweightCell}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={styles.bodyweightText}>Bodyweight</Text></View> : completed && !editing ? <Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={[styles.completedValue, styles.loadColumn]}>{set.actualLoad} {set.unit}</Text> : set.loadSemantic === "unavailable" ? <View style={styles.loadColumn}><Text maxFontSizeMultiplier={1.35} numberOfLines={2} style={styles.unavailableText}>Unavailable</Text></View> : <View style={styles.loadInputWrap}><NumericTextInput testID={`train-load-${exercise.order}-${set.number}`} accessibilityLabel={`${set.loadInputLabel} for set ${set.number} of ${exercise.name}, ${props.displayUnit}`} keyboardType="decimal-pad" returnKeyType="done" editable={!props.paused && (!completed || editing)} selectTextOnFocus value={editing ? props.editState!.load : values.load} onChangeText={(load) => editing ? props.setEditState({ ...props.editState!, load }) : props.setSetValues((currentValues) => ({ ...currentValues, [set.id]: { ...values, load } }))} style={[styles.compactInput, styles.loadInput, props.fieldError === "load" && current && styles.inputError]} /><Text maxFontSizeMultiplier={1.35} style={styles.unitLabel}>{props.displayUnit}</Text></View>}
+          <Pressable testID={`train-complete-${exercise.order}-${set.number}`} accessibilityRole="button" accessibilityLabel={completed ? `Set ${set.number} completed; edit available below` : `Complete set ${set.number} of ${exercise.name}`} accessibilityState={{ disabled: completed || !current || props.paused }} disabled={completed || !current || props.paused || (calibration?.required && !props.calibrationConfirmed) || set.loadSemantic === "unavailable"} onPress={() => props.onComplete(set)} style={({ pressed }) => [styles.doneControl, completed && styles.doneControlComplete, (!current || props.paused) && styles.doneControlUpcoming, pressed && styles.doneControlPressed]}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.doneGlyph, completed && styles.doneGlyphComplete]}>{completed ? "✓" : "✓"}</Text></Pressable>
         </View>
         <View style={styles.setDetailRow}>
           <Text style={styles.tinyMuted}>Target {set.target}{set.previous ? ` · Previous ${set.previous}` : ""}</Text>
@@ -568,34 +571,40 @@ function RestPanel({ timer, seconds, nextInstruction, onAction }: Readonly<{ tim
   </View>;
 }
 
-function RestAction({ label, onPress }: Readonly<{ label: string; onPress(): void }>) { return <Pressable accessibilityRole="button" accessibilityLabel={`${label} rest timer`} onPress={onPress} style={({ pressed }) => [styles.restAction, pressed && styles.pressed]}><Text numberOfLines={1} style={styles.restActionText}>{label}</Text></Pressable>; }
+function RestAction({ label, onPress }: Readonly<{ label: string; onPress(): void }>) { return <Pressable testID={stableUiIdentifier("action", `${label}-rest-timer`)} accessibilityRole="button" accessibilityLabel={`${label} rest timer`} onPress={onPress} style={({ pressed }) => [styles.restAction, pressed && styles.pressed]}><Text numberOfLines={1} style={styles.restActionText}>{label}</Text></Pressable>; }
 
-function PausedBanner({ busy, onResume }: Readonly<{ busy: boolean; onResume(): void }>) { return <View style={styles.pausedBanner}><View style={styles.flex}><Text style={styles.pausedTitle}>Workout paused</Text><Text style={styles.smallMuted}>Your completed work and rest state are saved.</Text></View><Pressable accessibilityRole="button" accessibilityLabel="Resume workout" disabled={busy} onPress={onResume} style={({ pressed }) => [styles.resumeAction, pressed && styles.primaryActionPressed]}><Text style={styles.resumeActionText}>Resume</Text></Pressable></View>; }
+function PausedBanner({ busy, onResume }: Readonly<{ busy: boolean; onResume(): void }>) { return <View style={styles.pausedBanner}><View style={styles.flex}><Text style={styles.pausedTitle}>Workout paused</Text><Text style={styles.smallMuted}>Your completed work and rest state are saved.</Text></View><Pressable testID="train-resume" accessibilityRole="button" accessibilityLabel="Resume workout" disabled={busy} onPress={onResume} style={({ pressed }) => [styles.resumeAction, pressed && styles.primaryActionPressed]}><Text style={styles.resumeActionText}>Resume</Text></Pressable></View>; }
 
-function FinishPanel({ presentation, busy, onFinish }: Readonly<{ presentation: WorkoutPresentation; busy: boolean; onFinish(): void }>) { return <View style={styles.finishPanel}><Text style={styles.finishTitle}>Finish workout</Text><Text style={styles.smallMuted}>{presentation.finishAllowed ? "Your recorded working sets are ready to complete." : presentation.finishBlockedReason}</Text><Pressable accessibilityRole="button" accessibilityLabel={presentation.finishAllowed ? "Finish workout" : `Finish workout unavailable. ${presentation.finishBlockedReason}`} accessibilityState={{ disabled: !presentation.finishAllowed }} disabled={!presentation.finishAllowed || busy} onPress={onFinish} style={({ pressed }) => [styles.finishAction, pressed && styles.primaryActionPressed, (!presentation.finishAllowed || busy) && styles.disabled]}><Text numberOfLines={1} style={styles.finishActionText}>{busy ? "Saving…" : "Finish workout"}</Text></Pressable></View>; }
+function FinishPanel({ presentation, busy, onFinish }: Readonly<{ presentation: WorkoutPresentation; busy: boolean; onFinish(): void }>) { return <View style={styles.finishPanel}><Text style={styles.finishTitle}>Finish workout</Text><Text style={styles.smallMuted}>{presentation.finishAllowed ? "Your recorded working sets are ready to complete." : presentation.finishBlockedReason}</Text><Pressable testID="train-finish" accessibilityRole="button" accessibilityLabel={presentation.finishAllowed ? "Finish workout" : `Finish workout unavailable. ${presentation.finishBlockedReason}`} accessibilityState={{ disabled: !presentation.finishAllowed }} disabled={!presentation.finishAllowed || busy} onPress={onFinish} style={({ pressed }) => [styles.finishAction, pressed && styles.primaryActionPressed, (!presentation.finishAllowed || busy) && styles.disabled]}><Text numberOfLines={1} style={styles.finishActionText}>{busy ? "Saving…" : "Finish workout"}</Text></Pressable></View>; }
 
 function TrainActionModal({ modal, reduceMotion, busy, onContinue, onPauseLeave, onRequestDiscard, onDiscard, onFinish }: Readonly<{ modal: TrainModal; reduceMotion: boolean; busy: boolean; onContinue(): void; onPauseLeave(): void; onRequestDiscard(): void; onDiscard(): void; onFinish(): void }>) {
   return <Modal visible={modal !== null} transparent animationType={reduceMotion ? "none" : "fade"} onRequestClose={onContinue} statusBarTranslucent>
     <View style={styles.modalBackdrop}><View accessibilityViewIsModal accessibilityRole="none" style={styles.modalSheet}>
+      <ScrollView key={modal ?? "closed"} bounces={false} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator contentContainerStyle={styles.modalContent}>
       {modal === "close" ? <>
-        <Text style={styles.modalTitle}>Leave this workout?</Text><Text style={styles.body}>Your valid completed sets are saved. Choose how you want to leave.</Text>
-        <Pressable accessibilityRole="button" onPress={onContinue} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>{canonicalTrainCloseActions[0].label}</Text></Pressable>
-        <Pressable accessibilityRole="button" disabled={busy} onPress={onPauseLeave} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>{canonicalTrainCloseActions[1].label}</Text></Pressable>
-        <Pressable accessibilityRole="button" onPress={onRequestDiscard} style={({ pressed }) => [styles.modalAction, styles.modalDangerOutline, pressed && styles.pressed]}><Text style={styles.modalDangerText}>{canonicalTrainCloseActions[2].label}</Text></Pressable>
+        <Text maxFontSizeMultiplier={1.5} style={styles.modalTitle}>Leave this workout?</Text><Text maxFontSizeMultiplier={1.6} style={styles.body}>Your valid completed sets are saved. Choose how you want to leave.</Text>
+        <Pressable testID="train-close-continue" accessibilityRole="button" accessibilityLabel={canonicalTrainCloseActions[0].label} onPress={onContinue} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>{canonicalTrainCloseActions[0].label}</Text></Pressable>
+        <Pressable testID="train-pause-leave" accessibilityRole="button" accessibilityLabel={canonicalTrainCloseActions[1].label} disabled={busy} onPress={onPauseLeave} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>{canonicalTrainCloseActions[1].label}</Text></Pressable>
+        <Pressable testID="train-request-discard" accessibilityRole="button" accessibilityLabel={canonicalTrainCloseActions[2].label} onPress={onRequestDiscard} style={({ pressed }) => [styles.modalAction, styles.modalDangerOutline, pressed && styles.pressed]}><Text style={styles.modalDangerText}>{canonicalTrainCloseActions[2].label}</Text></Pressable>
       </> : modal === "discard" ? <>
-        <Text style={styles.modalTitle}>Discard active attempt?</Text><Text style={styles.body}>This removes this in-progress attempt, its performed sets, and its rest timer. Completed workout history and the immutable prescription stay safe.</Text>
-        <Pressable accessibilityRole="button" onPress={onContinue} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>Cancel</Text></Pressable>
-        <Pressable accessibilityRole="button" disabled={busy} onPress={onDiscard} style={({ pressed }) => [styles.modalAction, styles.modalDanger, pressed && styles.pressed]}><Text style={styles.modalDangerFilledText}>{busy ? "Discarding…" : "Discard workout"}</Text></Pressable>
+        <Text maxFontSizeMultiplier={1.5} style={styles.modalTitle}>Discard active attempt?</Text><Text maxFontSizeMultiplier={1.6} style={styles.body}>This removes this in-progress attempt, its performed sets, and its rest timer. Completed workout history and the immutable prescription stay safe.</Text>
+        <Pressable testID="train-discard-cancel" accessibilityRole="button" accessibilityLabel="Cancel discard" onPress={onContinue} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>Cancel</Text></Pressable>
+        <Pressable testID="train-discard-confirm" accessibilityRole="button" accessibilityLabel="Discard workout" disabled={busy} onPress={onDiscard} style={({ pressed }) => [styles.modalAction, styles.modalDanger, pressed && styles.pressed]}><Text style={styles.modalDangerFilledText}>{busy ? "Discarding…" : "Discard workout"}</Text></Pressable>
       </> : modal === "finish" ? <>
-        <Text style={styles.modalTitle}>Finish workout?</Text><Text style={styles.body}>Your recorded sets will be completed exactly once and added to History.</Text>
-        <Pressable accessibilityRole="button" onPress={onContinue} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>Keep training</Text></Pressable>
-        <Pressable accessibilityRole="button" disabled={busy} onPress={onFinish} style={({ pressed }) => [styles.modalAction, styles.modalPrimary, pressed && styles.pressed]}><Text style={styles.modalPrimaryText}>{busy ? "Finishing…" : "Finish workout"}</Text></Pressable>
+        <Text maxFontSizeMultiplier={1.5} style={styles.modalTitle}>Finish workout?</Text><Text maxFontSizeMultiplier={1.6} style={styles.body}>Your recorded sets will be completed exactly once and added to History.</Text>
+        <Pressable testID="train-finish-cancel" accessibilityRole="button" accessibilityLabel="Keep training" onPress={onContinue} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>Keep training</Text></Pressable>
+        <Pressable testID="train-finish-confirm" accessibilityRole="button" accessibilityLabel="Confirm finish workout" disabled={busy} onPress={onFinish} style={({ pressed }) => [styles.modalAction, styles.modalPrimary, pressed && styles.pressed]}><Text style={styles.modalPrimaryText}>{busy ? "Finishing…" : "Finish workout"}</Text></Pressable>
       </> : null}
+      </ScrollView>
     </View></View>
   </Modal>;
 }
 
-function Field({ label, value, unit, keyboardType, error, onChange }: Readonly<{ label: string; value: string; unit: string; keyboardType: "number-pad" | "decimal-pad"; error: boolean; onChange(value: string): void }>) { return <View style={styles.field}><Text style={styles.columnLabel}>{label}</Text><View style={[styles.fieldInputWrap, error && styles.inputError]}><TextInput accessibilityLabel={`${label}, ${unit}`} keyboardType={keyboardType} value={value} onChangeText={onChange} style={styles.fieldInput} /><Text style={styles.unitLabel}>{unit}</Text></View></View>; }
+function Field({ testID, label, value, unit, keyboardType, error, onChange }: Readonly<{ testID: string; label: string; value: string; unit: string; keyboardType: "number-pad" | "decimal-pad"; error: boolean; onChange(value: string): void }>) { return <View style={styles.field}><Text maxFontSizeMultiplier={1.35} style={styles.columnLabel}>{label}</Text><View style={[styles.fieldInputWrap, error && styles.inputError]}><NumericTextInput testID={testID} accessibilityLabel={`${label}, ${unit}`} keyboardType={keyboardType} value={value} onChangeText={onChange} style={styles.fieldInput} /><Text maxFontSizeMultiplier={1.35} style={styles.unitLabel}>{unit}</Text></View></View>; }
+
+function NumericTextInput(props: React.ComponentProps<typeof TextInput> & Readonly<{ testID: string }>) {
+  return <TextInput maxFontSizeMultiplier={1.35} {...props} inputAccessoryViewID={Platform.OS === "ios" ? TRAIN_NUMERIC_KEYBOARD_ACCESSORY_ID : undefined} />;
+}
 function Stat({ label, value }: Readonly<{ label: string; value: string }>) { return <View style={styles.stat}><Text style={styles.statValue}>{value}</Text><Text style={styles.tinyMuted}>{label}</Text></View>; }
 
 function UnavailableState({ message, detail, onReturn, onRestore }: Readonly<{ message: string; detail?: string | null; onReturn(): void; onRestore?: () => void }>) { return <AppScreen><Text style={{ color: colors.text, fontSize: 28, fontWeight: "900" }}>Train safely</Text><Text style={{ color: colors.textMuted }}>{message}</Text>{detail ? <Text style={{ color: colors.textMuted }}>{detail}</Text> : null}{onRestore ? <SecondaryButton label="Restore workout" onPress={onRestore} /> : null}<SecondaryButton label="Return to Home" onPress={onReturn} /></AppScreen>; }
@@ -683,6 +692,9 @@ const styles = StyleSheet.create({
   field: { flex: 1, minWidth: 0, gap: 5 },
   fieldInputWrap: { minHeight: 48, flexDirection: "row", alignItems: "center", borderRadius: 10, backgroundColor: TRAIN.background, borderWidth: 1, borderColor: TRAIN.lineStrong },
   fieldInput: { flex: 1, minWidth: 0, minHeight: 46, color: TRAIN.text, fontSize: 17, fontWeight: "800", paddingLeft: 10, paddingRight: 42 },
+  keyboardAccessory: { minHeight: 44, alignItems: "flex-end", justifyContent: "center", paddingHorizontal: 12, backgroundColor: TRAIN.surface },
+  keyboardDone: { minWidth: 56, minHeight: 44, alignItems: "center", justifyContent: "center" },
+  keyboardDoneText: { color: TRAIN.accent, fontSize: 16, fontWeight: "900" },
   unitLabel: { position: "absolute", right: 0, color: TRAIN.muted, fontSize: 11, fontWeight: "900", textTransform: "uppercase", paddingRight: 8 },
   calibrationAction: { minHeight: 50, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: TRAIN.accent, paddingHorizontal: 12 },
   calibrationActionText: { color: TRAIN.background, fontSize: 15, fontWeight: "900" },
@@ -734,7 +746,8 @@ const styles = StyleSheet.create({
   finishAction: { minHeight: 52, alignItems: "center", justifyContent: "center", borderRadius: 13, backgroundColor: TRAIN.accent, paddingHorizontal: 12 },
   finishActionText: { color: TRAIN.background, fontSize: 15, fontWeight: "900" },
   modalBackdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.78)", padding: 12 },
-  modalSheet: { gap: 10, padding: 18, paddingBottom: 24, borderRadius: 22, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.lineStrong },
+  modalSheet: { maxHeight: "92%", borderRadius: 22, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.lineStrong, overflow: "hidden" },
+  modalContent: { gap: 10, padding: 18, paddingBottom: 24 },
   modalTitle: { color: TRAIN.text, fontSize: 23, lineHeight: 28, fontWeight: "900" },
   modalAction: { minHeight: 52, alignItems: "center", justifyContent: "center", borderRadius: 13, backgroundColor: TRAIN.surfaceRaised, borderWidth: 1, borderColor: TRAIN.lineStrong, paddingHorizontal: 12 },
   modalActionText: { color: TRAIN.text, fontSize: 15, fontWeight: "900" },

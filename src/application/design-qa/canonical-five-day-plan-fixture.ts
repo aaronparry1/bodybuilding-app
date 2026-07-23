@@ -108,6 +108,7 @@ export function applyCanonicalPlanVisualState(
 function applyCompletedWeekHistory(planId: string, now: string) {
   const repositoryPlan = canonicalActivePlanV2Repository.get();
   if (repositoryPlan.status !== "saved") throw new Error("canonical_plan_visual_carrier_unavailable");
+  const nextRevision = repositoryPlan.carrier.revision + 1;
   const references = repositoryPlan.carrier.plannedSessions.map((planned, index) => {
     const recordedSessionId = `${planId}:completed:${index + 1}`;
     const startedAt = offsetIso(now, index * 3_600_000 - 45 * 60_000);
@@ -126,9 +127,8 @@ function applyCompletedWeekHistory(planId: string, now: string) {
     completeActiveSession(planId, recordedSessionId, repositoryPlan.carrier.revision, work.ledgerVersion, offsetIso(now, index * 3_600_000), `week-${index + 1}`);
     const aggregate = canonicalRecordedSessionLedger.get(recordedSessionId);
     if (aggregate.status !== "found" || aggregate.session.status !== "completed") throw new Error("canonical_plan_visual_completion_unavailable");
-    return { sessionId: recordedSessionId, planId, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId, microcycleId: aggregate.session.microcycleId, revision: aggregate.session.version, status: "completed" as const, recordReference: `canonical-recorded-session:${recordedSessionId}` };
+    return { sessionId: recordedSessionId, planId, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId, microcycleId: aggregate.session.microcycleId, revision: nextRevision, status: "completed" as const, recordReference: `canonical-recorded-session:${recordedSessionId}` };
   });
-  const nextRevision = repositoryPlan.carrier.revision + 1;
   const saved = canonicalActivePlanV2Repository.saveAtomically({ ...repositoryPlan.carrier, revision: nextRevision, updatedAt: now, plannedSessions: [], recordedSessionReferences: references, progress: { ...repositoryPlan.carrier.progress, revision: nextRevision } }, repositoryPlan.carrier.revision);
   if (saved.status !== "saved") throw new Error(`canonical_plan_visual_reference_failed:${saved.status}`);
   return canonicalActivePlanState.hydrate().model ?? (() => { throw new Error("canonical_plan_visual_hydration_failed"); })();
@@ -168,6 +168,7 @@ function applyComparableProgressHistory(planId: string, exposures: number, loadS
     return Array.from({ length: requiredSets }, (_, setIndex) => ({ slot, setOrder: setIndex + 1, reps: exactTargets[setIndex] ?? Number(slot.targetReps ?? 6) }));
   });
   const durationMinutes = Math.max(45, prescribed.length * 3 + slots.length * 4);
+  const nextRevision = repositoryPlan.carrier.revision + 1;
   const references = [];
 
   for (let index = 0; index < exposures; index += 1) {
@@ -225,10 +226,9 @@ function applyComparableProgressHistory(planId: string, exposures: number, loadS
     completeActiveSession(planId, recordedSessionId, repositoryPlan.carrier.revision, ledgerVersion, completedAt, `comparison-${index + 1}`);
     const aggregate = canonicalRecordedSessionLedger.get(recordedSessionId);
     if (aggregate.status !== "found" || aggregate.session.status !== "completed") throw new Error("canonical_progress_visual_completion_unavailable");
-    references.push({ sessionId: recordedSessionId, planId, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId, microcycleId: aggregate.session.microcycleId, revision: aggregate.session.version, status: "completed" as const, recordReference: `canonical-recorded-session:${recordedSessionId}` });
+    references.push({ sessionId: recordedSessionId, planId, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId, microcycleId: aggregate.session.microcycleId, revision: nextRevision, status: "completed" as const, recordReference: `canonical-recorded-session:${recordedSessionId}` });
   }
 
-  const nextRevision = repositoryPlan.carrier.revision + 1;
   const saved = canonicalActivePlanV2Repository.saveAtomically({ ...repositoryPlan.carrier, revision: nextRevision, updatedAt: "2026-07-18T10:00:00.000Z", recordedSessionReferences: references, progress: { ...repositoryPlan.carrier.progress, revision: nextRevision } }, repositoryPlan.carrier.revision);
   if (saved.status !== "saved") throw new Error(`canonical_progress_visual_reference_failed:${saved.status}`);
   return canonicalActivePlanState.hydrate().model ?? (() => { throw new Error("canonical_progress_visual_hydration_failed"); })();

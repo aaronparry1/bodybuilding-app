@@ -19,17 +19,17 @@
     {
       "minutes": 30,
       "feasibility": "infeasible",
-      "calendarSliceWorkingSets": 40,
+      "calendarSliceWorkingSets": 44,
       "sessions": [
         {
           "role": "Push hypertrophy A",
-          "sessionWorkingSets": 8,
-          "estimatedMinutes": 27
+          "sessionWorkingSets": 9,
+          "estimatedMinutes": 30
         },
         {
           "role": "Pull hypertrophy B",
-          "sessionWorkingSets": 8,
-          "estimatedMinutes": 27
+          "sessionWorkingSets": 9,
+          "estimatedMinutes": 30
         },
         {
           "role": "Legs hypertrophy C",
@@ -38,24 +38,24 @@
         },
         {
           "role": "Push hypertrophy D",
-          "sessionWorkingSets": 8,
-          "estimatedMinutes": 27
+          "sessionWorkingSets": 9,
+          "estimatedMinutes": 30
         },
         {
           "role": "Pull hypertrophy E",
-          "sessionWorkingSets": 8,
-          "estimatedMinutes": 27
+          "sessionWorkingSets": 9,
+          "estimatedMinutes": 30
         }
       ],
       "completeRotationDirectSets": {
         "chest": 4,
         "anterior_delts": 4,
-        "lateral_delts": 4,
+        "lateral_delts": 6,
         "triceps": 4,
         "upper_back": 4,
         "lats": 4,
         "rear_delts": 4,
-        "biceps": 4,
+        "biceps": 6,
         "quadriceps": 4,
         "hip_extension": 4,
         "hamstrings_knee_flexion": 4,
@@ -64,12 +64,12 @@
       "normalizedSevenDayDirectSets": {
         "chest": 3.33,
         "anterior_delts": 3.33,
-        "lateral_delts": 3.33,
+        "lateral_delts": 5,
         "triceps": 3.33,
         "upper_back": 3.33,
         "lats": 3.33,
         "rear_delts": 3.33,
-        "biceps": 3.33,
+        "biceps": 5,
         "quadriceps": 3.33,
         "hip_extension": 3.33,
         "hamstrings_knee_flexion": 3.33,
@@ -123,6 +123,44 @@
             "quadriceps"
           ],
           "sessionRole": "Legs hypertrophy F"
+        }
+      ],
+      "redistributions": [
+        {
+          "stimulus": "biceps",
+          "fromSessionIndex": 1,
+          "fromSessionRole": "Pull hypertrophy B",
+          "toSessionIndex": 4,
+          "toSessionRole": "Pull hypertrophy E",
+          "movedWorkingSets": 0,
+          "recoveredWorkingSets": 1
+        },
+        {
+          "stimulus": "biceps",
+          "fromSessionIndex": 1,
+          "fromSessionRole": "Pull hypertrophy B",
+          "toSessionIndex": 1,
+          "toSessionRole": "Pull hypertrophy B",
+          "movedWorkingSets": 0,
+          "recoveredWorkingSets": 1
+        },
+        {
+          "stimulus": "lateral_delts",
+          "fromSessionIndex": 0,
+          "fromSessionRole": "Push hypertrophy A",
+          "toSessionIndex": 3,
+          "toSessionRole": "Push hypertrophy D",
+          "movedWorkingSets": 0,
+          "recoveredWorkingSets": 1
+        },
+        {
+          "stimulus": "lateral_delts",
+          "fromSessionIndex": 0,
+          "fromSessionRole": "Push hypertrophy A",
+          "toSessionIndex": 0,
+          "toSessionRole": "Push hypertrophy A",
+          "movedWorkingSets": 0,
+          "recoveredWorkingSets": 1
         }
       ],
       "recoveredLater": [
@@ -208,7 +246,7 @@
         "hamstrings_knee_flexion",
         "calves"
       ],
-      "customerGuidance": "This 30-minute, 5-day schedule cannot retain the authorised starting coverage for chest, anterior delts, lateral delts, triceps, upper back, lats, rear delts, biceps, quadriceps, hip extension, hamstrings knee flexion, calves. Choose longer workouts or a lower training frequency.",
+      "customerGuidance": "This 30-minute, 5-day schedule cannot retain the authorised starting coverage for chest, anterior delts, lateral delts, triceps, upper back, lats, rear delts, biceps, quadriceps, hip extension, hamstrings knee flexion, calves. Choose a longer supported workout duration, fewer weekly training days, or another training framework.",
       "certificationStatus": "failed",
       "certificationFailures": [
         "chronic_volume_floor_unmet:chest|anterior_delts|lateral_delts|triceps|upper_back|lats|rear_delts|biceps|quadriceps|hip_extension|hamstrings_knee_flexion|calves"
@@ -217,7 +255,7 @@
     {
       "minutes": 45,
       "feasibility": "infeasible",
-      "calendarSliceWorkingSets": 65,
+      "calendarSliceWorkingSets": 69,
       "sessions": [
         {
           "role": "Push hypertrophy A",
@@ -226,56 +264,94 @@
         },
         {
           "role": "Pull hypertrophy B",
-          "sessionWorkingSets": 13,
-          "estimatedMinutes": 43
+          "sessionWorkingSets": 14,
+          "estimatedMinutes": 45
         },
         {
           "role": "Legs hypertrophy C",
-          "sessionWorkingSets": 12,
-          "estimatedMinutes": 42
+          "sessionWorkingSets": 13,
+          "estimatedMinutes": 44
         },
         {
           "role": "Push hypertrophy D",
-          "sessionWorkingSets": 13,
-          "estimatedMinutes": 42
+          "sessionWorkingSets": 14,
+          "estimatedMinutes": 45
         },
         {
           "role": "Pull hypertrophy E",
-          "sessionWorkingSets": 13,
-          "estimatedMinutes": 43
+          "sessionWorkingSets": 14,
+          "estimatedMinutes": 45
         }
       ],
       "completeRotationDirectSets": {
         "chest": 10,
         "anterior_delts": 6,
-        "lateral_delts": 5,
+        "lateral_delts": 6,
         "triceps": 6,
         "upper_back": 10,
         "lats": 8,
         "rear_delts": 4,
-        "biceps": 4,
+        "biceps": 6,
         "quadriceps": 8,
         "hip_extension": 8,
         "hamstrings_knee_flexion": 4,
-        "calves": 4,
+        "calves": 5,
         "core": 2
       },
       "normalizedSevenDayDirectSets": {
         "chest": 8.33,
         "anterior_delts": 5,
-        "lateral_delts": 4.17,
+        "lateral_delts": 5,
         "triceps": 5,
         "upper_back": 8.33,
         "lats": 6.67,
         "rear_delts": 3.33,
-        "biceps": 3.33,
+        "biceps": 5,
         "quadriceps": 6.67,
         "hip_extension": 6.67,
         "hamstrings_knee_flexion": 3.33,
-        "calves": 3.33,
+        "calves": 4.17,
         "core": 1.67
       },
       "omittedStimuliByCompleteRotationSession": [],
+      "redistributions": [
+        {
+          "stimulus": "biceps",
+          "fromSessionIndex": 1,
+          "fromSessionRole": "Pull hypertrophy B",
+          "toSessionIndex": 4,
+          "toSessionRole": "Pull hypertrophy E",
+          "movedWorkingSets": 0,
+          "recoveredWorkingSets": 1
+        },
+        {
+          "stimulus": "biceps",
+          "fromSessionIndex": 1,
+          "fromSessionRole": "Pull hypertrophy B",
+          "toSessionIndex": 1,
+          "toSessionRole": "Pull hypertrophy B",
+          "movedWorkingSets": 0,
+          "recoveredWorkingSets": 1
+        },
+        {
+          "stimulus": "calves",
+          "fromSessionIndex": 2,
+          "fromSessionRole": "Legs hypertrophy C",
+          "toSessionIndex": 2,
+          "toSessionRole": "Legs hypertrophy C",
+          "movedWorkingSets": 0,
+          "recoveredWorkingSets": 1
+        },
+        {
+          "stimulus": "lateral_delts",
+          "fromSessionIndex": 0,
+          "fromSessionRole": "Push hypertrophy A",
+          "toSessionIndex": 3,
+          "toSessionRole": "Push hypertrophy D",
+          "movedWorkingSets": 0,
+          "recoveredWorkingSets": 1
+        }
+      ],
       "recoveredLater": [],
       "durationInducedUnmetTargets": [
         "anterior_delts",
@@ -289,7 +365,7 @@
         "hamstrings_knee_flexion",
         "calves"
       ],
-      "customerGuidance": "This 45-minute, 5-day schedule cannot retain the authorised starting coverage for anterior delts, lateral delts, triceps, lats, rear delts, biceps, quadriceps, hip extension, hamstrings knee flexion, calves. Choose longer workouts or a lower training frequency.",
+      "customerGuidance": "This 45-minute, 5-day schedule cannot retain the authorised starting coverage for anterior delts, lateral delts, triceps, lats, rear delts, biceps, quadriceps, hip extension, hamstrings knee flexion, calves. Choose a longer supported workout duration, fewer weekly training days, or another training framework.",
       "certificationStatus": "failed",
       "certificationFailures": [
         "chronic_volume_floor_unmet:anterior_delts|lateral_delts|triceps|lats|rear_delts|biceps|quadriceps|hip_extension|hamstrings_knee_flexion|calves"
@@ -297,8 +373,8 @@
     },
     {
       "minutes": 60,
-      "feasibility": "infeasible",
-      "calendarSliceWorkingSets": 82,
+      "feasibility": "viable",
+      "calendarSliceWorkingSets": 85,
       "sessions": [
         {
           "role": "Push hypertrophy A",
@@ -312,13 +388,13 @@
         },
         {
           "role": "Legs hypertrophy C",
-          "sessionWorkingSets": 17,
-          "estimatedMinutes": 59
+          "sessionWorkingSets": 16,
+          "estimatedMinutes": 56
         },
         {
           "role": "Push hypertrophy D",
-          "sessionWorkingSets": 13,
-          "estimatedMinutes": 42
+          "sessionWorkingSets": 17,
+          "estimatedMinutes": 51
         },
         {
           "role": "Pull hypertrophy E",
@@ -337,8 +413,8 @@
         "biceps": 7,
         "quadriceps": 10,
         "hip_extension": 10,
-        "hamstrings_knee_flexion": 6,
-        "calves": 5,
+        "hamstrings_knee_flexion": 7,
+        "calves": 7,
         "core": 2
       },
       "normalizedSevenDayDirectSets": {
@@ -352,21 +428,36 @@
         "biceps": 5.83,
         "quadriceps": 8.33,
         "hip_extension": 8.33,
-        "hamstrings_knee_flexion": 5,
-        "calves": 4.17,
+        "hamstrings_knee_flexion": 5.83,
+        "calves": 5.83,
         "core": 1.67
       },
       "omittedStimuliByCompleteRotationSession": [],
-      "recoveredLater": [],
-      "durationInducedUnmetTargets": [
-        "hamstrings_knee_flexion",
-        "calves"
+      "redistributions": [
+        {
+          "stimulus": "calves",
+          "fromSessionIndex": 2,
+          "fromSessionRole": "Legs hypertrophy C",
+          "toSessionIndex": 5,
+          "toSessionRole": "Legs hypertrophy F",
+          "movedWorkingSets": 0,
+          "recoveredWorkingSets": 2
+        },
+        {
+          "stimulus": "hamstrings_knee_flexion",
+          "fromSessionIndex": 2,
+          "fromSessionRole": "Legs hypertrophy C",
+          "toSessionIndex": 5,
+          "toSessionRole": "Legs hypertrophy F",
+          "movedWorkingSets": 0,
+          "recoveredWorkingSets": 1
+        }
       ],
-      "customerGuidance": "This 60-minute, 5-day schedule cannot retain the authorised starting coverage for hamstrings knee flexion, calves. Choose longer workouts or a lower training frequency.",
-      "certificationStatus": "failed",
-      "certificationFailures": [
-        "chronic_volume_floor_unmet:hamstrings_knee_flexion|calves"
-      ]
+      "recoveredLater": [],
+      "durationInducedUnmetTargets": [],
+      "customerGuidance": null,
+      "certificationStatus": "passed",
+      "certificationFailures": []
     },
     {
       "minutes": 75,
@@ -430,6 +521,7 @@
         "core": 1.67
       },
       "omittedStimuliByCompleteRotationSession": [],
+      "redistributions": [],
       "recoveredLater": [],
       "durationInducedUnmetTargets": [],
       "customerGuidance": null,
@@ -498,6 +590,7 @@
         "core": 1.67
       },
       "omittedStimuliByCompleteRotationSession": [],
+      "redistributions": [],
       "recoveredLater": [],
       "durationInducedUnmetTargets": [],
       "customerGuidance": null,

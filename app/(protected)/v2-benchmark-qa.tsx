@@ -1,6 +1,6 @@
 import { Redirect } from "expo-router";
 import { Text, View } from "react-native";
-import { isV2CoachingQaRequested } from "@/application/runtime/app-environment";
+import { isV2CoachingQaRequested } from "@/application/design-qa/design-qa-runtime";
 import {
   runProductionV2CompleteSessionReviewSuite,
   type CompleteCoachingSessionReview,

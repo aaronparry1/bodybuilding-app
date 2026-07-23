@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import type { CanonicalHomeAction, CanonicalHomePrimary, CanonicalHomeProjection } from "@/application/training/canonical-home-projection";
 import { colors, radius, shellTokens, spacing, type } from "@/ui/theme";
+import { stableUiIdentifier } from "@/ui/primitives";
 
 export function HomeDashboard({ projection, onAction }: Readonly<{ projection: CanonicalHomeProjection; onAction(action: CanonicalHomeAction): void }>) {
   return <View style={{ gap: shellTokens.sectionGap }}>
@@ -105,7 +106,7 @@ function DashboardSection({ eyebrow, title, children }: Readonly<{ eyebrow: stri
 }
 
 function DashboardAction({ label, onPress, emphasized = false }: Readonly<{ label: string; onPress(): void; emphasized?: boolean }>) {
-  return <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => ({ minHeight: shellTokens.controlMinHeight, alignItems: "center", justifyContent: "center", borderRadius: radius.md, borderCurve: "continuous", borderWidth: 1, borderColor: emphasized || pressed ? colors.accent : colors.line, backgroundColor: emphasized ? pressed ? colors.accentPressed : colors.accent : pressed ? colors.accentSoft : colors.surfaceMuted, paddingHorizontal: spacing.lg, opacity: pressed ? 0.86 : 1 })}>
+  return <Pressable testID={stableUiIdentifier("action", label)} accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => ({ minHeight: shellTokens.controlMinHeight, alignItems: "center", justifyContent: "center", borderRadius: radius.md, borderCurve: "continuous", borderWidth: 1, borderColor: emphasized || pressed ? colors.accent : colors.line, backgroundColor: emphasized ? pressed ? colors.accentPressed : colors.accent : pressed ? colors.accentSoft : colors.surfaceMuted, paddingHorizontal: spacing.lg, opacity: pressed ? 0.86 : 1 })}>
     <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.82} style={{ color: emphasized ? colors.background : colors.text, fontSize: 14, lineHeight: 18, fontWeight: "900" }}>{label}</Text>
   </Pressable>;
 }

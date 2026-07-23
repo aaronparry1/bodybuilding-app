@@ -31,6 +31,7 @@ function flag(name: string, publicName: string): boolean {
 }
 
 function loadLocalEnv() {
+  if (process.env.EXPO_NO_DOTENV === "1" || process.env.EXPO_NO_DOTENV === "true") return;
   for (const file of [".env", ".env.local", `.env.${process.env.APP_ENV ?? ""}`].filter(Boolean)) {
     if (!existsSync(file)) continue;
 
@@ -48,6 +49,7 @@ function loadLocalEnv() {
 const appEnvironment = readEnvironment();
 const isProduction = appEnvironment === "production";
 const isStaging = appEnvironment === "staging";
+const routerRoot = isProduction ? "app-production" : "app";
 const appName = env("APP_NAME", isProduction ? "Adaptive Strength Coach" : isStaging ? "Adaptive Strength Coach Staging" : "Adaptive Strength Coach Dev");
 const appDownloadUrl = env("APP_DOWNLOAD_URL", "https://adaptivestrengthcoach.com/download");
 const appStoreUrl = process.env.APP_STORE_URL;
@@ -59,7 +61,7 @@ const revenueCatAnnualProductId = env("EXPO_PUBLIC_REVENUECAT_ANNUAL_PRODUCT_ID"
 const config: ExpoConfig = {
   name: appName,
   slug: env("APP_SLUG", "hypertrophy-app"),
-  version: env("APP_VERSION", "1.0.13"),
+  version: env("APP_VERSION", "1.0.14"),
   orientation: "portrait",
   icon: "./assets/icon.png",
   scheme: env("APP_SCHEME", isProduction ? "ironlogic" : isStaging ? "ironlogic-staging" : "ironlogic-dev"),
@@ -75,7 +77,7 @@ const config: ExpoConfig = {
           ? "com.aaronparry.adaptivestrengthcoach.staging"
           : "com.aaronparry.adaptivestrengthcoach.dev",
     ),
-    buildNumber: env("APP_IOS_BUILD_NUMBER", "44"),
+    buildNumber: env("APP_IOS_BUILD_NUMBER", "45"),
     associatedDomains: ["applinks:adaptivestrengthcoach.com"],
     infoPlist: {
       CFBundleDisplayName: env("APP_IOS_DISPLAY_NAME", appName),
@@ -118,7 +120,7 @@ const config: ExpoConfig = {
     favicon: "./assets/favicon.png",
   },
   plugins: [
-    "expo-router",
+    ["expo-router", { root: routerRoot }],
     "expo-sharing",
     "expo-sqlite",
     "expo-secure-store",
@@ -141,14 +143,14 @@ const config: ExpoConfig = {
     revenueCatEntitlementId,
     revenueCatMonthlyProductId,
     revenueCatAnnualProductId,
-    designQaMode: !isProduction && process.env.EXPO_PUBLIC_DESIGN_QA_MODE === "1",
+    ...(!isProduction ? { designQaMode: process.env.EXPO_PUBLIC_DESIGN_QA_MODE === "1" } : {}),
     coachingEngineV3: {
       enabled: flag("ASC_COACHING_ENGINE_V3", "EXPO_PUBLIC_ASC_COACHING_ENGINE_V3"),
       activeWorkout: flag("ASC_V3_ACTIVE_WORKOUT", "EXPO_PUBLIC_ASC_V3_ACTIVE_WORKOUT"),
       qualityGateStrict: flag("ASC_V3_QUALITY_GATE_STRICT", "EXPO_PUBLIC_ASC_V3_QUALITY_GATE_STRICT"),
       shadowMode: flag("ASC_V3_SHADOW_MODE", "EXPO_PUBLIC_ASC_V3_SHADOW_MODE"),
     },
-    ordinaryV2ShadowObservationEnabled: process.env.EXPO_PUBLIC_ORDINARY_V2_SHADOW_OBSERVATION === "enabled",
+    ...(!isProduction ? { ordinaryV2ShadowObservationEnabled: process.env.EXPO_PUBLIC_ORDINARY_V2_SHADOW_OBSERVATION === "enabled" } : {}),
     eas: {
       projectId: env("EAS_PROJECT_ID", "74af0233-9986-445e-b138-8210fa059bfc"),
     },

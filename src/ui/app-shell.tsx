@@ -22,9 +22,9 @@ export function AppShellIcon({ name, color = colors.textMuted, size = 20 }: Read
 export function AppShellHeader() {
   const insets = useSafeAreaInsets();
   return <View style={{ paddingTop: Math.max(insets.top, spacing.sm), paddingHorizontal: shellTokens.pageHorizontal, paddingBottom: spacing.xs, minHeight: 48 + insets.top, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: colors.lineSoft }}>
-    <Text style={{ color: colors.text, fontSize: 14, lineHeight: 18, fontWeight: "900", letterSpacing: 0.1 }}>Adaptive Strength Coach</Text>
+    <Text maxFontSizeMultiplier={1.3} numberOfLines={1} adjustsFontSizeToFit style={{ flex: 1, color: colors.text, fontSize: 14, lineHeight: 18, fontWeight: "900", letterSpacing: 0.1 }}>Adaptive Strength Coach</Text>
     <Link href="/(protected)/settings" asChild>
-      <Pressable accessibilityRole="button" accessibilityLabel="Open settings" hitSlop={8} style={({ pressed }) => ({ width: 40, height: 40, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: pressed ? colors.accent : colors.line, backgroundColor: pressed ? colors.accentSoft : colors.surfaceMuted, opacity: pressed ? 0.82 : 1 })}>
+      <Pressable testID="action-open-settings" accessibilityRole="button" accessibilityLabel="Open settings" hitSlop={8} style={({ pressed }) => ({ width: 40, height: 40, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: pressed ? colors.accent : colors.line, backgroundColor: pressed ? colors.accentSoft : colors.surfaceMuted, opacity: pressed ? 0.82 : 1 })}>
         <AppShellIcon name="settings" color={colors.text} size={19} />
       </Pressable>
     </Link>

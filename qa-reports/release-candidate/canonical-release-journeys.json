@@ -1,56 +1,55 @@
 {
-  "schemaVersion": "canonical_release_candidate_journeys_v1",
-  "generatedFromHead": "fc9c80cbf774e022ccd9f865503255896d0c7f61",
+  "schemaVersion": "canonical_release_candidate_journeys_v2",
+  "certifiedWorkingTreeBaseHead": "146462e9553938a14e2454ed2e51c727d1e5da1",
   "journeys": [
     {
       "id": "A_fresh_install_training_lifecycle",
-      "status": "covered_by_composed_persisted_tests",
+      "status": "passed_on_native_modern_and_narrow",
       "testFiles": [
-        "tests/onboarding-final-screen.test.ts",
-        "tests/canonical-physical-journey.test.ts",
-        "tests/canonical-home-projection.test.ts",
-        "tests/canonical-plan-presentation.test.ts",
-        "tests/canonical-progress-athlete-presentation.test.ts"
+        "ios/AdaptiveStrengthCoachUITests/ReleaseCandidateJourneyUITests.swift"
       ],
       "assertions": [
-        "onboarding commits one canonical active plan",
-        "Home and Plan open the same canonical planned-session identity",
-        "every prescribed working set is recorded through the canonical ledger",
-        "completed work can be edited before completion",
-        "rest timer pauses, resumes and clears at completion",
-        "completion retry is idempotent",
-        "completed history contains exactly one recorded session and Progress evidence exists",
-        "the next session is a different canonical identity"
+        "fresh onboarding creates the five-day intermediate hypertrophy PPL at 60 minutes",
+        "Home, Plan and preview expose the canonical next session",
+        "calibration produces executable working-set defaults without zero load",
+        "working work, timer controls and completed-set edits persist through canonical commands",
+        "pause and leave restores tabs and resume preserves performed work",
+        "discard requires confirmation and releases only the active attempt",
+        "completion produces exactly one completed workout without a fabricated trend or PR",
+        "termination and relaunch restore completed history and the next planned session"
       ]
     },
     {
       "id": "B_existing_user_reconciliation",
-      "status": "passed",
+      "status": "passed_in_native_persistence_harness",
       "testFiles": [
+        "ios/AdaptiveStrengthCoachUITests/ReleaseCandidateJourneyUITests.swift",
+        "ios/AdaptiveStrengthCoachUITests/Fixtures/prepare_persisted_state.py",
         "tests/canonical-release-reconciliation.test.ts"
       ],
       "assertions": [
-        "historical four-day and five-day canonical plans keep their frequency",
-        "pre-target-reps and pre-duration future prescriptions are reconstructed",
+        "historical future prescriptions reconstruct through canonical Session Construction",
         "completed canonical ledger history remains byte-identical",
-        "only future Session Construction snapshots are regenerated",
-        "repeated launch performs no additional write"
+        "a second launch is idempotent",
+        "corrupt plans and incompatible attempts fail closed with customer-safe recovery",
+        "tabs remain available and no unsafe Train action becomes active"
       ]
     },
     {
       "id": "C_session_duration_change",
-      "status": "safety_deviation_from_requested_application",
+      "status": "passed_with_supported_and_fail_closed_branches",
       "testFiles": [
-        "tests/canonical-session-duration-planning.test.ts",
-        "tests/canonical-release-duration-matrix.test.ts"
+        "ios/AdaptiveStrengthCoachUITests/ReleaseCandidateJourneyUITests.swift",
+        "tests/canonical-release-duration-matrix.test.ts",
+        "tests/canonical-session-duration-planning.test.ts"
       ],
       "assertions": [
-        "the representative five-day PPL programme rejects 60-to-45 because both settings leave chronic rolling-coverage gaps",
-        "the rejected change performs no write and preserves completed history",
-        "a viable 90-to-75 change reconstructs future snapshots atomically and preserves completed history",
-        "all duration outputs label session, calendar-slice, complete-rotation and normalized-seven-day quantities"
-      ],
-      "customerGuidance": "Choose a longer workout or restart setup with fewer training days when the selected duration cannot preserve required rolling coverage."
+        "60 minutes constructs a viable programme with all five visible sessions at or below 60 minutes",
+        "90, 75 and 60 minute changes rebuild future sessions atomically and preserve completed history",
+        "45 and 30 minute changes fail closed with the exact coverage conflict and actionable choices",
+        "an infeasible choice never silently changes the existing 60-minute preference",
+        "all retained exercise slots contain at least two working sets"
+      ]
     },
     {
       "id": "D_recovery_and_adaptation",
@@ -73,9 +72,9 @@
       "id": "E_failure_and_retry",
       "status": "passed",
       "testFiles": [
+        "ios/AdaptiveStrengthCoachUITests/ReleaseCandidateJourneyUITests.swift",
         "tests/canonical-repository-failure-injection.test.ts",
         "tests/canonical-release-reconciliation.test.ts",
-        "tests/canonical-session-duration-planning.test.ts",
         "tests/canonical-progress-decision-production.test.ts"
       ],
       "assertions": [

@@ -1,23 +1,20 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { useAuth } from "@/application/auth/auth-context";
-import { getAppEnvironment, isDesignQaModeAvailable } from "@/application/runtime/app-environment";
+import { getAppEnvironment } from "@/application/runtime/app-environment";
 import { customerSafeServiceMessage } from "@/application/runtime/customer-facing-errors";
 import { AppInput, AppScreen, ErrorState, HeroPanel, PrimaryButton, SecondaryButton } from "@/ui/primitives";
 import { colors, radius, spacing } from "@/ui/theme";
 
 export default function AuthScreen() {
-  const { signIn, signUp, signInWithApple, signInWithGoogle, continueOffline, enterDesignQaMode, error, isLoading, isConfigured } = useAuth();
+  const { signIn, signUp, signInWithApple, signInWithGoogle, continueOffline, error, isLoading, isConfigured } = useAuth();
   const [mode, setMode] = useState<"login" | "signup">("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const canSubmit = email.includes("@") && password.length >= 6 && isConfigured && !isLoading;
   const appEnvironment = getAppEnvironment();
-  const showDesignQaMode = isDesignQaModeAvailable(appEnvironment);
   const safeError = customerSafeServiceMessage(error, appEnvironment);
-  const accountUnavailableMessage = showDesignQaMode
-    ? "Supabase config is missing, so cloud accounts are unavailable. Offline mode still works."
-    : "We couldn’t connect to online services right now. Offline mode still works.";
+  const accountUnavailableMessage = "We couldn’t connect to online services right now. Offline mode still works.";
 
   const submit = () => {
     if (!canSubmit) return;
@@ -53,14 +50,6 @@ export default function AuthScreen() {
 
       <View style={{ gap: spacing.sm }}>
         <SecondaryButton label="Continue offline" onPress={continueOffline} disabled={isLoading} />
-        {showDesignQaMode ? (
-          <View style={{ gap: spacing.xs }}>
-            <SecondaryButton label="Design QA Mode" onPress={enterDesignQaMode} disabled={isLoading} accessibilityLabel="Design QA Mode" />
-            <Text selectable style={{ color: colors.textSubtle, fontSize: 11, lineHeight: 16, textAlign: "center" }}>
-              {appEnvironment} only. Opens local offline screens without creating a cloud session.
-            </Text>
-          </View>
-        ) : null}
         <View style={{ flexDirection: "row", gap: spacing.sm }}>
           <SecondaryButton label="Apple" onPress={signInWithApple} disabled={!isConfigured || isLoading} compact />
           <SecondaryButton label="Google" onPress={signInWithGoogle} disabled={!isConfigured || isLoading} compact />

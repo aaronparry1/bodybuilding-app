@@ -1,7 +1,8 @@
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Text, View } from "react-native";
-import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested, isV2CoachingQaRequested } from "@/application/runtime/app-environment";
+import { getAppEnvironment } from "@/application/runtime/app-environment";
+import { isDesignQaModeAvailable, isDesignQaModeRequested, isV2CoachingQaRequested } from "@/application/design-qa/design-qa-runtime";
 import {
   applyDesignQaFixture,
   applyCanonicalHomeVisualPreview,

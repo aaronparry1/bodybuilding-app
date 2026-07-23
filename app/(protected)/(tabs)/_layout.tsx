@@ -28,11 +28,11 @@ export default function MainTabsLayout() {
       sceneStyle: { backgroundColor: colors.background },
     }}
   >
-    <Tabs.Screen name="index" options={{ title: "Home", tabBarAccessibilityLabel: "Home tab" }} />
-    <Tabs.Screen name="train" options={{ title: "Train", headerShown: false, tabBarAccessibilityLabel: "Train tab" }} />
-    <Tabs.Screen name="programmes" options={{ title: "Plan", tabBarAccessibilityLabel: "Plan tab" }} />
-    <Tabs.Screen name="analytics" options={{ title: "Progress", tabBarAccessibilityLabel: "Progress tab" }} />
-    <Tabs.Screen name="library" options={{ title: "Library", tabBarAccessibilityLabel: "Library tab" }} />
+    <Tabs.Screen name="index" options={{ title: "Home", tabBarAccessibilityLabel: "Home tab", tabBarButtonTestID: "tab-home" }} />
+    <Tabs.Screen name="train" options={{ title: "Train", headerShown: false, tabBarAccessibilityLabel: "Train tab", tabBarButtonTestID: "tab-train" }} />
+    <Tabs.Screen name="programmes" options={{ title: "Plan", tabBarAccessibilityLabel: "Plan tab", tabBarButtonTestID: "tab-plan" }} />
+    <Tabs.Screen name="analytics" options={{ title: "Progress", tabBarAccessibilityLabel: "Progress tab", tabBarButtonTestID: "tab-progress" }} />
+    <Tabs.Screen name="library" options={{ title: "Library", tabBarAccessibilityLabel: "Library tab", tabBarButtonTestID: "tab-library" }} />
     <Tabs.Screen name="account" options={{ href: null, title: "Account" }} />
   </Tabs>;
 }
@@ -60,7 +60,7 @@ function CompactTabBar({ state, descriptors, navigation }: TabBarProps) {
         style={({ pressed }) => ({ flex: 1, minWidth: 0, minHeight: 48, borderRadius: radius.md, alignItems: "center", justifyContent: "center", gap: 2, backgroundColor: pressed ? colors.surfaceSoft : "transparent", opacity: pressed ? 0.82 : 1 })}
       >
         <AppShellIcon name={iconByRoute[route.name] ?? "home"} color={focused ? colors.accent : colors.textMuted} size={19} />
-        <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.76} style={{ maxWidth: "100%", color: focused ? colors.accent : colors.textMuted, fontSize: 10, lineHeight: 13, fontWeight: focused ? "900" : "700", textAlign: "center" }}>{label}</Text>
+        <Text maxFontSizeMultiplier={1.2} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.76} style={{ maxWidth: "100%", color: focused ? colors.accent : colors.textMuted, fontSize: 10, lineHeight: 13, fontWeight: focused ? "900" : "700", textAlign: "center" }}>{label}</Text>
         <View style={{ width: focused ? 14 : 3, height: 2, borderRadius: radius.pill, backgroundColor: focused ? colors.accent : "transparent" }} />
       </Pressable>;
     })}

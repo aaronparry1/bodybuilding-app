@@ -10,16 +10,21 @@ describe("Home Design-QA production boundary", () => {
       env: { ...process.env, APP_ENV: "production", EAS_BUILD_PROFILE: "production", EXPO_PUBLIC_DESIGN_QA_MODE: "1" },
     });
     const config = JSON.parse(raw) as { extra?: { appEnvironment?: string; designQaMode?: boolean } };
-    expect(config.extra).toMatchObject({ appEnvironment: "production", designQaMode: false });
+    expect(config.extra).toMatchObject({ appEnvironment: "production" });
+    expect(config.extra).not.toHaveProperty("designQaMode");
   });
 
-  it("requires explicit local QA mode for fixture query state and chrome", () => {
-    const home = readFileSync("app/(protected)/(tabs)/index.tsx", "utf8");
-    const layout = readFileSync("app/(protected)/_layout.tsx", "utf8");
+  it("keeps QA routes and chrome in the non-production router graph only", () => {
+    const qaLayout = readFileSync("app/(protected)/_layout.tsx", "utf8");
+    const qaRoute = readFileSync("app/(protected)/design-qa.tsx", "utf8");
+    const productionLayout = readFileSync("app-production/(protected)/_layout.tsx", "utf8");
+    const productionShell = readFileSync("src/application/shell/production-protected-layout.tsx", "utf8");
     const eas = JSON.parse(readFileSync("eas.json", "utf8")) as { build: Record<string, { env?: Record<string, string> }> };
-    expect(home).toContain("isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested()");
-    expect(layout).toContain('qaChrome === "1"');
-    expect(layout).toContain("isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested()");
+    expect(qaRoute).toContain("isDesignQaModeAvailable(environment) || !isDesignQaModeRequested()");
+    expect(qaLayout).toContain('qaChrome === "1"');
+    expect(qaLayout).toContain("isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested()");
+    expect(productionLayout).toContain("production-protected-layout");
+    expect(productionShell).not.toMatch(/design.?qa|qaChrome|fixture/i);
     expect(eas.build.production?.env?.EXPO_PUBLIC_DESIGN_QA_MODE).toBeUndefined();
   });
 });

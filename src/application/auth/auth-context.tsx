@@ -1,8 +1,6 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { createOptionalAuthService, type AuthService, type AuthState } from "@/application/auth/auth-provider";
-import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/runtime/app-environment";
-import { ensureDesignQaLocalWorkoutReadyState } from "@/application/design-qa/design-qa-fixtures";
 
 interface AuthContextValue extends AuthState {
   isOfflineMode: boolean;
@@ -12,7 +10,6 @@ interface AuthContextValue extends AuthState {
   signInWithApple(): Promise<void>;
   signInWithGoogle(): Promise<void>;
   continueOffline(): void;
-  enterDesignQaMode(): void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -31,14 +28,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(configError);
 
   useEffect(() => {
-    if (isDesignQaModeRequested() && isDesignQaModeAvailable()) {
-      ensureDesignQaLocalWorkoutReadyState(getAppEnvironment());
-      setIsLoading(false);
-      setIsOfflineMode(true);
-      logAuthStage("design qa mode: auto-entered local protected app access");
-      return;
-    }
-
     if (!service) {
       setIsLoading(false);
       setIsOfflineMode(true);
@@ -100,17 +89,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const continueOffline = useCallback(() => setIsOfflineMode(true), []);
 
-  const enterDesignQaMode = useCallback(() => {
-    if (!isDesignQaModeAvailable()) {
-      setError("Design QA Mode is only available in development and staging builds.");
-      return;
-    }
-
-    ensureDesignQaLocalWorkoutReadyState(getAppEnvironment());
-    setIsOfflineMode(true);
-    logAuthStage("design qa mode: local protected app access");
-  }, []);
-
   const value = useMemo<AuthContextValue>(
     () => ({
       user: session?.user ?? null,
@@ -125,9 +103,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithApple: () => runAuthAction((authService) => authService.signInWithApple()),
       signInWithGoogle: () => runAuthAction((authService) => authService.signInWithGoogle()),
       continueOffline,
-      enterDesignQaMode,
     }),
-    [continueOffline, enterDesignQaMode, error, isLoading, isOfflineMode, runAuthAction, service, session, signOut],
+    [continueOffline, error, isLoading, isOfflineMode, runAuthAction, service, session, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

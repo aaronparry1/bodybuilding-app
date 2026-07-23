@@ -101,6 +101,37 @@ describe("release-start canonical plan reconciliation", () => {
     expect(reconcileCanonicalReleaseState({ onboardingCompleted: true, updatedAt: now })).toMatchObject({ status: "recovery_required", reason: "active_attempt_missing_from_ledger", planVisible: false, activeAttempt: "unsafe" });
   });
 
+  it("treats a recorded reference revision as a plan revision rather than a ledger version", () => {
+    const carrier = createCurrent("reference-plan-revision");
+    const advanced = { ...carrier, revision: 5, progress: { ...carrier.progress, revision: 5 } };
+    expect(canonicalActivePlanV2Repository.save(advanced).status).toBe("saved");
+    const planned = advanced.plannedSessions[0]!;
+    const started = startCanonicalSession({ planId: advanced.planId, expectedPlanRevision: 5, plannedSessionId: planned.id, expectedPrescriptionHash: prescriptionHash(planned.prescriptionSnapshot), operationId: "reference:start", startedAt: now, provenance: "release_reconciliation_test" });
+    expect(started).toMatchObject({ status: "started", planRevision: 6 });
+    const aggregate = canonicalRecordedSessionLedger.get(started.recordedSessionId!);
+    expect(aggregate.status).toBe("found");
+    if (aggregate.status !== "found") return;
+    expect(aggregate.session.version).toBe(1);
+    const saved = canonicalActivePlanV2Repository.get();
+    expect(saved.status).toBe("saved");
+    if (saved.status !== "saved") return;
+    expect(saved.carrier.recordedSessionReferences?.[0]?.revision).toBe(6);
+    expect(reconcileCanonicalActivePlanReferences()).toMatchObject({ status: "ready", repairedSessionIds: [] });
+  });
+
+  it("fails closed when a recorded reference is genuinely ahead of the active plan revision", () => {
+    const carrier = createCurrent("reference-ahead");
+    const planned = carrier.plannedSessions[0]!;
+    const started = startCanonicalSession({ planId: carrier.planId, expectedPlanRevision: 0, plannedSessionId: planned.id, expectedPrescriptionHash: prescriptionHash(planned.prescriptionSnapshot), operationId: "ahead:start", startedAt: now, provenance: "release_reconciliation_test" });
+    expect(started.status).toBe("started");
+    const saved = canonicalActivePlanV2Repository.get();
+    expect(saved.status).toBe("saved");
+    if (saved.status !== "saved") return;
+    const corrupted = { ...saved.carrier, recordedSessionReferences: saved.carrier.recordedSessionReferences?.map((reference) => ({ ...reference, revision: saved.carrier.revision + 1 })) };
+    expect(canonicalActivePlanV2Repository.save(corrupted).status).toBe("saved");
+    expect(reconcileCanonicalActivePlanReferences()).toMatchObject({ status: "recorded_history_corrupt", reason: `carrier_ahead:${started.recordedSessionId}` });
+  });
+
   it.each(["started", "paused"] as const)("preserves a compatible %s immutable attempt while rebuilding only stale future work", (lifecycle) => {
     const carrier = createCurrent(`safe-${lifecycle}`);
     const planned = carrier.plannedSessions[0]!;

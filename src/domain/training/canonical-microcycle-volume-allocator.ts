@@ -99,6 +99,15 @@ export type CanonicalMicrocycleVolumeAllocation = Readonly<{
     completeRotationConstrainedSessionIndexes: readonly number[];
     omittedStimuli: readonly CanonicalStimulusRegion[];
     omittedStimuliBySession: readonly Readonly<{ sessionIndex: number; sessionRole: string; stimuli: readonly CanonicalStimulusRegion[] }>[];
+    redistributions: readonly Readonly<{
+      stimulus: CanonicalStimulusRegion;
+      fromSessionIndex: number;
+      fromSessionRole: string;
+      toSessionIndex: number;
+      toSessionRole: string;
+      movedWorkingSets: number;
+      recoveredWorkingSets: number;
+    }>[];
     completeRotationDirectSets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>;
     normalizedSevenDayDirectSets: Readonly<Partial<Record<CanonicalStimulusRegion, number>>>;
     unmetStartingTargets: readonly CanonicalStimulusRegion[];
@@ -264,13 +273,14 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
       completeRotationConstrainedSessionIndexes: durationOmissionSource.constrainedSessionIndexes,
       omittedStimuli: durationOmissionSource.omittedStimuli,
       omittedStimuliBySession: durationOmissionSource.omittedStimuliBySession.map((entry) => ({ ...entry, sessionRole: durationRoles[entry.sessionIndex] ?? `Session ${entry.sessionIndex + 1}` })),
+      redistributions: durationOmissionSource.redistributions,
       completeRotationDirectSets: dosageComparison,
       normalizedSevenDayDirectSets,
       unmetStartingTargets,
       durationInducedUnmetTargets,
       recoveryByStimulus,
       feasibility: enforcedDurationGaps.length ? "infeasible" : "viable",
-      ...(enforcedDurationGaps.length ? { customerGuidance: `This ${duration.minutes}-minute, ${input.frequency}-day schedule cannot retain the authorised starting coverage for ${humanList(enforcedDurationGaps)}. Choose longer workouts or a lower training frequency.` } : {}),
+      ...(enforcedDurationGaps.length ? { customerGuidance: `This ${duration.minutes}-minute, ${input.frequency}-day schedule cannot retain the authorised starting coverage for ${humanList(enforcedDurationGaps)}. Choose a longer supported workout duration, fewer weekly training days, or another training framework.` } : {}),
     },
     startingDosage: { context: startingContext, policyTargets, rotationNormalisation: isRollingPpl(input) ? "six_session_rotation_at_five_sessions_per_week" : "calendar_microcycle", rounding: "nearest_whole_set_then_proportional_discrete_allocation" },
     fatigue: { perSession: perSessionFatigue, weeklyUnits: perSessionFatigue.reduce((sum, units) => sum + units, 0), overlapFlags: profile === "powerbuilding_five_day_v1" || input.macrocycleGoal === "build_strength" || input.macrocycleGoal === "build_muscle_and_strength" ? detectCanonicalMicrocycleOverlap(slots) : [] },
@@ -366,7 +376,13 @@ function constrainSlotsToDuration(
   availableMinutes: CanonicalSessionDurationMinutes,
   loadConfidence: CanonicalStartingVolumeContext["loadConfidence"],
   hypertrophy: boolean,
-): Readonly<{ slots: AllocatedSlot[]; constrainedSessionIndexes: number[]; omittedStimuli: CanonicalStimulusRegion[]; omittedStimuliBySession: Array<{ sessionIndex: number; stimuli: CanonicalStimulusRegion[] }> }> {
+): Readonly<{
+  slots: AllocatedSlot[];
+  constrainedSessionIndexes: number[];
+  omittedStimuli: CanonicalStimulusRegion[];
+  omittedStimuliBySession: Array<{ sessionIndex: number; stimuli: CanonicalStimulusRegion[] }>;
+  redistributions: DurationRedistribution[];
+}> {
   let slots = source.map((entry) => ({ ...entry }));
   const constrainedSessionIndexes: number[] = [];
   const omittedStimuli: CanonicalStimulusRegion[] = [];
@@ -405,12 +421,163 @@ function constrainSlotsToDuration(
       slots = slots.filter((candidate) => !(candidate.sessionIndex === removable.sessionIndex && candidate.order === removable.order));
     }
   }
+  const rebalanced = redistributeDurationConstrainedAccessories({
+    source,
+    constrained: slots,
+    sessionCount,
+    availableMinutes,
+    loadConfidence,
+  });
+  slots = rebalanced.slots;
   return {
     slots,
     constrainedSessionIndexes,
     omittedStimuli: Array.from(new Set(omittedStimuli)).sort(),
     omittedStimuliBySession: [...omittedBySession.entries()].sort(([a], [b]) => a - b).map(([sessionIndex, stimuli]) => ({ sessionIndex, stimuli: [...stimuli].sort() })),
+    redistributions: rebalanced.redistributions,
   };
+}
+
+type DurationRedistribution = Readonly<{
+  stimulus: CanonicalStimulusRegion;
+  fromSessionIndex: number;
+  fromSessionRole: string;
+  toSessionIndex: number;
+  toSessionRole: string;
+  movedWorkingSets: number;
+  recoveredWorkingSets: number;
+}>;
+
+/**
+ * A rolling split owns dosage across the complete rotation rather than inside
+ * one overloaded calendar day. After the per-session safety pass, move only
+ * low-systemic-cost, single-region accessory work into genuine rotation
+ * slack and then restore the sets removed by the duration constraint. Primary
+ * compounds, exercise identity, rest assumptions and the owned dosage target
+ * are never rewritten. The circular spacing guard keeps at least one session
+ * between direct exposures to the same region.
+ */
+function redistributeDurationConstrainedAccessories(input: Readonly<{
+  source: readonly AllocatedSlot[];
+  constrained: readonly AllocatedSlot[];
+  sessionCount: number;
+  availableMinutes: CanonicalSessionDurationMinutes;
+  loadConfidence: CanonicalStartingVolumeContext["loadConfidence"];
+}>): Readonly<{ slots: AllocatedSlot[]; redistributions: DurationRedistribution[] }> {
+  let slots = input.constrained.map((entry) => ({ ...entry }));
+  const sourceDirect = directSetsForSlots(input.source);
+  const redistributions: DurationRedistribution[] = [];
+  const durationFor = (candidateSlots: readonly AllocatedSlot[], sessionIndex: number) => estimateCanonicalSessionDuration(
+    candidateSlots.filter((entry) => entry.sessionIndex === sessionIndex),
+    input.loadConfidence,
+  ).minutes;
+
+  for (const stimulus of Object.keys(sourceDirect).sort() as CanonicalStimulusRegion[]) {
+    let missing = Number(sourceDirect[stimulus] ?? 0) - Number(directSetsForSlots(slots)[stimulus] ?? 0);
+    if (missing <= 0) continue;
+
+    while (missing > 0) {
+      const expandable = slots
+        .filter((entry) => entry.requiredStimuli.length === 1 && entry.requiredStimuli[0] === stimulus)
+        .map((entry) => ({ entry, duration: durationFor(slots, entry.sessionIndex) }))
+        .sort((a, b) => a.duration - b.duration || b.entry.sessionIndex - a.entry.sessionIndex || b.entry.order - a.entry.order)
+        .find(({ entry }) => {
+          const expanded = slots.map((candidate) => sameSlot(candidate, entry) ? { ...candidate, workingSets: candidate.workingSets + 1 } : candidate);
+          return durationFor(expanded, entry.sessionIndex) <= input.availableMinutes;
+        });
+      if (expandable) {
+        const origin = sourceDeficitSession(input.source, slots, stimulus) ?? expandable.entry.sessionIndex;
+        const originRole = input.source.find((entry) => entry.sessionIndex === origin)?.sessionRole ?? `Session ${origin + 1}`;
+        slots = slots.map((candidate) => sameSlot(candidate, expandable.entry) ? { ...candidate, workingSets: candidate.workingSets + 1 } : candidate);
+        const recorded = redistributions.findIndex((entry) => entry.stimulus === stimulus && entry.toSessionIndex === expandable.entry.sessionIndex);
+        if (recorded >= 0) {
+          const current = redistributions[recorded]!;
+          redistributions[recorded] = { ...current, recoveredWorkingSets: current.recoveredWorkingSets + 1 };
+        } else {
+          redistributions.push({
+            stimulus,
+            fromSessionIndex: origin,
+            fromSessionRole: originRole,
+            toSessionIndex: expandable.entry.sessionIndex,
+            toSessionRole: expandable.entry.sessionRole,
+            movedWorkingSets: 0,
+            recoveredWorkingSets: 1,
+          });
+        }
+        missing -= 1;
+        continue;
+      }
+
+      const movable = slots
+        .filter((entry) => entry.constructionRole === "accessory" && entry.requiredStimuli.length === 1 && entry.requiredStimuli[0] === stimulus)
+        .sort((a, b) => a.sessionIndex - b.sessionIndex || b.order - a.order)
+        .find((entry) => {
+          return Array.from({ length: input.sessionCount }, (_, index) => index).some((destination) => canRelocateAccessory({ slots, entry, destination, sessionCount: input.sessionCount, availableMinutes: input.availableMinutes, loadConfidence: input.loadConfidence }));
+        });
+      if (!movable) break;
+
+      const destination = Array.from({ length: input.sessionCount }, (_, index) => index)
+        .filter((index) => canRelocateAccessory({ slots, entry: movable, destination: index, sessionCount: input.sessionCount, availableMinutes: input.availableMinutes, loadConfidence: input.loadConfidence }))
+        .map((index) => ({ index, duration: durationFor(slots, index) }))
+        .sort((a, b) => a.duration - b.duration || a.index - b.index)[0];
+      if (!destination) break;
+      const destinationRole = slots.find((entry) => entry.sessionIndex === destination.index)?.sessionRole
+        ?? input.source.find((entry) => entry.sessionIndex === destination.index)?.sessionRole
+        ?? `Session ${destination.index + 1}`;
+      const nextOrder = Math.max(-1, ...slots.filter((entry) => entry.sessionIndex === destination.index).map((entry) => entry.order)) + 1;
+      slots = slots.map((entry) => sameSlot(entry, movable)
+        ? { ...entry, sessionIndex: destination.index, sessionRole: destinationRole, order: nextOrder, workingSets: entry.workingSets + 1 }
+        : entry);
+      redistributions.push({
+        stimulus,
+        fromSessionIndex: movable.sessionIndex,
+        fromSessionRole: movable.sessionRole,
+        toSessionIndex: destination.index,
+        toSessionRole: destinationRole,
+        movedWorkingSets: movable.workingSets,
+        recoveredWorkingSets: 1,
+      });
+      missing -= 1;
+    }
+  }
+  return { slots, redistributions };
+}
+
+function canRelocateAccessory(input: Readonly<{
+  slots: readonly AllocatedSlot[];
+  entry: AllocatedSlot;
+  destination: number;
+  sessionCount: number;
+  availableMinutes: CanonicalSessionDurationMinutes;
+  loadConfidence: CanonicalStartingVolumeContext["loadConfidence"];
+}>): boolean {
+  if (input.destination === input.entry.sessionIndex) return false;
+  const stimulus = input.entry.requiredStimuli[0]!;
+  if (input.slots.some((entry) => entry.sessionIndex === input.destination && entry.requiredStimuli.includes(stimulus))) return false;
+  const otherExposures = input.slots.filter((entry) => !sameSlot(entry, input.entry) && entry.requiredStimuli.includes(stimulus));
+  if (otherExposures.some((entry) => circularSessionDistance(input.destination, entry.sessionIndex, input.sessionCount) < 2)) return false;
+  const destinationRole = input.slots.find((entry) => entry.sessionIndex === input.destination)?.sessionRole ?? input.entry.sessionRole;
+  const nextOrder = Math.max(-1, ...input.slots.filter((entry) => entry.sessionIndex === input.destination).map((entry) => entry.order)) + 1;
+  const relocated = input.slots.map((entry) => sameSlot(entry, input.entry) ? { ...entry, sessionIndex: input.destination, sessionRole: destinationRole, order: nextOrder, workingSets: entry.workingSets + 1 } : entry);
+  return estimateCanonicalSessionDuration(relocated.filter((entry) => entry.sessionIndex === input.destination), input.loadConfidence).minutes <= input.availableMinutes;
+}
+
+function circularSessionDistance(left: number, right: number, count: number): number {
+  const distance = Math.abs(left - right);
+  return Math.min(distance, count - distance);
+}
+
+function sourceDeficitSession(source: readonly AllocatedSlot[], current: readonly AllocatedSlot[], stimulus: CanonicalStimulusRegion): number | undefined {
+  const sessionIndexes = [...new Set(source.filter((entry) => entry.requiredStimuli.includes(stimulus)).map((entry) => entry.sessionIndex))].sort((a, b) => a - b);
+  return sessionIndexes.find((sessionIndex) => {
+    const sourceSets = source.filter((entry) => entry.sessionIndex === sessionIndex && entry.requiredStimuli.includes(stimulus)).reduce((sum, entry) => sum + entry.workingSets, 0);
+    const currentSets = current.filter((entry) => entry.sessionIndex === sessionIndex && entry.requiredStimuli.includes(stimulus)).reduce((sum, entry) => sum + entry.workingSets, 0);
+    return currentSets < sourceSets;
+  });
+}
+
+function sameSlot(left: AllocatedSlot, right: AllocatedSlot): boolean {
+  return left.sessionIndex === right.sessionIndex && left.order === right.order;
 }
 function directSetsForSlots(slots: readonly AllocatedSlot[]): Partial<Record<CanonicalStimulusRegion, number>> {
   const direct: Partial<Record<CanonicalStimulusRegion, number>> = {};

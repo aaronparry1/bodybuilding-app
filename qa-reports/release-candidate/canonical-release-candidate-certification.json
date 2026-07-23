@@ -1,14 +1,14 @@
 {
-  "schemaVersion": "canonical_release_candidate_certification_v1",
-  "candidateSourceHead": "fc9c80cbf774e022ccd9f865503255896d0c7f61",
-  "latestUploadedSourceHead": "58d8ffb",
-  "includedCommitCount": 14,
+  "schemaVersion": "canonical_release_candidate_certification_v2",
+  "certifiedWorkingTreeBaseHead": "146462e9553938a14e2454ed2e51c727d1e5da1",
   "resolvedIdentity": {
-    "marketingVersion": "1.0.13",
-    "iosBuildNumber": "44",
+    "marketingVersion": "1.0.14",
+    "iosBuildNumber": "45",
     "bundleIdentifier": "com.aaronparry.adaptivestrengthcoach",
     "appName": "Adaptive Strength Coach",
-    "easProfile": "production"
+    "easProfile": "production",
+    "versionVerifiedAgainstEasRemoteBuildNumber": "44",
+    "versionVerifiedAgainstLatestProductionBuild": "1.0.13 (44)"
   },
   "productionFlags": {
     "canonicalCoachingEngineV3": true,
@@ -19,28 +19,27 @@
     "designQaMode": false
   },
   "automatedGates": {
-    "focusedMigrationLifecycleDurationPresentationTests": {
+    "focusedReleaseCandidateTests": {
       "status": "passed",
-      "tests": 39
-    },
-    "focusedPlanningTests": {
-      "status": "passed",
-      "tests": 41
-    },
-    "designQaProductionBoundaryAndUiTests": {
-      "status": "passed",
-      "tests": 150
+      "files": 13,
+      "tests": 86
     },
     "fullSuite": {
       "status": "passed",
-      "files": 355,
-      "tests": 2110,
+      "files": 356,
+      "tests": 2114,
       "failedFiles": 0,
       "failedTests": 0
     },
     "typecheck": "passed",
     "productionExpoPublicConfig": "passed",
     "productionWebExport": "passed",
+    "productionWebPayloadScan": "passed",
+    "nativeReleaseArchive": "passed",
+    "nativeArchivePayloadScan": "passed",
+    "nativeUiModern": "passed",
+    "nativeUiNarrowAccessibility": "passed",
+    "nativePersistenceRecovery": "passed",
     "testDiscoveryGuard": "passed",
     "gitDiffCheck": "passed"
   },
@@ -48,86 +47,74 @@
     "persistedReconciliationMatrix": "qa-reports/release-candidate/canonical-persisted-reconciliation-matrix.json",
     "durationCoverageMatrix": "qa-reports/release-candidate/canonical-duration-coverage.json",
     "journeyMatrix": "qa-reports/release-candidate/canonical-release-journeys.json",
+    "nativeJourneyCertification": "qa-reports/release-candidate/native-journey-certification.json",
+    "nativePerformanceSmoke": "qa-reports/release-candidate/native-performance-smoke.json",
+    "productionPayloadScan": "qa-reports/release-candidate/production-payload-scan.json",
     "historyMutation": "none",
     "futurePrescriptionOwner": "canonical Session Construction v3",
     "atomicity": "canonical carrier compare-and-swap",
-    "idempotency": "certified by repeated reconciliation and completion tests"
+    "idempotency": "certified by repeated native reconciliation and completion tests"
   },
   "durationCoverage": {
-    "30": "fail_closed_with_customer_guidance",
-    "45": "fail_closed_with_customer_guidance",
-    "60": "fail_closed_with_customer_guidance",
-    "75": "passed",
-    "90": "passed",
-    "timeChange60To45": "rejected_atomically_without_history_or_future_mutation",
-    "viableApplicationProof": "90_to_75_applied_atomically"
+    "30": "fail_closed_with_actionable_customer_guidance",
+    "45": "fail_closed_with_actionable_customer_guidance",
+    "60": "viable_with_authorised_rotation_redistribution",
+    "75": "viable_full_prescription",
+    "90": "viable_full_prescription",
+    "supportedApplicationProof": "60_to_90_to_75_to_60_applied_atomically",
+    "infeasibleApplicationProof": "60_to_45_and_60_to_30_rejected_without_mutation"
   },
   "nativeBuild": {
-    "platform": "iOS Simulator",
-    "device": "iPhone 17 Pro",
-    "runtime": "iOS 26.5 (23F77)",
-    "deviceUdid": "06EEA722-8702-40AC-81FC-53E92D205303",
+    "platform": "generic iOS device archive",
+    "sdk": "iPhoneOS 26.5 (23F81a)",
     "xcode": "26.6 (17F113)",
     "configuration": "Release",
     "architecture": "arm64",
-    "signing": "disabled_for_simulator",
-    "isolatedPublicBackend": "https://invalid.local",
-    "remoteCallsDuringSuccessfulBundle": 0,
+    "signing": "disabled_for_local_validation",
     "compileStatus": "passed",
-    "installStatus": "passed",
-    "launchStatus": "passed",
-    "uncaughtLaunchErrors": 0,
-    "appBundlePath": "/tmp/asc-rc-fc9c80c/Build/Products/Release-iphonesimulator/AdaptiveStrengthCoach.app",
-    "appStoreArchiveCreated": false
+    "storeValidationStatus": "passed",
+    "archiveStatus": "passed",
+    "archivePath": "/tmp/AdaptiveStrengthCoachRC-archive10.xcarchive",
+    "archivedAppPath": "/tmp/AdaptiveStrengthCoachRC-archive10.xcarchive/Products/Applications/AdaptiveStrengthCoach.app",
+    "archivedAppSizeMiB": 37,
+    "appStoreArchiveCreated": true
   },
   "nativeVisualEvidence": {
-    "standardTextOnboarding": "qa-reports/release-candidate/native-screenshots/ios-release-launch.png",
-    "accessibilityLargeOnboarding": "qa-reports/release-candidate/native-screenshots/ios-release-onboarding-accessibility-large.png",
-    "screensActuallyObserved": [
-      "onboarding_goal_selection"
+    "modernDevice": "iPhone 17 Pro, iOS 26.5",
+    "narrowDevice": "iPhone SE (3rd generation), iOS 26.5",
+    "dynamicType": [
+      "standard",
+      "accessibility-extra-extra-extra-large"
     ],
-    "screensNotInteractivelyCertified": [
-      "Home",
-      "Plan",
-      "workout preview",
-      "calibration",
-      "active Train logger",
-      "keyboard-open logging",
-      "rest timer",
-      "pause/discard",
-      "resumed session",
-      "completion summary",
-      "Progress states",
-      "cardio",
-      "Library",
-      "Settings duration change",
-      "recoverable errors"
-    ]
+    "modernScreenshotDirectory": "qa-reports/release-candidate/native-screenshots/modern",
+    "narrowScreenshotDirectory": "qa-reports/release-candidate/native-screenshots/narrow",
+    "recoveryScreenshotDirectory": "qa-reports/release-candidate/native-screenshots/recovery",
+    "modernScreenshots": 15,
+    "narrowScreenshots": 15,
+    "recoveryScreenshots": 3,
+    "screensNotInteractivelyCertified": []
   },
-  "preUploadBlockers": [
-    {
-      "id": "native_interaction_unavailable",
-      "evidence": "The iPhone simulator device boots and simctl captures its framebuffer, but Simulator.app exposes zero CGWindow/AX windows and no installed touch-automation runtime exists. Launch-only evidence cannot certify the required journeys."
-    },
-    {
-      "id": "qa_fixture_payload_embedded",
-      "evidence": "The Release Hermes bundle contains Design-QA fixture identifiers. Production flags and route guards make them unreachable, but the stricter requirement that the production candidate contain no QA fixture payload is not met."
-    }
-  ],
-  "devRuntimeInspection": {
+  "preUploadBlockers": [],
+  "productionPayloadIsolation": {
+    "productionRouterRoot": "app-production",
+    "qaRouterRoot": "app",
+    "qaRuntimeAvailableOutsideProduction": true,
+    "archivedFilesScanned": 104,
+    "archivedPayloadFindings": 0,
+    "webFilesScanned": 27,
+    "webPayloadFindings": 0,
     "exDevLauncherBundlePresent": false,
     "exDevMenuBundlePresent": false,
-    "expoDevClientMarkerPresent": false,
-    "exDevMenuInterfaceSymbolsPresent": true,
-    "classification": "interface symbols are linked transitively, but no development launcher/menu bundle or runtime entry is installed"
+    "expoDevClientMarkerPresent": false
   },
   "decision": {
-    "allPreUploadGatesPassed": false,
-    "releaseCandidateCertified": false,
-    "versionIncremented": false,
+    "allPreUploadGatesPassed": true,
+    "releaseCandidateCertified": true,
+    "versionIncremented": true,
     "testFlightBuildCreated": false,
     "uploadAttempted": false,
-    "releaseCandidateUploadAuthorized": false,
-    "publicReleaseAuthorized": false
+    "releaseCandidateUploadAuthorized": true,
+    "publicReleaseAuthorized": false,
+    "appReviewSubmissionAuthorized": false
   }
 }

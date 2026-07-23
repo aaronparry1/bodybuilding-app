@@ -25,10 +25,10 @@ export function reconcileCanonicalActivePlanReferences(): CanonicalActivePlanRec
     const session = aggregate.session;
     if (session.planId !== carrier.planId || session.macrocycleId !== reference.macrocycleId || session.mesocycleId !== reference.mesocycleId || session.microcycleId !== reference.microcycleId || session.prescriptionHash !== JSON.stringify(session.prescriptionSnapshot)) return { status: "immutable_linkage_conflict", repairedSessionIds: repaired, reason: `immutable_linkage:${reference.sessionId}` };
     if (session.status === "pending") return { status: "recorded_history_corrupt", repairedSessionIds: repaired, reason: `pending_ledger:${reference.sessionId}` };
-    if (reference.status === session.status && reference.revision === session.version) continue;
-    if (reference.revision > session.version) return { status: "recorded_history_corrupt", repairedSessionIds: repaired, reason: `carrier_ahead:${reference.sessionId}` };
+    if (reference.revision > carrier.revision) return { status: "recorded_history_corrupt", repairedSessionIds: repaired, reason: `carrier_ahead:${reference.sessionId}` };
+    if (reference.status === session.status) continue;
     const nextRevision = carrier.revision + 1;
-    const next = { ...carrier, revision: nextRevision, recordedSessionReferences: references.map((item) => item.sessionId === reference.sessionId ? { ...item, status: session.status === "historical" ? "legacy_historical" as const : session.status as "started" | "paused" | "completed", revision: session.version } : item), progress: { ...carrier.progress, revision: nextRevision } };
+    const next = { ...carrier, revision: nextRevision, recordedSessionReferences: references.map((item) => item.sessionId === reference.sessionId ? { ...item, status: session.status === "historical" ? "legacy_historical" as const : session.status as "started" | "paused" | "completed", revision: nextRevision } : item), progress: { ...carrier.progress, revision: nextRevision } };
     const saved = canonicalActivePlanV2Repository.saveAtomically(next, carrier.revision);
     if (saved.status !== "saved") return { status: "retry_required", repairedSessionIds: repaired, reason: `cas_repair:${reference.sessionId}` };
     carrier = saved.carrier;
@@ -47,10 +47,11 @@ export function reconcileCanonicalRecordedReference(command: CanonicalRecordedRe
   const session = aggregate.session;
   if (session.status === "pending") return { status: "rejected", reason: "pending_ledger_not_authoritative", planRevision: loaded.carrier.revision, recordedSessionId: command.recordedSessionId, ledgerVersion: session.version };
   if (session.planId !== loaded.carrier.planId || session.microcycleId !== reference.microcycleId || session.prescriptionHash !== JSON.stringify(session.prescriptionSnapshot)) return { status: "rejected", reason: "immutable_recorded_identity_mismatch", planRevision: loaded.carrier.revision, recordedSessionId: command.recordedSessionId, ledgerVersion: session.version };
+  if (reference.revision > loaded.carrier.revision) return { status: "rejected", reason: "recorded_reference_ahead_of_plan", planRevision: loaded.carrier.revision, recordedSessionId: command.recordedSessionId, ledgerVersion: session.version };
   const summary = session.status === "completed" || session.status === "historical" ? deriveCanonicalCompletionSummary(session, aggregate.events) : undefined;
-  if (reference.status === session.status && reference.revision === session.version) return { status: "consistent", reason: "carrier_matches_ledger", planRevision: loaded.carrier.revision, recordedSessionId: command.recordedSessionId, ledgerVersion: session.version, ...(summary ? { completionSummaryId: summary.summaryId } : {}) };
+  if (reference.status === session.status) return { status: "consistent", reason: "carrier_matches_ledger", planRevision: loaded.carrier.revision, recordedSessionId: command.recordedSessionId, ledgerVersion: session.version, ...(summary ? { completionSummaryId: summary.summaryId } : {}) };
   const nextRevision = loaded.carrier.revision + 1;
-  const next = { ...loaded.carrier, revision: nextRevision, recordedSessionReferences: loaded.carrier.recordedSessionReferences!.map((item) => item.sessionId === command.recordedSessionId ? { ...item, status: session.status as "started" | "paused" | "completed" | "legacy_historical", revision: session.version } : item), progress: { ...loaded.carrier.progress, revision: nextRevision } };
+  const next = { ...loaded.carrier, revision: nextRevision, recordedSessionReferences: loaded.carrier.recordedSessionReferences!.map((item) => item.sessionId === command.recordedSessionId ? { ...item, status: session.status as "started" | "paused" | "completed" | "legacy_historical", revision: nextRevision } : item), progress: { ...loaded.carrier.progress, revision: nextRevision } };
   const saved = canonicalActivePlanV2Repository.saveAtomically(next, loaded.carrier.revision);
   if (saved.status !== "saved") return { status: "retry_required", reason: "carrier_repair_cas_failed", planRevision: loaded.carrier.revision, recordedSessionId: command.recordedSessionId, ledgerVersion: session.version };
   return { status: "repaired", reason: "carrier_reconciled_to_ledger", planRevision: loaded.carrier.revision, newRevision: nextRevision, recordedSessionId: command.recordedSessionId, ledgerVersion: session.version, ...(summary ? { completionSummaryId: summary.summaryId } : {}) };

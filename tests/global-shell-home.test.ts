@@ -29,7 +29,9 @@ describe("global application shell and Home boundary", () => {
     expect(home).toContain("HomeDashboard");
     expect(home).not.toMatch(/startCanonicalSession|pauseCanonicalSession|resumeCanonicalSession|completeCanonicalSession|discardCanonicalSessionAttempt|recordCanonicalPerformedWork/);
     for (const owner of ["HomeGreeting", "HomeNextAction", "HomeProgrammePosition", "HomeZeroHistory", "HomeProgressSnapshot", "HomeAttention", "HomeRecentWork"]) expect(homeUi).toContain(`function ${owner}`);
-    expect(home).toContain("isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested()");
+    expect(home).not.toMatch(/design-qa|isDesignQaModeAvailable|isDesignQaModeRequested/);
+    expect(protectedLayout).toContain("isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested()");
+    expect(readFileSync("app-production/(protected)/_layout.tsx", "utf8")).toContain("production-protected-layout");
     expect(homeUi).not.toContain("projection.greeting.eyebrow");
   });
 

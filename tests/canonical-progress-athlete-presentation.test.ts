@@ -16,13 +16,13 @@ describe("athlete-facing canonical Progress presentation", () => {
   });
 
   it("shows an honest zero-history state and excludes merely started work", () => {
-    applyCanonicalHomeVisualState("active", { planId: "progress-started-only", now: "2026-07-18T10:00:00.000Z" });
+    const model = applyCanonicalHomeVisualState("active", { planId: "progress-started-only", now: "2026-07-18T10:00:00.000Z" });
     const progress = readCanonicalProgressPresentation({ now });
     expect(progress.status).toBe("zero");
     expect(progress.overview).toBeUndefined();
     expect(progress.progressionHighlight).toBeUndefined();
     expect(progress.trend).toBeUndefined();
-    expect(progress.nextWorkout?.action).toMatchObject({ type: "open_planned_session", planId: "progress-started-only", planRevision: 2 });
+    expect(progress.nextWorkout?.action).toMatchObject({ type: "open_planned_session", planId: "progress-started-only", planRevision: model.revision });
     expect(JSON.stringify(progress)).not.toMatch(/On track|evidence count|refresh/i);
   });
 

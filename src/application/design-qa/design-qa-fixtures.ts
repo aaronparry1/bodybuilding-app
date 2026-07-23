@@ -5,7 +5,7 @@ import { jsonStore } from "@/data/local/json-store";
 import { programmeRepository } from "@/data/local/programme-repository";
 import { sessionPrepRepository } from "@/data/local/session-prep-repository";
 import type { AppEnvironment } from "@/application/runtime/app-environment-core";
-import { isDesignQaModeAvailable } from "@/application/runtime/app-environment-core";
+import { isDesignQaModeAvailable } from "@/application/design-qa/design-qa-runtime-core";
 import { calculateNextSessionStartingLoadFromProductiveSets, resolveStartingLoadRecommendation } from "@/domain/training/load-selection";
 import { exerciseLibrary } from "@/domain/training/presets";
 import type { WorkoutSession } from "@/domain/training/models";

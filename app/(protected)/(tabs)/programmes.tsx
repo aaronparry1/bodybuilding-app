@@ -1,26 +1,17 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useState } from "react";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import type { CanonicalPlanPresentationAction } from "@/application/training/canonical-plan-presentation";
-import { getAppEnvironment, isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/runtime/app-environment";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { PlanDashboard } from "@/ui/plan-dashboard";
 import { useCanonicalPlanPresentation } from "@/ui/canonical-training-presentation-hooks";
 import { AppScreen } from "@/ui/primitives";
 import { TrainingSystemGuideButton } from "@/ui/training-system-guide";
 
-type PlanPreview = "generating" | "recoverable_error" | "storage_error" | "empty";
-
-function qaPreview(value: string | undefined): PlanPreview | undefined {
-  if (!isDesignQaModeAvailable(getAppEnvironment()) || !isDesignQaModeRequested()) return undefined;
-  return ["generating", "recoverable_error", "storage_error", "empty"].includes(value ?? "") ? value as PlanPreview : undefined;
-}
-
 export default function PlanScreen() {
   const { settings } = useAppSettings();
-  const { qaPlanPreview } = useLocalSearchParams<{ qaPlanPreview?: string }>();
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
-  const projection = useCanonicalPlanPresentation({ displayUnit: settings.unit, previewStatus: qaPreview(qaPlanPreview) });
+  const projection = useCanonicalPlanPresentation({ displayUnit: settings.unit });
   const onAction = (action: CanonicalPlanPresentationAction) => {
     if (action.type === "retry") { canonicalActivePlanState.refresh(); return; }
     if (action.type === "setup_plan") { router.push("/(protected)/onboarding"); return; }
