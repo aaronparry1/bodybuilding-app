@@ -1,12 +1,17 @@
 .git
 node_modules
+.env
+.env.*
 dist
+dist-release-candidate
 docs
 screenshots
 qa-screenshots
 qa-reports
 output
 website
+hf_portfolio_backtest
+project_sources
 credentials
 ios/Pods
 ios/build
@@ -16,4 +21,6 @@ android/app/build
 .expo
 DerivedData
 .DS_Store
+*.xcarchive
+*.xcresult
 *.log
