@@ -5,9 +5,12 @@ node_modules
 dist
 dist-release-candidate
 docs
+research
+reports
 screenshots
 qa-screenshots
 qa-reports
+tests
 output
 website
 hf_portfolio_backtest
