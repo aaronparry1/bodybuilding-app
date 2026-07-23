@@ -43,11 +43,22 @@ describe("canonical release-candidate certification", () => {
       allPreUploadGatesPassed: true,
       releaseCandidateCertified: true,
       versionIncremented: true,
-      testFlightBuildCreated: false,
-      uploadAttempted: false,
+      testFlightBuildCreated: true,
+      uploadAttempted: true,
+      uploadSucceeded: true,
       releaseCandidateUploadAuthorized: true,
       publicReleaseAuthorized: false,
       appReviewSubmissionAuthorized: false,
+    });
+    expect(report.testFlightUpload).toMatchObject({
+      easBuildId: "0810f076-c114-4737-92cc-379675043889",
+      easBuildStatus: "finished",
+      easSubmissionId: "7d39f089-0fd6-4973-91c4-30143e0aa8cc",
+      appStoreConnectAppId: "6762462649",
+      appStoreConnectStatus: "uploaded_processing",
+      internalTestingStatus: "pending_apple_processing",
+      appReviewSubmitted: false,
+      publicReleasePerformed: false,
     });
     expect(payloadScan.web).toMatchObject({ status: "passed", scannedFiles: 27, findings: [] });
     expect(payloadScan.nativeArchive).toMatchObject({ status: "passed", scannedFiles: 104, findings: [] });

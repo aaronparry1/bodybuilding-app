@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "canonical_release_candidate_certification_v2",
+  "schemaVersion": "canonical_release_candidate_certification_v3",
   "certifiedWorkingTreeBaseHead": "146462e9553938a14e2454ed2e51c727d1e5da1",
   "resolvedIdentity": {
     "marketingVersion": "1.0.14",
@@ -107,12 +107,25 @@
     "exDevMenuBundlePresent": false,
     "expoDevClientMarkerPresent": false
   },
+  "testFlightUpload": {
+    "easBuildId": "0810f076-c114-4737-92cc-379675043889",
+    "easBuildUrl": "https://expo.dev/accounts/arxapps/projects/hypertrophy-app/builds/0810f076-c114-4737-92cc-379675043889",
+    "easBuildStatus": "finished",
+    "easSubmissionId": "7d39f089-0fd6-4973-91c4-30143e0aa8cc",
+    "easSubmissionUrl": "https://expo.dev/accounts/arxapps/projects/hypertrophy-app/submissions/7d39f089-0fd6-4973-91c4-30143e0aa8cc",
+    "appStoreConnectAppId": "6762462649",
+    "appStoreConnectStatus": "uploaded_processing",
+    "internalTestingStatus": "pending_apple_processing",
+    "appReviewSubmitted": false,
+    "publicReleasePerformed": false
+  },
   "decision": {
     "allPreUploadGatesPassed": true,
     "releaseCandidateCertified": true,
     "versionIncremented": true,
-    "testFlightBuildCreated": false,
-    "uploadAttempted": false,
+    "testFlightBuildCreated": true,
+    "uploadAttempted": true,
+    "uploadSucceeded": true,
     "releaseCandidateUploadAuthorized": true,
     "publicReleaseAuthorized": false,
     "appReviewSubmissionAuthorized": false

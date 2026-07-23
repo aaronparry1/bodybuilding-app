@@ -43,4 +43,19 @@ The native performance evidence is intentionally described as a basic interactio
 
 ## Decision
 
-`allPreUploadGatesPassed` and `releaseCandidateCertified` are true. A TestFlight upload is authorized by this task; public release and App Review submission are not authorized.
+`allPreUploadGatesPassed` and `releaseCandidateCertified` are true.
+
+## TestFlight upload
+
+- EAS build: `0810f076-c114-4737-92cc-379675043889` — finished successfully.
+- EAS build page: <https://expo.dev/accounts/arxapps/projects/hypertrophy-app/builds/0810f076-c114-4737-92cc-379675043889>
+- EAS submission: `7d39f089-0fd6-4973-91c4-30143e0aa8cc` — uploaded successfully.
+- EAS submission page: <https://expo.dev/accounts/arxapps/projects/hypertrophy-app/submissions/7d39f089-0fd6-4973-91c4-30143e0aa8cc>
+- App Store Connect application: `6762462649`.
+- Uploaded identity: `1.0.14 (45)` for `com.aaronparry.adaptivestrengthcoach`.
+- Current Apple state: uploaded and processing for TestFlight.
+- Internal testing availability: pending Apple processing.
+- App Review submission: not performed.
+- Public release: not performed.
+
+The production TestFlight build and upload are complete. Public release and App Review submission remain unauthorized.
