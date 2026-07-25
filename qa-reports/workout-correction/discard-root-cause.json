@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "canonical_workout_discard_root_cause_v1",
+  "observedProductionPath": "Close workout -> Discard -> confirm -> render-time plan/ledger revisions -> carrier write -> ledger delete -> navigation",
+  "rootCauses": [
+    "The UI submitted plan and ledger revisions captured before the confirmation interaction, so a legitimate intervening persistence update could make confirmation stale.",
+    "The old application order committed the restored planned-session carrier before deleting the active ledger attempt, leaving an inconsistent restored-plan-plus-live-attempt state when ledger deletion failed.",
+    "Ledger storage exceptions could escape the boundary, leaving the busy UI unresolved.",
+    "Errors were rendered behind the open modal and were therefore not customer-visible.",
+    "The destructive action did not dismiss an open numeric keyboard before confirmation."
+  ],
+  "correctedTransition": [
+    "resolve current carrier and ledger revisions at confirmation",
+    "validate immutable snapshot identity and active-only status",
+    "delete only the mutable active ledger attempt",
+    "atomically restore the immutable planned session and remove only its active reference",
+    "restore the exact ledger aggregate if carrier CAS fails",
+    "remove attempt-owned evidence and rest timer",
+    "hydrate canonical state",
+    "close modal and restore tab navigation"
+  ],
+  "failureSemantics": {
+    "storage": "retryable; carrier and attempt remain coherent; visible customer-safe error",
+    "staleRevision": "rejected; no deletion or plan mutation",
+    "completedHistory": "rejected and preserved",
+    "doubleActivation": "idempotent"
+  },
+  "coverage": [
+    "before any set",
+    "after performed work",
+    "during rest",
+    "after edit",
+    "after pause/resume",
+    "first-exposure calibration",
+    "older completed history",
+    "double activation",
+    "storage failure",
+    "carrier CAS failure with compensation",
+    "stale revision",
+    "termination/rehydration"
+  ],
+  "nativeStatus": "passed_release_scheme_standard_and_large_dynamic_type",
+  "nativeAssertion": "A started attempt containing performed work was paused, restored, cancelled once at confirmation, then discarded while the numeric keyboard owned focus. The planned immutable session returned, its active ledger attempt was absent, the keyboard closed, and a fresh attempt started and completed.",
+  "nativeEvidence": [
+    "qa-reports/workout-correction/native-screenshots/standard/discard-confirmation.png",
+    "qa-reports/workout-correction/native-screenshots/large/discard-confirmation.png"
+  ]
+}

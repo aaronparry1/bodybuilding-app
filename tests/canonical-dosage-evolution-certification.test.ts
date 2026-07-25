@@ -84,7 +84,8 @@ describe("canonical dosage, rotation, method evolution and cardio certification"
     expect(methods.examples.map((example) => example.method)).toEqual(["straight_sets", "pyramid", "amrap", "back_off_sets", "bbb"]);
     expect(methods.examples.every((example) => example.exactTargets.length > 0 && example.stopRule && example.exitRule.length > 0)).toBe(true);
     expect(methods.examples.every((example) => example.selectedByGovernance.mapsToExpected)).toBe(true);
-    expect(methods.unsupportedMethods.map((item) => item.method)).toEqual(["rest_pause", "supersets_trisets", "high_rep_finisher_as_separate_method"]);
+    expect(methods.supportedLinkedMethods.map((item) => item.method)).toEqual(["antagonist_superset", "rest_pause"]);
+    expect(methods.unsupportedMethods.map((item) => item.method)).toEqual(["same_region_supersets_trisets", "high_rep_finisher_as_separate_method"]);
   });
 
   it("simulates productive, local, systemic, missed-session and stagnation paths without weekly auto-escalation", () => {

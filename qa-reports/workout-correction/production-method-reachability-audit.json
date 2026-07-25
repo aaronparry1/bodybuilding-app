@@ -1,0 +1,853 @@
+{
+  "schemaVersion": "canonical_production_method_reachability_audit_v1",
+  "generatedFrom": "real_canonical_session_construction_v3",
+  "policyId": "canonical_training_method_policy_v1",
+  "calibrationBoundary": "Initial calibration remains deliberately straight; later established-load Mesocycles may select bounded methods.",
+  "cases": [
+    {
+      "id": "audit:build_muscle:beginner",
+      "goal": "build_muscle",
+      "experience": "beginner",
+      "mesocyclePurpose": "hypertrophy_volume",
+      "status": "constructed",
+      "sessionCount": 5,
+      "workingSets": 62,
+      "methods": {
+        "straight_sets": 24
+      },
+      "executableStructures": {
+        "standalone": 24
+      },
+      "sessions": [
+        {
+          "role": "Push hypertrophy A",
+          "workingSets": 14,
+          "durationMinutes": 45,
+          "methods": {
+            "straight_sets": 5
+          }
+        },
+        {
+          "role": "Pull hypertrophy B",
+          "workingSets": 16,
+          "durationMinutes": 51,
+          "methods": {
+            "straight_sets": 6
+          }
+        },
+        {
+          "role": "Legs hypertrophy C",
+          "workingSets": 16,
+          "durationMinutes": 52,
+          "methods": {
+            "straight_sets": 5
+          }
+        },
+        {
+          "role": "Push hypertrophy D",
+          "workingSets": 8,
+          "durationMinutes": 27,
+          "methods": {
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Pull hypertrophy E",
+          "workingSets": 8,
+          "durationMinutes": 27,
+          "methods": {
+            "straight_sets": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:build_muscle:intermediate",
+      "goal": "build_muscle",
+      "experience": "intermediate",
+      "mesocyclePurpose": "hypertrophy_volume",
+      "status": "constructed",
+      "sessionCount": 5,
+      "workingSets": 85,
+      "methods": {
+        "amrap": 11,
+        "straight_sets": 18
+      },
+      "executableStructures": {
+        "standalone": 29
+      },
+      "sessions": [
+        {
+          "role": "Push hypertrophy A",
+          "workingSets": 18,
+          "durationMinutes": 54,
+          "methods": {
+            "amrap": 3,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Pull hypertrophy B",
+          "workingSets": 18,
+          "durationMinutes": 55,
+          "methods": {
+            "amrap": 2,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Legs hypertrophy C",
+          "workingSets": 20,
+          "durationMinutes": 65,
+          "methods": {
+            "amrap": 2,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Push hypertrophy D",
+          "workingSets": 13,
+          "durationMinutes": 42,
+          "methods": {
+            "amrap": 2,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Pull hypertrophy E",
+          "workingSets": 16,
+          "durationMinutes": 51,
+          "methods": {
+            "amrap": 2,
+            "straight_sets": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:build_muscle:advanced",
+      "goal": "build_muscle",
+      "experience": "advanced",
+      "mesocyclePurpose": "hypertrophy_volume",
+      "status": "constructed",
+      "sessionCount": 5,
+      "workingSets": 110,
+      "methods": {
+        "amrap": 12,
+        "antagonist_superset": 2,
+        "rest_pause": 1,
+        "straight_sets": 15
+      },
+      "executableStructures": {
+        "linked_rounds": 2,
+        "rest_pause": 1,
+        "standalone": 27
+      },
+      "sessions": [
+        {
+          "role": "Push hypertrophy A",
+          "workingSets": 22,
+          "durationMinutes": 67,
+          "methods": {
+            "amrap": 3,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Pull hypertrophy B",
+          "workingSets": 23,
+          "durationMinutes": 69,
+          "methods": {
+            "amrap": 2,
+            "rest_pause": 1,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Legs hypertrophy C",
+          "workingSets": 19,
+          "durationMinutes": 65,
+          "methods": {
+            "amrap": 1,
+            "antagonist_superset": 2,
+            "straight_sets": 2
+          }
+        },
+        {
+          "role": "Push hypertrophy D",
+          "workingSets": 25,
+          "durationMinutes": 71,
+          "methods": {
+            "amrap": 4,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Pull hypertrophy E",
+          "workingSets": 21,
+          "durationMinutes": 62,
+          "methods": {
+            "amrap": 2,
+            "straight_sets": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:build_strength:beginner",
+      "goal": "build_strength",
+      "experience": "beginner",
+      "mesocyclePurpose": "strength_accumulation",
+      "status": "constructed",
+      "sessionCount": 4,
+      "workingSets": 48,
+      "methods": {
+        "ladder": 8,
+        "straight_sets": 14
+      },
+      "executableStructures": {
+        "standalone": 22
+      },
+      "sessions": [
+        {
+          "role": "Upper strength",
+          "workingSets": 13,
+          "durationMinutes": 42,
+          "methods": {
+            "ladder": 2,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Lower strength",
+          "workingSets": 11,
+          "durationMinutes": 40,
+          "methods": {
+            "ladder": 2,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Upper strength",
+          "workingSets": 13,
+          "durationMinutes": 42,
+          "methods": {
+            "ladder": 2,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Lower strength",
+          "workingSets": 11,
+          "durationMinutes": 40,
+          "methods": {
+            "ladder": 2,
+            "straight_sets": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:build_strength:intermediate",
+      "goal": "build_strength",
+      "experience": "intermediate",
+      "mesocyclePurpose": "strength_accumulation",
+      "status": "constructed",
+      "sessionCount": 4,
+      "workingSets": 56,
+      "methods": {
+        "straight_sets": 22
+      },
+      "executableStructures": {
+        "standalone": 22
+      },
+      "sessions": [
+        {
+          "role": "Upper strength",
+          "workingSets": 14,
+          "durationMinutes": 45,
+          "methods": {
+            "straight_sets": 6
+          }
+        },
+        {
+          "role": "Lower strength",
+          "workingSets": 14,
+          "durationMinutes": 51,
+          "methods": {
+            "straight_sets": 5
+          }
+        },
+        {
+          "role": "Upper strength",
+          "workingSets": 14,
+          "durationMinutes": 45,
+          "methods": {
+            "straight_sets": 6
+          }
+        },
+        {
+          "role": "Lower strength",
+          "workingSets": 14,
+          "durationMinutes": 51,
+          "methods": {
+            "straight_sets": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:build_strength:advanced",
+      "goal": "build_strength",
+      "experience": "advanced",
+      "mesocyclePurpose": "strength_accumulation",
+      "status": "constructed",
+      "sessionCount": 4,
+      "workingSets": 60,
+      "methods": {
+        "straight_sets": 22
+      },
+      "executableStructures": {
+        "standalone": 22
+      },
+      "sessions": [
+        {
+          "role": "Upper strength",
+          "workingSets": 15,
+          "durationMinutes": 49,
+          "methods": {
+            "straight_sets": 6
+          }
+        },
+        {
+          "role": "Lower strength",
+          "workingSets": 15,
+          "durationMinutes": 55,
+          "methods": {
+            "straight_sets": 5
+          }
+        },
+        {
+          "role": "Upper strength",
+          "workingSets": 15,
+          "durationMinutes": 49,
+          "methods": {
+            "straight_sets": 6
+          }
+        },
+        {
+          "role": "Lower strength",
+          "workingSets": 15,
+          "durationMinutes": 55,
+          "methods": {
+            "straight_sets": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:build_muscle_and_strength:beginner",
+      "goal": "build_muscle_and_strength",
+      "experience": "beginner",
+      "mesocyclePurpose": "powerbuilding_hypertrophy",
+      "status": "constructed",
+      "sessionCount": 5,
+      "workingSets": 53,
+      "methods": {
+        "pyramid": 5,
+        "straight_sets": 20
+      },
+      "executableStructures": {
+        "standalone": 25
+      },
+      "sessions": [
+        {
+          "role": "Push strength and hypertrophy",
+          "workingSets": 11,
+          "durationMinutes": 37,
+          "methods": {
+            "pyramid": 1,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Pull strength and hypertrophy",
+          "workingSets": 10,
+          "durationMinutes": 33,
+          "methods": {
+            "pyramid": 1,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Legs strength and hypertrophy",
+          "workingSets": 11,
+          "durationMinutes": 40,
+          "methods": {
+            "pyramid": 1,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Push strength and hypertrophy",
+          "workingSets": 11,
+          "durationMinutes": 37,
+          "methods": {
+            "pyramid": 1,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Pull strength and hypertrophy",
+          "workingSets": 10,
+          "durationMinutes": 33,
+          "methods": {
+            "pyramid": 1,
+            "straight_sets": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:build_muscle_and_strength:intermediate",
+      "goal": "build_muscle_and_strength",
+      "experience": "intermediate",
+      "mesocyclePurpose": "powerbuilding_hypertrophy",
+      "status": "constructed",
+      "sessionCount": 5,
+      "workingSets": 72,
+      "methods": {
+        "antagonist_superset": 4,
+        "pyramid": 5,
+        "rest_pause": 2,
+        "straight_sets": 14
+      },
+      "executableStructures": {
+        "linked_rounds": 4,
+        "rest_pause": 2,
+        "standalone": 19
+      },
+      "sessions": [
+        {
+          "role": "Push strength and hypertrophy",
+          "workingSets": 15,
+          "durationMinutes": 49,
+          "methods": {
+            "antagonist_superset": 2,
+            "pyramid": 1,
+            "straight_sets": 2
+          }
+        },
+        {
+          "role": "Pull strength and hypertrophy",
+          "workingSets": 14,
+          "durationMinutes": 46,
+          "methods": {
+            "pyramid": 1,
+            "rest_pause": 1,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Legs strength and hypertrophy",
+          "workingSets": 14,
+          "durationMinutes": 51,
+          "methods": {
+            "pyramid": 1,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Push strength and hypertrophy",
+          "workingSets": 15,
+          "durationMinutes": 49,
+          "methods": {
+            "antagonist_superset": 2,
+            "pyramid": 1,
+            "straight_sets": 2
+          }
+        },
+        {
+          "role": "Pull strength and hypertrophy",
+          "workingSets": 14,
+          "durationMinutes": 46,
+          "methods": {
+            "pyramid": 1,
+            "rest_pause": 1,
+            "straight_sets": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:build_muscle_and_strength:advanced",
+      "goal": "build_muscle_and_strength",
+      "experience": "advanced",
+      "mesocyclePurpose": "powerbuilding_hypertrophy",
+      "status": "constructed",
+      "sessionCount": 5,
+      "workingSets": 77,
+      "methods": {
+        "antagonist_superset": 4,
+        "pyramid": 5,
+        "rest_pause": 2,
+        "straight_sets": 14
+      },
+      "executableStructures": {
+        "linked_rounds": 4,
+        "rest_pause": 2,
+        "standalone": 19
+      },
+      "sessions": [
+        {
+          "role": "Push strength and hypertrophy",
+          "workingSets": 16,
+          "durationMinutes": 53,
+          "methods": {
+            "antagonist_superset": 2,
+            "pyramid": 1,
+            "straight_sets": 2
+          }
+        },
+        {
+          "role": "Pull strength and hypertrophy",
+          "workingSets": 15,
+          "durationMinutes": 49,
+          "methods": {
+            "pyramid": 1,
+            "rest_pause": 1,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Legs strength and hypertrophy",
+          "workingSets": 15,
+          "durationMinutes": 55,
+          "methods": {
+            "pyramid": 1,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Push strength and hypertrophy",
+          "workingSets": 16,
+          "durationMinutes": 53,
+          "methods": {
+            "antagonist_superset": 2,
+            "pyramid": 1,
+            "straight_sets": 2
+          }
+        },
+        {
+          "role": "Pull strength and hypertrophy",
+          "workingSets": 15,
+          "durationMinutes": 49,
+          "methods": {
+            "pyramid": 1,
+            "rest_pause": 1,
+            "straight_sets": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:athletic_performance:beginner",
+      "goal": "athletic_performance",
+      "experience": "beginner",
+      "mesocyclePurpose": "athletic_general",
+      "status": "constructed",
+      "sessionCount": 3,
+      "workingSets": 30,
+      "methods": {
+        "straight_sets": 15
+      },
+      "executableStructures": {
+        "standalone": 15
+      },
+      "sessions": [
+        {
+          "role": "Full body strength and power A",
+          "workingSets": 10,
+          "durationMinutes": 36,
+          "methods": {
+            "straight_sets": 5
+          }
+        },
+        {
+          "role": "Full body strength and power B",
+          "workingSets": 10,
+          "durationMinutes": 36,
+          "methods": {
+            "straight_sets": 5
+          }
+        },
+        {
+          "role": "Full body strength and power C",
+          "workingSets": 10,
+          "durationMinutes": 36,
+          "methods": {
+            "straight_sets": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:athletic_performance:intermediate",
+      "goal": "athletic_performance",
+      "experience": "intermediate",
+      "mesocyclePurpose": "athletic_general",
+      "status": "constructed",
+      "sessionCount": 3,
+      "workingSets": 30,
+      "methods": {
+        "antagonist_superset": 4,
+        "straight_sets": 11
+      },
+      "executableStructures": {
+        "linked_rounds": 4,
+        "standalone": 11
+      },
+      "sessions": [
+        {
+          "role": "Full body strength and power A",
+          "workingSets": 10,
+          "durationMinutes": 38,
+          "methods": {
+            "antagonist_superset": 2,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Full body strength and power B",
+          "workingSets": 10,
+          "durationMinutes": 38,
+          "methods": {
+            "straight_sets": 5
+          }
+        },
+        {
+          "role": "Full body strength and power C",
+          "workingSets": 10,
+          "durationMinutes": 38,
+          "methods": {
+            "antagonist_superset": 2,
+            "straight_sets": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:athletic_performance:advanced",
+      "goal": "athletic_performance",
+      "experience": "advanced",
+      "mesocyclePurpose": "athletic_general",
+      "status": "constructed",
+      "sessionCount": 3,
+      "workingSets": 33,
+      "methods": {
+        "antagonist_superset": 4,
+        "straight_sets": 11
+      },
+      "executableStructures": {
+        "linked_rounds": 4,
+        "standalone": 11
+      },
+      "sessions": [
+        {
+          "role": "Full body strength and power A",
+          "workingSets": 11,
+          "durationMinutes": 42,
+          "methods": {
+            "antagonist_superset": 2,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Full body strength and power B",
+          "workingSets": 11,
+          "durationMinutes": 41,
+          "methods": {
+            "straight_sets": 5
+          }
+        },
+        {
+          "role": "Full body strength and power C",
+          "workingSets": 11,
+          "durationMinutes": 42,
+          "methods": {
+            "antagonist_superset": 2,
+            "straight_sets": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:get_leaner:beginner",
+      "goal": "get_leaner",
+      "experience": "beginner",
+      "mesocyclePurpose": "hypertrophy_volume",
+      "status": "constructed",
+      "sessionCount": 4,
+      "workingSets": 52,
+      "methods": {
+        "straight_sets": 21
+      },
+      "executableStructures": {
+        "standalone": 21
+      },
+      "sessions": [
+        {
+          "role": "Upper hypertrophy",
+          "workingSets": 15,
+          "durationMinutes": 48,
+          "methods": {
+            "straight_sets": 6
+          }
+        },
+        {
+          "role": "Lower hypertrophy",
+          "workingSets": 12,
+          "durationMinutes": 41,
+          "methods": {
+            "straight_sets": 5
+          }
+        },
+        {
+          "role": "Upper hypertrophy",
+          "workingSets": 15,
+          "durationMinutes": 48,
+          "methods": {
+            "straight_sets": 6
+          }
+        },
+        {
+          "role": "Lower hypertrophy",
+          "workingSets": 10,
+          "durationMinutes": 36,
+          "methods": {
+            "straight_sets": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:get_leaner:intermediate",
+      "goal": "get_leaner",
+      "experience": "intermediate",
+      "mesocyclePurpose": "hypertrophy_volume",
+      "status": "constructed",
+      "sessionCount": 4,
+      "workingSets": 70,
+      "methods": {
+        "amrap": 10,
+        "straight_sets": 14
+      },
+      "executableStructures": {
+        "standalone": 24
+      },
+      "sessions": [
+        {
+          "role": "Upper hypertrophy",
+          "workingSets": 21,
+          "durationMinutes": 64,
+          "methods": {
+            "amrap": 3,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Lower hypertrophy",
+          "workingSets": 14,
+          "durationMinutes": 46,
+          "methods": {
+            "amrap": 2,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Upper hypertrophy",
+          "workingSets": 21,
+          "durationMinutes": 64,
+          "methods": {
+            "amrap": 3,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Lower hypertrophy",
+          "workingSets": 14,
+          "durationMinutes": 46,
+          "methods": {
+            "amrap": 2,
+            "straight_sets": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "audit:get_leaner:advanced",
+      "goal": "get_leaner",
+      "experience": "advanced",
+      "mesocyclePurpose": "hypertrophy_volume",
+      "status": "constructed",
+      "sessionCount": 4,
+      "workingSets": 84,
+      "methods": {
+        "amrap": 10,
+        "straight_sets": 14
+      },
+      "executableStructures": {
+        "standalone": 24
+      },
+      "sessions": [
+        {
+          "role": "Upper hypertrophy",
+          "workingSets": 24,
+          "durationMinutes": 74,
+          "methods": {
+            "amrap": 3,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Lower hypertrophy",
+          "workingSets": 18,
+          "durationMinutes": 58,
+          "methods": {
+            "amrap": 2,
+            "straight_sets": 4
+          }
+        },
+        {
+          "role": "Upper hypertrophy",
+          "workingSets": 24,
+          "durationMinutes": 74,
+          "methods": {
+            "amrap": 3,
+            "straight_sets": 3
+          }
+        },
+        {
+          "role": "Lower hypertrophy",
+          "workingSets": 18,
+          "durationMinutes": 58,
+          "methods": {
+            "amrap": 2,
+            "straight_sets": 4
+          }
+        }
+      ]
+    }
+  ],
+  "allConstructedProductionMethodsHaveExecutableStructure": true,
+  "failClosedCases": [],
+  "unsupportedMethodsFailClosed": [
+    "same_region_superset",
+    "triset",
+    "myo_reps",
+    "drop_set",
+    "capped_amrap",
+    "ten_by_ten",
+    "high_rep_finisher"
+  ]
+}

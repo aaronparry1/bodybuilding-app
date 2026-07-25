@@ -1,7 +1,7 @@
 import type { CanonicalActivePlanReadModel } from "@/application/training/canonical-active-plan-application";
 import { canonicalActivePlanState, type CanonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { displayLoadFromBaseKg } from "@/application/training/canonical-workout-presentation";
-import { exerciseDisplayName, mesocyclePurposeDisplayName, sessionRoleDisplayName } from "@/application/training/display-labels";
+import { exerciseDisplayName, mesocyclePurposeDisplayName, methodDisplayName, sessionRoleDisplayName } from "@/application/training/display-labels";
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
@@ -51,7 +51,7 @@ export type CanonicalProgressPresentation = Readonly<{
     observations: readonly Readonly<{ sessionId: string; label: string; value: number }>[];
     summary: string;
   }>;
-  recentTraining: readonly Readonly<{ id: string; title: string; detail: string; completedAt: string; action: CanonicalProgressPresentationAction }>[];
+  recentTraining: readonly Readonly<{ id: string; title: string; detail: string; methods: readonly string[]; completedAt: string; action: CanonicalProgressPresentationAction }>[];
   review?: Readonly<{ title: string; detail: string; applicationStatus: "review_only" }>;
   attention?: Readonly<{ title: string; detail: string; action?: CanonicalProgressPresentationAction }>;
   primaryAction?: CanonicalProgressPresentationAction;
@@ -156,7 +156,11 @@ export function projectCanonicalProgressPresentation(input: Readonly<{
     const missed = effective.filter((event) => event.payload.completion === "missed").length;
     const completion = prescribed > 0 ? `${work.length} of ${prescribed} working sets completed` : `${work.length} working sets completed`;
     const exceptions = [partial ? `${partial} ${plural(partial, "partial set")}` : "", missed ? `${missed} ${plural(missed, "missed set")}` : ""].filter(Boolean).join(" · ");
-    return { id: aggregate.session.recordedSessionId, title: sessionRoleDisplayName(aggregate.session.role), detail: `${completion}${exceptions ? ` · ${exceptions}` : ""}${duration ? ` · ${duration} min` : ""}`, completedAt: completionTime(aggregate), action: { type: "open_history" as const, label: "View workout", sessionId: aggregate.session.recordedSessionId } };
+    const performedSlotIds = new Set(effective.map((event) => String(event.payload.slotId)));
+    const snapshot = aggregate.session.prescriptionSnapshot as Record<string, unknown>;
+    const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
+    const methods = [...new Set(slots.filter((slot) => performedSlotIds.has(String(slot.id))).map((slot) => methodDisplayName(String(slot.method))))];
+    return { id: aggregate.session.recordedSessionId, title: sessionRoleDisplayName(aggregate.session.role), detail: `${completion}${exceptions ? ` · ${exceptions}` : ""}${duration ? ` · ${duration} min` : ""}`, methods, completedAt: completionTime(aggregate), action: { type: "open_history" as const, label: "View workout", sessionId: aggregate.session.recordedSessionId } };
   });
   const statusAllowed = established && !pending && freshness === "current";
   const improving = trend ? trend.observations.at(-1)!.value > trend.observations[0]!.value : false;

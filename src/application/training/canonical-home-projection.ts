@@ -27,6 +27,7 @@ export type CanonicalHomeWorkoutSummary = Readonly<{
   progressPercent: number;
   estimatedDurationMinutes: number | null;
   exercisePreview: readonly string[];
+  methodPreview: readonly string[];
 }>;
 
 export type CanonicalHomePrimary = Readonly<{
@@ -189,7 +190,8 @@ function plannedAction(model: CanonicalActivePlanReadModel, sessionId: string): 
 }
 
 function summarizeWorkout(workout: WorkoutPresentation, role?: string): CanonicalHomeWorkoutSummary {
-  return { title: workout.title, purpose: sessionPurposeCopy(role, workout.title), lifecycle: workout.lifecycle, exerciseCount: workout.exercises.length, workingSetCount: workout.totalSets, completedSetCount: workout.completedSets, progressPercent: workout.progressPercent, estimatedDurationMinutes: workout.estimatedDurationMinutes, exercisePreview: workout.exercises.slice(0, 2).map((exercise) => exercise.name) };
+  const methods = [...new Set(workout.exercises.map((exercise) => exercise.method))];
+  return { title: workout.title, purpose: sessionPurposeCopy(role, workout.title), lifecycle: workout.lifecycle, exerciseCount: workout.exercises.length, workingSetCount: workout.totalSets, completedSetCount: workout.completedSets, progressPercent: workout.progressPercent, estimatedDurationMinutes: workout.estimatedDurationMinutes, exercisePreview: workout.exercises.slice(0, 2).map((exercise) => exercise.name), methodPreview: methods };
 }
 
 function progressSummary(historicalCount: number, completedThisMicrocycle: number, evidenceStatus: "current" | "not_yet_available", reviewAvailable: boolean): CanonicalHomeProjection["progress"] {

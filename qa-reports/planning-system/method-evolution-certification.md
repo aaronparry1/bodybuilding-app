@@ -15,7 +15,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "exercise": "Bench Press",
       "method": "straight_sets",
       "selectedByGovernance": {
-        "selected": "technical_repeated_sets",
+        "selected": "exact_straight_sets",
         "mapsToExpected": true
       },
       "exactTargets": [
@@ -163,14 +163,22 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "why": "A governed 5 × 10 supplemental-volume allocation that replaces other supplemental work."
     }
   ],
-  "unsupportedMethods": [
+  "supportedLinkedMethods": [
     {
-      "method": "rest_pause",
-      "reason": "not present in canonical Mesocycle or exact-target contracts"
+      "method": "antagonist_superset",
+      "policy": "canonical_training_method_policy_v1",
+      "boundary": "one equal-round, low/moderate-fatigue antagonist pair in an eligible Mesocycle"
     },
     {
-      "method": "supersets_trisets",
-      "reason": "not present in canonical Mesocycle or exact-target contracts"
+      "method": "rest_pause",
+      "policy": "canonical_training_method_policy_v1",
+      "boundary": "one established-load stable row/accessory, three rounds of ten one-rep segments"
+    }
+  ],
+  "unsupportedMethods": [
+    {
+      "method": "same_region_supersets_trisets",
+      "reason": "no approved bounded production eligibility and exact execution contract"
     },
     {
       "method": "high_rep_finisher_as_separate_method",

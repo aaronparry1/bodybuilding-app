@@ -62,10 +62,18 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     attachScreenshot("06-discard-confirmation")
     tap("train-discard-cancel")
     XCTAssertTrue(element("train-close").waitForExistence(timeout: 5))
+
+    // Physical failure reproduction: confirmation must still work while a
+    // numeric set field owns the keyboard.
+    let nextReps = element("train-reps-1-2")
+    XCTAssertTrue(nextReps.waitForExistence(timeout: 5))
+    replaceText("8", in: nextReps)
+    XCTAssertTrue(app.keyboards.firstMatch.exists)
     tap("train-close")
     tap("train-request-discard")
     tap("train-discard-confirm")
     XCTAssertTrue(element("action-start-workout").waitForExistence(timeout: 15), "Discard must make the immutable planned session available again")
+    XCTAssertFalse(app.keyboards.firstMatch.exists, "Discard must dismiss the numeric keyboard and restore normal navigation")
 
     // Start a fresh attempt, record valid work, and complete exactly once.
     tap("action-start-workout")
@@ -116,6 +124,80 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] %@", "recorded work remains stored for recovery")).firstMatch.exists)
     XCTAssertFalse(element("train-start").exists)
     attachScreenshot("12-recoverable-incompatible-attempt")
+  }
+
+  func testInjectedCanonicalAntagonistSupersetIsExecutable() throws {
+    // The generator certifies these deterministic slot positions in the
+    // companion carrier artifact; the UI test does not select training policy.
+    try assertInjectedCanonicalMethod(
+      methodLabel: "Antagonist superset",
+      methodSlotOrder: 2,
+      screenshotPrefix: "13-antagonist-superset",
+      expectedNextInstruction: "Move directly"
+    )
+  }
+
+  func testInjectedCanonicalRestPauseIsExecutable() throws {
+    try assertInjectedCanonicalMethod(
+      methodLabel: "Rest-pause",
+      methodSlotOrder: 4,
+      screenshotPrefix: "14-rest-pause",
+      expectedNextInstruction: "rest-pause round"
+    )
+  }
+
+  private func assertInjectedCanonicalMethod(
+    methodLabel: String,
+    methodSlotOrder: Int,
+    screenshotPrefix: String,
+    expectedNextInstruction: String
+  ) throws {
+    enterOfflineModeIfNeeded()
+    XCTAssertTrue(element("action-start-workout").waitForExistence(timeout: 20))
+    tap("action-start-workout")
+    unlockMockSubscriptionIfPresented()
+    tap("train-start")
+    XCTAssertTrue(element("train-exercise-1").waitForExistence(timeout: 15), "Train must finish starting before method execution advances")
+
+    advanceToWorkingSet(exercise: methodSlotOrder, set: 1)
+    tap("train-exercise-\(methodSlotOrder)")
+    let methodText = app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] %@", methodLabel)).firstMatch
+    XCTAssertTrue(methodText.waitForExistence(timeout: 15), "Train must project the immutable canonical \(methodLabel) prescription")
+    attachScreenshot(screenshotPrefix)
+
+    let complete = element("train-complete-\(methodSlotOrder)-1")
+    XCTAssertTrue(complete.waitForExistence(timeout: 8), "The canonical method must expose an executable working-set control")
+    XCTAssertTrue(complete.isEnabled, "The current canonical method set must be executable")
+    complete.tap()
+    XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] %@", expectedNextInstruction)).firstMatch.waitForExistence(timeout: 8))
+    attachScreenshot("\(screenshotPrefix)-next-step")
+  }
+
+  private func advanceToWorkingSet(exercise targetExercise: Int, set targetSet: Int) {
+    let target = element("train-complete-\(targetExercise)-\(targetSet)")
+    for _ in 0..<80 {
+      let targetTab = element("train-exercise-\(targetExercise)")
+      if targetTab.exists { targetTab.tap() }
+      if target.exists && target.isEnabled { return }
+      var advanced = false
+      for exercise in 1...12 {
+        let tab = element("train-exercise-\(exercise)")
+        if !tab.exists { continue }
+        tab.tap()
+        for set in 1...12 {
+          let candidate = element("train-complete-\(exercise)-\(set)")
+          if candidate.exists && candidate.isEnabled {
+            candidate.tap()
+            skipRestIfPresent()
+            advanced = true
+            break
+          }
+        }
+        if advanced { break }
+      }
+      XCTAssertTrue(advanced, "No canonical working set could advance the method journey")
+    }
+    XCTFail("The canonical method working set did not become current")
   }
 
   private func enterOfflineModeIfNeeded() {

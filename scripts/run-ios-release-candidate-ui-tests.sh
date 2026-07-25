@@ -35,13 +35,24 @@ export ASC_V3_ACTIVE_WORKOUT=true
 export ASC_V3_QUALITY_GATE_STRICT=true
 export ASC_V3_SHADOW_MODE=false
 
-xcodebuild -quiet test \
-  -workspace ios/AdaptiveStrengthCoach.xcworkspace \
-  -scheme AdaptiveStrengthCoachReleaseCandidate \
-  -configuration Release \
-  -destination "platform=iOS Simulator,id=$DEVICE_ID" \
-  -derivedDataPath "$DERIVED_DATA" \
-  -resultBundlePath "$RESULT_PATH" \
-  "-only-testing:$ONLY_TEST" \
-  ONLY_ACTIVE_ARCH=YES \
-  CODE_SIGNING_ALLOWED=NO
+if [[ "${ASC_IOS_UI_TEST_WITHOUT_BUILDING:-0}" == "1" ]]; then
+  xcodebuild -quiet test-without-building \
+    -workspace ios/AdaptiveStrengthCoach.xcworkspace \
+    -scheme AdaptiveStrengthCoachReleaseCandidate \
+    -configuration Release \
+    -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+    -derivedDataPath "$DERIVED_DATA" \
+    -resultBundlePath "$RESULT_PATH" \
+    "-only-testing:$ONLY_TEST"
+else
+  xcodebuild -quiet test \
+    -workspace ios/AdaptiveStrengthCoach.xcworkspace \
+    -scheme AdaptiveStrengthCoachReleaseCandidate \
+    -configuration Release \
+    -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+    -derivedDataPath "$DERIVED_DATA" \
+    -resultBundlePath "$RESULT_PATH" \
+    "-only-testing:$ONLY_TEST" \
+    ONLY_ACTIVE_ARCH=YES \
+    CODE_SIGNING_ALLOWED=NO
+fi

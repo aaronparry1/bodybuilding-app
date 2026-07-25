@@ -10699,9 +10699,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "reps",
                 "reps"
               ],
-              "method": "straight_sets",
+              "method": "antagonist_superset",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 0,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
@@ -10736,9 +10736,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "reps",
                 "reps"
               ],
-              "method": "straight_sets",
+              "method": "antagonist_superset",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 60,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
@@ -11104,9 +11104,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "reps",
                 "reps"
               ],
-              "method": "straight_sets",
+              "method": "antagonist_superset",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 0,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
@@ -11142,9 +11142,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "reps",
                 "reps"
               ],
-              "method": "straight_sets",
+              "method": "antagonist_superset",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 60,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [

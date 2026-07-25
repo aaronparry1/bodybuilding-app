@@ -128,6 +128,33 @@ def inject(device_id: str, case: str, evidence_path: Path) -> None:
     evidence_path.write_text(json.dumps(evidence, sort_keys=True, indent=2) + "\n")
 
 
+def inject_method(device_id: str, carrier_path: Path, evidence_path: Path) -> None:
+    db_path = database(device_id)
+    rows = read_rows(db_path)
+    fixture = json.loads(carrier_path.read_text())
+    if fixture.get("schemaVersion") != "canonical_native_method_carrier_fixture_v1":
+        raise RuntimeError("unsupported canonical method carrier fixture")
+    serialized = fixture.get("serializedCarrier")
+    if not isinstance(serialized, str):
+        raise RuntimeError("canonical method fixture lacks serialized carrier")
+    plan = json.loads(serialized)
+    if plan.get("schema") != "canonical_plan_v2":
+        raise RuntimeError("canonical method fixture is not a canonical carrier")
+    rows[PLAN_KEY] = json.dumps(serialized, separators=(",", ":"))
+    # The method journeys start with a new immutable plan and no active or
+    # historical attempt. Other synthetic settings and entitlement rows remain.
+    rows[LEDGER_KEY] = json.dumps({}, separators=(",", ":"))
+    write_rows(db_path, rows)
+    evidence_path.write_text(json.dumps({
+        "schemaVersion": "canonical_ios_method_fixture_v1",
+        "method": fixture["method"],
+        "selectedRole": fixture["selectedRole"],
+        "methodSlots": fixture["methodSlots"],
+        "planSha256": digest(rows[PLAN_KEY]),
+        "ledgerSha256": digest(rows[LEDGER_KEY]),
+    }, sort_keys=True, indent=2) + "\n")
+
+
 def assert_outcome(device_id: str, evidence_path: Path) -> None:
     evidence = json.loads(evidence_path.read_text())
     rows = read_rows(database(device_id))
@@ -157,11 +184,12 @@ def assert_outcome(device_id: str, evidence_path: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=["snapshot", "restore", "inject", "assert"])
+    parser.add_argument("action", choices=["snapshot", "restore", "inject", "inject-method", "assert"])
     parser.add_argument("--device-id", required=True)
     parser.add_argument("--snapshot", type=Path, required=True)
     parser.add_argument("--case", choices=["stale_future", "corrupt_plan", "incompatible_attempt"])
     parser.add_argument("--evidence", type=Path)
+    parser.add_argument("--carrier", type=Path)
     args = parser.parse_args()
 
     subprocess.run(["xcrun", "simctl", "terminate", args.device_id, BUNDLE_ID], check=False)
@@ -173,6 +201,10 @@ def main() -> None:
         if not args.case or not args.evidence:
             parser.error("inject requires --case and --evidence")
         inject(args.device_id, args.case, args.evidence)
+    elif args.action == "inject-method":
+        if not args.carrier or not args.evidence:
+            parser.error("inject-method requires --carrier and --evidence")
+        inject_method(args.device_id, args.carrier, args.evidence)
     elif args.action == "assert":
         if not args.evidence:
             parser.error("assert requires --evidence")

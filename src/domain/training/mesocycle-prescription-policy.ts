@@ -3,7 +3,7 @@ import { mesocycleById, mesocycleLibrary, type MesocycleId, type MesocycleSpec }
 import type { TrainingLane } from "@/domain/training/models";
 
 export const MESOCYCLE_PRESCRIPTION_POLICY_VERSION = "mesocycle_prescription_policy_v1" as const;
-export type PrescriptionMethodFamily = "straight_sets" | "back_off_sets" | "amrap" | "five_three_one" | "eight_across" | "pyramid" | "ladder" | "cluster" | "bbb" | "dynamic_effort" | "max_effort" | "heavy_single_triple_five_backoffs";
+export type PrescriptionMethodFamily = "straight_sets" | "antagonist_superset" | "rest_pause" | "back_off_sets" | "amrap" | "five_three_one" | "eight_across" | "pyramid" | "ladder" | "cluster" | "bbb" | "dynamic_effort" | "max_effort" | "heavy_single_triple_five_backoffs";
 export type FatigueBoundary = "normal" | "tight" | "very_tight" | "recovery_first";
 export type ProgressionFamily = "double_progression" | "load_progression" | "velocity_intent" | "expression" | "fatigue_reduction";
 export type CanonicalLaneCharacter = "hypertrophy" | "strength" | "power" | "recovery" | "expression";
@@ -98,6 +98,8 @@ function policyFor(spec: MesocycleSpec): MesocyclePrescriptionPolicy {
   if (!isDeload && !isTaper && (id.includes("strength") || id.includes("specific") || isRealisation)) methods.push("heavy_single_triple_five_backoffs");
   if (!isDeload && !isTaper && isPower) methods.push("dynamic_effort");
   if (["hypertrophy_base", "hypertrophy_volume", "hypertrophy_specialisation", "powerbuilding_hypertrophy"].includes(id)) methods.push("amrap");
+  if (["hypertrophy_volume", "hypertrophy_specialisation", "powerbuilding_hypertrophy", "athletic_general"].includes(id)) methods.push("antagonist_superset");
+  if (["hypertrophy_volume", "hypertrophy_specialisation", "powerbuilding_hypertrophy"].includes(id)) methods.push("rest_pause");
   if (["hypertrophy_volume", "hypertrophy_specialisation", "powerbuilding_hypertrophy"].includes(id)) methods.push("eight_across");
   if (id === "strength_accumulation" || id === "powerbuilding_strength") methods.push("five_three_one", "ladder");
   if (id === "strength_specific" || id === "athletic_force") methods.push("cluster");

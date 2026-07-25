@@ -11,7 +11,22 @@ export function sessionRoleDisplayName(role: string): string {
 }
 
 export function methodDisplayName(method: string): string {
-  const labels: Record<string, string> = { straight_sets: "Straight sets", rest_pause: "Rest-pause", myo_reps: "Myo-reps", drop_set: "Drop set" };
+  const labels: Record<string, string> = {
+    straight_sets: "Straight sets",
+    antagonist_superset: "Antagonist superset",
+    rest_pause: "Rest-pause",
+    back_off_sets: "Top set + back-offs",
+    amrap: "Capped AMRAP",
+    five_three_one: "5/3/1",
+    eight_across: "Eight Across",
+    bbb: "Boring But Big",
+    cluster: "Clusters",
+    dynamic_effort: "Dynamic effort",
+    max_effort: "Max effort",
+    heavy_single_triple_five_backoffs: "Heavy set + back-offs",
+    myo_reps: "Myo-reps",
+    drop_set: "Drop set",
+  };
   return labels[method] ?? title(method);
 }
 

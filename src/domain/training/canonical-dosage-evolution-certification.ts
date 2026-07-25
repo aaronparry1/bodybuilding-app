@@ -303,7 +303,20 @@ function buildMethodEvolution() {
     methodExample("strength-top-and-backoffs", "strength_specific", "intermediate", "ex-bench-press", "primary_compound", 4, "back_off_sets"),
     methodExample("powerbuilding-bbb-conditional", "powerbuilding_hypertrophy", "advanced", "ex-bench-press", "secondary_compound", 5, "bbb"),
   ];
-  return { schemaVersion: CANONICAL_DOSAGE_EVOLUTION_CERTIFICATION_VERSION, firstRotationReason: "The initial hypertrophy calibration Mesocycle owns stable, repeatable technique and load evidence; exact straight sets reduce ambiguity before comparable evidence exists.", examples, unsupportedMethods: [{ method: "rest_pause", reason: "not present in canonical Mesocycle or exact-target contracts" }, { method: "supersets_trisets", reason: "not present in canonical Mesocycle or exact-target contracts" }, { method: "high_rep_finisher_as_separate_method", reason: "not a canonical method; high-rep exact accessory targets remain straight or capped AMRAP only when authorised" }], indefiniteIdenticalStructureAbsent: examples.some((example) => example.method !== "straight_sets") };
+  return {
+    schemaVersion: CANONICAL_DOSAGE_EVOLUTION_CERTIFICATION_VERSION,
+    firstRotationReason: "The initial hypertrophy calibration Mesocycle owns stable, repeatable technique and load evidence; exact straight sets reduce ambiguity before comparable evidence exists.",
+    examples,
+    supportedLinkedMethods: [
+      { method: "antagonist_superset", policy: "canonical_training_method_policy_v1", boundary: "one equal-round, low/moderate-fatigue antagonist pair in an eligible Mesocycle" },
+      { method: "rest_pause", policy: "canonical_training_method_policy_v1", boundary: "one established-load stable row/accessory, three rounds of ten one-rep segments" },
+    ],
+    unsupportedMethods: [
+      { method: "same_region_supersets_trisets", reason: "no approved bounded production eligibility and exact execution contract" },
+      { method: "high_rep_finisher_as_separate_method", reason: "not a canonical method; high-rep exact accessory targets remain straight or capped AMRAP only when authorised" },
+    ],
+    indefiniteIdenticalStructureAbsent: examples.some((example) => example.method !== "straight_sets"),
+  };
 }
 
 function methodExample(id: string, mesocycleId: MesocycleId, experience: ExperienceLevel, exerciseId: string, role: AllocatedSlot["exerciseRole"], sets: number, method: Parameters<typeof resolveCanonicalExactTarget>[0]["method"]) {

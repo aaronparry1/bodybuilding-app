@@ -1,8 +1,9 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import {
   completeCanonicalSession,
   discardCanonicalSessionAttempt,
+  discardLatestCanonicalSessionAttempt,
   editCanonicalPerformedWork,
   pauseCanonicalSession,
   prescriptionHash,
@@ -11,6 +12,7 @@ import {
   startCanonicalSession,
 } from "@/application/training/canonical-recorded-session-application";
 import { projectCanonicalWorkoutPresentation } from "@/application/training/canonical-workout-presentation";
+import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
@@ -19,6 +21,7 @@ import { exerciseLibrary } from "@/domain/training/presets";
 
 describe("canonical active Train lifecycle", () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     canonicalActivePlanState.clear();
     canonicalRecordedSessionLedger.clear();
     canonicalProgressEvidenceRepository.clear();
@@ -76,7 +79,7 @@ describe("canonical active Train lifecycle", () => {
     expect(deriveCanonicalCompletionSummary(aggregate.session, aggregate.events)).toMatchObject({ performedSets: 1, performedReps: 5, performedLoad: 77.5 });
     const evidence = canonicalProgressEvidenceRepository.list(started.planId).filter((item) => item.sessionId === started.recordedSessionId && item.kind === "performance");
     expect(evidence).toHaveLength(1);
-    expect(evidence[0]?.observations).toMatchObject({ reps: 5, load: 77.5, exerciseId: slot.exerciseId, completion: "complete" });
+    expect(evidence[0]?.observations).toMatchObject({ reps: 5, load: 77.5, exerciseId: slot.exerciseId, completion: "complete", method: slot.method, methodPolicyId: "canonical_training_method_policy_v1" });
   });
 
   it("treats an identical repeated set command as idempotent and rejects a conflicting duplicate", () => {
@@ -90,6 +93,56 @@ describe("canonical active Train lifecycle", () => {
     expect(recordCanonicalPerformedWork({ ...base, operationId: "duplicate-conflict", load: 72.5 })).toMatchObject({ status: "rejected", reason: "performed_set_conflict" });
     const after = canonicalRecordedSessionLedger.get(started.recordedSessionId);
     expect(after.status === "found" && after.events.filter((event) => event.type === "performance")).toHaveLength(1);
+  });
+
+  it("discards a first-exposure attempt before performed work, remains idempotent, and survives rehydration", () => {
+    const started = startNext("discard-empty");
+    const first = discardLatestCanonicalSessionAttempt(latestDiscard(started, "discard-empty-confirm"));
+    expect(first).toMatchObject({ status: "applied", reason: "session_attempt_discarded" });
+    const repeated = discardLatestCanonicalSessionAttempt(latestDiscard(started, "discard-empty-repeat"));
+    expect(repeated).toMatchObject({ status: "idempotent", reason: "discard_already_applied" });
+    canonicalActivePlanState.hydrate();
+    const model = canonicalActivePlanState.getReadModel();
+    expect(model?.activeRecordedSession).toBeNull();
+    expect(model?.plannedSessions.filter((session) => session.id === started.plannedSessionId)).toHaveLength(1);
+    expect(model?.plannedSessions.find((session) => session.id === started.plannedSessionId)?.status).toBe("planned");
+    expect(canonicalRecordedSessionLedger.get(started.recordedSessionId).status).toBe("not_found");
+  });
+
+  it("fails storage deletion safely without changing the active plan or hiding the attempt", () => {
+    const started = startNext("discard-storage");
+    const before = canonicalActivePlanState.getReadModel();
+    vi.spyOn(canonicalRecordedSessionLedger, "deleteActive").mockReturnValueOnce({ status: "storage_failure", reason: "recorded_session_storage_write_failed" });
+    const result = discardLatestCanonicalSessionAttempt(latestDiscard(started, "discard-storage-confirm"));
+    expect(result).toEqual({ status: "retryable", reason: "recorded_session_storage_write_failed" });
+    expect(canonicalActivePlanState.getReadModel()?.revision).toBe(before?.revision);
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession?.recordedSessionId).toBe(started.recordedSessionId);
+    expect(canonicalRecordedSessionLedger.get(started.recordedSessionId).status).toBe("found");
+  });
+
+  it("compensates the ledger exactly when the carrier CAS fails", () => {
+    const started = startNext("discard-cas");
+    const aggregate = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    if (aggregate.status !== "found") throw new Error("recorded session missing");
+    vi.spyOn(canonicalActivePlanV2Repository, "saveAtomically").mockReturnValueOnce({ status: "conflict", reason: "stale_revision" });
+    const result = discardLatestCanonicalSessionAttempt(latestDiscard(started, "discard-cas-confirm"));
+    expect(result).toEqual({ status: "retryable", reason: "discard_carrier_update_pending" });
+    expect(canonicalRecordedSessionLedger.get(started.recordedSessionId)).toEqual(aggregate);
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession?.recordedSessionId).toBe(started.recordedSessionId);
+  });
+
+  it("rejects stale low-level revisions and never discards completed history", () => {
+    const started = startNext("discard-stale");
+    expect(discardCanonicalSessionAttempt(command(started.planId, started.planRevision - 1, started.recordedSessionId, 1, "discard-stale-confirm"))).toMatchObject({ status: "rejected", reason: "stale_plan_revision" });
+    const recorded = recordFirstSet(started, "discard-complete-work", 60, 8);
+    const completed = completeCanonicalSession(command(started.planId, started.planRevision, started.recordedSessionId, recorded.ledgerVersion!, "discard-complete"));
+    expect(completed.status).toBe("applied");
+    const current = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    if (current.status !== "found") throw new Error("completed session missing");
+    const currentPlanRevision = canonicalActivePlanState.getReadModel()?.revision;
+    if (currentPlanRevision === undefined) throw new Error("current plan missing");
+    expect(discardCanonicalSessionAttempt(command(started.planId, currentPlanRevision, started.recordedSessionId, current.session.version, "discard-completed-history"))).toMatchObject({ status: "rejected", reason: "completed_history_cannot_be_discarded" });
+    expect(canonicalRecordedSessionLedger.get(started.recordedSessionId).status).toBe("found");
   });
 });
 
@@ -118,4 +171,5 @@ function recordFirstSet(started: ReturnType<typeof startNext>, operationId: stri
 }
 
 function command(planId: string, expectedPlanRevision: number, recordedSessionId: string, expectedLedgerVersion: number, operationId: string) { return { planId, expectedPlanRevision, recordedSessionId, expectedLedgerVersion, operationId, occurredAt: `2026-01-01T10:${String(expectedLedgerVersion).padStart(2, "0")}:00.000Z`, provenance: "canonical_train_test" }; }
+function latestDiscard(started: ReturnType<typeof startNext>, operationId: string) { return { planId: started.planId, recordedSessionId: started.recordedSessionId, operationId, occurredAt: "2026-01-01T12:00:00.000Z", provenance: "canonical_train_test" }; }
 function firstSlot(snapshot: Readonly<Record<string, unknown>>): Record<string, unknown> { const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Record<string, unknown>[] : []; if (!slots[0]) throw new Error("slot missing"); return slots[0]; }

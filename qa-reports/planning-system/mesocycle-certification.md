@@ -1070,6 +1070,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "back_off_sets",
             "pyramid",
             "amrap",
+            "antagonist_superset",
+            "rest_pause",
             "eight_across"
           ],
           "prohibited": [],
@@ -1446,6 +1448,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "back_off_sets",
             "pyramid",
             "amrap",
+            "antagonist_superset",
+            "rest_pause",
             "eight_across"
           ],
           "prohibited": [],
@@ -2768,6 +2772,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "back_off_sets",
             "pyramid",
             "amrap",
+            "antagonist_superset",
+            "rest_pause",
             "eight_across",
             "bbb"
           ],
@@ -6537,7 +6543,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "permitted": [
             "straight_sets",
             "back_off_sets",
-            "pyramid"
+            "pyramid",
+            "antagonist_superset"
           ],
           "prohibited": [],
           "conditional": []

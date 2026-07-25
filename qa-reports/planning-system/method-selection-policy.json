@@ -35,6 +35,8 @@
           "back_off_sets",
           "pyramid",
           "amrap",
+          "antagonist_superset",
+          "rest_pause",
           "eight_across"
         ],
         "prohibited": [],
@@ -49,6 +51,8 @@
           "back_off_sets",
           "pyramid",
           "amrap",
+          "antagonist_superset",
+          "rest_pause",
           "eight_across"
         ],
         "prohibited": [],
@@ -109,6 +113,8 @@
           "back_off_sets",
           "pyramid",
           "amrap",
+          "antagonist_superset",
+          "rest_pause",
           "eight_across",
           "bbb"
         ],
@@ -279,7 +285,8 @@
         "permitted": [
           "straight_sets",
           "back_off_sets",
-          "pyramid"
+          "pyramid",
+          "antagonist_superset"
         ],
         "prohibited": [],
         "conditional": []
@@ -330,6 +337,7 @@
     }
   ],
   "observedMethods": [
+    "antagonist_superset",
     "back_off_sets",
     "straight_sets"
   ]

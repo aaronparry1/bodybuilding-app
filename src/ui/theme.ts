@@ -22,7 +22,34 @@ export const colors = {
   blueSoft: "#121a2d",
   focus: "#d8b56d",
   scrim: "rgba(3, 5, 8, 0.72)",
-};
+  transparent: "transparent",
+} as const;
+
+/**
+ * Semantic workout-state colours derived from the approved application shell.
+ * Workout screens must consume this view rather than inventing a local palette.
+ */
+export const workoutColors = {
+  background: colors.background,
+  surface: colors.surface,
+  surfaceRaised: colors.surfaceSoft,
+  line: colors.lineSoft,
+  lineStrong: colors.line,
+  text: colors.text,
+  muted: colors.textMuted,
+  subtle: colors.textSubtle,
+  accent: colors.accent,
+  accentPressed: colors.accentPressed,
+  accentSoft: colors.accentSoft,
+  success: colors.success,
+  successSoft: colors.successSoft,
+  warning: colors.warning,
+  warningSoft: colors.warningSoft,
+  danger: colors.danger,
+  dangerSoft: colors.dangerSoft,
+  scrim: colors.scrim,
+  transparent: colors.transparent,
+} as const;
 
 export const spacing = {
   xs: 4,

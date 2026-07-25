@@ -3,7 +3,22 @@ import type { Exercise } from "@/domain/training/models";
 
 export const CANONICAL_SESSION_CONSTRUCTION_DISPLAY_PROJECTION_VERSION = "canonical_session_construction_display_projection_v1" as const;
 export type DisplayProjectionResult = Readonly<{ status: "ready"; projection: Readonly<{ projectionVersion: typeof CANONICAL_SESSION_CONSTRUCTION_DISPLAY_PROJECTION_VERSION; snapshotVersion: string; sessionId: string; roleLabel: string; sessionName: string; slots: readonly Readonly<{ index: number; exerciseId: string; exerciseName: string; methodLabel: string; loadStateLabel: string; accessibilityLabel: string }>[] }> }> | Readonly<{ status: "unavailable" | "corrupt"; reason: string }>;
-const methodLabels: Record<string, string> = { straight_sets: "Straight sets", back_off_sets: "Back-off sets", pyramid: "Pyramid", amrap: "AMRAP", dynamic_effort: "Dynamic effort" };
+const methodLabels: Record<string, string> = {
+  straight_sets: "Straight sets",
+  antagonist_superset: "Antagonist superset",
+  rest_pause: "Rest-pause",
+  back_off_sets: "Top set + back-offs",
+  pyramid: "Pyramid",
+  amrap: "Capped AMRAP",
+  five_three_one: "5/3/1",
+  eight_across: "Eight Across",
+  ladder: "Ladder",
+  cluster: "Clusters",
+  bbb: "Boring But Big",
+  dynamic_effort: "Dynamic effort",
+  max_effort: "Max effort",
+  heavy_single_triple_five_backoffs: "Heavy set + back-offs",
+};
 const roleLabels: Record<string, string> = { primary: "Primary", secondary: "Secondary", accessory: "Accessory", upper: "Upper", lower: "Lower" };
 export function projectCanonicalSessionConstructionDisplay(snapshot: CanonicalSessionSnapshot, exercises: readonly Exercise[]): DisplayProjectionResult {
   if (!snapshot || !["canonical_session_snapshot_v2", "canonical_session_snapshot_v3"].includes(snapshot.schemaVersion) || !snapshot.sessionId || !snapshot.provenance?.inputVersion) return { status: "corrupt", reason: "invalid_snapshot" };

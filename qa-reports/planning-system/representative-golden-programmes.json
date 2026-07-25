@@ -10694,9 +10694,9 @@
                 "reps",
                 "reps"
               ],
-              "method": "straight_sets",
+              "method": "antagonist_superset",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 0,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
@@ -10731,9 +10731,9 @@
                 "reps",
                 "reps"
               ],
-              "method": "straight_sets",
+              "method": "antagonist_superset",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 60,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
@@ -11099,9 +11099,9 @@
                 "reps",
                 "reps"
               ],
-              "method": "straight_sets",
+              "method": "antagonist_superset",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 0,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
@@ -11137,9 +11137,9 @@
                 "reps",
                 "reps"
               ],
-              "method": "straight_sets",
+              "method": "antagonist_superset",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 60,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [

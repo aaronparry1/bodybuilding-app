@@ -51,6 +51,7 @@ function WorkoutAtAGlance({ primary }: Readonly<{ primary: CanonicalHomePrimary 
       <Metric label="Estimate" value={workout.estimatedDurationMinutes ? `${workout.estimatedDurationMinutes}m` : "—"} />
     </View>
     {workout.exercisePreview.length ? <Text numberOfLines={2} style={{ color: colors.textMuted, fontSize: 13, lineHeight: 19 }}>{workout.exercisePreview.join(" · ")}{remainingExercises ? ` · +${remainingExercises} more` : ""}</Text> : null}
+    {workout.methodPreview.length ? <Text numberOfLines={2} style={{ color: colors.textSubtle, fontSize: 12, lineHeight: 18 }}>Methods: {workout.methodPreview.join(" · ")}</Text> : null}
   </View>;
 }
 

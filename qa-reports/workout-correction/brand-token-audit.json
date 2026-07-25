@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "canonical_workout_brand_token_audit_v1",
+  "productionRoute": "app/(protected)/(tabs)/train.tsx",
+  "rootCause": "The production Train route declared an independent cyan-on-navy TRAIN palette and raw opacity/overlay literals instead of consuming the shared gold semantic theme.",
+  "violationsRemoved": [
+    "local TRAIN colour system",
+    "raw hexadecimal colour literals",
+    "raw rgba modal and completed-state overlays",
+    "workout-only active/success/warning/danger colour ownership"
+  ],
+  "canonicalOwner": "src/ui/theme.ts",
+  "semanticStates": [
+    "active",
+    "upcoming",
+    "completed",
+    "rest",
+    "paused",
+    "warning",
+    "destructive",
+    "disabled"
+  ],
+  "guard": "tests/canonical-train-brand-boundary.test.ts",
+  "nativeComparisonStatus": "passed_release_scheme_standard_and_large_dynamic_type",
+  "nativeBaselineEvidence": [
+    "qa-reports/release-candidate/native-screenshots/modern/04-active-logger.png",
+    "qa-reports/release-candidate/native-screenshots/modern/06-discard-confirmation.png"
+  ],
+  "baselineLimitation": "The committed 1.0.14 release-candidate evidence provides the native pre-correction comparison at standard text size. A separate pre-correction large-Dynamic-Type capture does not exist and is not fabricated.",
+  "nativeEvidence": [
+    "qa-reports/workout-correction/native-screenshots/standard/active-straight-workout.png",
+    "qa-reports/workout-correction/native-screenshots/large/active-straight-workout.png",
+    "qa-reports/workout-correction/native-screenshots/methods-standard/antagonist-superset-next-step.png",
+    "qa-reports/workout-correction/native-screenshots/methods-large/rest-pause-next-step.png"
+  ]
+}

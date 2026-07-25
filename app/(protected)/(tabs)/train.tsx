@@ -21,7 +21,7 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import { loadPlannedSession } from "@/application/training/canonical-active-plan-application";
 import {
   completeCanonicalSession,
-  discardCanonicalSessionAttempt,
+  discardLatestCanonicalSessionAttempt,
   editCanonicalPerformedWork,
   pauseCanonicalSession,
   prescriptionHash,
@@ -57,7 +57,7 @@ import { useSubscription } from "@/application/billing/subscription-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { hapticFeedback } from "@/application/training/haptic-feedback";
 import { AppScreen, PrimaryButton, SecondaryButton, stableUiIdentifier } from "@/ui/primitives";
-import { colors, type } from "@/ui/theme";
+import { colors, type, workoutColors } from "@/ui/theme";
 
 type RouteParams = Readonly<{
   planId?: string;
@@ -73,23 +73,7 @@ type TrainModal = "close" | "discard" | "finish" | null;
 
 const TRAIN_NUMERIC_KEYBOARD_ACCESSORY_ID = "train-numeric-keyboard-accessory";
 
-const TRAIN = {
-  background: "#05070A",
-  surface: "#0B1119",
-  surfaceRaised: "#101925",
-  line: "#263448",
-  lineStrong: "#52647E",
-  text: "#FFFFFF",
-  muted: "#B8C4D4",
-  subtle: "#7E8DA2",
-  accent: "#52E5FF",
-  accentPressed: "#9BF1FF",
-  accentSoft: "#0B2C35",
-  success: "#77F2AE",
-  successSoft: "#10291E",
-  danger: "#FF6B72",
-  dangerSoft: "#321319",
-};
+const TRAIN = workoutColors;
 
 function operationId(prefix: string): string { return `train:${prefix}:${Date.now()}`; }
 
@@ -246,14 +230,25 @@ function CanonicalTrainExperience() {
   const discard = () => {
     if (!plan || aggregate.status !== "found") return;
     setBusy(true);
-    const result = discardCanonicalSessionAttempt(lifecycleCommand(plan.planId, plan.revision, aggregate.session.recordedSessionId, aggregate.session.version, "discard"));
-    setMessage(friendlyReason(result.reason));
-    canonicalActivePlanState.refresh();
-    setBusy(false);
-    if (result.status === "applied" || result.status === "idempotent") {
-      setRecordedId(undefined);
-      setModal(null);
-      router.replace("/(protected)/(tabs)");
+    try {
+      const result = discardLatestCanonicalSessionAttempt({
+        planId: plan.planId,
+        recordedSessionId: aggregate.session.recordedSessionId,
+        operationId: operationId("discard"),
+        occurredAt: new Date().toISOString(),
+        provenance: "canonical_train",
+      });
+      setMessage(friendlyReason(result.reason));
+      canonicalActivePlanState.refresh();
+      if (result.status === "applied" || result.status === "idempotent") {
+        setRecordedId(undefined);
+        setModal(null);
+        router.replace("/(protected)/(tabs)");
+      }
+    } catch {
+      setMessage("Discard did not complete. Your workout is still saved; try again.");
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -399,11 +394,14 @@ function CanonicalTrainExperience() {
   const lastInstruction = nextInstruction ?? [...aggregate.events].reverse().find((event) => event.type === "performance" && typeof event.payload.nextInstruction === "string")?.payload.nextInstruction as string | null | undefined;
   const paused = aggregate.session.status === "paused";
 
-  return <TrainShell insets={insets} presentation={presentation} onClose={() => setModal("close")}>
+  return <TrainShell insets={insets} presentation={presentation} onClose={() => { Keyboard.dismiss(); setMessage(null); setModal("close"); }}>
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex} keyboardVerticalOffset={0}>
       <ScrollView ref={scrollRef} automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" contentContainerStyle={[styles.content, { paddingBottom: Math.max(insets.bottom, 16) + 108 }]}>
         {paused ? <PausedBanner busy={busy} onResume={resume} /> : null}
         {restTimer && restTimer.state !== "skipped" ? <RestPanel timer={restTimer} seconds={restSeconds} nextInstruction={lastInstruction ?? null} onAction={restAction} /> : null}
+        {(!restTimer || restTimer.state === "skipped") && lastInstruction?.startsWith("Move directly")
+          ? <View testID="train-next-instruction" accessibilityRole="summary" style={styles.nextInstruction}><Text style={styles.nextInstructionLabel}>UP NEXT</Text><Text style={styles.nextInstructionText}>{lastInstruction}</Text></View>
+          : null}
         <ExerciseRail exercises={presentation.exercises} activeId={activeExercise?.id ?? ""} onSelect={setActiveExerciseId} />
         {activeExercise ? <ActiveExerciseCard
           exercise={activeExercise}
@@ -429,7 +427,17 @@ function CanonicalTrainExperience() {
       </ScrollView>
     </KeyboardAvoidingView>
     {Platform.OS === "ios" ? <InputAccessoryView nativeID={TRAIN_NUMERIC_KEYBOARD_ACCESSORY_ID}><View style={styles.keyboardAccessory}><Pressable testID="train-keyboard-done" accessibilityRole="button" accessibilityLabel="Done" onPress={Keyboard.dismiss} style={({ pressed }) => [styles.keyboardDone, pressed && styles.pressed]}><Text maxFontSizeMultiplier={1.4} style={styles.keyboardDoneText}>Done</Text></Pressable></View></InputAccessoryView> : null}
-    <TrainActionModal modal={modal} reduceMotion={reduceMotion} busy={busy} onContinue={() => setModal(null)} onPauseLeave={pauseAndLeave} onRequestDiscard={() => setModal("discard")} onDiscard={discard} onFinish={finish} />
+    <TrainActionModal
+      modal={modal}
+      reduceMotion={reduceMotion}
+      busy={busy}
+      message={message}
+      onContinue={() => setModal(null)}
+      onPauseLeave={pauseAndLeave}
+      onRequestDiscard={() => { Keyboard.dismiss(); setModal("discard"); }}
+      onDiscard={discard}
+      onFinish={finish}
+    />
   </TrainShell>;
 }
 
@@ -465,7 +473,8 @@ function WorkoutPreview({ presentation, busy, onStart, message }: Readonly<{ pre
       <View style={styles.previewExerciseText}>
         <Text style={styles.exerciseName}>{exercise.name}</Text>
         <Text style={styles.smallMuted}>{exercise.sets.length} sets · {exercise.sets.map((set) => set.target).join(" / ")}</Text>
-        <Text style={styles.smallMuted}>{exercise.sets[0]?.loadLabel} · {exercise.sets[0]?.restSeconds}s rest · {exercise.method}</Text>
+        <Text style={styles.smallMuted}>{exercise.sets[0]?.loadLabel} · {exercise.method}</Text>
+        <Text style={styles.methodSummary}>{exercise.methodExecution.instruction}</Text>
       </View>
     </View>)}</View>
     <Pressable testID="train-start" accessibilityRole="button" accessibilityLabel="Start workout" disabled={busy} onPress={onStart} style={({ pressed }) => [styles.primaryAction, pressed && styles.primaryActionPressed, busy && styles.disabled]}><Text numberOfLines={1} style={styles.primaryActionText}>{busy ? "Starting…" : "Start workout"}</Text></Pressable>
@@ -512,10 +521,19 @@ function ActiveExerciseCard(props: Readonly<{
       <View style={styles.exerciseHeadingText}>
         <Text style={styles.eyebrow}>EXERCISE {exercise.order}</Text>
         <Text style={styles.activeExerciseName}>{exercise.name}</Text>
-        <Text style={styles.body}>{exercise.sets.length} working sets · {exercise.sets.map((set) => set.target).join(" / ")} · {exercise.sets[0]?.restSeconds}s rest</Text>
+        <Text style={styles.body}>{exercise.sets.length} working sets · {exercise.sets.map((set) => set.target).join(" / ")}</Text>
         <Text style={styles.smallMuted}>{exercise.method} · {exercise.loadState}</Text>
         {exercise.previousPerformance ? <Text style={styles.previous}>Previous: {exercise.previousPerformance}</Text> : null}
       </View>
+    </View>
+    <View testID={`train-method-${exercise.order}`} style={styles.methodPanel}>
+      <Text style={styles.methodTitle}>{exercise.methodExecution.sequenceLabel ? `${exercise.methodExecution.sequenceLabel} · ` : ""}{exercise.method}</Text>
+      <Text style={styles.methodSummary}>{exercise.methodExecution.instruction}</Text>
+      <Text style={styles.tinyMuted}>{exercise.methodExecution.kind === "linked_rounds"
+        ? `${exercise.methodExecution.intraMethodRestSeconds ?? 0}s between exercises · ${exercise.methodExecution.interRoundRestSeconds}s between rounds`
+        : exercise.methodExecution.kind === "rest_pause"
+          ? `${exercise.methodExecution.intraMethodRestSeconds ?? 0}s reset between single reps · ${exercise.methodExecution.interRoundRestSeconds}s between rounds`
+          : `${exercise.methodExecution.interRoundRestSeconds}s between sets`}</Text>
     </View>
     {exercise.coachingNote ? <View style={styles.coaching}><Text style={styles.coachingText}>{exercise.coachingNote}</Text></View> : null}
     {calibration?.required && !props.calibrationConfirmed ? <View style={styles.calibrationPanel}>
@@ -536,7 +554,7 @@ function ActiveExerciseCard(props: Readonly<{
       <Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.columnLabel, { width: props.layout.doneWidth, textAlign: "center" }]}>Done</Text>
     </View>
     <View style={{ gap: props.layout.rowGap }}>{exercise.sets.map((set) => {
-      const current = set.id === firstIncomplete?.id;
+      const current = set.state === "current";
       const completed = set.state === "completed";
       const values = props.valuesFor(exercise, set);
       const editing = props.editState?.setId === set.id;
@@ -562,7 +580,7 @@ function RestPanel({ timer, seconds, nextInstruction, onAction }: Readonly<{ tim
   const paused = timer.state === "paused";
   return <View style={styles.restPanel} accessibilityLiveRegion="polite">
     <View style={styles.restTop}><View><Text style={styles.eyebrow}>{expired ? "REST COMPLETE" : paused ? "REST PAUSED" : "REST"}</Text><Text accessibilityLabel={expired ? "Rest complete" : `${seconds} seconds remaining`} style={styles.restTime}>{expired ? "GO" : formatTimer(seconds)}</Text></View><Text style={styles.restPrescribed}>{timer.prescribedDurationSeconds}s prescribed</Text></View>
-    {expired && nextInstruction ? <Text style={styles.restInstruction}>{nextInstruction}</Text> : null}
+    {nextInstruction ? <Text testID="train-next-instruction" style={styles.restInstruction}>{nextInstruction}</Text> : null}
     {!expired ? <View style={styles.restActions}>
       <RestAction label={paused ? "Resume" : "Pause"} onPress={() => onAction(paused ? "resume" : "pause")} />
       <RestAction label="+30s" onPress={() => onAction("add")} />
@@ -577,8 +595,8 @@ function PausedBanner({ busy, onResume }: Readonly<{ busy: boolean; onResume(): 
 
 function FinishPanel({ presentation, busy, onFinish }: Readonly<{ presentation: WorkoutPresentation; busy: boolean; onFinish(): void }>) { return <View style={styles.finishPanel}><Text style={styles.finishTitle}>Finish workout</Text><Text style={styles.smallMuted}>{presentation.finishAllowed ? "Your recorded working sets are ready to complete." : presentation.finishBlockedReason}</Text><Pressable testID="train-finish" accessibilityRole="button" accessibilityLabel={presentation.finishAllowed ? "Finish workout" : `Finish workout unavailable. ${presentation.finishBlockedReason}`} accessibilityState={{ disabled: !presentation.finishAllowed }} disabled={!presentation.finishAllowed || busy} onPress={onFinish} style={({ pressed }) => [styles.finishAction, pressed && styles.primaryActionPressed, (!presentation.finishAllowed || busy) && styles.disabled]}><Text numberOfLines={1} style={styles.finishActionText}>{busy ? "Saving…" : "Finish workout"}</Text></Pressable></View>; }
 
-function TrainActionModal({ modal, reduceMotion, busy, onContinue, onPauseLeave, onRequestDiscard, onDiscard, onFinish }: Readonly<{ modal: TrainModal; reduceMotion: boolean; busy: boolean; onContinue(): void; onPauseLeave(): void; onRequestDiscard(): void; onDiscard(): void; onFinish(): void }>) {
-  return <Modal visible={modal !== null} transparent animationType={reduceMotion ? "none" : "fade"} onRequestClose={onContinue} statusBarTranslucent>
+function TrainActionModal({ modal, reduceMotion, busy, message, onContinue, onPauseLeave, onRequestDiscard, onDiscard, onFinish }: Readonly<{ modal: TrainModal; reduceMotion: boolean; busy: boolean; message: string | null; onContinue(): void; onPauseLeave(): void; onRequestDiscard(): void; onDiscard(): void; onFinish(): void }>) {
+  return <Modal visible={modal !== null} transparent animationType={reduceMotion ? "none" : "fade"} onShow={Keyboard.dismiss} onRequestClose={onContinue} statusBarTranslucent>
     <View style={styles.modalBackdrop}><View accessibilityViewIsModal accessibilityRole="none" style={styles.modalSheet}>
       <ScrollView key={modal ?? "closed"} bounces={false} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator contentContainerStyle={styles.modalContent}>
       {modal === "close" ? <>
@@ -595,6 +613,7 @@ function TrainActionModal({ modal, reduceMotion, busy, onContinue, onPauseLeave,
         <Pressable testID="train-finish-cancel" accessibilityRole="button" accessibilityLabel="Keep training" onPress={onContinue} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>Keep training</Text></Pressable>
         <Pressable testID="train-finish-confirm" accessibilityRole="button" accessibilityLabel="Confirm finish workout" disabled={busy} onPress={onFinish} style={({ pressed }) => [styles.modalAction, styles.modalPrimary, pressed && styles.pressed]}><Text style={styles.modalPrimaryText}>{busy ? "Finishing…" : "Finish workout"}</Text></Pressable>
       </> : null}
+      {message && modal ? <Text testID="train-modal-message" accessibilityLiveRegion="assertive" style={styles.modalMessage}>{message}</Text> : null}
       </ScrollView>
     </View></View>
   </Modal>;
@@ -634,7 +653,25 @@ function lifecycleCommand(planId: string, revision: number, recordedSessionId: s
 function awaitHaptic(promise: Promise<void>) { void promise.catch(() => undefined); }
 function formatElapsed(seconds: number) { const hours = Math.floor(seconds / 3600); const minutes = Math.floor((seconds % 3600) / 60); const remainder = seconds % 60; return hours ? `${hours}:${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}` : `${minutes}:${String(remainder).padStart(2, "0")}`; }
 function formatTimer(seconds: number) { return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`; }
-function friendlyReason(reason: string): string { const labels: Record<string, string> = { canonical_session_started: "Workout started", performed_work_recorded: "Set completed", performed_work_edited: "Set updated", session_pause: "Workout paused and saved", session_resumed: "Workout resumed", session_completed: "Workout complete", session_attempt_discarded: "Active attempt discarded; the session is planned again", stale_ledger_version: "This workout changed. Refresh and try again.", stale_plan_revision: "Your plan changed. Return to Home and reopen this workout." }; return labels[reason] ?? reason.replace(/_/g, " "); }
+function friendlyReason(reason: string): string {
+  const labels: Record<string, string> = {
+    canonical_session_started: "Workout started",
+    performed_work_recorded: "Set completed",
+    performed_work_edited: "Set updated",
+    session_pause: "Workout paused and saved",
+    session_resumed: "Workout resumed",
+    session_completed: "Workout complete",
+    session_attempt_discarded: "Active attempt discarded; the session is planned again",
+    discard_already_applied: "This active attempt was already discarded. The planned workout is ready again.",
+    stale_ledger_version: "This workout changed. Refresh and try again.",
+    stale_plan_revision: "Your plan changed. Return to Home and reopen this workout.",
+    recorded_session_storage_write_failed: "Discard did not complete because local storage could not be updated. Your workout is still saved; try again.",
+    discard_carrier_update_pending: "Discard did not complete because your plan changed. Your workout is still saved; reopen it and try again.",
+    discard_compensation_failed: "Discard could not be completed safely. Your workout data has been preserved for recovery.",
+    discard_cleanup_pending: "The workout was restored, but local cleanup is still pending. Confirm discard again.",
+  };
+  return labels[reason] ?? reason.replace(/_/g, " ");
+}
 
 export { recordCanonicalPerformedWork };
 
@@ -686,6 +723,12 @@ const styles = StyleSheet.create({
   previous: { color: TRAIN.accent, fontSize: 12, lineHeight: 17, fontWeight: "700" },
   coaching: { padding: 10, borderRadius: 10, backgroundColor: TRAIN.surfaceRaised, borderLeftWidth: 3, borderLeftColor: TRAIN.accent },
   coachingText: { color: TRAIN.muted, fontSize: 12, lineHeight: 17, fontWeight: "600" },
+  methodPanel: { gap: 3, padding: 10, borderRadius: 10, backgroundColor: TRAIN.accentSoft, borderWidth: 1, borderColor: TRAIN.line },
+  methodTitle: { color: TRAIN.accent, fontSize: 13, lineHeight: 18, fontWeight: "900" },
+  methodSummary: { color: TRAIN.muted, fontSize: 12, lineHeight: 17, fontWeight: "700" },
+  nextInstruction: { gap: 3, padding: 12, borderRadius: 12, backgroundColor: TRAIN.accentSoft, borderWidth: 1, borderColor: TRAIN.accent },
+  nextInstructionLabel: { color: TRAIN.accent, fontSize: 11, lineHeight: 15, fontWeight: "900", letterSpacing: 0.8 },
+  nextInstructionText: { color: TRAIN.text, fontSize: 14, lineHeight: 20, fontWeight: "800" },
   calibrationPanel: { gap: 10, padding: 14, borderRadius: 14, backgroundColor: TRAIN.accentSoft, borderWidth: 1, borderColor: TRAIN.accent },
   calibrationTitle: { color: TRAIN.text, fontSize: 20, lineHeight: 25, fontWeight: "900" },
   calibrationInputs: { flexDirection: "row", gap: 8 },
@@ -704,7 +747,7 @@ const styles = StyleSheet.create({
   loadColumn: { flex: 1.18, minWidth: 0 },
   setBlock: { gap: 5, padding: 7, borderRadius: 12, borderWidth: 1, borderColor: TRAIN.line, backgroundColor: TRAIN.background },
   setBlockCurrent: { borderColor: TRAIN.accent, backgroundColor: TRAIN.accentSoft },
-  setBlockCompleted: { borderColor: "#28553D", backgroundColor: TRAIN.successSoft },
+  setBlockCompleted: { borderColor: TRAIN.success, backgroundColor: TRAIN.successSoft },
   setRow: { minHeight: 48, flexDirection: "row", alignItems: "center", gap: 6 },
   setIdentity: { alignItems: "center", justifyContent: "center" },
   setNumber: { color: TRAIN.text, fontSize: 17, lineHeight: 20, fontWeight: "900", fontVariant: ["tabular-nums"] },
@@ -720,7 +763,7 @@ const styles = StyleSheet.create({
   unavailableText: { color: TRAIN.danger, fontSize: 10, lineHeight: 13, fontWeight: "800", textAlign: "center" },
   doneControl: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center", backgroundColor: TRAIN.accent, borderWidth: 2, borderColor: TRAIN.accent },
   doneControlComplete: { backgroundColor: TRAIN.success, borderColor: TRAIN.success },
-  doneControlUpcoming: { backgroundColor: "transparent", borderColor: TRAIN.lineStrong, opacity: 0.55 },
+  doneControlUpcoming: { backgroundColor: TRAIN.transparent, borderColor: TRAIN.lineStrong, opacity: 0.55 },
   doneControlPressed: { transform: [{ scale: 0.96 }] },
   doneGlyph: { color: TRAIN.background, fontSize: 21, lineHeight: 23, fontWeight: "900" },
   doneGlyphComplete: { color: TRAIN.background },
@@ -745,7 +788,7 @@ const styles = StyleSheet.create({
   finishTitle: { color: TRAIN.text, fontSize: 18, fontWeight: "900" },
   finishAction: { minHeight: 52, alignItems: "center", justifyContent: "center", borderRadius: 13, backgroundColor: TRAIN.accent, paddingHorizontal: 12 },
   finishActionText: { color: TRAIN.background, fontSize: 15, fontWeight: "900" },
-  modalBackdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.78)", padding: 12 },
+  modalBackdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: TRAIN.scrim, padding: 12 },
   modalSheet: { maxHeight: "92%", borderRadius: 22, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.lineStrong, overflow: "hidden" },
   modalContent: { gap: 10, padding: 18, paddingBottom: 24 },
   modalTitle: { color: TRAIN.text, fontSize: 23, lineHeight: 28, fontWeight: "900" },
@@ -757,6 +800,7 @@ const styles = StyleSheet.create({
   modalDangerFilledText: { color: TRAIN.background, fontSize: 15, fontWeight: "900" },
   modalPrimary: { borderColor: TRAIN.accent, backgroundColor: TRAIN.accent },
   modalPrimaryText: { color: TRAIN.background, fontSize: 15, fontWeight: "900" },
+  modalMessage: { color: TRAIN.danger, fontSize: 13, lineHeight: 19, fontWeight: "700", padding: 8, borderRadius: 10, backgroundColor: TRAIN.dangerSoft },
   disabled: { opacity: 0.42 },
   pressed: { opacity: 0.76 },
 });

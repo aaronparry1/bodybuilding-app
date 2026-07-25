@@ -1,26 +1,28 @@
 import type { MesocycleId } from "@/domain/training/mesocycle-library";
 import type { ExperienceLevel, ExerciseRole } from "@/domain/training/models";
+import { resolveCanonicalTrainingMethodCandidate } from "@/domain/training/canonical-training-method-policy";
 
 export type SetMethod = "exact_straight_sets" | "top_set_backoffs" | "controlled_performance_set" | "technical_repeated_sets" | "output_controlled_sets" | "five_three_one" | "eight_across" | "boring_but_big" | "ladder" | "pyramid" | "clusters" | "dynamic_effort" | "max_effort";
 
 export function selectSetMethod(input: { mesocycleId?: MesocycleId; experience: ExperienceLevel; exerciseRole: ExerciseRole; sessionRole: string }): SetMethod {
-  const phase = input.mesocycleId ?? "";
-  const advanced = input.experience === "advanced";
-  const intermediate = input.experience !== "beginner";
-  if (phase.startsWith("strength_intensification") && advanced && input.exerciseRole === "primary_compound") return "max_effort";
-  if ((phase.startsWith("strength_specific") || phase.startsWith("powerbuilding_strength")) && intermediate && input.exerciseRole === "primary_compound") return "top_set_backoffs";
-  if ((phase.startsWith("strength_accumulation") || phase.startsWith("powerbuilding_strength")) && intermediate && input.exerciseRole === "primary_compound") return "five_three_one";
-  if ((phase.startsWith("strength_accumulation") || phase.startsWith("powerbuilding_foundation")) && intermediate && input.exerciseRole === "secondary_compound") return "eight_across";
-  if (phase.startsWith("powerbuilding_hypertrophy") && intermediate && input.exerciseRole === "secondary_compound") return "boring_but_big";
-  if ((phase.startsWith("strength_specific") || phase.startsWith("athletic_force")) && intermediate && input.exerciseRole === "primary_compound") return "clusters";
-  if ((phase.startsWith("strength_accumulation") || phase.startsWith("hypertrophy_base")) && input.exerciseRole === "secondary_compound") return "ladder";
-  if ((phase.startsWith("hypertrophy_base") || phase.startsWith("powerbuilding_hypertrophy")) && input.exerciseRole === "primary_compound") return "pyramid";
-  if ((phase.startsWith("hypertrophy_volume") || phase.startsWith("hypertrophy_specialisation")) && intermediate && input.exerciseRole === "isolation") return "controlled_performance_set";
-  if ((phase.startsWith("athletic_power") || phase.startsWith("strength_specific")) && intermediate && input.sessionRole.toLowerCase().includes("power")) return "dynamic_effort";
-  if (phase.startsWith("athletic_power")) return "output_controlled_sets";
-  if (phase.startsWith("strength_") && input.exerciseRole === "primary_compound" && input.experience !== "beginner") return "top_set_backoffs";
-  if ((phase.includes("calibration") || phase.includes("foundation")) && input.exerciseRole !== "isolation") return "technical_repeated_sets";
-  return "exact_straight_sets";
+  const candidate = resolveCanonicalTrainingMethodCandidate(input);
+  const mapping: Record<ReturnType<typeof resolveCanonicalTrainingMethodCandidate>, SetMethod> = {
+    straight_sets: "exact_straight_sets",
+    back_off_sets: "top_set_backoffs",
+    amrap: "controlled_performance_set",
+    five_three_one: "five_three_one",
+    eight_across: "eight_across",
+    pyramid: "pyramid",
+    ladder: "ladder",
+    cluster: "clusters",
+    bbb: "boring_but_big",
+    dynamic_effort: "dynamic_effort",
+    max_effort: "max_effort",
+    heavy_single_triple_five_backoffs: "top_set_backoffs",
+    antagonist_superset: "exact_straight_sets",
+    rest_pause: "controlled_performance_set",
+  };
+  return mapping[candidate];
 }
 
 export function setMethodExplanation(method: SetMethod): string {

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "canonical_workout_correction_native_journey_v1",
+  "status": "passed",
+  "device": {
+    "name": "iPhone 17 Pro",
+    "runtime": "iOS 26.5",
+    "deviceId": "06EEA722-8702-40AC-81FC-53E92D205303",
+    "configuration": "Release",
+    "scheme": "AdaptiveStrengthCoachReleaseCandidate",
+    "bundleMode": "production",
+    "remoteServices": "disabled_with_example_invalid"
+  },
+  "standardDynamicType": "passed",
+  "largeDynamicType": "passed",
+  "straightSet": {
+    "status": "passed",
+    "coverage": [
+      "open immutable planned session",
+      "start canonical ledger attempt",
+      "calibrate first exposure",
+      "record and edit performed work",
+      "exercise rest controls",
+      "pause, leave and restore",
+      "complete through canonical completion summary"
+    ],
+    "standardResultBundle": "/tmp/AdaptiveStrengthCoachWorkoutCorrectionStandard.xcresult",
+    "largeResultBundle": "/tmp/AdaptiveStrengthCoachWorkoutCorrectionLarge.xcresult"
+  },
+  "antagonistSuperset": {
+    "status": "passed",
+    "coverage": [
+      "real v3 Session Construction snapshot",
+      "immutable linked-round method projection",
+      "first paired set recorded through canonical ledger",
+      "zero-rest direct transition to paired exercise"
+    ],
+    "standardResultBundle": "/tmp/asc-ios-method-results-medium-final/antagonist_superset.xcresult",
+    "largeResultBundle": "/tmp/asc-ios-method-results-large-final/antagonist_superset.xcresult"
+  },
+  "restPause": {
+    "status": "passed",
+    "coverage": [
+      "real v3 Session Construction snapshot",
+      "immutable rest-pause method projection",
+      "first round recorded through canonical ledger",
+      "next-round instruction visible during prescribed rest"
+    ],
+    "standardResultBundle": "/tmp/asc-ios-method-results-medium-final/rest_pause.xcresult",
+    "largeResultBundle": "/tmp/asc-ios-method-results-large-final/rest_pause.xcresult"
+  },
+  "discard": {
+    "status": "passed",
+    "coverage": [
+      "cancel confirmation preserves attempt",
+      "confirm with numeric keyboard open",
+      "performed active attempt removed",
+      "immutable planned session restored",
+      "fresh restart and completion succeeds"
+    ]
+  },
+  "screenshots": [
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/standard/active-straight-workout.png",
+      "sha256": "a116cfbf6be0c9c1bb22aad12e8fb8c2d632146ec946bc9bff6fddf15b73619b"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/large/active-straight-workout.png",
+      "sha256": "9f6f21107eb4e6cb50df9df274649340598e69afa31152f10c268d8852ec7f99"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/standard/discard-confirmation.png",
+      "sha256": "f420ff6e32bac2d79d2f4d699b34725f125dd0b2e564285da50f329a12fd3c4d"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/large/discard-confirmation.png",
+      "sha256": "2853d39faa433b8d7423ee6c84cf837872211f810ab832f7bcf0e5ec28c23894"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/methods-standard/antagonist-superset.png",
+      "sha256": "0e1a58a41696ffe0cf3a1cc5f64fb36f9fb40f17d9ee2c9b76df82fd3ce98145"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/methods-standard/antagonist-superset-next-step.png",
+      "sha256": "ea83149b8ef90eff13e2c791574181853877c17bd8c0214ba56ce0655a81eabd"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/methods-standard/rest-pause.png",
+      "sha256": "19459d106e7745721e4753718f503b7cfaf21c8f2ef01589eab2b8f6dba08225"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/methods-standard/rest-pause-next-step.png",
+      "sha256": "3a9d7f9ea0d86a60448db177caa26d601bf14b69e300f77ac50550468cd6c1f4"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/methods-large/antagonist-superset.png",
+      "sha256": "b2c58d5b3501d649a8232867c46c4a2ecdc7cbe08bcc2049c6bf61f6a859df0e"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/methods-large/antagonist-superset-next-step.png",
+      "sha256": "7ee9f7f56d0054d62367d772a5236f25e7cb1fbb010acd175e33b993117a106d"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/methods-large/rest-pause.png",
+      "sha256": "3f4f0550c970894c42f68f60713c03aec701b7b79b2f79dcb324f4925c247edb"
+    },
+    {
+      "path": "qa-reports/workout-correction/native-screenshots/methods-large/rest-pause-next-step.png",
+      "sha256": "a700d2870bf5736a21be9f8dab4e9d5b2c57d5fcc32b95081827912de8fc3c5b"
+    }
+  ],
+  "externalBuildOrUploadPerformed": false
+}

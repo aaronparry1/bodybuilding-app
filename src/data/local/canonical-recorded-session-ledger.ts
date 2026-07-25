@@ -9,27 +9,35 @@ export const canonicalRecordedSessionLedger = {
   list(planId: string) { return Object.values(jsonStore.get<Store>(key, {})).filter((value) => value.session.planId === planId).map((value) => value.session).sort((a, b) => a.recordedSessionId.localeCompare(b.recordedSessionId)); },
   exportPlan(planId: string) { return Object.values(jsonStore.get<Store>(key, {})).filter((value) => value.session.planId === planId).sort((a, b) => a.session.recordedSessionId.localeCompare(b.session.recordedSessionId)).map((value) => ({ session: value.session, events: value.events.slice() })); },
   deleteActive(recordedSessionId: string, expectedVersion: number) {
-    const store = jsonStore.get<Store>(key, {});
-    const aggregate = store[recordedSessionId];
-    if (!aggregate) return { status: "not_found" as const };
-    if (aggregate.session.version !== expectedVersion) return { status: "stale" as const, reason: "aggregate_version_mismatch" };
-    if (!["pending", "started", "paused"].includes(aggregate.session.status)) return { status: "rejected" as const, reason: "historical_session_cannot_be_deleted" };
-    const { [recordedSessionId]: _removed, ...remaining } = store;
-    jsonStore.set(key, remaining);
-    return { status: "deleted" as const };
+    try {
+      const store = jsonStore.get<Store>(key, {});
+      const aggregate = store[recordedSessionId];
+      if (!aggregate) return { status: "not_found" as const };
+      if (aggregate.session.version !== expectedVersion) return { status: "stale" as const, reason: "aggregate_version_mismatch" };
+      if (!["pending", "started", "paused"].includes(aggregate.session.status)) return { status: "rejected" as const, reason: "historical_session_cannot_be_deleted" };
+      const { [recordedSessionId]: _removed, ...remaining } = store;
+      jsonStore.set(key, remaining);
+      return { status: "deleted" as const };
+    } catch {
+      return { status: "storage_failure" as const, reason: "recorded_session_storage_write_failed" };
+    }
   },
   restorePlan(records: readonly { session: CanonicalRecordedSession; events: readonly CanonicalRecordedSessionEvent[] }[]) {
-    const store = jsonStore.get<Store>(key, {});
-    const next = { ...store };
-    for (const record of records.slice().sort((a, b) => a.session.recordedSessionId.localeCompare(b.session.recordedSessionId))) {
-      const valid = validateCanonicalRecordedSession(record.session);
-      if (valid.status !== "valid" || record.events.some((event) => event.aggregateId !== record.session.recordedSessionId || event.expectedVersion < 0)) return { status: "rejected" as const, reason: "invalid_ledger_record" };
-      const existing = next[record.session.recordedSessionId];
-      if (existing && JSON.stringify(existing) !== JSON.stringify({ session: record.session, events: record.events })) return { status: "conflict" as const, reason: "ledger_record_conflict" };
-      next[record.session.recordedSessionId] = { session: record.session, events: record.events.slice() };
+    try {
+      const store = jsonStore.get<Store>(key, {});
+      const next = { ...store };
+      for (const record of records.slice().sort((a, b) => a.session.recordedSessionId.localeCompare(b.session.recordedSessionId))) {
+        const valid = validateCanonicalRecordedSession(record.session);
+        if (valid.status !== "valid" || record.events.some((event) => event.aggregateId !== record.session.recordedSessionId || event.expectedVersion < 0)) return { status: "rejected" as const, reason: "invalid_ledger_record" };
+        const existing = next[record.session.recordedSessionId];
+        if (existing && JSON.stringify(existing) !== JSON.stringify({ session: record.session, events: record.events })) return { status: "conflict" as const, reason: "ledger_record_conflict" };
+        next[record.session.recordedSessionId] = { session: record.session, events: record.events.slice() };
+      }
+      jsonStore.set(key, next);
+      return { status: "restored" as const };
+    } catch {
+      return { status: "storage_failure" as const, reason: "recorded_session_storage_write_failed" };
     }
-    jsonStore.set(key, next);
-    return { status: "restored" as const };
   },
   clear() { jsonStore.remove(key); },
 };

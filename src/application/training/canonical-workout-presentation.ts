@@ -34,12 +34,24 @@ export type WorkoutCalibrationPresentation = Readonly<{
   evidenceStatus: string;
 }>;
 
+export type WorkoutMethodExecutionPresentation = Readonly<{
+  policyId: string;
+  kind: "standalone" | "linked_rounds" | "rest_pause";
+  groupId: string | null;
+  sequenceLabel: string | null;
+  rounds: number;
+  intraMethodRestSeconds: number | null;
+  interRoundRestSeconds: number;
+  instruction: string;
+}>;
+
 export type WorkoutExercisePresentation = Readonly<{
   id: string;
   order: number;
   name: string;
   method: string;
   groupType: "straight_set" | "superset" | "triset" | "giant_set" | "circuit";
+  methodExecution: WorkoutMethodExecutionPresentation;
   loadState: string;
   loadSemantic: WorkoutLoadSemantic;
   previousPerformance: string | null;
@@ -78,14 +90,14 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
   const performance = effectiveCanonicalPerformedWork(events);
   const displayUnit = input.displayUnit ?? "kg";
   const slots = Array.isArray(input.snapshot.slots) ? input.snapshot.slots as SnapshotSlot[] : [];
-  let currentAssigned = false;
-  const exercises = slots.slice().sort((left, right) => number(left.index, 0) - number(right.index, 0)).map((slot, index) => {
+  const projectedExercises = slots.slice().sort((left, right) => number(left.index, 0) - number(right.index, 0)).map((slot, index) => {
     const settings = object(slot.settings);
     const range = object(settings.repRange);
     const min = number(range.min, 1);
     const max = number(range.max, min);
     const requiredSets = Math.max(1, number(settings.requiredSets, number(settings.requiredWorkSets, 1)));
     const restSeconds = number(object(slot.rest).seconds, 90);
+    const methodExecution = methodExecutionPresentation(slot, requiredSets, restSeconds);
     const loadPrescription = object(slot.loadPrescription);
     const loadingMode = String(loadPrescription.loadingMode ?? slot.loadingMode ?? "unavailable");
     const prescribedBaseLoad = numberOrNull(slot.prescribedLoad) ?? numberOrNull(loadPrescription.prescribedBaseLoad);
@@ -101,14 +113,16 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
       const setNumber = offset + 1;
       const event = actual.find((candidate) => String(candidate.payload.setId ?? "") === `${String(slot.id)}:set:${setNumber}` || number(candidate.payload.setOrder, 0) === setNumber);
       const targetReps = number(exactTargets[offset], number(slot.targetReps, min));
-      const target = `${targetReps} reps`;
+      const target = methodExecution.kind === "rest_pause"
+        ? `${targetReps} × 1 rep · ${methodExecution.intraMethodRestSeconds ?? 0} sec reset`
+        : methodExecution.kind === "linked_rounds"
+          ? `Round ${setNumber} · ${targetReps} reps`
+          : `${targetReps} reps`;
       const displayedPrescription = toDisplayLoad(prescribedBaseLoad, displayUnit);
       const displayedDefault = toDisplayLoad(baseDefaultLoad, displayUnit);
       const actualBaseLoad = event ? numberOrNull(event.payload.load) : null;
       const actualLoad = loadSemantic === "bodyweight" ? null : toDisplayLoad(actualBaseLoad, displayUnit);
       const completed = Boolean(event);
-      const current = !completed && !currentAssigned;
-      if (current) currentAssigned = true;
       return {
         id: `${String(slot.id)}:set:${setNumber}`,
         number: setNumber,
@@ -125,7 +139,7 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
         restSeconds,
         actualReps: event ? numberOrNull(event.payload.reps) : null,
         actualLoad,
-        state: completed ? "completed" as const : current ? "current" as const : "upcoming" as const,
+        state: completed ? "completed" as const : "upcoming" as const,
       };
     });
     const protocol = object(loadPrescription.protocol);
@@ -145,6 +159,7 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
       name: exerciseDisplayName(String(slot.exerciseId)),
       method: methodDisplayName(String(slot.method)),
       groupType: groupTypeForMethod(String(slot.method)),
+      methodExecution,
       loadState: loadStateLabel(loadState, loadSemantic),
       loadSemantic,
       previousPerformance: compatibleEvidence ? performanceLabel(compatibleEvidence, displayUnit, loadSemantic) : null,
@@ -153,6 +168,12 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
       sets,
     };
   });
+  const nextSetId = methodExecutionOrder(projectedExercises).find((setId) =>
+    projectedExercises.some((exercise) => exercise.sets.some((set) => set.id === setId && set.state !== "completed")));
+  const exercises = projectedExercises.map((exercise) => ({
+    ...exercise,
+    sets: exercise.sets.map((set) => set.id === nextSetId ? { ...set, state: "current" as const } : set),
+  }));
   const totalSets = exercises.reduce((sum, exercise) => sum + exercise.sets.length, 0);
   const completedSets = exercises.reduce((sum, exercise) => sum + exercise.sets.filter((set) => set.state === "completed").length, 0);
   const lifecycle = input.session ? input.session.status === "started" ? "active" : input.session.status === "paused" ? "paused" : input.session.status === "completed" ? "completed" : "unavailable" : "planned";
@@ -265,6 +286,47 @@ function loadInputLabelFor(semantic: WorkoutLoadSemantic): string {
 function toDisplayLoad(load: number | null, unit: "kg" | "lb"): number | null { return load === null ? null : displayLoadFromBaseKg(load, unit); }
 function round(value: number, places: number): number { const factor = 10 ** places; return Math.round(value * factor) / factor; }
 function groupTypeForMethod(method: string): WorkoutExercisePresentation["groupType"] { if (/triset/i.test(method)) return "triset"; if (/super/i.test(method)) return "superset"; if (/giant/i.test(method)) return "giant_set"; if (/circuit/i.test(method)) return "circuit"; return "straight_set"; }
+function methodExecutionPresentation(slot: SnapshotSlot, requiredSets: number, restSeconds: number): WorkoutMethodExecutionPresentation {
+  const structure = object(slot.methodStructure);
+  const kind = structure.kind === "linked_rounds" || structure.kind === "rest_pause" ? structure.kind : "standalone";
+  const position = number(structure.position, 0);
+  const sequenceLabel = kind === "linked_rounds" && (position === 1 || position === 2) ? String.fromCharCode(64 + position) : null;
+  const intraMethodRestSeconds = kind === "linked_rounds" || kind === "rest_pause" ? number(structure.intraMethodRestSeconds, 0) : null;
+  return {
+    policyId: String(structure.policyId ?? "canonical_training_method_policy_v1"),
+    kind,
+    groupId: kind === "linked_rounds" ? String(structure.groupId ?? "") || null : null,
+    sequenceLabel,
+    rounds: number(structure.rounds, requiredSets),
+    intraMethodRestSeconds,
+    interRoundRestSeconds: number(structure.interRoundRestSeconds, restSeconds),
+    instruction: String(structure.executionLabel ?? `${requiredSets} standalone working sets`),
+  };
+}
+
+function methodExecutionOrder(exercises: readonly WorkoutExercisePresentation[]): string[] {
+  const order: string[] = [];
+  const consumedGroups = new Set<string>();
+  for (const exercise of exercises) {
+    const execution = exercise.methodExecution;
+    if (execution.kind !== "linked_rounds" || !execution.groupId) {
+      order.push(...exercise.sets.map((set) => set.id));
+      continue;
+    }
+    if (consumedGroups.has(execution.groupId)) continue;
+    const group = exercises
+      .filter((candidate) => candidate.methodExecution.groupId === execution.groupId)
+      .sort((left, right) => (left.methodExecution.sequenceLabel ?? "").localeCompare(right.methodExecution.sequenceLabel ?? ""));
+    consumedGroups.add(execution.groupId);
+    for (let round = 0; round < execution.rounds; round += 1) {
+      for (const member of group) {
+        const set = member.sets[round];
+        if (set) order.push(set.id);
+      }
+    }
+  }
+  return order;
+}
 function object(value: unknown): Record<string, unknown> { return value && typeof value === "object" ? value as Record<string, unknown> : {}; }
 function number(value: unknown, fallback: number): number { return typeof value === "number" && Number.isFinite(value) ? value : fallback; }
 function numberOrNull(value: unknown): number | null { return typeof value === "number" && Number.isFinite(value) ? value : null; }

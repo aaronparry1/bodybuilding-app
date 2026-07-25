@@ -1,0 +1,2137 @@
+{
+  "schemaVersion": "canonical_representative_corrected_sessions_v1",
+  "policyId": "canonical_training_method_policy_v1",
+  "source": "canonical_session_snapshot_v3",
+  "sessions": [
+    {
+      "label": "intermediate hypertrophy Push",
+      "sessionId": "canonical-session:hypertrophy_volume:example:hypertrophy:microcycle:Push hypertrophy A:0:canonical_plan_v3:representative-revision-v1",
+      "sessionRole": "Push hypertrophy A",
+      "mesocyclePurpose": "hypertrophy_volume",
+      "expectedDurationMinutes": 54,
+      "workingSets": 18,
+      "exercises": [
+        {
+          "order": 1,
+          "exerciseId": "ex-bench-press",
+          "exercise": "Bench Press",
+          "role": "suitable_alternative",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 3,
+            "interRoundRestSeconds": 150,
+            "executionLabel": "3 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 3,
+          "exactReps": [
+            8,
+            8,
+            8
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 150,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:hypertrophy",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "all_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:hypertrophy",
+              "role:primary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 2,
+          "exerciseId": "ex-incline-dumbbell-press",
+          "exercise": "Incline Dumbbell Press",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 3,
+          "exerciseId": "ex-machine-shoulder-press",
+          "exercise": "Machine Shoulder Press",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 4,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "4 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 4,
+          "exactReps": [
+            10,
+            10,
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 4,
+          "exerciseId": "ex-cable-lateral-raise",
+          "exercise": "Cable Lateral Raise",
+          "role": "primary_choice",
+          "method": "amrap",
+          "methodLabel": "Capped AMRAP",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "amrap",
+            "rounds": 4,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "4 standalone working sets",
+            "reasonCodes": [
+              "selected_method:amrap"
+            ]
+          },
+          "sets": 4,
+          "exactReps": [
+            15,
+            15,
+            15,
+            15
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "method:amrap"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:amrap"
+          ]
+        },
+        {
+          "order": 5,
+          "exerciseId": "ex-cable-rope-overhead-extension",
+          "exercise": "Rope Overhead Triceps Extension",
+          "role": "primary_choice",
+          "method": "amrap",
+          "methodLabel": "Capped AMRAP",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "amrap",
+            "rounds": 3,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "3 standalone working sets",
+            "reasonCodes": [
+              "selected_method:amrap"
+            ]
+          },
+          "sets": 3,
+          "exactReps": [
+            12,
+            12,
+            12
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "method:amrap"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:amrap"
+          ]
+        },
+        {
+          "order": 6,
+          "exerciseId": "ex-close-neutral-pushdown",
+          "exercise": "Close Neutral Pushdown",
+          "role": "primary_choice",
+          "method": "amrap",
+          "methodLabel": "Capped AMRAP",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "amrap",
+            "rounds": 2,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:amrap"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            12,
+            12
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "method:amrap"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:amrap"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "intermediate hypertrophy Pull",
+      "sessionId": "canonical-session:hypertrophy_volume:example:hypertrophy:microcycle:Pull hypertrophy B:1:canonical_plan_v3:representative-revision-v1",
+      "sessionRole": "Pull hypertrophy B",
+      "mesocyclePurpose": "hypertrophy_volume",
+      "expectedDurationMinutes": 55,
+      "workingSets": 18,
+      "exercises": [
+        {
+          "order": 1,
+          "exerciseId": "ex-chest-supported-row",
+          "exercise": "Chest Supported Row",
+          "role": "suitable_alternative",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 3,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "3 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 3,
+          "exactReps": [
+            12,
+            12,
+            12
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:hypertrophy",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:hypertrophy",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 2,
+          "exerciseId": "ex-lat-pulldown",
+          "exercise": "Lat Pulldown",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 3,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "3 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 3,
+          "exactReps": [
+            10,
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 3,
+          "exerciseId": "ex-dorian-yates-row-machine",
+          "exercise": "Dorian Yates Row Machine",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 4,
+          "exerciseId": "ex-cable-rear-delt-fly",
+          "exercise": "Cable Rear Delt Fly",
+          "role": "primary_choice",
+          "method": "amrap",
+          "methodLabel": "Capped AMRAP",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "amrap",
+            "rounds": 4,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "4 standalone working sets",
+            "reasonCodes": [
+              "selected_method:amrap"
+            ]
+          },
+          "sets": 4,
+          "exactReps": [
+            15,
+            15,
+            15,
+            15
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "method:amrap"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:amrap"
+          ]
+        },
+        {
+          "order": 5,
+          "exerciseId": "ex-bayesian-curl",
+          "exercise": "Bayesian Curl",
+          "role": "primary_choice",
+          "method": "amrap",
+          "methodLabel": "Capped AMRAP",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "amrap",
+            "rounds": 4,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "4 standalone working sets",
+            "reasonCodes": [
+              "selected_method:amrap"
+            ]
+          },
+          "sets": 4,
+          "exactReps": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "method:amrap"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:amrap"
+          ]
+        },
+        {
+          "order": 6,
+          "exerciseId": "ex-lat-pulldown-machine",
+          "exercise": "Lat Pulldown Machine",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "intermediate hypertrophy Legs",
+      "sessionId": "canonical-session:hypertrophy_volume:example:hypertrophy:microcycle:Legs hypertrophy C:2:canonical_plan_v3:representative-revision-v1",
+      "sessionRole": "Legs hypertrophy C",
+      "mesocyclePurpose": "hypertrophy_volume",
+      "expectedDurationMinutes": 65,
+      "workingSets": 20,
+      "exercises": [
+        {
+          "order": 1,
+          "exerciseId": "ex-hack-squat-machine",
+          "exercise": "Hack Squat Machine",
+          "role": "suitable_alternative",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 4,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "4 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 4,
+          "exactReps": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:hypertrophy",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:hypertrophy",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 2,
+          "exerciseId": "ex-belt-squat",
+          "exercise": "Belt Squat",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 3,
+          "exerciseId": "ex-stiff-leg-deadlift",
+          "exercise": "Stiff-Leg Deadlift",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 3,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "3 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 3,
+          "exactReps": [
+            10,
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 4,
+          "exerciseId": "ex-kneeling-leg-curl",
+          "exercise": "Kneeling Leg Curl",
+          "role": "primary_choice",
+          "method": "amrap",
+          "methodLabel": "Capped AMRAP",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "amrap",
+            "rounds": 4,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "4 standalone working sets",
+            "reasonCodes": [
+              "selected_method:amrap"
+            ]
+          },
+          "sets": 4,
+          "exactReps": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "method:amrap"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:amrap"
+          ]
+        },
+        {
+          "order": 5,
+          "exerciseId": "ex-hip-thrust-machine",
+          "exercise": "Hip Thrust Machine",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 3,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "3 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 3,
+          "exactReps": [
+            10,
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 6,
+          "exerciseId": "ex-donkey-calf-raise",
+          "exercise": "Donkey Calf Raise",
+          "role": "primary_choice",
+          "method": "amrap",
+          "methodLabel": "Capped AMRAP",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "amrap",
+            "rounds": 4,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "4 standalone working sets",
+            "reasonCodes": [
+              "selected_method:amrap"
+            ]
+          },
+          "sets": 4,
+          "exactReps": [
+            15,
+            15,
+            15,
+            15
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "method:amrap"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:hypertrophy_volume:dropoff:v1",
+            "provenance": [
+              "mesocycle:hypertrophy_volume",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:amrap"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "intermediate powerbuilding upper",
+      "sessionId": "canonical-session:powerbuilding_hypertrophy:example:powerbuilding:microcycle:Push strength and hypertrophy:0:canonical_plan_v3:representative-revision-v1",
+      "sessionRole": "Push strength and hypertrophy",
+      "mesocyclePurpose": "powerbuilding_hypertrophy",
+      "expectedDurationMinutes": 49,
+      "workingSets": 15,
+      "exercises": [
+        {
+          "order": 1,
+          "exerciseId": "ex-bench-press",
+          "exercise": "Bench Press",
+          "role": "primary_choice",
+          "method": "pyramid",
+          "methodLabel": "Pyramid",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "pyramid",
+            "rounds": 4,
+            "interRoundRestSeconds": 180,
+            "executionLabel": "4 standalone working sets",
+            "reasonCodes": [
+              "selected_method:pyramid"
+            ]
+          },
+          "sets": 4,
+          "exactReps": [
+            8,
+            6,
+            4,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 180,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:powerbuilding_hypertrophy",
+              "lane:hypertrophy",
+              "method:pyramid"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "all_work_sets",
+            "reason": "canonical_stop:mesocycle:powerbuilding_hypertrophy:dropoff:v1",
+            "provenance": [
+              "mesocycle:powerbuilding_hypertrophy",
+              "lane:hypertrophy",
+              "role:primary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:pyramid"
+          ]
+        },
+        {
+          "order": 2,
+          "exerciseId": "ex-decline-plate-loaded-press",
+          "exercise": "Decline Plate Loaded Press",
+          "role": "primary_choice",
+          "method": "antagonist_superset",
+          "methodLabel": "Antagonist superset",
+          "execution": {
+            "kind": "linked_rounds",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "antagonist_superset",
+            "groupId": "method-group:canonical-session:powerbuilding_hypertrophy:example:powerbuilding:microcycle:Push strength and hypertrophy:0:canonical_plan_v3:representative-revision-v1:slot:1:canonical-session:powerbuilding_hypertrophy:example:powerbuilding:microcycle:Push strength and hypertrophy:0:canonical_plan_v3:representative-revision-v1:slot:2",
+            "position": 1,
+            "groupSize": 2,
+            "rounds": 3,
+            "intraMethodRestSeconds": 0,
+            "interRoundRestSeconds": 60,
+            "pairedExerciseName": "Chest Supported Row",
+            "executionLabel": "A · 3 rounds · Decline Plate Loaded Press + Chest Supported Row",
+            "reasonCodes": [
+              "antagonist_pair",
+              "equal_rounds",
+              "source:tier_manual_pdf_103_printed_87",
+              "source:tier_manual_pdf_232"
+            ]
+          },
+          "sets": 3,
+          "exactReps": [
+            10,
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 0,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:powerbuilding_hypertrophy",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:powerbuilding_hypertrophy:dropoff:v1",
+            "provenance": [
+              "mesocycle:powerbuilding_hypertrophy",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "antagonist_pair",
+            "equal_rounds",
+            "source:tier_manual_pdf_103_printed_87",
+            "source:tier_manual_pdf_232"
+          ]
+        },
+        {
+          "order": 3,
+          "exerciseId": "ex-chest-supported-row",
+          "exercise": "Chest Supported Row",
+          "role": "primary_choice",
+          "method": "antagonist_superset",
+          "methodLabel": "Antagonist superset",
+          "execution": {
+            "kind": "linked_rounds",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "antagonist_superset",
+            "groupId": "method-group:canonical-session:powerbuilding_hypertrophy:example:powerbuilding:microcycle:Push strength and hypertrophy:0:canonical_plan_v3:representative-revision-v1:slot:1:canonical-session:powerbuilding_hypertrophy:example:powerbuilding:microcycle:Push strength and hypertrophy:0:canonical_plan_v3:representative-revision-v1:slot:2",
+            "position": 2,
+            "groupSize": 2,
+            "rounds": 3,
+            "intraMethodRestSeconds": 0,
+            "interRoundRestSeconds": 60,
+            "pairedExerciseName": "Decline Plate Loaded Press",
+            "executionLabel": "B · 3 rounds · Decline Plate Loaded Press + Chest Supported Row",
+            "reasonCodes": [
+              "antagonist_pair",
+              "equal_rounds",
+              "source:tier_manual_pdf_103_printed_87",
+              "source:tier_manual_pdf_232"
+            ]
+          },
+          "sets": 3,
+          "exactReps": [
+            10,
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 60,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:powerbuilding_hypertrophy",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:powerbuilding_hypertrophy:dropoff:v1",
+            "provenance": [
+              "mesocycle:powerbuilding_hypertrophy",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "antagonist_pair",
+            "equal_rounds",
+            "source:tier_manual_pdf_103_printed_87",
+            "source:tier_manual_pdf_232"
+          ]
+        },
+        {
+          "order": 4,
+          "exerciseId": "ex-cable-rope-overhead-extension",
+          "exercise": "Rope Overhead Triceps Extension",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 3,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "3 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 3,
+          "exactReps": [
+            12,
+            12,
+            12
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:powerbuilding_hypertrophy",
+              "lane:maintenance",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:powerbuilding_hypertrophy:dropoff:v1",
+            "provenance": [
+              "mesocycle:powerbuilding_hypertrophy",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 5,
+          "exerciseId": "ex-cable-lateral-raise",
+          "exercise": "Cable Lateral Raise",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            15,
+            15
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:powerbuilding_hypertrophy",
+              "lane:maintenance",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:powerbuilding_hypertrophy:dropoff:v1",
+            "provenance": [
+              "mesocycle:powerbuilding_hypertrophy",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "intermediate strength primary-lift session",
+      "sessionId": "canonical-session:strength_accumulation:example:strength:microcycle:Upper strength:0:canonical_plan_v3:representative-revision-v1",
+      "sessionRole": "Upper strength",
+      "mesocyclePurpose": "strength_accumulation",
+      "expectedDurationMinutes": 45,
+      "workingSets": 14,
+      "exercises": [
+        {
+          "order": 1,
+          "exerciseId": "ex-bench-press",
+          "exercise": "Bench Press",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 4,
+            "interRoundRestSeconds": 180,
+            "executionLabel": "4 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 4,
+          "exactReps": [
+            5,
+            5,
+            5,
+            5
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 180,
+          "progression": {
+            "rule": "load_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "increase load by the established increment after success",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:strength",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 1,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_1",
+            "action": "change_target",
+            "appliesTo": "all_work_sets",
+            "reason": "canonical_stop:mesocycle:strength_accumulation:dropoff:v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:strength",
+              "role:primary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 2,
+          "exerciseId": "ex-chest-supported-row",
+          "exercise": "Chest Supported Row",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:strength_accumulation:dropoff:v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 3,
+          "exerciseId": "ex-lat-pulldown",
+          "exercise": "Lat Pulldown",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:strength_accumulation:dropoff:v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 4,
+          "exerciseId": "ex-cable-lateral-raise",
+          "exercise": "Cable Lateral Raise",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            15,
+            15
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:maintenance",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:strength_accumulation:dropoff:v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 5,
+          "exerciseId": "ex-cable-rope-overhead-extension",
+          "exercise": "Rope Overhead Triceps Extension",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            12,
+            12
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:maintenance",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:strength_accumulation:dropoff:v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 6,
+          "exerciseId": "ex-bayesian-curl",
+          "exercise": "Bayesian Curl",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 75,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            12,
+            12
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 75,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:maintenance",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:strength_accumulation:dropoff:v1",
+            "provenance": [
+              "mesocycle:strength_accumulation",
+              "lane:maintenance",
+              "role:isolation"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "intermediate athletic session",
+      "sessionId": "canonical-session:athletic_general:example:athletic:microcycle:Full body strength and power A:0:canonical_plan_v3:representative-revision-v1",
+      "sessionRole": "Full body strength and power A",
+      "mesocyclePurpose": "athletic_general",
+      "expectedDurationMinutes": 38,
+      "workingSets": 10,
+      "exercises": [
+        {
+          "order": 1,
+          "exerciseId": "ex-barbell-back-squat",
+          "exercise": "Barbell Back Squat",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 3,
+            "interRoundRestSeconds": 210,
+            "executionLabel": "3 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 3,
+          "exactReps": [
+            6,
+            6,
+            6
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 210,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:athletic_general",
+              "lane:hypertrophy",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "all_work_sets",
+            "reason": "canonical_stop:mesocycle:athletic_general:dropoff:v1",
+            "provenance": [
+              "mesocycle:athletic_general",
+              "lane:hypertrophy",
+              "role:primary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 2,
+          "exerciseId": "ex-decline-plate-loaded-press",
+          "exercise": "Decline Plate Loaded Press",
+          "role": "primary_choice",
+          "method": "antagonist_superset",
+          "methodLabel": "Antagonist superset",
+          "execution": {
+            "kind": "linked_rounds",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "antagonist_superset",
+            "groupId": "method-group:canonical-session:athletic_general:example:athletic:microcycle:Full body strength and power A:0:canonical_plan_v3:representative-revision-v1:slot:1:canonical-session:athletic_general:example:athletic:microcycle:Full body strength and power A:0:canonical_plan_v3:representative-revision-v1:slot:2",
+            "position": 1,
+            "groupSize": 2,
+            "rounds": 2,
+            "intraMethodRestSeconds": 0,
+            "interRoundRestSeconds": 60,
+            "pairedExerciseName": "Chest Supported Row",
+            "executionLabel": "A · 2 rounds · Decline Plate Loaded Press + Chest Supported Row",
+            "reasonCodes": [
+              "antagonist_pair",
+              "equal_rounds",
+              "source:tier_manual_pdf_103_printed_87",
+              "source:tier_manual_pdf_232"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 0,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:athletic_general",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:athletic_general:dropoff:v1",
+            "provenance": [
+              "mesocycle:athletic_general",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "antagonist_pair",
+            "equal_rounds",
+            "source:tier_manual_pdf_103_printed_87",
+            "source:tier_manual_pdf_232"
+          ]
+        },
+        {
+          "order": 3,
+          "exerciseId": "ex-chest-supported-row",
+          "exercise": "Chest Supported Row",
+          "role": "primary_choice",
+          "method": "antagonist_superset",
+          "methodLabel": "Antagonist superset",
+          "execution": {
+            "kind": "linked_rounds",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "antagonist_superset",
+            "groupId": "method-group:canonical-session:athletic_general:example:athletic:microcycle:Full body strength and power A:0:canonical_plan_v3:representative-revision-v1:slot:1:canonical-session:athletic_general:example:athletic:microcycle:Full body strength and power A:0:canonical_plan_v3:representative-revision-v1:slot:2",
+            "position": 2,
+            "groupSize": 2,
+            "rounds": 2,
+            "intraMethodRestSeconds": 0,
+            "interRoundRestSeconds": 60,
+            "pairedExerciseName": "Decline Plate Loaded Press",
+            "executionLabel": "B · 2 rounds · Decline Plate Loaded Press + Chest Supported Row",
+            "reasonCodes": [
+              "antagonist_pair",
+              "equal_rounds",
+              "source:tier_manual_pdf_103_printed_87",
+              "source:tier_manual_pdf_232"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 60,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:athletic_general",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:athletic_general:dropoff:v1",
+            "provenance": [
+              "mesocycle:athletic_general",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "antagonist_pair",
+            "equal_rounds",
+            "source:tier_manual_pdf_103_printed_87",
+            "source:tier_manual_pdf_232"
+          ]
+        },
+        {
+          "order": 4,
+          "exerciseId": "ex-hip-thrust-machine",
+          "exercise": "Hip Thrust Machine",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 2,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "2 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 2,
+          "exactReps": [
+            10,
+            10
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:athletic_general",
+              "lane:strength_support",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 4,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_4",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:athletic_general:dropoff:v1",
+            "provenance": [
+              "mesocycle:athletic_general",
+              "lane:strength_support",
+              "role:secondary_compound"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        },
+        {
+          "order": 5,
+          "exerciseId": "ex-cable-crunch",
+          "exercise": "Cable Crunch",
+          "role": "primary_choice",
+          "method": "straight_sets",
+          "methodLabel": "Straight sets",
+          "execution": {
+            "kind": "standalone",
+            "policyId": "canonical_training_method_policy_v1",
+            "method": "straight_sets",
+            "rounds": 1,
+            "interRoundRestSeconds": 120,
+            "executionLabel": "1 standalone working sets",
+            "reasonCodes": [
+              "selected_method:straight_sets"
+            ]
+          },
+          "sets": 1,
+          "exactReps": [
+            12
+          ],
+          "loadState": "established",
+          "prescribedBaseLoadKg": 50,
+          "restSeconds": 120,
+          "progression": {
+            "rule": "rep_progression",
+            "success": "complete all targets without triggering stop rule",
+            "repeat": "repeat the prescription when success evidence is incomplete",
+            "adjustment": "add reps within the target envelope before load",
+            "stop": "respect the resolved stop rule",
+            "evidenceRequired": true,
+            "staleRevision": "representative-revision-v1",
+            "provenance": [
+              "mesocycle:athletic_general",
+              "lane:maintenance",
+              "method:straight_sets"
+            ]
+          },
+          "stopRule": {
+            "monitoring": "rep",
+            "threshold": 8,
+            "comparison": "minimum_rep_target",
+            "trigger": "work_set_reps_below_8",
+            "action": "change_target",
+            "appliesTo": "remaining_work_sets",
+            "reason": "canonical_stop:mesocycle:athletic_general:dropoff:v1",
+            "provenance": [
+              "mesocycle:athletic_general",
+              "lane:maintenance",
+              "role:accessory"
+            ]
+          },
+          "why": [
+            "selected_method:straight_sets"
+          ]
+        }
+      ]
+    }
+  ],
+  "mesocycleProgression": [
+    {
+      "phase": "hypertrophy_calibration",
+      "methodBoundary": "straight sets only",
+      "reason": "establish reproducible exercise, load and recovery evidence"
+    },
+    {
+      "phase": "hypertrophy_base",
+      "methodBoundary": "canonical standalone methods only",
+      "reason": "build stable overload without density-first pairing"
+    },
+    {
+      "phase": "hypertrophy_volume",
+      "methodBoundary": "one eligible antagonist pair and at most one eligible rest-pause movement",
+      "reason": "bounded density and source-backed stable-movement exposure"
+    },
+    {
+      "phase": "hypertrophy_specialisation",
+      "methodBoundary": "same bounded policy, never random rotation",
+      "reason": "retain only methods compatible with current evidence and recovery"
+    },
+    {
+      "phase": "consolidation/deload/transition",
+      "methodBoundary": "straight sets",
+      "reason": "repeatability and fatigue reduction override method variety"
+    }
+  ]
+}
