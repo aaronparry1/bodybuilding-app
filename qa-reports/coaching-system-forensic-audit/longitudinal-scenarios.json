@@ -1,0 +1,286 @@
+{
+  "schemaVersion": "coaching_system_longitudinal_scenarios_v1",
+  "generatedAt": "2026-07-25T08:00:00.000Z",
+  "isolation": "pure in-memory construction; no repositories, cloud, user data, or mutation",
+  "scenarios": [
+    {
+      "id": "normal-responder",
+      "athlete": "Normal responder",
+      "weeks": 12,
+      "goal": "build_muscle",
+      "programmeGoal": "hypertrophy",
+      "experience": "intermediate",
+      "days": 4,
+      "duration": 75,
+      "split": "upper_lower",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "evidencePattern": "normal"
+    },
+    {
+      "id": "high-responder",
+      "athlete": "High responder",
+      "weeks": 12,
+      "goal": "build_muscle",
+      "programmeGoal": "hypertrophy",
+      "experience": "advanced",
+      "days": 5,
+      "duration": 90,
+      "split": "push_pull_legs",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "startingVolumeContext": {
+        "continuity": "currently_training",
+        "recentTrainingDaysPerWeek": 5,
+        "recentSessionWorkload": "high",
+        "recentSessionDurationMinutes": 90,
+        "recovery": "high",
+        "history": "established_productive",
+        "workCapacity": "demonstrated_high",
+        "concurrentSport": "none",
+        "loadConfidence": "established",
+        "dosageConfidence": "canonical_productive_history"
+      },
+      "evidencePattern": "high_response"
+    },
+    {
+      "id": "stalled-athlete",
+      "athlete": "Stalled athlete",
+      "weeks": 12,
+      "goal": "build_strength",
+      "programmeGoal": "strength_hypertrophy",
+      "experience": "intermediate",
+      "days": 4,
+      "duration": 75,
+      "split": "upper_lower",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "evidencePattern": "stalled"
+    },
+    {
+      "id": "poor-recovery-athlete",
+      "athlete": "Poor-recovery athlete",
+      "weeks": 12,
+      "goal": "build_muscle",
+      "programmeGoal": "hypertrophy",
+      "experience": "intermediate",
+      "days": 4,
+      "duration": 60,
+      "split": "upper_lower",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "startingVolumeContext": {
+        "continuity": "currently_training",
+        "recentTrainingDaysPerWeek": 3,
+        "recentSessionWorkload": "moderate",
+        "recentSessionDurationMinutes": 60,
+        "recovery": "low_acceptable",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none",
+        "loadConfidence": "calibration_required",
+        "dosageConfidence": "declared_recent_training"
+      },
+      "evidencePattern": "poor_recovery"
+    },
+    {
+      "id": "inconsistent-athlete",
+      "athlete": "Inconsistent athlete",
+      "weeks": 12,
+      "goal": "build_muscle",
+      "programmeGoal": "hypertrophy",
+      "experience": "intermediate",
+      "days": 3,
+      "duration": 60,
+      "split": "full_body",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "evidencePattern": "inconsistent"
+    },
+    {
+      "id": "returning-athlete",
+      "athlete": "Returning athlete",
+      "weeks": 12,
+      "goal": "build_muscle",
+      "programmeGoal": "hypertrophy",
+      "experience": "advanced",
+      "days": 3,
+      "duration": 60,
+      "split": "full_body",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "startingVolumeContext": {
+        "continuity": "extended_layoff",
+        "recentTrainingDaysPerWeek": 0,
+        "recentSessionWorkload": "light",
+        "recentSessionDurationMinutes": 60,
+        "recovery": "ordinary",
+        "history": "established_productive",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "none",
+        "loadConfidence": "calibration_required",
+        "dosageConfidence": "low_after_layoff"
+      },
+      "evidencePattern": "returning"
+    },
+    {
+      "id": "pain-limitation-athlete",
+      "athlete": "Pain/limitation athlete",
+      "weeks": 12,
+      "goal": "build_muscle",
+      "programmeGoal": "hypertrophy",
+      "experience": "intermediate",
+      "days": 4,
+      "duration": 75,
+      "split": "upper_lower",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "limitations": [
+        "exclude_exercise:ex-bench-press"
+      ],
+      "evidencePattern": "pain"
+    },
+    {
+      "id": "time-constrained-athlete",
+      "athlete": "Time-constrained athlete",
+      "weeks": 12,
+      "goal": "build_muscle",
+      "programmeGoal": "hypertrophy",
+      "experience": "intermediate",
+      "days": 3,
+      "duration": 45,
+      "split": "full_body",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "evidencePattern": "time_constrained"
+    },
+    {
+      "id": "advanced-five-day-hypertrophy",
+      "athlete": "Advanced five-day hypertrophy athlete",
+      "weeks": 16,
+      "goal": "build_muscle",
+      "programmeGoal": "hypertrophy",
+      "experience": "advanced",
+      "days": 5,
+      "duration": 90,
+      "split": "push_pull_legs",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "evidencePattern": "hypertrophy"
+    },
+    {
+      "id": "strength-expression-athlete",
+      "athlete": "Strength athlete approaching expression",
+      "weeks": 16,
+      "goal": "build_strength",
+      "programmeGoal": "strength_hypertrophy",
+      "experience": "advanced",
+      "days": 4,
+      "duration": 90,
+      "split": "upper_lower",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "evidencePattern": "strength_expression"
+    },
+    {
+      "id": "powerbuilding-athlete",
+      "athlete": "Powerbuilding athlete",
+      "weeks": 16,
+      "goal": "build_muscle_and_strength",
+      "programmeGoal": "strength_hypertrophy",
+      "experience": "intermediate",
+      "days": 5,
+      "duration": 90,
+      "split": "push_pull_legs",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "evidencePattern": "powerbuilding"
+    },
+    {
+      "id": "athletic-performance-athlete",
+      "athlete": "Athletic-performance athlete",
+      "weeks": 16,
+      "goal": "athletic_performance",
+      "programmeGoal": "hypertrophy",
+      "experience": "intermediate",
+      "days": 3,
+      "duration": 60,
+      "split": "full_body",
+      "equipment": [
+        "barbell",
+        "dumbbell",
+        "machine",
+        "cable",
+        "bodyweight"
+      ],
+      "startingVolumeContext": {
+        "continuity": "currently_training",
+        "recentTrainingDaysPerWeek": 3,
+        "recentSessionWorkload": "moderate",
+        "recentSessionDurationMinutes": 60,
+        "recovery": "ordinary",
+        "history": "none",
+        "workCapacity": "not_demonstrated",
+        "concurrentSport": "lower_body_loading",
+        "loadConfidence": "calibration_required",
+        "dosageConfidence": "declared_recent_training"
+      },
+      "evidencePattern": "athletic_workload"
+    }
+  ]
+}

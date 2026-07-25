@@ -1,0 +1,267 @@
+{
+  "schemaVersion": "coaching_system_input_utilisation_matrix_v1",
+  "generatedAt": "2026-07-25T08:00:00.000Z",
+  "methodology": "A field counts as effective only when an executable mounted production path can change a coaching output. Pure/test-only capability is not counted.",
+  "totalInputsAudited": 32,
+  "meaningfulProgrammingInputs": 30,
+  "materiallyEffectiveProgrammingInputs": 14,
+  "meaningfulInputUtilisationPercent": 46.7,
+  "entries": [
+    {
+      "id": "goal",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "Macrocycle strategy, first Mesocycle, Microcycle roles, exact prescription",
+      "proof": "onboarding.tsx → constructCanonicalActivePlanFromCanonicalInputs → createMacrocycle/selectMesocycles/createMicrocycle/constructCanonicalSession",
+      "counterfactual": "hypertrophy-vs-strength"
+    },
+    {
+      "id": "target_date",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "rolling versus fixed Macrocycle horizon and timeline validation",
+      "proof": "training commitment targetDate reaches createMacrocycle and validateMacrocycleTimeline",
+      "counterfactual": "repository golden fixed-horizon cases"
+    },
+    {
+      "id": "event_type",
+      "meaningfulProgrammingInput": true,
+      "classification": "collected_but_unreachable",
+      "productionDecision": "No independent production programming decision after compatibility filtering",
+      "proof": "onboarding event type selects/validates target context but is absent from CanonicalGeneratedPlanInput",
+      "counterfactual": "same goal/date with different compatible event type reaches the same canonical construction command"
+    },
+    {
+      "id": "experience",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "Mesocycle eligibility, volume band, method eligibility, exercise suitability",
+      "proof": "experienceLevel reaches all canonical construction owners",
+      "counterfactual": "beginner-vs-advanced"
+    },
+    {
+      "id": "recent_consistency",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "initial re-entry or current-training dosage",
+      "proof": "continuity is normalized and passed in startingVolumeContext",
+      "counterfactual": "returning-athlete versus normal-responder construction"
+    },
+    {
+      "id": "recent_training_frequency",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "bounded initial regional volume",
+      "proof": "recentTrainingDaysPerWeek reaches resolveCanonicalHypertrophyStartingVolume",
+      "counterfactual": "canonical starting-volume policy cases"
+    },
+    {
+      "id": "recent_session_workload",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "bounded initial regional volume",
+      "proof": "recentSessionWorkload reaches resolveCanonicalHypertrophyStartingVolume",
+      "counterfactual": "canonical starting-volume policy cases"
+    },
+    {
+      "id": "available_days",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "Microcycle frequency, session roles, scheduling and dose distribution",
+      "proof": "daysPerWeek reaches createMicrocycle and volume allocation",
+      "counterfactual": "three-vs-five-days"
+    },
+    {
+      "id": "available_workout_duration",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "bounded per-session dosage and feasibility",
+      "proof": "availableSessionMinutes reaches allocation and exact-duration validation",
+      "counterfactual": "45-vs-90-minutes"
+    },
+    {
+      "id": "framework_preference",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "compatible Microcycle framework, roles and exercise delivery",
+      "proof": "selected PreferredSplit reaches createMicrocycle; phase authority may morph it",
+      "counterfactual": "five-day framework certification; PPL-vs-auto resolves identically where PPL is the recommendation"
+    },
+    {
+      "id": "commitment",
+      "meaningfulProgrammingInput": true,
+      "classification": "duplicated_by_another_input",
+      "productionDecision": "Only changes programming through targetDate/rolling representation",
+      "proof": "TrainingCommitment is normalized before canonical construction; no independent commitment field remains",
+      "counterfactual": "rolling versus fixed target date"
+    },
+    {
+      "id": "equipment",
+      "meaningfulProgrammingInput": true,
+      "classification": "silently_defaulted",
+      "productionDecision": "Exercise candidate filtering when a real list is supplied",
+      "proof": "onboarding.tsx hardcodes the full equipment catalogue in both probe and commit",
+      "counterfactual": "full-vs-limited-equipment proves the engine can respond, not that onboarding collects it"
+    },
+    {
+      "id": "movement_preferences",
+      "meaningfulProgrammingInput": true,
+      "classification": "collected_but_unreachable",
+      "productionDecision": "No mounted collection or canonical writer found",
+      "proof": "no onboarding/settings movement-preference field reaches construction",
+      "counterfactual": "unavailable"
+    },
+    {
+      "id": "disliked_exercises",
+      "meaningfulProgrammingInput": true,
+      "classification": "collected_but_unreachable",
+      "productionDecision": "Exercise selection changes only if an ExercisePreferenceRecord is directly supplied",
+      "proof": "pure construction supports exercisePreferences; mounted substitution does not persist a learned preference into reconstruction facts",
+      "counterfactual": "canonical preference unit test only"
+    },
+    {
+      "id": "custom_exercises",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "Catalogue candidate pool and exercise selection",
+      "proof": "customExerciseRepository is the reconstruction catalogue; valid metadata participates in Session Construction",
+      "counterfactual": "custom movement certification cases"
+    },
+    {
+      "id": "limitations",
+      "meaningfulProgrammingInput": true,
+      "classification": "collected_but_unreachable",
+      "productionDecision": "Typed exclusions change exercise selection only when directly supplied",
+      "proof": "onboarding does not collect limitations; resolveCanonicalConstructionFacts reconstructs limitations as []",
+      "counterfactual": "no-pain-vs-limitation proves pure construction, while future reconstruction loses the fact"
+    },
+    {
+      "id": "pain_during_training",
+      "meaningfulProgrammingInput": true,
+      "classification": "collected_but_unreachable",
+      "productionDecision": "No mounted Train pain entry was found that creates a future Progress intervention",
+      "proof": "pain policies and evaluators exist, but mounted Train records performed work/completion only",
+      "counterfactual": "pain longitudinal scenario reaches review only because the harness manually supplies pain evidence"
+    },
+    {
+      "id": "units",
+      "meaningfulProgrammingInput": false,
+      "classification": "changes_only_presentation",
+      "productionDecision": "Display conversion",
+      "proof": "kg/lb metamorphic construction preserves physiological prescription",
+      "counterfactual": "canonical unit metamorphic test"
+    },
+    {
+      "id": "load_increment_profile",
+      "meaningfulProgrammingInput": true,
+      "classification": "stored_but_unused",
+      "productionDecision": "No mounted future-load adjustment is authorised",
+      "proof": "load policy requires equipment rounding but ends manual_review_required; construction command does not carry AppSettings increment profile",
+      "counterfactual": "no automatic numeric load outcome exists"
+    },
+    {
+      "id": "established_loads",
+      "meaningfulProgrammingInput": true,
+      "classification": "converted_incorrectly",
+      "productionDecision": "Established versus calibration load state when correct evidence is directly supplied",
+      "proof": "resolveCanonicalConstructionFacts keys loads by slotId and omits loadEvidence while Session Construction resolves by exerciseId plus matching evidence",
+      "counterfactual": "adequate-evidence-vs-first-exposure proves direct input; production reconstruction cannot reproduce it"
+    },
+    {
+      "id": "performed_work",
+      "meaningfulProgrammingInput": true,
+      "classification": "stored_but_unused",
+      "productionDecision": "Creates immutable Progress evidence and presentation history, but no mounted future-prescription decision",
+      "proof": "completeActiveSession records evidence; mounted Progress only projects it",
+      "counterfactual": "all longitudinal scenarios"
+    },
+    {
+      "id": "target_achievement",
+      "meaningfulProgrammingInput": true,
+      "classification": "stored_but_unused",
+      "productionDecision": "No mounted progression qualification",
+      "proof": "performed reps/completion are evidence facts; no mounted evaluator/producer/application caller consumes them",
+      "counterfactual": "normal versus high responder produces identical future prescriptions"
+    },
+    {
+      "id": "adherence_and_missed_sessions",
+      "meaningfulProgrammingInput": true,
+      "classification": "stored_but_unused",
+      "productionDecision": "Pure Microcycle reflow exists, but mounted completion/history does not invoke it",
+      "proof": "reflowCanonicalMicrocycleAfterMissedSession has tests and no mounted caller",
+      "counterfactual": "consistent-vs-missed-sessions"
+    },
+    {
+      "id": "performance_trend",
+      "meaningfulProgrammingInput": true,
+      "classification": "changes_only_presentation",
+      "productionDecision": "Progress dashboard trend/highlight presentation",
+      "proof": "canonical-progress-presentation derives trends; no mounted decision production follows",
+      "counterfactual": "stable versus improving history affects display, not prescription"
+    },
+    {
+      "id": "rep_drop_off",
+      "meaningfulProgrammingInput": true,
+      "classification": "stored_but_unused",
+      "productionDecision": "A stop rule is embedded in snapshots, but no mounted evidence-to-future-dose application is proven",
+      "proof": "volume/drop-off policies are pure and test-covered; production decision chain is unmounted",
+      "counterfactual": "stable-vs-excessive-drop-off"
+    },
+    {
+      "id": "fatigue_readiness",
+      "meaningfulProgrammingInput": true,
+      "classification": "collected_but_unreachable",
+      "productionDecision": "Recovery policy can return bounded review when called",
+      "proof": "mounted Train/Progress has no factual readiness entry → policy → persisted intervention chain",
+      "counterfactual": "poor-recovery longitudinal scenario"
+    },
+    {
+      "id": "recovery_cardio_preference",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "Canonical conditioning prescription and presentation",
+      "proof": "onboarding setting reaches resolveCanonicalCardioPrescription",
+      "counterfactual": "recommended/minimal/off policy tests"
+    },
+    {
+      "id": "perceived_recovery_at_onboarding",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "Initial volume only",
+      "proof": "perceivedRecovery reaches startingVolumeContext.recovery and volume allocation",
+      "counterfactual": "good-vs-poor-recovery-at-construction"
+    },
+    {
+      "id": "sport_workload",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "Initial lower-body starting volume when declared during onboarding",
+      "proof": "concurrentSport reaches startingVolumeContext; later workload evidence has no mounted adaptation chain",
+      "counterfactual": "athletic-performance scenario versus otherwise equivalent no-sport construction"
+    },
+    {
+      "id": "body_metrics",
+      "meaningfulProgrammingInput": false,
+      "classification": "stored_but_unused",
+      "productionDecision": "No coaching prescription decision",
+      "proof": "registry explicitly limits body metrics to evidence/presentation; no construction consumer",
+      "counterfactual": "none expected"
+    },
+    {
+      "id": "active_cycle_state",
+      "meaningfulProgrammingInput": true,
+      "classification": "materially_changes_production_programming",
+      "productionDecision": "Current authoritative plan/session identity and immutable prescriptions",
+      "proof": "Home, Plan, Train and Progress hydrate the canonical carrier/read model",
+      "counterfactual": "initial goal/phase constructions"
+    },
+    {
+      "id": "previous_mesocycles",
+      "meaningfulProgrammingInput": true,
+      "classification": "stored_but_unused",
+      "productionDecision": "Lineage/successor validation exists, but no mounted transition decision is produced",
+      "proof": "cycleLineage is persisted; transition evaluator/producer/application has no mounted caller",
+      "counterfactual": "accumulation-vs-intensification"
+    }
+  ]
+}

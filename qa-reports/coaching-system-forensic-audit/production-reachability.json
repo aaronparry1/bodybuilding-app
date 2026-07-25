@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "coaching_system_production_reachability_v1",
+  "auditedHead": "7834d96e383301e5bde8ae19873aef240ad9cb89",
+  "productionRouterRoot": "app-production",
+  "methodology": "Reachability requires an executable import/invocation chain from a mounted app-production route. Declarations, tests, certification artifacts and pure functions without mounted callers are not production capabilities.",
+  "summary": {
+    "claimedCapabilities": 21,
+    "productionReachableAndAuthoritative": 9,
+    "productionReachableButIncomplete": 5,
+    "unreachableOrTestOnly": 7,
+    "mountedFuturePrescriptionAdaptationChain": false
+  },
+  "capabilities": [
+    {
+      "id": "initial_macrocycle",
+      "capability": "Macrocycle goal strategy and horizon",
+      "classification": "production-reachable and authoritative",
+      "entrypoint": "app-production/(protected)/onboarding.tsx",
+      "callerChain": "onboarding → completeCanonicalOnboardingSetup → canonicalActivePlanState.completeOnboarding → constructCanonicalActivePlanFromCanonicalInputs → createMacrocycle",
+      "authority": "src/domain/training/macrocycle-engine.ts:createMacrocycle",
+      "persistence": "canonical active-plan carrier",
+      "verdict": "PROVEN"
+    },
+    {
+      "id": "initial_mesocycle",
+      "capability": "Initial Mesocycle selection and purpose",
+      "classification": "production-reachable and authoritative",
+      "entrypoint": "app-production/(protected)/onboarding.tsx",
+      "callerChain": "canonical construction → selectMesocycles(...)[0] → resolveMesocyclePrescriptionPolicy",
+      "authority": "src/domain/training/mesocycle-library.ts and mesocycle-prescription-policy.ts",
+      "persistence": "canonical active-plan carrier",
+      "verdict": "PROVEN"
+    },
+    {
+      "id": "macrocycle_pathway",
+      "capability": "Full multi-phase Macrocycle pathway",
+      "classification": "production-reachable but incomplete",
+      "entrypoint": "initial construction only",
+      "callerChain": "createMacrocycle records phaseSpecs; construction always selects first eligible Mesocycle",
+      "authority": "Macrocycle/Mesocycle specifications",
+      "persistence": "initial cycle only; lineage can retain applied transitions",
+      "verdict": "PARTIALLY PROVEN"
+    },
+    {
+      "id": "mesocycle_transitions",
+      "capability": "Mesocycle transition from completed training",
+      "classification": "unreachable/dead",
+      "entrypoint": "none mounted",
+      "callerChain": "pure evaluator/decision/application functions exist; no app or app-production invocation",
+      "authority": "Progress plus Mesocycle successor resolution",
+      "persistence": "supported by application code only when explicitly invoked",
+      "verdict": "UNREACHABLE"
+    },
+    {
+      "id": "microcycle_schedule",
+      "capability": "Microcycle frequency, roles, order and recovery spacing",
+      "classification": "production-reachable and authoritative",
+      "entrypoint": "onboarding canonical construction",
+      "callerChain": "constructCanonicalActivePlanFromCanonicalInputs → createMicrocycle",
+      "authority": "src/domain/training/microcycle-scheduler.ts:createMicrocycle",
+      "persistence": "canonical carrier and immutable session snapshots",
+      "verdict": "PROVEN"
+    },
+    {
+      "id": "framework_morphing",
+      "capability": "Compatible framework selection and phase-specific morphing",
+      "classification": "production-reachable and authoritative",
+      "entrypoint": "onboarding framework probe and construction",
+      "callerChain": "resolveExecutableOnboardingFrameworks → construction → resolveCanonicalProgrammeFramework/createMicrocycle",
+      "authority": "programme-framework-rules.ts and Microcycle",
+      "persistence": "requested preference and resolved delivery strategy",
+      "verdict": "PROVEN"
+    },
+    {
+      "id": "microcycle_adjustment",
+      "capability": "Missed-session reflow or rotation adjustment after evidence",
+      "classification": "test-only",
+      "entrypoint": "none mounted",
+      "callerChain": "reflowCanonicalMicrocycleAfterMissedSession and rotation policy have tests but no route caller",
+      "authority": "Microcycle",
+      "persistence": "not reached from mounted evidence",
+      "verdict": "UNREACHABLE"
+    },
+    {
+      "id": "session_construction",
+      "capability": "Exact exercise, order, sets, reps, rest, load state, method and stop rule",
+      "classification": "production-reachable and authoritative",
+      "entrypoint": "onboarding and approved reconstruction/application paths",
+      "callerChain": "constructCanonicalActivePlanFromCanonicalInputs → allocateCanonicalMicrocycleVolume → constructCanonicalSession",
+      "authority": "Session Construction and its typed component policies",
+      "persistence": "immutable v3 session snapshots in canonical carrier",
+      "verdict": "PROVEN"
+    },
+    {
+      "id": "volume_allocation",
+      "capability": "Initial recoverable volume and duration-bounded allocation",
+      "classification": "production-reachable and authoritative",
+      "entrypoint": "onboarding canonical construction",
+      "callerChain": "startingVolumeContext → allocateCanonicalMicrocycleVolume → exact sessions",
+      "authority": "Mesocycle volume policy and Microcycle allocator",
+      "persistence": "exact immutable snapshots",
+      "verdict": "PROVEN"
+    },
+    {
+      "id": "volume_adaptation",
+      "capability": "Later volume change from performance/drop-off/recovery",
+      "classification": "test-only",
+      "entrypoint": "none mounted",
+      "callerChain": "canonical hypertrophy volume policy and volume intervention evaluator exist without mounted producer/application",
+      "authority": "Mesocycle policy plus Progress",
+      "persistence": "no production decision created",
+      "verdict": "UNREACHABLE"
+    },
+    {
+      "id": "load_calibration",
+      "capability": "First-exposure calibration presentation and performed load evidence",
+      "classification": "production-reachable but incomplete",
+      "entrypoint": "Train",
+      "callerChain": "v3 load prescription → workout presentation → calibration entry → performed-work evidence",
+      "authority": "Session Construction/Train/ledger",
+      "persistence": "performed load is retained as evidence",
+      "verdict": "PARTIALLY PROVEN"
+    },
+    {
+      "id": "exact_load_progression",
+      "capability": "Automatic future load progression/regression",
+      "classification": "incomplete or unsafe",
+      "entrypoint": "none",
+      "callerChain": "load adjustment policy always fails closed to manual_review_required; no mounted intervention/application",
+      "authority": "Mesocycle bounds, Progress decision, Session Construction exact load",
+      "persistence": "no future numeric adjustment",
+      "verdict": "CONTRADICTED"
+    },
+    {
+      "id": "established_load_reconstruction",
+      "capability": "Reuse performed load as an established future prescription",
+      "classification": "incomplete or unsafe",
+      "entrypoint": "reconstruction/application paths",
+      "callerChain": "resolveCanonicalConstructionFacts keys by slotId and omits loadEvidence; Session Construction resolves by exerciseId plus evidence",
+      "authority": "construction facts and load prescription",
+      "persistence": "evidence exists but is not reconstructed into a valid established-load input",
+      "verdict": "UNSAFE"
+    },
+    {
+      "id": "fatigue_recovery",
+      "capability": "Fatigue/recovery response",
+      "classification": "production-reachable but incomplete",
+      "entrypoint": "initial onboarding only",
+      "callerChain": "perceived recovery changes starting volume; later recovery policy/evaluator has no mounted evidence/action chain",
+      "authority": "Mesocycle recovery policy plus Progress",
+      "persistence": "initial context persists; later review decision not produced",
+      "verdict": "PARTIALLY PROVEN"
+    },
+    {
+      "id": "deload",
+      "capability": "Evidence-led deload entry and exit",
+      "classification": "unreachable/dead",
+      "entrypoint": "none mounted",
+      "callerChain": "pure evaluator/application paths exist; actual completion evidence does not derive deload intent and mounted Progress does not evaluate",
+      "authority": "Mesocycle successor plus Progress",
+      "persistence": "possible only through direct application invocation",
+      "verdict": "UNREACHABLE"
+    },
+    {
+      "id": "taper_peak",
+      "capability": "Taper/peak-compatible behaviour as event approaches",
+      "classification": "production-reachable but incomplete",
+      "entrypoint": "event onboarding creates Macrocycle horizon",
+      "callerChain": "Macrocycle records phase pathway; mounted production does not advance from the initial Mesocycle",
+      "authority": "Macrocycle/Mesocycle",
+      "persistence": "future phase specs are structural metadata, not reached prescriptions",
+      "verdict": "PARTIALLY PROVEN"
+    },
+    {
+      "id": "exercise_substitution",
+      "capability": "In-session exercise substitution and learned future preference",
+      "classification": "incomplete or unsafe",
+      "entrypoint": "mounted Train has no substitution control",
+      "callerChain": "ledger payload supports substitutionId and projections can display it; current Train UI never authors it",
+      "authority": "Session Construction/Train/Progress",
+      "persistence": "schema support only",
+      "verdict": "CONTRADICTED"
+    },
+    {
+      "id": "extra_session",
+      "capability": "Extra/custom session construction",
+      "classification": "production-reachable and authoritative",
+      "entrypoint": "app-production/(protected)/programmes/ai.tsx",
+      "callerChain": "constructCanonicalExtraSession → startCanonicalExtraSession → canonical recorded-session lifecycle",
+      "authority": "canonical extra-session admission and Session Construction",
+      "persistence": "canonical carrier/ledger without consuming scheduled session",
+      "verdict": "PROVEN"
+    },
+    {
+      "id": "advanced_methods",
+      "capability": "Straight sets, antagonist supersets and rest-pause",
+      "classification": "production-reachable and authoritative",
+      "entrypoint": "Session Construction and Train presentation/execution",
+      "callerChain": "Mesocycle permission → canonical_training_method_policy_v1 → immutable snapshot → Train → performed evidence",
+      "authority": "Mesocycle plus canonical training-method policy",
+      "persistence": "snapshot and performed-work method facts",
+      "verdict": "PROVEN"
+    },
+    {
+      "id": "pr_detection",
+      "capability": "Conservative Progress highlights/estimated-1RM recognition",
+      "classification": "production-reachable and authoritative",
+      "entrypoint": "mounted Progress tab",
+      "callerChain": "ledger/evidence → canonical progress presentation",
+      "authority": "Progress presentation only",
+      "persistence": "derived from immutable evidence; not a programming decision",
+      "verdict": "PROVEN"
+    },
+    {
+      "id": "coaching_explanations",
+      "capability": "Reasons for initial prescriptions and later adaptations",
+      "classification": "production-reachable but incomplete",
+      "entrypoint": "Home/Plan/Train/Progress",
+      "callerChain": "initial planningRationale and slot reasons are persisted; no later adaptation reason exists because no decision is produced",
+      "authority": "owning policy/presentation",
+      "persistence": "initial reasons persist",
+      "verdict": "PARTIALLY PROVEN"
+    }
+  ]
+}
