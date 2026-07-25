@@ -47,7 +47,7 @@ function WorkoutAtAGlance({ primary }: Readonly<{ primary: CanonicalHomePrimary 
     {workout.lifecycle === "active" || workout.lifecycle === "paused" ? <View accessibilityRole="progressbar" accessibilityLabel={`${workout.progressPercent}% of working sets complete`} style={{ height: 4, borderRadius: radius.pill, overflow: "hidden", backgroundColor: colors.backgroundElevated }}><View style={{ width: `${workout.progressPercent}%`, height: "100%", backgroundColor: colors.accent }} /></View> : null}
     <View style={{ flexDirection: "row", gap: spacing.sm }}>
       <Metric label="Exercises" value={String(workout.exerciseCount)} />
-      <Metric label={workout.completedSetCount ? "Working sets completed" : "Current session working sets"} value={workout.completedSetCount ? `${workout.completedSetCount}/${workout.workingSetCount}` : String(workout.workingSetCount)} />
+      <Metric label="Sets" value={workout.completedSetCount ? `${workout.completedSetCount}/${workout.workingSetCount}` : String(workout.workingSetCount)} />
       <Metric label="Estimate" value={workout.estimatedDurationMinutes ? `${workout.estimatedDurationMinutes}m` : "—"} />
     </View>
     {workout.exercisePreview.length ? <Text numberOfLines={2} style={{ color: colors.textMuted, fontSize: 13, lineHeight: 19 }}>{workout.exercisePreview.join(" · ")}{remainingExercises ? ` · +${remainingExercises} more` : ""}</Text> : null}
@@ -113,7 +113,7 @@ function DashboardAction({ label, onPress, emphasized = false }: Readonly<{ labe
 }
 
 function Metric({ label, value }: Readonly<{ label: string; value: string }>) {
-  return <View style={{ flex: 1, minWidth: 0, paddingHorizontal: spacing.sm, paddingVertical: 7, gap: 1, borderRadius: radius.md, backgroundColor: colors.backgroundElevated }}><Text numberOfLines={1} style={{ color: colors.text, fontSize: 18, lineHeight: 22, fontWeight: "900", fontVariant: ["tabular-nums"] }}>{value}</Text><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78} style={{ color: colors.textSubtle, fontSize: 10, lineHeight: 13, fontWeight: "800", textTransform: "uppercase" }}>{label}</Text></View>;
+  return <View style={{ flex: 1, minWidth: 0, paddingHorizontal: spacing.sm, paddingVertical: 8, gap: 2, borderRadius: radius.md, backgroundColor: colors.backgroundElevated }}><Text numberOfLines={1} style={{ color: colors.text, fontSize: 18, lineHeight: 22, fontWeight: "900", fontVariant: ["tabular-nums"] }}>{value}</Text><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.84} style={{ color: colors.textSubtle, fontSize: 12, lineHeight: 15, fontWeight: "800", textTransform: "uppercase" }}>{label}</Text></View>;
 }
 
 function Pill({ text }: Readonly<{ text: string }>) {

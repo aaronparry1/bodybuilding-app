@@ -10,7 +10,7 @@ describe("onboarding final programme screen", () => {
     expect(source).toContain('title: step === "review" ? "Your Programme" : "Welcome"');
     expect(source).toContain('review: "Your Programme"');
     expect(source).toContain("ASC will use these choices to build your first programme.");
-    expect(source).toContain('step === "review" ? "Create Programme" : "Continue"');
+    expect(source).toContain('creationPending ? "Creating Programme…" : "Create Programme"');
   });
 
   it("shows all programme summary rows", () => {
@@ -46,9 +46,9 @@ describe("onboarding final programme screen", () => {
   it("keeps onboarding completion and generation boundaries stable", () => {
     const source = onboardingSource();
 
-    expect(source).toContain("canonicalActivePlanState.completeOnboarding({");
+    expect(source).toContain("completeCanonicalOnboardingSetup({");
     expect(source).toContain('if (committed.status !== "saved")');
-    expect(source).toContain("updateSettings({");
+    expect(source).toContain("settings: {");
     expect(source).toContain("unit,");
     expect(source).not.toContain("generateV2Workout");
     expect(source).not.toContain("useSubscription");

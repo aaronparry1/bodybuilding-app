@@ -46,10 +46,10 @@ describe("complete canonical adaptive planning system", () => {
         }
       }
     }
-    expect(count).toBe(120);
+    expect(count).toBe(138);
   });
 
-  it("uses the exact three-framework frequency truth table", () => {
+  it("uses the base frequency table plus explicitly executable five-day hypertrophy choices", () => {
     expect([2, 3, 4, 5, 6].map((frequency) => getCustomerFrameworksForFrequency(frequency))).toEqual([
       ["full_body", "upper_lower"],
       ["full_body", "push_pull_legs"],
@@ -57,7 +57,8 @@ describe("complete canonical adaptive planning system", () => {
       ["push_pull_legs"],
       ["push_pull_legs"],
     ]);
-    for (const goal of ["build_muscle", "get_stronger", "build_muscle_strength", "athletic_performance", "lose_fat"] as const) {
+    expect(getSelectableFrameworkOptionsForGoal("build_muscle", 5).map((option) => option.id)).toEqual(["push_pull_legs", "upper_lower", "full_body", "body_part_split"]);
+    for (const goal of ["get_stronger", "build_muscle_strength", "athletic_performance"] as const) {
       for (const frequency of [2, 3, 4, 5, 6]) expect(getSelectableFrameworkOptionsForGoal(goal, frequency).every((option) => ["full_body", "upper_lower", "push_pull_legs"].includes(option.id))).toBe(true);
     }
   });
@@ -82,19 +83,20 @@ describe("complete canonical adaptive planning system", () => {
     }
   });
 
-  it("constructs the dense intermediate hypertrophy five-day PPL from production paths", () => {
+  it("constructs every dense intermediate five-day hypertrophy choice from production paths", () => {
     const options = getSelectableFrameworkOptionsForGoal("build_muscle", 5);
-    expect(options.map((option) => option.id)).toEqual(["push_pull_legs"]);
+    expect(options.map((option) => option.id)).toEqual(["push_pull_legs", "upper_lower", "full_body", "body_part_split"]);
     const outputs = options.map((option) => constructGoldenProgramme({ id: `five-${option.id}`, label: option.displayName, setupGoal: "build_muscle", programmeGoal: "hypertrophy", experience: "intermediate", frequency: 5, framework: preferredSplit(option.id), equipment: fullEquipment, expected: "constructed" }));
     expect(outputs.every((output) => output.status === "constructed")).toBe(true);
     for (const output of outputs) if (output.status === "constructed") {
       expect(output.sessions).toHaveLength(5);
       expect(output.sessions.every((session) => session.exercises.every((exercise) => exercise.workingSets! > 0 && exercise.exactReps.length === exercise.workingSets && exercise.restSeconds > 0))).toBe(true);
-      expect(output.accounting.totalWorkingSets).toBeGreaterThan(49);
+      expect(output.accounting.totalWorkingSets).toBe(output.accounting.perSessionWorkingSets.reduce((total, sets) => total + sets, 0));
+      expect(output.certification.allocation.status).toBe("passed");
       expect(output.accounting.perSessionEstimatedMinutes.every((minutes) => minutes <= 90)).toBe(true);
     }
     const paired = buildCanonicalPlanningCertificationArtifacts()["intermediate-hypertrophy-five-day"].cases;
-    expect(paired).toHaveLength(2);
+    expect(paired).toHaveLength(8);
     for (const option of options) {
       const cases = paired.flatMap((item) => item.status === "constructed" && item.input.requestedFramework === preferredSplit(option.id) ? [item] : []);
       expect(cases).toHaveLength(2);

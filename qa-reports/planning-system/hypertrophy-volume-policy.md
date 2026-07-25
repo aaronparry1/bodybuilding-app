@@ -116,6 +116,216 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "triceps": 2,
         "upper_back": 2
       }
+    },
+    {
+      "id": "intermediate-hypertrophy-5-upper_lower-calibration",
+      "totalWorkingSets": 70,
+      "directSets": {
+        "chest": 8,
+        "upper_back": 10,
+        "lats": 8,
+        "lateral_delts": 6,
+        "triceps": 6,
+        "biceps": 6,
+        "quadriceps": 8,
+        "hip_extension": 8,
+        "hamstrings_knee_flexion": 6,
+        "calves": 6
+      },
+      "secondarySets": {
+        "triceps": 8,
+        "anterior_delts": 8,
+        "biceps": 16,
+        "rear_delts": 8,
+        "hip_extension": 8,
+        "upper_back": 2
+      },
+      "frequency": {
+        "biceps": 3,
+        "calves": 2,
+        "chest": 3,
+        "hamstrings_knee_flexion": 2,
+        "hip_extension": 2,
+        "lateral_delts": 3,
+        "lats": 3,
+        "quadriceps": 2,
+        "triceps": 3,
+        "upper_back": 3
+      }
+    },
+    {
+      "id": "intermediate-hypertrophy-5-upper_lower-established",
+      "totalWorkingSets": 80,
+      "directSets": {
+        "chest": 9,
+        "upper_back": 11,
+        "lats": 9,
+        "lateral_delts": 7,
+        "triceps": 7,
+        "biceps": 7,
+        "quadriceps": 9,
+        "hip_extension": 9,
+        "hamstrings_knee_flexion": 7,
+        "calves": 7
+      },
+      "secondarySets": {
+        "triceps": 9,
+        "anterior_delts": 9,
+        "biceps": 18,
+        "rear_delts": 9,
+        "hip_extension": 9,
+        "upper_back": 3
+      },
+      "frequency": {
+        "biceps": 3,
+        "calves": 2,
+        "chest": 3,
+        "hamstrings_knee_flexion": 2,
+        "hip_extension": 2,
+        "lateral_delts": 3,
+        "lats": 3,
+        "quadriceps": 2,
+        "triceps": 3,
+        "upper_back": 3
+      }
+    },
+    {
+      "id": "intermediate-hypertrophy-5-full_body-calibration",
+      "totalWorkingSets": 42,
+      "directSets": {
+        "quadriceps": 8,
+        "chest": 8,
+        "upper_back": 8,
+        "hip_extension": 8,
+        "core": 2,
+        "lats": 8
+      },
+      "secondarySets": {
+        "hip_extension": 12,
+        "triceps": 8,
+        "biceps": 16,
+        "rear_delts": 8,
+        "upper_back": 8,
+        "quadriceps": 2,
+        "anterior_delts": 6
+      },
+      "frequency": {
+        "chest": 4,
+        "core": 1,
+        "hip_extension": 4,
+        "lats": 2,
+        "quadriceps": 4,
+        "upper_back": 3
+      }
+    },
+    {
+      "id": "intermediate-hypertrophy-5-full_body-established",
+      "totalWorkingSets": 48,
+      "directSets": {
+        "quadriceps": 9,
+        "chest": 9,
+        "upper_back": 9,
+        "hip_extension": 9,
+        "core": 3,
+        "lats": 9
+      },
+      "secondarySets": {
+        "hip_extension": 13,
+        "triceps": 9,
+        "biceps": 18,
+        "rear_delts": 9,
+        "upper_back": 9,
+        "quadriceps": 3,
+        "anterior_delts": 6
+      },
+      "frequency": {
+        "chest": 4,
+        "core": 1,
+        "hip_extension": 4,
+        "lats": 2,
+        "quadriceps": 4,
+        "upper_back": 3
+      }
+    },
+    {
+      "id": "intermediate-hypertrophy-5-body_part_split-calibration",
+      "totalWorkingSets": 82,
+      "directSets": {
+        "chest": 8,
+        "anterior_delts": 6,
+        "lateral_delts": 6,
+        "upper_back": 8,
+        "lats": 8,
+        "rear_delts": 6,
+        "triceps": 6,
+        "calves": 6,
+        "biceps": 6,
+        "quadriceps": 8,
+        "hip_extension": 8,
+        "hamstrings_knee_flexion": 6
+      },
+      "secondarySets": {
+        "triceps": 14,
+        "anterior_delts": 8,
+        "biceps": 16,
+        "rear_delts": 8,
+        "upper_back": 10,
+        "hip_extension": 5
+      },
+      "frequency": {
+        "anterior_delts": 2,
+        "biceps": 1,
+        "calves": 1,
+        "chest": 1,
+        "hamstrings_knee_flexion": 1,
+        "hip_extension": 1,
+        "lateral_delts": 2,
+        "lats": 1,
+        "quadriceps": 1,
+        "rear_delts": 2,
+        "triceps": 2,
+        "upper_back": 1
+      }
+    },
+    {
+      "id": "intermediate-hypertrophy-5-body_part_split-established",
+      "totalWorkingSets": 94,
+      "directSets": {
+        "chest": 9,
+        "anterior_delts": 7,
+        "lateral_delts": 7,
+        "upper_back": 9,
+        "lats": 9,
+        "rear_delts": 7,
+        "triceps": 7,
+        "calves": 7,
+        "biceps": 7,
+        "hamstrings_knee_flexion": 7,
+        "quadriceps": 9,
+        "hip_extension": 9
+      },
+      "secondarySets": {
+        "triceps": 16,
+        "anterior_delts": 9,
+        "biceps": 18,
+        "rear_delts": 9,
+        "upper_back": 12,
+        "hip_extension": 5
+      },
+      "frequency": {
+        "anterior_delts": 2,
+        "biceps": 1,
+        "calves": 1,
+        "chest": 1,
+        "hamstrings_knee_flexion": 1,
+        "hip_extension": 1,
+        "lateral_delts": 2,
+        "lats": 1,
+        "quadriceps": 1,
+        "rear_delts": 2,
+        "triceps": 2,
+        "upper_back": 1
+      }
     }
   ]
 }

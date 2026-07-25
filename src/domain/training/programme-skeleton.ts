@@ -220,7 +220,8 @@ export function resolveProgrammeSkeletonFramework({
 }
 
 function recommendedFrameworkForGoal(goal: TrainingGoalId, sessionsPerWeek: number): ProgrammeFrameworkId {
-  return getRecommendedCustomerFramework(goal, sessionsPerWeek) ?? "full_body";
+  const recommended = getRecommendedCustomerFramework(goal, sessionsPerWeek);
+  return recommended === "body_part_split" ? "chest_back_shoulders_arms_legs" : recommended ?? "full_body";
 }
 
 function resolveCommitmentMode(commitment: ProgrammeSkeletonCommitmentInput): ProgrammeSkeletonMacroMode {

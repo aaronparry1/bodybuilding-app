@@ -34,7 +34,9 @@ describe("training frequency", () => {
   it("updates onboarding wording without exposing one or seven day choices", () => {
     const source = readFileSync("app/(protected)/onboarding.tsx", "utf8");
 
-    expect(source).toContain("How many days can you realistically commit to training every week?");
+    expect(source).toContain('schedule: "What fits your week?"');
+    expect(source).toContain("Training days");
+    expect(source).toContain("Workout length");
     expect(source).toContain("Choose the number you can consistently achieve. You can change this later and ASC will adjust your programme.");
     expect(source).toContain("trainingFrequencyOptions.map");
     expect(source).not.toContain("[1, 2, 3, 4, 5, 6, 7]");

@@ -6,7 +6,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
 {
   "schemaVersion": "canonical_adaptive_planning_certification_v1",
   "strategy": "exhaustive goal × experience × frequency × onboarding-selectable framework; representative cross-owner interactions only where the input is actually executable",
-  "categoricalCases": 120,
+  "categoricalCases": 138,
   "allSupportedPairsCovered": true,
   "coveredGroups": [
     {
@@ -16,14 +16,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "frequency",
         "onboarding_framework"
       ],
-      "evidence": "120 exhaustive compatible constructions"
+      "evidence": "138 exhaustive compatible constructions"
     },
     {
       "dimensions": [
         "framework",
         "history_state"
       ],
-      "evidence": "paired five-day PPL certifications"
+      "evidence": "paired executable five-day hypertrophy framework certifications"
     },
     {
       "dimensions": [

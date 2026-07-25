@@ -490,10 +490,12 @@ export function AppScreen({
   children,
   bottom,
   scrollRef,
+  respectTopSafeArea = false,
 }: {
   children: ReactNode;
   bottom?: number;
   scrollRef?: RefObject<ScrollView | null>;
+  respectTopSafeArea?: boolean;
 }) {
   const insets = useSafeAreaInsets();
   const bottomPadding = bottom == null ? getTabScreenBottomPadding(insets.bottom) : bottom + insets.bottom;
@@ -505,7 +507,12 @@ export function AppScreen({
       keyboardDismissMode="interactive"
       keyboardShouldPersistTaps="handled"
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={{ paddingHorizontal: shellTokens.pageHorizontal, paddingTop: spacing.lg, paddingBottom: bottomPadding, gap: spacing.xxl }}
+      contentContainerStyle={{
+        paddingHorizontal: shellTokens.pageHorizontal,
+        paddingTop: respectTopSafeArea ? Math.max(spacing.lg, insets.top) : spacing.lg,
+        paddingBottom: bottomPadding,
+        gap: spacing.xxl,
+      }}
     >
       {children}
     </ScrollView>

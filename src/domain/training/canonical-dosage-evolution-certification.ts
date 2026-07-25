@@ -172,8 +172,8 @@ function buildTestDiscoveryReconciliation() {
     "programme framework rules > keeps every framework sequence deterministic for 2 to 6 days",
   ];
   const addedBeforeThisTask = [
-    "complete canonical adaptive planning system > uses the exact three-framework frequency truth table",
-    "complete canonical adaptive planning system > constructs the dense intermediate hypertrophy five-day PPL from production paths",
+    "complete canonical adaptive planning system > uses the base frequency table plus explicitly executable five-day hypertrophy choices",
+    "complete canonical adaptive planning system > constructs every dense intermediate five-day hypertrophy choice from production paths",
     "canonical microcycle volume allocator > retains goal/frequency/split-specific construction for build_strength advanced 4-day upper_lower",
     "canonical microcycle volume allocator > retains goal/frequency/split-specific construction for athletic_performance intermediate 6-day push_pull_legs",
     "final canonical adaptive-planning product rules > keeps the three experience levels materially distinct without treating advanced as automatic volume",

@@ -1,14 +1,16 @@
 import { Stack, router } from "expo-router";
-import { useMemo, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useAppSettings } from "@/application/settings/app-settings";
-import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import {
+  completeCanonicalOnboardingSetup,
+  normalizeRecentTrainingInput,
+  onboardingStepKeys,
+  resolveExecutableOnboardingFrameworks,
+} from "@/application/training/canonical-onboarding-setup";
 import { exerciseLibrary } from "@/domain/training/presets";
 import type { ExperienceLevel, ProgrammeGoal, UnitSystem } from "@/domain/training/models";
-import { getCustomerFrameworksForFrequency, getRecommendedCustomerFramework, getSelectableFrameworkOptionsForGoal } from "@/domain/training/programme-framework-rules";
 import {
-  type EventType,
-  type PlanningChoice,
   type PreferredSplit,
   type RecoveryCardioPreference,
   type TrainingSetupGoal,
@@ -21,14 +23,14 @@ import {
   type TrainingEventType,
 } from "@/domain/training/training-commitment";
 import { trainingExperiences } from "@/domain/training/training-experience";
-import { deriveTrainingFrequency, trainingFrequencyOptions, type TrainingDaysPerWeek } from "@/domain/training/training-frequency";
+import { trainingFrequencyOptions, type TrainingDaysPerWeek } from "@/domain/training/training-frequency";
 import type { TrainingGoalId } from "@/domain/training/training-goals";
 import { AppScreen, HeroPanel, PremiumCard, PrimaryButton, SecondaryButton, stableUiIdentifier } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
 import { canonicalSessionDurationOptions, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
 import { type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
 
-type StepKey = "goal" | "commitment" | "event" | "schedule" | "duration" | "split" | "experience" | "recent_training" | "recovery" | "review";
+type StepKey = "goal" | "commitment" | "event" | "schedule" | "split" | "experience" | "recent_training" | "recovery" | "review";
 
 const goalOptions: Array<{ value: TrainingSetupGoal; label: string; detail: string }> = [
   { value: "build_muscle", label: "Hypertrophy", detail: "Build muscle with productive volume and steady performance." },
@@ -63,9 +65,9 @@ const unitOptions: Array<{ value: UnitSystem; label: string; detail: string }> =
 ];
 
 const continuityOptions: Array<{ value: CanonicalStartingVolumeContext["continuity"]; label: string; detail: string }> = [
-  { value: "currently_training", label: "Yes — I’m training consistently", detail: "Use my recent routine as a provisional starting point while ASC learns my completed training." },
-  { value: "short_layoff", label: "I’ve had a short break", detail: "A break of roughly one to six weeks. Keep my experience, but ease the first weeks back." },
-  { value: "extended_layoff", label: "I’ve been away for longer", detail: "More than six weeks without consistent lifting. Use a lower re-entry dose without relabelling my experience." },
+  { value: "currently_training", label: "Yes — I’m training consistently", detail: "Use my recent routine to choose an appropriate starting workload." },
+  { value: "short_layoff", label: "I’ve had a short break", detail: "Keep my experience in mind, but ease me back into regular training." },
+  { value: "extended_layoff", label: "I’ve been away for longer", detail: "Start more conservatively while I rebuild training consistency." },
 ];
 
 const recentWorkloadOptions: Array<{ value: CanonicalStartingVolumeContext["recentSessionWorkload"]; label: string; detail: string }> = [
@@ -81,12 +83,13 @@ const perceivedRecoveryOptions: Array<{ value: CanonicalStartingVolumeContext["r
 ];
 
 const concurrentSportOptions: Array<{ value: CanonicalStartingVolumeContext["concurrentSport"]; label: string; detail: string }> = [
-  { value: "none", label: "No regular lower-body sport", detail: "Your lifting plan owns the resistance-training recovery budget." },
+  { value: "none", label: "No regular lower-body sport", detail: "Plan recovery around lifting." },
   { value: "lower_body_loading", label: "Yes — regular sport or running", detail: "Account for meaningful lower-body loading outside the gym." },
 ];
 
 export default function OnboardingScreen() {
-  const { settings, updateSettings } = useAppSettings();
+  const { settings } = useAppSettings();
+  const scrollRef = useRef<ScrollView | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
   const [unit, setUnit] = useState<UnitSystem>(settings.unit);
   const [setupGoal, setSetupGoal] = useState<TrainingSetupGoal>("build_muscle");
@@ -95,7 +98,7 @@ export default function OnboardingScreen() {
   const [targetDate, setTargetDate] = useState("2026-12-01");
   const [daysPerWeek, setDaysPerWeek] = useState<TrainingDaysPerWeek>(5);
   const [availableSessionMinutes, setAvailableSessionMinutes] = useState<CanonicalSessionDurationMinutes>(settings.availableSessionMinutes);
-  const [preferredSplit, setPreferredSplit] = useState<PreferredSplit>("push_pull_legs");
+  const [preferredSplit, setPreferredSplit] = useState<PreferredSplit>("let_app_choose");
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(settings.experienceLevel);
   const [recoveryCardioPreference, setRecoveryCardioPreference] = useState<RecoveryCardioPreference>(settings.recoveryCardioPreference);
   const [continuity, setContinuity] = useState<CanonicalStartingVolumeContext["continuity"]>(settings.startingVolumeContext.continuity);
@@ -104,16 +107,10 @@ export default function OnboardingScreen() {
   const [perceivedRecovery, setPerceivedRecovery] = useState<CanonicalStartingVolumeContext["recovery"]>(settings.startingVolumeContext.recovery);
   const [concurrentSport, setConcurrentSport] = useState<CanonicalStartingVolumeContext["concurrentSport"]>(settings.startingVolumeContext.concurrentSport);
   const [creationError, setCreationError] = useState<string | null>(null);
+  const [creationPending, setCreationPending] = useState(false);
+  const [creationAttempt, setCreationAttempt] = useState<Readonly<{ fingerprint: string; timestamp: string }> | null>(null);
 
-  const steps = useMemo(() => {
-    const next: StepKey[] = ["goal", "commitment"];
-    if (commitmentType === "event_driven") next.push("event");
-    next.push("schedule", "duration", "split", "experience", "recent_training", "recovery", "review");
-    return next;
-  }, [commitmentType]);
-  const step = steps[Math.min(stepIndex, steps.length - 1)] ?? "goal";
   const trainingGoalId = trainingGoalIdForSetup(setupGoal);
-  const splitOptions = frameworkOptionsForGoal(trainingGoalId, daysPerWeek);
   const compatibleEventOptions = eventOptions.filter((option) => isTrainingEventTypeCompatibleWithGoal(trainingGoalId, option.value));
   const selectedEventType = isTrainingEventTypeCompatibleWithGoal(trainingGoalId, eventType) ? eventType : compatibleEventOptions[0]?.value ?? "custom";
   const trainingCommitment = deriveTrainingCommitment({
@@ -122,10 +119,58 @@ export default function OnboardingScreen() {
     eventType: selectedEventType,
     targetDate,
   });
-  const effectivePlanningChoice: PlanningChoice = trainingCommitment.commitmentType === "event_driven" ? "custom_date_event" : "recommended_12_month";
-  const effectiveEventType: EventType | undefined =
-    trainingCommitment.commitmentType === "event_driven" ? eventTypeForTrainingCommitment(selectedEventType) : undefined;
+  const normalizedRecentTraining = normalizeRecentTrainingInput({ continuity, recentTrainingDaysPerWeek });
+  const startingVolumeContext = useMemo<CanonicalStartingVolumeContext>(() => ({
+    continuity: normalizedRecentTraining.continuity,
+    recentTrainingDaysPerWeek: normalizedRecentTraining.recentTrainingDaysPerWeek,
+    recentSessionWorkload,
+    recentSessionDurationMinutes: recentSessionWorkload === "light" ? 45 : recentSessionWorkload === "high" ? 90 : 60,
+    recovery: perceivedRecovery,
+    history: "none",
+    workCapacity: "not_demonstrated",
+    concurrentSport,
+    loadConfidence: "calibration_required",
+    dosageConfidence: normalizedRecentTraining.continuity === "currently_training" ? "declared_recent_training" : "low_after_layoff",
+  }), [concurrentSport, normalizedRecentTraining.continuity, normalizedRecentTraining.recentTrainingDaysPerWeek, perceivedRecovery, recentSessionWorkload]);
+  const splitOptions = useMemo(() => resolveExecutableOnboardingFrameworks({
+    goalId: trainingGoalId,
+    goal: programmeGoalForSetup(setupGoal, experienceLevel),
+    macrocycleGoal: setupGoal,
+    targetDate: trainingCommitment.targetDate,
+    daysPerWeek,
+    experienceLevel,
+    equipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight", "bands", "other"],
+    units: unit,
+    recoveryCardioPreference,
+    availableSessionMinutes,
+    startingVolumeContext,
+    exercises: exerciseLibrary,
+  }), [
+    availableSessionMinutes,
+    daysPerWeek,
+    experienceLevel,
+    recoveryCardioPreference,
+    setupGoal,
+    startingVolumeContext,
+    trainingCommitment.targetDate,
+    trainingGoalId,
+    unit,
+  ]);
+  const steps = useMemo(
+    () => onboardingStepKeys({
+      eventDriven: commitmentType === "event_driven",
+      frameworkOptionCount: splitOptions.length,
+    }) as readonly StepKey[],
+    [commitmentType, splitOptions.length],
+  );
+  const step = steps[Math.min(stepIndex, steps.length - 1)] ?? "goal";
   const progressLabel = `${Math.min(stepIndex + 1, steps.length)} of ${steps.length}`;
+  const selectedFramework = splitOptions.find((option) => option.value === preferredSplit);
+  const frameworkSummary = selectedFramework
+    ? selectedFramework.value === "let_app_choose"
+      ? `${selectedFramework.label} · ${selectedFramework.resolvedLabel}`
+      : selectedFramework.label
+    : "Framework unavailable";
 
   const goNext = () => setStepIndex((current) => Math.min(current + 1, steps.length - 1));
   const goBack = () => setStepIndex((current) => Math.max(0, current - 1));
@@ -136,66 +181,95 @@ export default function OnboardingScreen() {
       setEventType(getCompatibleTrainingEventTypes(nextGoalId)[0] ?? "custom");
     }
   };
-  const chooseDaysPerWeek = (days: TrainingDaysPerWeek) => {
-    setDaysPerWeek(days);
-    if (!getCustomerFrameworksForFrequency(days).includes(preferredSplit as "full_body" | "upper_lower" | "push_pull_legs")) {
-      setPreferredSplit(getRecommendedCustomerFramework(trainingGoalId, days) ?? "full_body");
-    }
+  const chooseRecentTrainingDays = (days: CanonicalStartingVolumeContext["recentTrainingDaysPerWeek"]) => {
+    setRecentTrainingDaysPerWeek(days);
+    if (days === 0 && continuity === "currently_training") setContinuity("short_layoff");
+  };
+  const chooseContinuity = (value: CanonicalStartingVolumeContext["continuity"]) => {
+    setContinuity(value);
+    if (value === "currently_training" && recentTrainingDaysPerWeek === 0) setRecentTrainingDaysPerWeek(1);
   };
 
+  useEffect(() => {
+    if (!splitOptions.length) return;
+    if (!splitOptions.some((option) => option.value === preferredSplit)) {
+      setPreferredSplit(splitOptions[0]!.value);
+    }
+  }, [preferredSplit, splitOptions]);
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [step]);
+
   const finish = () => {
+    if (creationPending) return;
     setCreationError(null);
-    const now = new Date().toISOString();
-    const startingVolumeContext: CanonicalStartingVolumeContext = {
-      continuity,
-      recentTrainingDaysPerWeek,
-      recentSessionWorkload,
-      recentSessionDurationMinutes: recentSessionWorkload === "light" ? 45 : recentSessionWorkload === "high" ? 90 : 60,
-      recovery: perceivedRecovery,
-      history: "none",
-      workCapacity: "not_demonstrated",
-      concurrentSport,
-      loadConfidence: "calibration_required",
-      dosageConfidence: continuity === "currently_training" ? "declared_recent_training" : "low_after_layoff",
-    };
-    const committed = canonicalActivePlanState.completeOnboarding({
-      planId: `canonical-plan:${now}`,
-      createdAt: now,
-      updatedAt: now,
-      goal: programmeGoalForSetup(setupGoal, experienceLevel),
-      macrocycleGoal: setupGoal,
+    setCreationPending(true);
+    const fingerprint = JSON.stringify({
+      setupGoal,
       targetDate: trainingCommitment.targetDate,
       daysPerWeek,
+      availableSessionMinutes,
       preferredSplit,
       experienceLevel,
-      equipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight", "bands", "other"],
-      units: unit,
+      unit,
       recoveryCardioPreference,
-      availableSessionMinutes,
       startingVolumeContext,
-      exercises: exerciseLibrary,
+    });
+    const attempt = creationAttempt?.fingerprint === fingerprint
+      ? creationAttempt
+      : { fingerprint, timestamp: new Date().toISOString() };
+    if (creationAttempt?.fingerprint !== fingerprint) setCreationAttempt(attempt);
+    const trainingGoal = programmeGoalForSetup(setupGoal, experienceLevel);
+    const committed = completeCanonicalOnboardingSetup({
+      command: {
+        planId: `canonical-plan:${attempt.timestamp}`,
+        createdAt: attempt.timestamp,
+        updatedAt: attempt.timestamp,
+        goal: trainingGoal,
+        macrocycleGoal: setupGoal,
+        targetDate: trainingCommitment.targetDate,
+        daysPerWeek,
+        preferredSplit,
+        experienceLevel,
+        equipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight", "bands", "other"],
+        units: unit,
+        recoveryCardioPreference,
+        availableSessionMinutes,
+        startingVolumeContext,
+        exercises: exerciseLibrary,
+      },
+      settings: {
+        unit,
+        trainingGoal,
+        experienceLevel,
+        recoveryCardioPreference,
+        availableSessionMinutes,
+        startingVolumeContext,
+      },
     });
     if (committed.status !== "saved") {
       const durationFailure = committed.reason.includes("chronic_volume_floor_unmet");
+      const activeAttemptFailure = committed.reason === "active_attempt_must_be_completed_or_discarded";
+      console.error("[onboarding:programme-creation]", {
+        reason: committed.reason,
+        priorRevision: committed.priorRevision,
+        requestedDays: daysPerWeek,
+        requestedDuration: availableSessionMinutes,
+      });
       setCreationError(durationFailure
         ? `This ${availableSessionMinutes}-minute, ${daysPerWeek}-day schedule cannot retain the required rolling training coverage. Choose longer workouts or fewer training days.`
-        : "Your programme could not be saved safely. Nothing was changed; review your choices and try again.");
+        : activeAttemptFailure
+          ? "Finish or discard your current workout, then return here to create this programme. Your choices are still saved on this screen."
+          : `Your programme was not changed (${programmeCreationReason(committed.reason)}). Review your choices and try again.`);
+      setCreationPending(false);
       return;
     }
-    updateSettings({
-      unit,
-      trainingGoal: programmeGoalForSetup(setupGoal, experienceLevel),
-      experienceLevel,
-      recoveryCardioPreference,
-      availableSessionMinutes,
-      startingVolumeContext,
-      onboardingCompleted: true,
-    });
+    setCreationPending(false);
     router.replace("/(protected)");
   };
 
   return (
-    <AppScreen bottom={64}>
+    <AppScreen bottom={96} respectTopSafeArea scrollRef={scrollRef}>
       <Stack.Screen options={{ title: step === "review" ? "Your Programme" : "Welcome" }} />
       <HeroPanel eyebrow={`Setup · ${progressLabel}`} title={titleForStep(step)} subtitle={subtitleForStep(step)} />
       <ProgressDots count={steps.length} active={stepIndex} />
@@ -215,21 +289,26 @@ export default function OnboardingScreen() {
         </View>
       ) : null}
       {step === "schedule" ? (
-        <OptionList<TrainingDaysPerWeek>
-          options={trainingFrequencyOptions.map((day) => {
-            const frequency = deriveTrainingFrequency(day);
-            return { value: day, label: `${day} days`, detail: frequency.internalMeaning };
-          })}
-          selected={daysPerWeek}
-          onSelect={chooseDaysPerWeek}
-        />
-      ) : null}
-      {step === "duration" ? (
-        <OptionList<CanonicalSessionDurationMinutes>
-          options={canonicalSessionDurationOptions.map((minutes) => ({ value: minutes, label: `${minutes} minutes`, detail: "Maximum time available for each workout. ASC keeps required coverage or asks you to choose a viable option." }))}
-          selected={availableSessionMinutes}
-          onSelect={setAvailableSessionMinutes}
-        />
+        <View style={{ gap: spacing.xl }}>
+          <View style={{ gap: spacing.sm }}>
+            <Text selectable style={{ ...type.section, color: colors.text }}>Training days</Text>
+            <OptionList<TrainingDaysPerWeek>
+              options={trainingFrequencyOptions.map((day) => ({ value: day, label: `${day} days` }))}
+              selected={daysPerWeek}
+              onSelect={setDaysPerWeek}
+              guidance="Choose the number of training days you can repeat most weeks."
+            />
+          </View>
+          <View style={{ gap: spacing.sm }}>
+            <Text selectable style={{ ...type.section, color: colors.text }}>Workout length</Text>
+            <OptionList<CanonicalSessionDurationMinutes>
+              options={canonicalSessionDurationOptions.map((minutes) => ({ value: minutes, label: `${minutes} minutes` }))}
+              selected={availableSessionMinutes}
+              onSelect={setAvailableSessionMinutes}
+              guidance="Choose the time you can reliably protect for each workout."
+            />
+          </View>
+        </View>
       ) : null}
       {step === "split" ? <OptionList<PreferredSplit> options={splitOptions} selected={preferredSplit} onSelect={setPreferredSplit} /> : null}
       {step === "experience" ? (
@@ -241,13 +320,14 @@ export default function OnboardingScreen() {
       ) : null}
       {step === "recent_training" ? (
         <View style={{ gap: spacing.lg }}>
-          <OptionList<CanonicalStartingVolumeContext["continuity"]> options={continuityOptions} selected={continuity} onSelect={setContinuity} />
+          <OptionList<CanonicalStartingVolumeContext["continuity"]> options={continuityOptions} selected={continuity} onSelect={chooseContinuity} />
           <PremiumCard>
             <Text selectable style={{ ...type.label, color: colors.textSubtle }}>Recent training days</Text>
             <OptionList<CanonicalStartingVolumeContext["recentTrainingDaysPerWeek"]>
-              options={([0, 1, 2, 3, 4, 5, 6, 7] as const).map((days) => ({ value: days, label: `${days} ${days === 1 ? "day" : "days"} per week`, detail: days === 0 ? "No consistent lifting recently." : "Your actual recent average, not your intended schedule." }))}
+              options={([0, 1, 2, 3, 4, 5, 6, 7] as const).map((days) => ({ value: days, label: `${days} ${days === 1 ? "day" : "days"} per week` }))}
               selected={recentTrainingDaysPerWeek}
-              onSelect={setRecentTrainingDaysPerWeek}
+              onSelect={chooseRecentTrainingDays}
+              guidance="Choose your actual recent average, not your intended schedule."
             />
           </PremiumCard>
           <PremiumCard>
@@ -274,7 +354,7 @@ export default function OnboardingScreen() {
           commitment={trainingCommitment.userFacingSummary}
           daysPerWeek={daysPerWeek}
           availableSessionMinutes={availableSessionMinutes}
-          framework={labelFor(splitOptions, preferredSplit)}
+          framework={frameworkSummary}
           experience={labelForExperience(experienceLevel)}
           recentTraining={`${labelFor(continuityOptions, continuity)} · ${recentTrainingDaysPerWeek} days/week · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`}
           recoveryCapacity={labelFor(recoveryCardioOptions, recoveryCardioPreference)}
@@ -287,7 +367,11 @@ export default function OnboardingScreen() {
       <View style={{ flexDirection: "row", gap: spacing.sm }}>
         {stepIndex > 0 ? <SecondaryButton label="Back" onPress={goBack} /> : null}
         <View style={{ flex: 1 }}>
-          <PrimaryButton label={step === "review" ? "Create Programme" : "Continue"} onPress={step === "review" ? finish : goNext} />
+          <PrimaryButton
+            label={step === "review" ? creationPending ? "Creating Programme…" : "Create Programme" : "Continue"}
+            onPress={step === "review" ? finish : goNext}
+            disabled={creationPending || (step === "split" && splitOptions.length === 0)}
+          />
         </View>
       </View>
     </AppScreen>
@@ -298,10 +382,12 @@ function OptionList<T extends string | number>({
   options,
   selected,
   onSelect,
+  guidance,
 }: {
-  options: Array<{ value: T; label: string; detail: string }>;
+  options: readonly Readonly<{ value: T; label: string; detail?: string }>[];
   selected: T;
   onSelect(value: T): void;
+  guidance?: string;
 }) {
   return (
     <View style={{ gap: spacing.sm }}>
@@ -328,12 +414,15 @@ function OptionList<T extends string | number>({
             <Text selectable style={{ color: active ? colors.accent : colors.text, fontSize: 17, lineHeight: 22, fontWeight: "900" }}>
               {option.label}
             </Text>
-            <Text selectable style={{ color: colors.textMuted, fontSize: 13, lineHeight: 19 }}>
-              {option.detail}
-            </Text>
+            {option.detail ? (
+              <Text selectable style={{ color: colors.textMuted, fontSize: 13, lineHeight: 19 }}>
+                {option.detail}
+              </Text>
+            ) : null}
           </Pressable>
         );
       })}
+      {guidance ? <Text selectable style={{ ...type.body, color: colors.textMuted }}>{guidance}</Text> : null}
     </View>
   );
 }
@@ -460,9 +549,8 @@ function titleForStep(step: StepKey): string {
     goal: "What are you training for?",
     commitment: "Are you training for something specific?",
     event: "Set the target",
-    schedule: "How many days can you realistically commit to training every week?",
-    duration: "How much time do you have for each workout?",
-    split: "Preferred split",
+    schedule: "What fits your week?",
+    split: "Choose a training framework",
     experience: "How would you describe your lifting experience?",
     recent_training: "What has your recent training looked like?",
     recovery: "Recovery & Cardio",
@@ -475,13 +563,13 @@ function subtitleForStep(step: StepKey): string {
   if (step === "schedule") {
     return "Choose the number you can consistently achieve. You can change this later and ASC will adjust your programme.";
   }
-  if (step === "duration") return "Choose the time you can reliably protect. This is separate from how many days you train.";
+  if (step === "split") return "Every option shown can build a complete programme from your choices.";
   if (step === "experience") {
     return "This helps ASC choose an appropriate starting coaching strategy. It will continue learning from your training over time.";
   }
-  if (step === "recent_training") return "This is separate from experience. It helps ASC choose a realistic first dose while load calibration and completed training build confidence.";
+  if (step === "recent_training") return "Your recent routine helps set an appropriate starting workload.";
   if (step === "review") return "Confirm your setup before ASC builds your first programme.";
-  return "Build the year. Autoregulate the workout.";
+  return "A few clear choices are enough to build your programme.";
 }
 
 function labelFor<T extends string | number>(options: Array<{ value: T; label: string }>, value: T): string {
@@ -504,25 +592,18 @@ function trainingGoalIdForSetup(goal: TrainingSetupGoal): TrainingGoalId {
   return "build_muscle";
 }
 
-function eventTypeForTrainingCommitment(eventType: TrainingEventType): EventType {
-  if (eventType === "athletic_event_or_season") return "sport_season";
-  if (eventType === "holiday_or_photoshoot") return "photoshoot";
-  if (eventType === "physique_event") return "photoshoot";
-  return eventType;
-}
-
-function frameworkOptionsForGoal(goalId: TrainingGoalId, daysPerWeek: TrainingDaysPerWeek): Array<{ value: PreferredSplit; label: string; detail: string }> {
-  return getSelectableFrameworkOptionsForGoal(goalId, daysPerWeek).map((option) => ({
-    value: option.id as PreferredSplit,
-    label: option.displayName,
-    detail: `${option.isDefaultRecommendation ? "Recommended · " : ""}${option.shortDescription}`,
-  }));
-}
-
 function programmeGoalForSetup(goal: TrainingSetupGoal, experienceLevel: ExperienceLevel): ProgrammeGoal {
   if (goal === "build_strength" || goal === "build_muscle_and_strength") return "strength_hypertrophy";
   if (goal === "powerlifting_meet") return "strength_hypertrophy";
   if (goal === "get_leaner") return "body_recomposition";
   if (experienceLevel === "beginner") return "beginner_hypertrophy";
   return "hypertrophy";
+}
+
+function programmeCreationReason(reason: string): string {
+  if (reason === "stale_plan_revision") return "the programme changed while it was being saved";
+  if (reason === "atomic_onboarding_commit_failed") return "local storage did not confirm the save";
+  if (reason.startsWith("unrestorable_existing_plan:")) return "the existing programme needs recovery first";
+  if (reason.includes("unsupported_framework")) return "the selected framework is no longer compatible";
+  return "the programme could not be validated";
 }

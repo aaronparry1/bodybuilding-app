@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "canonical_onboarding_programme_integrity_repair_v1",
+  "protectedBaseline": "c2d1b5b3f3aef31683762115154075bfda712ca5",
+  "reportedFixture": {
+    "goal": "hypertrophy",
+    "targetDate": null,
+    "trainingDays": 5,
+    "workoutMinutes": 90,
+    "experience": "advanced",
+    "recentTraining": "currently_training",
+    "recentTrainingDays": 3,
+    "recentSessionWorkload": "high",
+    "recovery": "ordinary",
+    "concurrentSport": "none",
+    "recoveryCardio": "recommended"
+  },
+  "rootCause": {
+    "freshCanonicalConstruction": "constructed",
+    "freshPlannedSessions": 5,
+    "saveFailureTrigger": "active_attempt_must_be_completed_or_discarded",
+    "evidence": [
+      "The fresh reported fixture constructs and validates.",
+      "The pre-repair commit owner rejects an existing started or paused ledger attempt before writing.",
+      "The pre-repair onboarding screen collapsed every non-duration rejection into one generic save message.",
+      "The reported Home screen showing an in-progress workout is evidence of the retained pre-existing active attempt, not a successfully created partial programme."
+    ]
+  },
+  "supportedFiveDayHypertrophyChoices": [
+    {
+      "choice": "asc_recommended",
+      "requestedValue": "let_app_choose",
+      "resolvedFramework": "push_pull_legs",
+      "construction": "constructed"
+    },
+    {
+      "choice": "push_pull_legs",
+      "requestedValue": "push_pull_legs",
+      "resolvedFramework": "push_pull_legs",
+      "construction": "constructed"
+    },
+    {
+      "choice": "upper_lower",
+      "requestedValue": "upper_lower",
+      "resolvedFramework": "upper_lower",
+      "construction": "constructed"
+    },
+    {
+      "choice": "full_body",
+      "requestedValue": "full_body",
+      "resolvedFramework": "full_body",
+      "construction": "constructed"
+    },
+    {
+      "choice": "body_part_split",
+      "requestedValue": "body_part_split",
+      "resolvedFramework": "body_part_split",
+      "construction": "constructed"
+    }
+  ],
+  "onboardingFieldDisposition": [
+    {
+      "field": "goal",
+      "classification": "required_before_programme_generation",
+      "presentation": "retained"
+    },
+    {
+      "field": "target_commitment",
+      "classification": "required_before_programme_generation",
+      "presentation": "retained; target details remain conditional"
+    },
+    {
+      "field": "training_days",
+      "classification": "required_before_programme_generation",
+      "presentation": "merged with workout length"
+    },
+    {
+      "field": "workout_length",
+      "classification": "required_before_programme_generation",
+      "presentation": "merged with training days; repeated option copy removed"
+    },
+    {
+      "field": "framework",
+      "classification": "derived_then_optional_choice",
+      "presentation": "executable choices only; sole valid choice is automatic"
+    },
+    {
+      "field": "experience",
+      "classification": "required_before_programme_generation",
+      "presentation": "retained"
+    },
+    {
+      "field": "recent_continuity_days_and_workload",
+      "classification": "required_before_programme_generation",
+      "presentation": "retained together; zero days deterministically resolves a contradictory consistent state"
+    },
+    {
+      "field": "recovery_and_concurrent_sport",
+      "classification": "required_before_programme_generation",
+      "presentation": "retained in the compact recent-training screen"
+    },
+    {
+      "field": "recovery_cardio",
+      "classification": "safely_defaultable_but_meaningful_preference",
+      "presentation": "retained as one compact choice"
+    },
+    {
+      "field": "units",
+      "classification": "safely_defaultable",
+      "presentation": "uses stored preference and remains editable on review"
+    }
+  ],
+  "stepCounts": {
+    "continuousDevelopmentBefore": 9,
+    "continuousDevelopmentAfterMultipleFrameworks": 8,
+    "continuousDevelopmentAfterSingleFramework": 7,
+    "eventDrivenBefore": 10,
+    "eventDrivenAfterMultipleFrameworks": 9,
+    "eventDrivenAfterSingleFramework": 8
+  },
+  "reportedPushSession": {
+    "role": "Push hypertrophy A",
+    "exerciseCount": 6,
+    "workingSetCount": 22,
+    "estimatedDurationMinutes": 60,
+    "source": "one canonical_session_snapshot_v3",
+    "durationInputs": [
+      "warm-up and ramp allowance",
+      "working sets",
+      "prescribed rest",
+      "setup and exercise transitions",
+      "method structure"
+    ]
+  },
+  "atomicity": {
+    "planAndSettingsUserVisibleCommit": true,
+    "settingsFailureRestoresPriorCarrier": true,
+    "identicalRetryIdempotent": true,
+    "activeAttemptRejectedBeforeWrite": true,
+    "technicalReasonLoggedWithoutWorkoutContent": true
+  },
+  "initialState": {
+    "sessionPosition": "Session 1 of 5",
+    "completedSessions": "0 of 5 sessions completed",
+    "completedWorkingSets": 0,
+    "lifecycle": "planned",
+    "cta": "Start workout",
+    "continueRequiresExplicitLedgerStart": true
+  },
+  "renderedEvidence": {
+    "beforeOnboardingReview": "qa-reports/release-candidate/native-screenshots/narrow/00-onboarding-review.png",
+    "afterOnboardingStart": "qa-reports/onboarding-programme-integrity/after-onboarding-start-390x844.png",
+    "afterFiveDayFrameworks": "qa-reports/onboarding-programme-integrity/after-five-day-frameworks-390x844.png",
+    "beforeHomePlanned": "qa-reports/design-qa/global-shell-home/screenshots/home-planned-390x844.png",
+    "afterHomePlanned": "qa-reports/onboarding-programme-integrity/after-home-planned-390x844.png",
+    "viewport": "390x844"
+  },
+  "verification": {
+    "focusedTests": {
+      "filesPassed": 12,
+      "testsPassed": 106
+    },
+    "fullSuite": {
+      "filesPassed": 361,
+      "testsPassed": 2150,
+      "failures": 0
+    },
+    "typecheck": "passed",
+    "expoPublicConfig": "passed",
+    "webExport": "passed",
+    "productionPayloadScan": "passed",
+    "buildUploadDeployPerformed": false
+  }
+}

@@ -33,16 +33,28 @@ describe("canonical customer programme framework rules", () => {
     for (const days of [2, 3, 4, 5, 6] as const) {
       const options = getSelectableFrameworkOptionsForGoal("build_muscle", days);
       const recommended = getRecommendedCustomerFramework("build_muscle", days);
-      expect(options).toHaveLength(getCustomerFrameworksForFrequency(days).length);
+      expect(options.length).toBeGreaterThanOrEqual(getCustomerFrameworksForFrequency(days).length);
       expect(options.filter((option) => option.isDefaultRecommendation).map((option) => option.id)).toEqual([recommended]);
     }
   });
 
   it("rejects incompatible public preferences before construction", () => {
-    expect(resolveCanonicalProgrammeFramework({ goal: "build_muscle", sessionsPerWeek: 5, requested: "upper_lower" })).toEqual({ status: "unsupported", reason: "unsupported_framework" });
+    expect(resolveCanonicalProgrammeFramework({ goal: "build_muscle", sessionsPerWeek: 6, requested: "upper_lower" })).toEqual({ status: "unsupported", reason: "unsupported_framework" });
     expect(resolveCanonicalProgrammeFramework({ goal: "build_muscle", sessionsPerWeek: 2, requested: "push_pull_legs" })).toEqual({ status: "unsupported", reason: "unsupported_framework" });
     expect(resolveCanonicalProgrammeFramework({ goal: "build_strength", sessionsPerWeek: 4, requested: "bench_squat_deadlift" })).toEqual({ status: "unsupported", reason: "unsupported_framework" });
     expect(resolveCanonicalProgrammeFramework({ goal: "build_muscle", sessionsPerWeek: 4, requested: "body_part_split" })).toEqual({ status: "unsupported", reason: "unsupported_framework" });
+  });
+
+  it("supports every canonical five-day hypertrophy framework the engine can execute", () => {
+    expect(getSelectableFrameworkOptionsForGoal("build_muscle", 5).map((option) => option.id)).toEqual([
+      "push_pull_legs",
+      "upper_lower",
+      "full_body",
+      "body_part_split",
+    ]);
+    for (const requested of ["push_pull_legs", "upper_lower", "full_body", "body_part_split"] as const) {
+      expect(resolveCanonicalProgrammeFramework({ goal: "build_muscle", sessionsPerWeek: 5, requested }).status).toBe("resolved");
+    }
   });
 
   it("keeps four- and five-day PPL recognisable and rolling", () => {
@@ -60,9 +72,10 @@ describe("canonical customer programme framework rules", () => {
 
   it("keeps onboarding free of internal framework choices", () => {
     const source = readFileSync("app/(protected)/onboarding.tsx", "utf8");
-    expect(source).toContain("getSelectableFrameworkOptionsForGoal(goalId, daysPerWeek)");
-    expect(source).not.toContain("ASC Recommended");
-    expect(source).not.toContain("Body Part Split");
+    const setup = readFileSync("src/application/training/canonical-onboarding-setup.ts", "utf8");
+    expect(source).toContain("resolveExecutableOnboardingFrameworks");
+    expect(setup).toContain("getSelectableFrameworkOptionsForGoal");
+    expect(setup).toContain('label: "ASC Recommended"');
     expect(source).not.toContain("Bench/Squat/Deadlift");
   });
 

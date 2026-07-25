@@ -8,8 +8,8 @@ export type ProgrammeFrameworkGoal =
   | "athletic_performance"
   | "build_muscle_strength";
 
-/** The three framework preferences an athlete can choose. */
-export type CustomerProgrammeFrameworkId = "push_pull_legs" | "upper_lower" | "full_body";
+/** Framework preferences that can be shown only when canonical construction supports them. */
+export type CustomerProgrammeFrameworkId = "push_pull_legs" | "upper_lower" | "full_body" | "body_part_split";
 
 /** Internal delivery strategies are Microcycle-owned and never onboarding choices. */
 export type InternalProgrammeDeliveryStrategy =
@@ -21,7 +21,7 @@ export type InternalProgrammeDeliveryStrategy =
   | "hypertrophy_asymmetric_rotation";
 
 export type ProgrammeFrameworkId =
-  | CustomerProgrammeFrameworkId
+  | Exclude<CustomerProgrammeFrameworkId, "body_part_split">
   | "chest_back_shoulders_arms_legs"
   | "bench_squat_deadlift";
 
@@ -78,6 +78,7 @@ export const customerFrameworkFrequencyPolicy = {
     full_body: "Distributes the core patterns across a lower-frequency week without leaving a body area untrained.",
     upper_lower: "Alternates complementary upper and lower exposures with predictable recovery.",
     push_pull_legs: "Uses a recognisable push, pull and legs rotation that can roll across calendar weeks.",
+    body_part_split: "Uses distinct body-area sessions when five training days provide complete weekly coverage.",
   },
 } as const;
 
@@ -120,6 +121,7 @@ const frameworkDisplay: Record<CustomerProgrammeFrameworkId, Pick<ProgrammeFrame
   push_pull_legs: { displayName: "Push/Pull/Legs", shortDescription: "A rolling push, pull and legs rotation for three to six training days." },
   upper_lower: { displayName: "Upper/Lower", shortDescription: "Complementary upper and lower sessions, especially effective across four days." },
   full_body: { displayName: "Full Body", shortDescription: "Varied full-body sessions that distribute key patterns across a lower-frequency week." },
+  body_part_split: { displayName: "Body-Part Split", shortDescription: "Distinct chest, back, shoulders, arms and legs sessions across five training days." },
 };
 
 export function getCustomerFrameworksForFrequency(sessionsPerWeek: number): readonly CustomerProgrammeFrameworkId[] {
@@ -136,10 +138,13 @@ export function getRecommendedCustomerFramework(goal: TrainingGoalId, sessionsPe
   return "push_pull_legs";
 }
 
-/** Public options are frequency-owned. Goal changes which valid option is recommended, not which extra frameworks appear. */
+/** Public options are canonical goal/frequency compatibility, never an onboarding-only list. */
 export function getSelectableFrameworkOptionsForGoal(goal: TrainingGoalId, sessionsPerWeek = 3): ProgrammeFrameworkOption[] {
   const recommended = getRecommendedCustomerFramework(goal, sessionsPerWeek);
-  return getCustomerFrameworksForFrequency(sessionsPerWeek).map((id) => ({
+  const ids: readonly CustomerProgrammeFrameworkId[] = sessionsPerWeek === 5 && (goal === "build_muscle" || goal === "lose_fat")
+    ? ["push_pull_legs", "upper_lower", "full_body", "body_part_split"]
+    : getCustomerFrameworksForFrequency(sessionsPerWeek);
+  return ids.map((id) => ({
     id,
     displayName: frameworkDisplay[id].displayName,
     suitability: id === recommended ? "best" : "recommended",
@@ -149,7 +154,7 @@ export function getSelectableFrameworkOptionsForGoal(goal: TrainingGoalId, sessi
   }));
 }
 
-/** Compatibility API now returns only the three customer-facing choices. */
+/** Compatibility API returns customer-facing framework identities only. */
 export function getFrameworkOptionsForGoal(goal: TrainingGoalId): ProgrammeFrameworkOption[] {
   return (["full_body", "upper_lower", "push_pull_legs"] as const).map((id) => ({
     id,
@@ -184,9 +189,26 @@ export function resolveCanonicalProgrammeFramework(input: Readonly<{ goal: Train
   const publicPreference = input.requested === "let_app_choose"
     ? getRecommendedCustomerFramework(trainingGoalForFrameworkGoal(goal), input.sessionsPerWeek)
     : customerPreference(input.requested);
-  if (!publicPreference || !getCustomerFrameworksForFrequency(input.sessionsPerWeek).includes(publicPreference)) return { status: "unsupported", reason: "unsupported_framework" };
+  const goalSpecificFiveDayFramework = input.sessionsPerWeek === 5
+    && (goal === "hypertrophy" || goal === "get_lean")
+    && (publicPreference === "upper_lower" || publicPreference === "full_body" || publicPreference === "body_part_split");
+  if (!publicPreference || (!getCustomerFrameworksForFrequency(input.sessionsPerWeek).includes(publicPreference) && !goalSpecificFiveDayFramework)) return { status: "unsupported", reason: "unsupported_framework" };
   const morphPolicy = resolveCanonicalFrameworkMorph({ goal, phase: input.phase, publicPreference, sessionsPerWeek: input.sessionsPerWeek });
-  return { status: "resolved", goal, requested: input.requested, publicPreference, framework: morphPolicy.internalFramework, reason: morphPolicy.internalFramework === publicPreference ? input.requested === "let_app_choose" ? "asc_recommended_for_frequency" : "explicit_supported_preference" : "phase_specific_morph", morphPolicy };
+  const isPreferenceTranslation = publicPreference === "body_part_split"
+    && morphPolicy.internalFramework === "chest_back_shoulders_arms_legs";
+  return {
+    status: "resolved",
+    goal,
+    requested: input.requested,
+    publicPreference,
+    framework: morphPolicy.internalFramework,
+    reason: morphPolicy.internalFramework === publicPreference || isPreferenceTranslation
+      ? input.requested === "let_app_choose"
+        ? "asc_recommended_for_frequency"
+        : "explicit_supported_preference"
+      : "phase_specific_morph",
+    morphPolicy,
+  };
 }
 
 export function resolveCanonicalFrameworkMorph(input: Readonly<{ goal: ProgrammeFrameworkGoal; phase?: string; publicPreference: CustomerProgrammeFrameworkId; sessionsPerWeek: number }>): CanonicalFrameworkMorphPolicy {
@@ -196,10 +218,17 @@ export function resolveCanonicalFrameworkMorph(input: Readonly<{ goal: Programme
     return { schemaVersion: "canonical_framework_morph_policy_v1", publicPreference: input.publicPreference, internalFramework: "bench_squat_deadlift", deliveryStrategy: "lift_emphasis_rotation", sessionIdentity: "lift_emphasis_preserving_preference", rationaleCodes: [`preference:${input.publicPreference}`, `phase:${phase}`, "main_lift_priority", "hypertrophy_assistance_retained"] };
   }
   if (input.goal === "athletic_performance" && /power|pre_competition/.test(phase)) {
-    return { schemaVersion: "canonical_framework_morph_policy_v1", publicPreference: input.publicPreference, internalFramework: input.publicPreference, deliveryStrategy: "athletic_asymmetric_rotation", sessionIdentity: "athletic_delivery_preserving_preference", rationaleCodes: [`preference:${input.publicPreference}`, `phase:${phase}`, "power_and_sport_workload_coordinated"] };
+    return { schemaVersion: "canonical_framework_morph_policy_v1", publicPreference: input.publicPreference, internalFramework: internalFrameworkForPreference(input.publicPreference), deliveryStrategy: "athletic_asymmetric_rotation", sessionIdentity: "athletic_delivery_preserving_preference", rationaleCodes: [`preference:${input.publicPreference}`, `phase:${phase}`, "power_and_sport_workload_coordinated"] };
   }
-  const deliveryStrategy: InternalProgrammeDeliveryStrategy = input.publicPreference === "push_pull_legs" ? "classic_push_pull_legs_rotation" : input.publicPreference === "upper_lower" ? "complementary_upper_lower_rotation" : "varied_full_body_rotation";
-  return { schemaVersion: "canonical_framework_morph_policy_v1", publicPreference: input.publicPreference, internalFramework: input.publicPreference, deliveryStrategy, sessionIdentity: "recognisable_preference", rationaleCodes: [`preference:${input.publicPreference}`, `goal:${input.goal}`, "frequency_compatible", "preference_identity_preserved"] };
+  const internalFramework = internalFrameworkForPreference(input.publicPreference);
+  const deliveryStrategy: InternalProgrammeDeliveryStrategy = input.publicPreference === "push_pull_legs"
+    ? "classic_push_pull_legs_rotation"
+    : input.publicPreference === "upper_lower"
+      ? "complementary_upper_lower_rotation"
+      : input.publicPreference === "body_part_split"
+        ? "hypertrophy_asymmetric_rotation"
+        : "varied_full_body_rotation";
+  return { schemaVersion: "canonical_framework_morph_policy_v1", publicPreference: input.publicPreference, internalFramework, deliveryStrategy, sessionIdentity: "recognisable_preference", rationaleCodes: [`preference:${input.publicPreference}`, `goal:${input.goal}`, "frequency_compatible", "preference_identity_preserved"] };
 }
 
 export function frameworkGoalForSetupGoal(goal: TrainingSetupGoal): ProgrammeFrameworkGoal | null {
@@ -227,7 +256,7 @@ export function buildWeeklySessionSequence({ goal, framework, sessionsPerWeek, s
 }
 
 function customerPreference(split: PreferredSplit): CustomerProgrammeFrameworkId | null {
-  return split === "push_pull_legs" || split === "upper_lower" || split === "full_body" ? split : null;
+  return split === "push_pull_legs" || split === "upper_lower" || split === "full_body" || split === "body_part_split" ? split : null;
 }
 
 function trainingGoalForFrameworkGoal(goal: ProgrammeFrameworkGoal): TrainingGoalId {
@@ -236,4 +265,8 @@ function trainingGoalForFrameworkGoal(goal: ProgrammeFrameworkGoal): TrainingGoa
   if (goal === "strength") return "get_stronger";
   if (goal === "build_muscle_strength") return "build_muscle_strength";
   return "athletic_performance";
+}
+
+function internalFrameworkForPreference(preference: CustomerProgrammeFrameworkId): ProgrammeFrameworkId {
+  return preference === "body_part_split" ? "chest_back_shoulders_arms_legs" : preference;
 }

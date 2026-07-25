@@ -37,10 +37,26 @@ export function commitCanonicalOnboardingPlan(command: CanonicalGeneratedPlanInp
   if (previous.status === "saved") {
     const active = inspectActiveAttempt(previous.carrier);
     if (active.status !== "none") return { status: "rejected", reason: active.status === "unsafe" ? active.reason : "active_attempt_must_be_completed_or_discarded", priorRevision: previous.carrier.revision, newRevision: previous.carrier.revision, historyPreserved: true };
+    if (previous.carrier.planId === command.planId && previous.carrier.updatedAt === command.updatedAt) {
+      return {
+        status: "saved",
+        reason: "onboarding_commit_already_applied",
+        priorRevision: previous.carrier.revision,
+        newRevision: previous.carrier.revision,
+        historyPreserved: true,
+      };
+    }
   }
   const planId = previous.status === "saved" ? previous.carrier.planId : command.planId;
   const createdAt = previous.status === "saved" ? previous.carrier.createdAt : command.createdAt;
-  const constructed = constructCanonicalActivePlanFromCanonicalInputs({ ...command, planId, createdAt });
+  const constructed = constructCanonicalActivePlanFromCanonicalInputs({
+    ...command,
+    planId,
+    createdAt,
+    microcycleSequenceNumber: previous.status === "saved"
+      ? previous.carrier.microcycle.output.sequenceNumber + 1
+      : command.microcycleSequenceNumber,
+  });
   if (constructed.status !== "constructed") return { status: "rejected", reason: constructed.reason, priorRevision: previous.status === "saved" ? previous.carrier.revision : null, newRevision: previous.status === "saved" ? previous.carrier.revision : null, historyPreserved: true };
   const nextRevision = previous.status === "saved" ? previous.carrier.revision + 1 : constructed.carrier.revision;
   const next: CanonicalActivePlanCarrier = previous.status === "saved" ? {

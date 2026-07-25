@@ -10,7 +10,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "input": "goal",
       "expected": "structure,dosage,exercise_selection,recovery",
       "status": "certified_or_owner_isolated",
-      "evidence": "120-case compatible construction matrix and five goal-specific strategy records"
+      "evidence": "138-case compatible construction matrix and five goal-specific strategy records"
     },
     {
       "input": "experience",
@@ -28,7 +28,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "input": "framework_preference",
       "expected": "structure,scheduling,exercise_selection",
       "status": "certified_or_owner_isolated",
-      "evidence": "frequency truth table, typed morph tests and paired five-day PPL certifications"
+      "evidence": "frequency compatibility, typed morph tests and paired executable five-day hypertrophy framework certifications"
     },
     {
       "input": "commitment",
@@ -94,7 +94,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       "input": "established_loads",
       "expected": "load",
       "status": "certified_or_owner_isolated",
-      "evidence": "paired five-day calibration/established certifications"
+      "evidence": "paired five-day framework calibration/established certifications"
     },
     {
       "input": "performed_work",
