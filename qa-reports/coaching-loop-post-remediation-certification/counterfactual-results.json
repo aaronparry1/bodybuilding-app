@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "canonical_coaching_loop_post_remediation_counterfactual_v1",
+  "auditedCommit": "2fe93443add4420aaa7d4e3a9a86fdc1a13c8da1",
+  "pairs": [
+    {
+      "pair": "achieved_vs_failed_targets",
+      "expectedDifference": "successful calibration or maintain versus incomplete maintain/recalibration only after qualification",
+      "actualDifference": "success establishes calibration when missing; one failure maintains",
+      "authority": "canonical_progress_evaluation_v3",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PROVEN"
+    },
+    {
+      "pair": "stable_reps_vs_excessive_drop_off",
+      "expectedDifference": "drop-off must not progress",
+      "actualDifference": "drop-off produces maintain with rep_drop_off_blocks_progression",
+      "authority": "canonical_progress_evaluation_v3",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PROVEN"
+    },
+    {
+      "pair": "first_exposure_vs_sufficient_comparable_evidence",
+      "expectedDifference": "first exposure cannot invent an increase",
+      "actualDifference": "first exposure may establish observed calibration; comparator count is not prescription-compatible",
+      "authority": "canonical_progress_evaluation_v3",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PARTIALLY PROVEN"
+    },
+    {
+      "pair": "one_failure_vs_repeated_qualified_failure",
+      "expectedDifference": "one maintains; repeated qualified failure recalibrates",
+      "actualDifference": "different result reproduced, but prior failure was directly injected and not fully comparable",
+      "authority": "canonical_progress_evaluation_v3",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PARTIALLY PROVEN"
+    },
+    {
+      "pair": "available_vs_missing_equipment",
+      "expectedDifference": "missing context blocks",
+      "actualDifference": "construction blocks when context absent; mounted onboarding always supplies full gym",
+      "authority": "canonical_construction_facts",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PARTIALLY PROVEN"
+    },
+    {
+      "pair": "no_limitation_vs_recorded_limitation",
+      "expectedDifference": "limitation persists and excludes unsafe selection",
+      "actualDifference": "typed limitation persists when supplied; no mounted pain/limitation update writer",
+      "authority": "Session Construction context",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PARTIALLY PROVEN"
+    },
+    {
+      "pair": "full_recovery_vs_missing_recovery",
+      "expectedDifference": "missing is not good recovery",
+      "actualDifference": "missing becomes not_collected; constrained evidence blocks, but both non-missing inputs are simulation-only",
+      "authority": "canonical_progress_evaluation_v3",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "UNREACHABLE"
+    },
+    {
+      "pair": "ordinary_week_vs_deload_eligibility",
+      "expectedDifference": "eligible factual fatigue may authorize bounded deload path",
+      "actualDifference": "deloadEligible is always false",
+      "authority": "canonical_progress_evaluation_v3",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "NOT PROVEN"
+    },
+    {
+      "pair": "same_exercise_vs_substitution",
+      "expectedDifference": "substitution cannot establish the prescribed exercise load",
+      "actualDifference": "substitution evidence is excluded from calibration/load reconstruction",
+      "authority": "evaluator and construction facts",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PROVEN"
+    },
+    {
+      "pair": "kg_vs_lb_display",
+      "expectedDifference": "presentation conversion cannot create progression",
+      "actualDifference": "only base kg evidence can establish load; lb evidence is ignored",
+      "authority": "canonical load evidence",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PROVEN"
+    },
+    {
+      "pair": "single_vs_duplicate_completion",
+      "expectedDifference": "duplicate is idempotent",
+      "actualDifference": "all 12 retries leave revision unchanged",
+      "authority": "ledger, coaching operation, plan CAS",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PROVEN"
+    },
+    {
+      "pair": "uninterrupted_vs_application_retry",
+      "expectedDifference": "same decision applied once after transient failure",
+      "actualDifference": "CAS fault test retains prior sessions and applies once on retry",
+      "authority": "canonical progress decision application",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PROVEN"
+    },
+    {
+      "pair": "same_context_presentation_only_change",
+      "expectedDifference": "no coaching mutation",
+      "actualDifference": "Home Plan and Train are read-only projections of one carrier",
+      "authority": "canonical active-plan read model",
+      "unrelatedPrescriptionsChanged": false,
+      "verdict": "PROVEN"
+    }
+  ]
+}
