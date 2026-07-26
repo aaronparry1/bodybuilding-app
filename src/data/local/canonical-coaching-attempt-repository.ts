@@ -12,17 +12,30 @@ export type CanonicalCoachingAttempt = Readonly<{
   reason: string;
   evaluationId?: string;
   decisionId?: string;
+  planRevisionAtCompletion?: number;
+  completedLedgerVersion?: number;
+  prescriptionHash?: string;
+  evidenceState?: "pending" | "complete";
+  decisionState?: "pending" | "persisted";
+  applicationState?: "pending" | "applied" | "unchanged" | "blocked";
+  retryIdentity?: string;
   updatedAt: string;
 }>;
 
 export const canonicalCoachingAttemptRepository = {
   save(attempt: CanonicalCoachingAttempt) {
-    if (attempt.schemaVersion !== "canonical_coaching_attempt_v1" || !attempt.operationId || !attempt.planId || !attempt.recordedSessionId || !attempt.completionEvidenceId || Number.isNaN(Date.parse(attempt.updatedAt))) return { status: "invalid" as const, reason: "invalid_coaching_attempt" };
+    if (attempt.schemaVersion !== "canonical_coaching_attempt_v1" || !attempt.operationId || !attempt.planId || !attempt.recordedSessionId || !attempt.completionEvidenceId || Number.isNaN(Date.parse(attempt.updatedAt))
+      || attempt.planRevisionAtCompletion !== undefined && (!Number.isInteger(attempt.planRevisionAtCompletion) || attempt.planRevisionAtCompletion < 0)
+      || attempt.completedLedgerVersion !== undefined && (!Number.isInteger(attempt.completedLedgerVersion) || attempt.completedLedgerVersion < 1)
+      || attempt.retryIdentity !== undefined && attempt.retryIdentity !== attempt.operationId) return { status: "invalid" as const, reason: "invalid_coaching_attempt" };
     const all = jsonStore.get<Record<string, CanonicalCoachingAttempt>>(key, {});
     const existing = all[attempt.operationId];
     if (existing && (existing.planId !== attempt.planId || existing.recordedSessionId !== attempt.recordedSessionId || existing.completionEvidenceId !== attempt.completionEvidenceId)) return { status: "conflict" as const, reason: "coaching_operation_identity_conflict" };
-    jsonStore.set(key, { ...all, [attempt.operationId]: attempt });
-    return { status: "saved" as const, attempt };
+    const persisted = existing
+      ? { ...existing, ...Object.fromEntries(Object.entries(attempt).filter(([, value]) => value !== undefined)) } as CanonicalCoachingAttempt
+      : attempt;
+    jsonStore.set(key, { ...all, [attempt.operationId]: persisted });
+    return { status: "saved" as const, attempt: persisted };
   },
   get(operationId: string) {
     const value = jsonStore.get<Record<string, CanonicalCoachingAttempt>>(key, {})[operationId];

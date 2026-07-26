@@ -1,15 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import * as canonicalConstruction from "@/application/training/canonical-active-plan-construction";
 import { readCanonicalHomeProjection } from "@/application/training/canonical-home-projection";
 import { projectCanonicalPlan } from "@/application/training/canonical-plan-projections";
 import {
   completeCanonicalSession,
+  editCanonicalPerformedWork,
   prescriptionHash,
   recordCanonicalPerformedWork,
   startCanonicalSession,
 } from "@/application/training/canonical-recorded-session-application";
 import { projectCanonicalWorkoutPresentation } from "@/application/training/canonical-workout-presentation";
 import { resolveCanonicalConstructionFacts } from "@/application/training/canonical-construction-facts";
+import {
+  reconcileCanonicalCompletedSessionEvidence,
+  resumePendingCanonicalCoachingWork,
+} from "@/application/training/canonical-completion-evidence-reconciliation";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { canonicalCoachingAttemptRepository } from "@/data/local/canonical-coaching-attempt-repository";
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
@@ -17,6 +23,8 @@ import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-prog
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { jsonStore } from "@/data/local/json-store";
 import type { CanonicalLoadEvidence } from "@/domain/training/canonical-load-prescription";
+import { compareCanonicalMaterialPrescriptions } from "@/domain/training/canonical-material-prescription-delta";
+import { validateCanonicalProgressDecision } from "@/domain/training/canonical-progress-decision";
 import { exerciseLibrary } from "@/domain/training/presets";
 
 describe("mounted canonical coaching loop P0 remediation", () => {
@@ -201,6 +209,29 @@ describe("mounted canonical coaching loop P0 remediation", () => {
     expect(JSON.stringify(afterFailure.carrier.plannedSessions)).toBe(beforeFuture);
     expect(canonicalCoachingAttemptRepository.list(started.planId).at(-1)?.status).toBe("pending");
     expect(canonicalProgressDecisionRepository.list(started.planId)).toHaveLength(1);
+    const completedAggregate = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    if (completedAggregate.status !== "found") throw new Error("completed aggregate missing");
+    const completedSlot = firstSlot(started.aggregate.session.prescriptionSnapshot);
+    const performedEvidenceId = `${started.recordedSessionId}:evidence:${String(completedSlot.id)}:set:1`;
+    const performedEvidenceBefore = canonicalProgressEvidenceRepository.get(performedEvidenceId);
+    expect(editCanonicalPerformedWork({
+      planId: started.planId,
+      expectedPlanRevision: started.planRevision,
+      recordedSessionId: started.recordedSessionId,
+      expectedLedgerVersion: completedAggregate.session.version,
+      operationId: "application-failure-retry:late-edit",
+      occurredAt: "2026-07-25T10:45:00.000Z",
+      provenance: "canonical_coaching_loop_test",
+      slotId: String(completedSlot.id),
+      exerciseId: String(completedSlot.exerciseId),
+      setId: `${String(completedSlot.id)}:set:1`,
+      setOrder: 1,
+      reps: 99,
+      load: 99,
+      unit: "kg",
+      completion: "complete",
+    })).toMatchObject({ status: "rejected", reason: "performed_work_edit_not_allowed" });
+    expect(canonicalProgressEvidenceRepository.get(performedEvidenceId)).toEqual(performedEvidenceBefore);
 
     vi.restoreAllMocks();
     const retry = completeCanonicalSession({
@@ -279,6 +310,453 @@ describe("mounted canonical coaching loop P0 remediation", () => {
     expect(trainPresentation.id).toBe(model.nextSession.id);
     expect(model.progress.latestDecision?.sourceRecordedSessionId).toBe(started.recordedSessionId);
   });
+
+  it("does not claim an applied coaching change when reconstruction is materially equivalent", () => {
+    const started = createAndStart("truthful-no-op", {
+      experienceLevel: "advanced",
+      macrocycleGoal: "build_muscle",
+      goal: "hypertrophy",
+      daysPerWeek: 5,
+    });
+    const before = canonicalActivePlanV2Repository.get();
+    if (before.status !== "saved") throw new Error("plan missing");
+    vi.spyOn(canonicalConstruction, "constructCanonicalActivePlanFromCanonicalInputs").mockReturnValue({
+      status: "constructed",
+      carrier: before.carrier,
+    });
+    const completion = completeSuccessfulWorkout(started, 80);
+    const decision = canonicalProgressDecisionRepository.list(started.planId)[0];
+    const receipt = decision?.phaseOneApplication;
+    expect(receipt?.schemaVersion).toBe("canonical_coaching_application_receipt_v2");
+    if (receipt?.schemaVersion !== "canonical_coaching_application_receipt_v2") throw new Error("v2 receipt missing");
+    expect(receipt.status).toBe("unchanged");
+    expect(receipt.actualResult).toBe("explicit_no_change");
+    expect(receipt.reasonCode).toBe("material_prescription_delta_absent");
+    expect(receipt.materialDeltas).toEqual([]);
+    expect(validateCanonicalProgressDecision({
+      ...decision,
+      phaseOneApplication: { ...receipt, status: "blocked" },
+    })).toMatchObject({ status: "invalid", reason: "invalid_phase_one_application_receipt" });
+    expect(completion.nextInstruction).toMatch(/materially equivalent/i);
+    expect(completion.nextInstruction).not.toMatch(/progress|increas|advanced/i);
+    const after = canonicalActivePlanV2Repository.get();
+    expect(after.status === "saved" && after.carrier.revision).toBe(receipt.priorRevision);
+    expect(receipt.newRevision).toBe(receipt.priorRevision);
+
+    const command = {
+      planId: decision.planId,
+      expectedPlanRevision: receipt.priorRevision,
+      macrocycleId: decision.macrocycleId,
+      mesocycleId: decision.mesocycleId,
+      microcycleId: decision.microcycleId,
+      decisionId: decision.decisionId,
+      evaluationId: decision.evaluationId,
+      expectedEvidenceIds: decision.evidenceIds,
+    };
+    const firstReplay = canonicalActivePlanState.applyProgressDecision(command);
+    const concurrentReplay = canonicalActivePlanState.applyProgressDecision(command);
+    expect(firstReplay).toMatchObject({ status: "unchanged", priorRevision: receipt.priorRevision, newRevision: receipt.priorRevision });
+    expect(concurrentReplay).toEqual(firstReplay);
+    expect(canonicalActivePlanV2Repository.get()).toEqual(after);
+  });
+
+  it("ignores generated metadata but detects exact prescription changes", () => {
+    const started = createAndStart("material-comparator");
+    const loaded = canonicalActivePlanV2Repository.get();
+    if (loaded.status !== "saved") throw new Error("plan missing");
+    const before = loaded.carrier.plannedSessions;
+    const metadataOnly = before.map((session) => ({
+      ...session,
+      id: `${session.id}:regenerated`,
+      revision: session.revision + 1,
+      prescriptionSnapshot: {
+        ...session.prescriptionSnapshot,
+        provenance: { source: "new-metadata" },
+        slots: sessionSlots(session.prescriptionSnapshot).map((slot) => ({
+          ...slot,
+          progression: {
+            ...(slot.progression as Record<string, unknown>),
+            staleRevision: "2099-01-01T00:00:00.000Z",
+          },
+        })),
+      },
+    }));
+    expect(compareCanonicalMaterialPrescriptions(before, metadataOnly)).toEqual({ status: "unchanged", deltas: [] });
+
+    const changed = metadataOnly.map((session, sessionIndex) => sessionIndex ? session : {
+      ...session,
+      prescriptionSnapshot: {
+        ...session.prescriptionSnapshot,
+        slots: sessionSlots(session.prescriptionSnapshot).map((slot, slotIndex) => slotIndex ? slot : {
+          ...slot,
+          exactTargets: (slot.exactTargets as number[]).map((target, index) => index ? target : target + 1),
+        }),
+      },
+    });
+    const comparison = compareCanonicalMaterialPrescriptions(before, changed);
+    expect(comparison.status).toBe("changed");
+    expect(comparison.deltas.some((delta) => delta.field.includes("exactTargets"))).toBe(true);
+
+    const setChanged = metadataOnly.map((session, sessionIndex) => sessionIndex ? session : {
+      ...session,
+      prescriptionSnapshot: {
+        ...session.prescriptionSnapshot,
+        slots: sessionSlots(session.prescriptionSnapshot).map((slot, slotIndex) => slotIndex ? slot : {
+          ...slot,
+          settings: { ...(slot.settings as Record<string, unknown>), requiredSets: Number((slot.settings as Record<string, unknown>).requiredSets) + 1 },
+        }),
+      },
+    });
+    expect(compareCanonicalMaterialPrescriptions(before, setChanged).deltas.some((delta) => delta.field.includes("requiredSets"))).toBe(true);
+
+    const loadChanged = metadataOnly.map((session, sessionIndex) => sessionIndex ? session : {
+      ...session,
+      prescriptionSnapshot: {
+        ...session.prescriptionSnapshot,
+        slots: sessionSlots(session.prescriptionSnapshot).map((slot, slotIndex) => slotIndex ? slot : { ...slot, prescribedLoad: 82.5 }),
+      },
+    });
+    expect(compareCanonicalMaterialPrescriptions(before, loadChanged).deltas.some((delta) => delta.field === "slots[0].prescribedLoad")).toBe(true);
+
+    const displayUnitOnly = before.map((session) => ({
+      ...session,
+      prescriptionSnapshot: {
+        ...session.prescriptionSnapshot,
+        slots: sessionSlots(session.prescriptionSnapshot).map((slot) => ({
+          ...slot,
+          settings: { ...(slot.settings as Record<string, unknown>), unit: "lb" },
+        })),
+      },
+    }));
+    expect(compareCanonicalMaterialPrescriptions(before, displayUnitOnly)).toEqual({ status: "unchanged", deltas: [] });
+    expect(started.recordedSessionId).toBeTruthy();
+  });
+
+  it("keeps rounded or bounded proposals truthful when the committed prescription is identical", () => {
+    const started = createAndStart("rounded-bounded-no-op", true);
+    const loaded = canonicalActivePlanV2Repository.get();
+    if (loaded.status !== "saved") throw new Error("plan missing");
+    const sameAfterRounding = loaded.carrier.plannedSessions.map((session) => ({
+      ...session,
+      revision: session.revision + 1,
+      prescriptionSnapshot: { ...session.prescriptionSnapshot, proposedUnroundedLoad: 80.1, boundedTarget: 80 },
+    }));
+    expect(compareCanonicalMaterialPrescriptions(loaded.carrier.plannedSessions, sameAfterRounding)).toEqual({ status: "unchanged", deltas: [] });
+    expect(started.recordedSessionId).toBeTruthy();
+  });
+
+  it("reconciles missing completion evidence from the durable ledger after restart exactly once", () => {
+    const started = createAndStart("completion-reconciliation");
+    const originalRecord = canonicalProgressEvidenceRepository.record.bind(canonicalProgressEvidenceRepository);
+    let failed = false;
+    vi.spyOn(canonicalProgressEvidenceRepository, "record").mockImplementation((evidence) => {
+      if (evidence.kind === "completion" && !failed) {
+        failed = true;
+        return { status: "invalid" as const, reason: "fault_injected_completion_evidence_write" };
+      }
+      return originalRecord(evidence);
+    });
+    const completion = completeSuccessfulWorkout(started, 60);
+    expect(completion).toMatchObject({ status: "retryable", reason: "completed_with_evidence_pending" });
+    expect(canonicalRecordedSessionLedger.get(started.recordedSessionId)).toMatchObject({ status: "found", session: { status: "completed" } });
+    expect(canonicalCoachingAttemptRepository.list(started.planId)).toHaveLength(1);
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]).toMatchObject({
+      status: "pending",
+      evidenceState: "pending",
+      decisionState: "pending",
+      applicationState: "pending",
+    });
+
+    vi.restoreAllMocks();
+    jsonStore.resetCache();
+    canonicalActivePlanState.hydrate();
+    const resumed = resumePendingCanonicalCoachingWork(started.planId);
+    expect(resumed).toHaveLength(1);
+    expect(resumed[0]?.status).toMatch(/reconciled|already_complete/);
+    expect(canonicalProgressEvidenceRepository.list(started.planId).some((evidence) => evidence.kind === "completion" && evidence.sessionId === started.recordedSessionId)).toBe(true);
+    expect(canonicalProgressDecisionRepository.list(started.planId)).toHaveLength(1);
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]).toMatchObject({
+      evidenceState: "complete",
+      decisionState: "persisted",
+    });
+    const revision = canonicalActivePlanState.getReadModel()?.revision;
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toEqual([]);
+    expect(canonicalProgressDecisionRepository.list(started.planId)).toHaveLength(1);
+    expect(canonicalActivePlanState.getReadModel()?.revision).toBe(revision);
+  });
+
+  it("reconstructs the latest repaired completed-set facts before a pending adaptation retry", () => {
+    const started = createAndStart("repaired-set-reconciliation");
+    const slot = firstSlot(started.aggregate.session.prescriptionSnapshot);
+    const target = Number((slot.exactTargets as number[] | undefined)?.[0] ?? slot.targetReps ?? 8);
+    const recorded = recordCanonicalPerformedWork({
+      planId: started.planId,
+      expectedPlanRevision: started.planRevision,
+      recordedSessionId: started.recordedSessionId,
+      expectedLedgerVersion: started.aggregate.session.version,
+      operationId: "repair-reconciliation:record",
+      occurredAt: "2026-07-26T08:01:00.000Z",
+      provenance: "p0_reconciliation_test",
+      slotId: String(slot.id),
+      exerciseId: String(slot.exerciseId),
+      setId: "repaired-set",
+      setOrder: 1,
+      reps: target,
+      load: 60,
+      unit: "kg",
+      completion: "complete",
+    });
+    expect(recorded.status).toBe("applied");
+    const edited = editCanonicalPerformedWork({
+      planId: started.planId,
+      expectedPlanRevision: started.planRevision,
+      recordedSessionId: started.recordedSessionId,
+      expectedLedgerVersion: recorded.ledgerVersion!,
+      operationId: "repair-reconciliation:edit",
+      occurredAt: "2026-07-26T08:02:00.000Z",
+      provenance: "p0_reconciliation_test",
+      slotId: String(slot.id),
+      exerciseId: String(slot.exerciseId),
+      setId: "repaired-set",
+      setOrder: 1,
+      reps: target + 1,
+      load: 62.5,
+      unit: "kg",
+      completion: "complete",
+    });
+    expect(edited.status).toBe("applied");
+
+    const originalRecord = canonicalProgressEvidenceRepository.record.bind(canonicalProgressEvidenceRepository);
+    let failed = false;
+    vi.spyOn(canonicalProgressEvidenceRepository, "record").mockImplementation((evidence) => {
+      if (evidence.kind === "completion" && !failed) {
+        failed = true;
+        return { status: "invalid" as const, reason: "fault_injected_completion_evidence_write" };
+      }
+      return originalRecord(evidence);
+    });
+    expect(completeCanonicalSession({
+      planId: started.planId,
+      expectedPlanRevision: started.planRevision,
+      recordedSessionId: started.recordedSessionId,
+      expectedLedgerVersion: edited.ledgerVersion!,
+      operationId: "repair-reconciliation:complete",
+      occurredAt: "2026-07-26T08:03:00.000Z",
+      provenance: "p0_reconciliation_test",
+    })).toMatchObject({ status: "retryable", reason: "completed_with_evidence_pending" });
+
+    vi.restoreAllMocks();
+    jsonStore.resetCache();
+    canonicalActivePlanState.hydrate();
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toHaveLength(1);
+    expect(canonicalProgressEvidenceRepository.get(`${started.recordedSessionId}:evidence:repaired-set`)).toMatchObject({
+      status: "found",
+      evidence: {
+        observations: {
+          reps: target + 1,
+          load: 62.5,
+        },
+      },
+    });
+  });
+
+  it("fails closed when durable performed work cannot be matched to the immutable prescription", () => {
+    const started = createAndStart("irreconstructible-completion");
+    const before = canonicalActivePlanV2Repository.get();
+    if (before.status !== "saved") throw new Error("plan missing");
+    const priorFuture = JSON.stringify(before.carrier.plannedSessions);
+    const impossible = canonicalRecordedSessionLedger.append(started.recordedSessionId, {
+      eventId: `${started.recordedSessionId}:performance:unknown`,
+      aggregateId: started.recordedSessionId,
+      expectedVersion: started.aggregate.session.version,
+      type: "performance",
+      occurredAt: "2026-07-26T08:05:00.000Z",
+      operationId: "fault:irreconstructible-performance",
+      payload: {
+        setId: "unknown-set",
+        slotId: "unknown-slot",
+        exerciseId: "unknown-exercise",
+        setOrder: 1,
+        reps: 8,
+        load: 60,
+        unit: "kg",
+        completion: "complete",
+      },
+    });
+    expect(impossible.status).toBe("saved");
+    const completion = completeCanonicalSession({
+      planId: started.planId,
+      expectedPlanRevision: started.planRevision,
+      recordedSessionId: started.recordedSessionId,
+      expectedLedgerVersion: impossible.status === "saved" ? impossible.session.version : -1,
+      operationId: "fault:complete-irreconstructible",
+      occurredAt: "2026-07-26T08:10:00.000Z",
+      provenance: "p0_fault_injection",
+    });
+    expect(completion).toMatchObject({ status: "applied", reason: "session_completed" });
+    expect(reconcileCanonicalCompletedSessionEvidence({
+      planId: started.planId,
+      recordedSessionId: started.recordedSessionId,
+    })).toMatchObject({ status: "already_complete" });
+    const after = canonicalActivePlanV2Repository.get();
+    expect(after.status === "saved" && JSON.stringify(after.carrier.plannedSessions)).toBe(priorFuture);
+    const decision = canonicalProgressDecisionRepository.list(started.planId)[0];
+    expect(decision?.phaseOne).toMatchObject({
+      decisionType: "blocked",
+      result: "blocked_no_change",
+      reasonCodes: ["performed_work_identity_unavailable"],
+    });
+    expect(decision?.phaseOneApplication).toMatchObject({
+      schemaVersion: "canonical_coaching_application_receipt_v2",
+      status: "blocked",
+      actualResult: "blocked_no_change",
+    });
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]).toMatchObject({
+      status: "blocked",
+      evidenceState: "complete",
+      decisionState: "persisted",
+      applicationState: "blocked",
+    });
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toEqual([]);
+  });
+
+  it("keeps evidence durable and the future unchanged when decision persistence fails, then resumes once", () => {
+    const started = createAndStart("decision-write-retry");
+    const before = canonicalActivePlanV2Repository.get();
+    if (before.status !== "saved") throw new Error("plan missing");
+    const priorFuture = JSON.stringify(before.carrier.plannedSessions);
+    const originalSave = canonicalProgressDecisionRepository.save.bind(canonicalProgressDecisionRepository);
+    let failed = false;
+    vi.spyOn(canonicalProgressDecisionRepository, "save").mockImplementation((decision) => {
+      if (!failed) {
+        failed = true;
+        return { status: "invalid" as const, reason: "fault_injected_decision_write" };
+      }
+      return originalSave(decision);
+    });
+    const completion = completeSuccessfulWorkout(started, 65);
+    expect(completion.reason).toBe("session_completed_adaptation_pending");
+    expect(canonicalProgressEvidenceRepository.list(started.planId).some((evidence) => evidence.kind === "completion")).toBe(true);
+    const afterFailure = canonicalActivePlanV2Repository.get();
+    expect(afterFailure.status === "saved" && JSON.stringify(afterFailure.carrier.plannedSessions)).toBe(priorFuture);
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]?.status).toBe("pending");
+
+    vi.restoreAllMocks();
+    jsonStore.resetCache();
+    canonicalActivePlanState.hydrate();
+    expect(resumePendingCanonicalCoachingWork(started.planId)[0]?.status).toMatch(/already_complete|reconciled/);
+    expect(canonicalProgressDecisionRepository.list(started.planId)).toHaveLength(1);
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]?.status).toMatch(/applied|unchanged/);
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toEqual([]);
+  });
+
+  it("rolls back a future change when its application receipt fails and retries the same decision once", () => {
+    const started = createAndStart("receipt-write-retry");
+    const before = canonicalActivePlanV2Repository.get();
+    if (before.status !== "saved") throw new Error("plan missing");
+    const priorFuture = JSON.stringify(before.carrier.plannedSessions);
+    const originalRecord = canonicalProgressDecisionRepository.recordApplication.bind(canonicalProgressDecisionRepository);
+    let failed = false;
+    vi.spyOn(canonicalProgressDecisionRepository, "recordApplication").mockImplementation((decisionId, receipt) => {
+      if (!failed) {
+        failed = true;
+        return { status: "invalid" as const, reason: "fault_injected_receipt_write" };
+      }
+      return originalRecord(decisionId, receipt);
+    });
+    const completion = completeSuccessfulWorkout(started, 67.5);
+    expect(completion.reason).toBe("session_completed_adaptation_pending");
+    const rolledBack = canonicalActivePlanV2Repository.get();
+    expect(rolledBack.status === "saved" && JSON.stringify(rolledBack.carrier.plannedSessions)).toBe(priorFuture);
+    expect(canonicalProgressDecisionRepository.list(started.planId)[0]?.phaseOneApplication).toBeUndefined();
+
+    vi.restoreAllMocks();
+    jsonStore.resetCache();
+    canonicalActivePlanState.hydrate();
+    resumePendingCanonicalCoachingWork(started.planId);
+    const decision = canonicalProgressDecisionRepository.list(started.planId)[0];
+    expect(decision?.phaseOneApplication?.status).toBe("applied");
+    const revision = canonicalActivePlanState.getReadModel()?.revision;
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toEqual([]);
+    expect(canonicalActivePlanState.getReadModel()?.revision).toBe(revision);
+  });
+
+  it("constructs an approved successor atomically while retaining limited equipment and limitations", () => {
+    const planId = "limited-transition";
+    const limitation = "exclude_exercise:ex-donkey-calf-raise";
+    let started = createAndStart(planId, {
+      established: true,
+      macrocycleGoal: "build_strength",
+      goal: "strength_hypertrophy",
+      daysPerWeek: 3,
+      equipment: ["barbell", "dumbbell", "bodyweight", "bands"],
+      limitations: [limitation],
+    });
+    for (let ordinal = 0; ordinal < 12; ordinal += 1) {
+      if (ordinal) started = startNextExisting(planId, ordinal);
+      completeSuccessfulWorkout(started, 80);
+    }
+    const carrier = canonicalActivePlanV2Repository.get();
+    if (carrier.status !== "saved") throw new Error("transitioned plan missing");
+    expect(carrier.carrier.mesocycle.id).toBe("strength_accumulation");
+    expect(carrier.carrier.constraints.equipment).toEqual(["barbell", "dumbbell", "bodyweight", "bands"]);
+    expect(carrier.carrier.constructionContext?.limitations).toContain(limitation);
+    expect(carrier.carrier.cycleLineage?.some((entry) => entry.mesocycleId === "strength_general" && entry.status === "predecessor")).toBe(true);
+    expect(carrier.carrier.plannedSessions.length).toBeGreaterThan(0);
+    canonicalActivePlanState.hydrate();
+    const model = canonicalActivePlanState.getReadModel();
+    if (!model?.nextSession) throw new Error("transition next session missing");
+    expect(readCanonicalHomeProjection({ now: Date.parse("2026-08-20T08:00:00.000Z") }).primary?.action?.sessionId).toBe(model.nextSession.id);
+    expect(projectCanonicalPlan(model).nextActionableSession?.id).toBe(model.nextSession.id);
+    expect(canonicalActivePlanState.getPlannedSession(model.nextSession.id)?.id).toBe(model.nextSession.id);
+  }, 20_000);
+
+  it("continues the current Mesocycle within its certified horizon when an approved successor cannot be constructed", () => {
+    const originalConstruct = canonicalConstruction.constructCanonicalActivePlanFromCanonicalInputs;
+    let successorFailureInjected = false;
+    vi.spyOn(canonicalConstruction, "constructCanonicalActivePlanFromCanonicalInputs").mockImplementation((input) => {
+      if (input.selectedMesocycleId === "strength_specific" && !successorFailureInjected) {
+        successorFailureInjected = true;
+        return { status: "carrier_validation_failed", reason: "session_0:no_suitable_exercise" };
+      }
+      return originalConstruct(input);
+    });
+    const planId = "successor-construction-continuity";
+    let started = createAndStart(planId, {
+      established: true,
+      macrocycleGoal: "build_strength",
+      goal: "strength_hypertrophy",
+      daysPerWeek: 3,
+    });
+    for (let ordinal = 0; ordinal < 30; ordinal += 1) {
+      if (ordinal) started = startNextExisting(planId, ordinal);
+      completeSuccessfulWorkout(started, 80);
+    }
+
+    expect(successorFailureInjected).toBe(true);
+    const carrier = canonicalActivePlanV2Repository.get();
+    if (carrier.status !== "saved") throw new Error("continued plan missing");
+    expect(carrier.carrier.mesocycle.id).toBe("strength_accumulation");
+    expect(carrier.carrier.microcycle.output.sequenceNumber).toBe(11);
+    expect(carrier.carrier.plannedSessions.length).toBeGreaterThan(0);
+    const decision = canonicalProgressDecisionRepository.list(planId).find((candidate) =>
+      candidate.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+      && candidate.phaseOneApplication.reasonCode === "approved_successor_construction_unavailable_continued_within_horizon"
+    );
+    expect(decision?.phaseOne?.boundaryResolution).toMatchObject({
+      status: "transition_approved",
+      successorMesocycleId: "strength_specific",
+    });
+    expect(decision?.phaseOneApplication).toMatchObject({
+      schemaVersion: "canonical_coaching_application_receipt_v2",
+      status: "applied",
+      actualResult: "future_prescription_change",
+      reasonCode: "approved_successor_construction_unavailable_continued_within_horizon",
+    });
+    const receipt = decision?.phaseOneApplication;
+    if (receipt?.schemaVersion !== "canonical_coaching_application_receipt_v2") throw new Error("truthful continuation receipt missing");
+    expect(receipt.explanation).toMatch(/continues in the current phase/i);
+  }, 30_000);
 
   it("certifies the mounted longitudinal scenario matrix without silent non-adaptation", () => {
     const results: Array<{ scenario: string; decision: string; result: string }> = [];
@@ -604,7 +1082,7 @@ function certifyStrengthTransitionBoundary(): { scenario: string; decision: stri
       ordinal += 1;
     }
   }
-  expect(lastDecision).toBe("blocked");
-  expect(lastResult).toBe("blocked_no_change");
+  expect(lastDecision).toBe("transition");
+  expect(lastResult).toBe("future_prescription_change");
   return { scenario: "strength_transition_boundary", decision: lastDecision, result: lastResult };
 }

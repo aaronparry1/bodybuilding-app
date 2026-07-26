@@ -7,6 +7,7 @@ import { useAuth } from "@/application/auth/auth-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { getActiveDesignQaFixture, subscribeDesignQaFixture } from "@/application/design-qa/design-qa-fixtures";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { resumePendingCanonicalCoachingWork } from "@/application/training/canonical-completion-evidence-reconciliation";
 import { reconcileCanonicalReleaseState, type CanonicalReleaseReconciliationResult } from "@/application/training/canonical-release-reconciliation";
 import { getAppEnvironment } from "@/application/runtime/app-environment";
 import { isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/design-qa/design-qa-runtime";
@@ -32,7 +33,10 @@ export default function ProtectedLayout() {
     if (activeFixture) { canonicalActivePlanState.hydrate(); return; }
     const result = reconcileCanonicalReleaseState({ onboardingCompleted: settings.onboardingCompleted, updatedAt: new Date().toISOString() });
     setReconciliation(result);
-    if (result.status === "ready" || result.status === "reconstructed") canonicalActivePlanState.hydrate();
+    if (result.status === "ready" || result.status === "reconstructed") {
+      const hydrated = canonicalActivePlanState.hydrate();
+      if (hydrated.model) resumePendingCanonicalCoachingWork(hydrated.model.planId);
+    }
   }, [activeFixture, settings.onboardingCompleted]);
 
   if (isLoading) {

@@ -53,7 +53,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         8,
         6,
         4,
-        10
+        8
       ],
       "targetKinds": [
         "reps",
@@ -141,11 +141,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "mapsToExpected": true
       },
       "exactTargets": [
-        10,
-        10,
-        10,
-        10,
-        10
+        8,
+        8,
+        8,
+        8,
+        8
       ],
       "targetKinds": [
         "reps",

@@ -3,6 +3,7 @@ import { resolveCanonicalConstructionFacts } from "@/application/training/canoni
 import { produceCanonicalProgressDecision } from "@/application/training/canonical-progress-decision-production";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { canonicalCoachingAttemptRepository } from "@/data/local/canonical-coaching-attempt-repository";
+import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalCoachingOperationId, type CanonicalCoachingIdentity } from "@/domain/training/canonical-coaching-identity";
@@ -48,9 +49,19 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
   const priorAttempt = canonicalCoachingAttemptRepository.get(operationId);
   if (raw.carrier.progress.decisionReference === operationId || priorAttempt.status === "found" && (priorAttempt.attempt.status === "applied" || priorAttempt.attempt.status === "unchanged" || priorAttempt.attempt.status === "blocked")) {
     const decision = priorAttempt.status === "found" && priorAttempt.attempt.decisionId ? priorAttempt.attempt.decisionId : operationId;
-    return { status: priorAttempt.status === "found" && priorAttempt.attempt.status === "blocked" ? "blocked" : "unchanged", reason: "post_workout_adaptation_already_resolved", operationId, decisionId: decision };
+    const persisted = canonicalProgressDecisionRepository.get(decision);
+    const explanation = persisted.status === "found" && persisted.decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+      ? persisted.decision.phaseOneApplication.explanation
+      : undefined;
+    return {
+      status: priorAttempt.status === "found" && priorAttempt.attempt.status === "blocked" ? "blocked" : "unchanged",
+      reason: "post_workout_adaptation_already_resolved",
+      operationId,
+      decisionId: decision,
+      ...(explanation ? { explanation } : {}),
+    };
   }
-  canonicalCoachingAttemptRepository.save({ schemaVersion: "canonical_coaching_attempt_v1", operationId, planId: input.planId, recordedSessionId: input.recordedSessionId, completionEvidenceId: input.completionEvidenceId, status: "pending", reason: "evaluation_started", updatedAt: input.occurredAt });
+  canonicalCoachingAttemptRepository.save({ schemaVersion: "canonical_coaching_attempt_v1", operationId, planId: input.planId, recordedSessionId: input.recordedSessionId, completionEvidenceId: input.completionEvidenceId, status: "pending", reason: "evaluation_started", evidenceState: "complete", decisionState: "pending", applicationState: "pending", retryIdentity: operationId, updatedAt: input.occurredAt });
 
   const mesocycle = mesocycleById(raw.carrier.mesocycle.id);
   const policy = resolveMesocyclePrescriptionPolicy(raw.carrier.mesocycle.id, { goal: raw.carrier.macrocycle.output.goal });
@@ -106,7 +117,7 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
       : {}),
   });
   if (produced.status !== "produced" || !produced.decision) return pending(operationId, input, produced.reason, evaluation.evaluationId);
-  canonicalCoachingAttemptRepository.save({ schemaVersion: "canonical_coaching_attempt_v1", operationId, planId: input.planId, recordedSessionId: input.recordedSessionId, completionEvidenceId: input.completionEvidenceId, status: "decision_persisted", reason: produced.reason, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, updatedAt: input.occurredAt });
+  canonicalCoachingAttemptRepository.save({ schemaVersion: "canonical_coaching_attempt_v1", operationId, planId: input.planId, recordedSessionId: input.recordedSessionId, completionEvidenceId: input.completionEvidenceId, status: "decision_persisted", reason: produced.reason, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, evidenceState: "complete", decisionState: "persisted", applicationState: "pending", retryIdentity: operationId, updatedAt: input.occurredAt });
   const applied = canonicalActivePlanState.applyProgressDecision({
     planId: plan.planId,
     expectedPlanRevision: plan.revision,
@@ -119,9 +130,13 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
   });
   if (applied.status === "rejected") return pending(operationId, input, applied.reason, evaluation.evaluationId, produced.decision.decisionId);
   const finalStatus = evaluation.outcome === "blocked" ? "blocked" as const : applied.status === "applied" ? "applied" as const : "unchanged" as const;
-  canonicalCoachingAttemptRepository.save({ schemaVersion: "canonical_coaching_attempt_v1", operationId, planId: input.planId, recordedSessionId: input.recordedSessionId, completionEvidenceId: input.completionEvidenceId, status: finalStatus, reason: applied.reason, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, updatedAt: input.occurredAt });
+  canonicalCoachingAttemptRepository.save({ schemaVersion: "canonical_coaching_attempt_v1", operationId, planId: input.planId, recordedSessionId: input.recordedSessionId, completionEvidenceId: input.completionEvidenceId, status: finalStatus, reason: applied.reason, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, evidenceState: "complete", decisionState: "persisted", applicationState: finalStatus, retryIdentity: operationId, updatedAt: input.occurredAt });
   canonicalActivePlanState.hydrate();
-  return { status: finalStatus, reason: applied.reason, operationId, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, explanation: evaluation.explanation, priorRevision: applied.priorRevision, newRevision: applied.newRevision };
+  const committed = canonicalProgressDecisionRepository.get(produced.decision.decisionId);
+  const explanation = committed.status === "found" && committed.decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+    ? committed.decision.phaseOneApplication.explanation
+    : evaluation.explanation;
+  return { status: finalStatus, reason: applied.reason, operationId, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, explanation, priorRevision: applied.priorRevision, newRevision: applied.newRevision };
 }
 
 function phaseOneDecisionDetails(
@@ -153,6 +168,7 @@ function phaseOneDecisionDetails(
     priorFutureSessionIds: [...priorFutureSessionIds].sort(),
     result: decisionType === "blocked" ? "blocked_no_change" : decisionType === "maintain" ? "explicit_no_change" : "future_prescription_change",
     boundedAdjustment: { kind, exerciseIds: [...evaluation.affectedExerciseIds].sort(), numericLoadAdjustmentAuthorised: false },
+    ...(evaluation.boundaryResolution ? { boundaryResolution: evaluation.boundaryResolution } : {}),
     contextIdentity: { macrocycleId: evaluation.macrocycleId, mesocycleId: evaluation.mesocycleId, microcycleId: evaluation.microcycleId },
     decidedAt,
     idempotencyKey,

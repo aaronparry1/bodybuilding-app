@@ -28,7 +28,11 @@ export function resolveCanonicalExactTarget(input: Readonly<{
   // versioned target policy. The catalogue default remains a general-use
   // default for legacy/generic consumers and must not override that policy.
   const minimum = input.slot.liftExposure === "primary" ? input.envelope.minReps : Math.max(input.envelope.minReps, input.exercise.defaultRepRange.min);
-  const maximum = input.slot.liftExposure === "primary" ? input.envelope.maxReps : Math.min(input.envelope.maxReps, input.exercise.defaultRepRange.max);
+  const envelopeMaximum = input.slot.liftExposure === "primary" ? input.envelope.maxReps : Math.min(input.envelope.maxReps, input.exercise.defaultRepRange.max);
+  // This is the already-certified constructed-session safety boundary, not a
+  // new coaching threshold. Method shapes remain intact, but a high-fatigue
+  // exercise cannot produce targets the final canonical certification rejects.
+  const maximum = input.exercise.fatigueCost === "high" ? Math.min(envelopeMaximum, 8) : envelopeMaximum;
   if (minimum > maximum) return { status: "blocked", policyId: CANONICAL_EXACT_TARGET_POLICY_ID, reason: "exercise_and_mesocycle_targets_do_not_overlap" };
   const reps = Math.max(minimum, Math.min(maximum, ideal));
   const targets = targetsForMethod(input.method, input.slot.workingSets, reps, minimum, maximum);

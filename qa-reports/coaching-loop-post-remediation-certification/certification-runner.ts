@@ -19,7 +19,10 @@ import { jsonStore } from "@/data/local/json-store";
 import type { CanonicalLoadEvidence } from "@/domain/training/canonical-load-prescription";
 import { exerciseLibrary } from "@/domain/training/presets";
 
-const outputDirectory = fileURLToPath(new URL("./", import.meta.url));
+const continuityMode = process.env.ASC_P0_CONTINUITY_MODE === "1";
+const outputDirectory = process.env.ASC_P0_CONTINUITY_OUTPUT
+  ? fileURLToPath(new URL(process.env.ASC_P0_CONTINUITY_OUTPUT, `file://${process.cwd()}/`))
+  : fileURLToPath(new URL("./", import.meta.url));
 const createdAt = "2026-07-25T08:00:00.000Z";
 
 type ScenarioId =
@@ -66,6 +69,9 @@ const scenarios: readonly Scenario[] = [
   { id: "powerbuilding_athlete", athleteContext: "Established five-day powerbuilding athlete", established: true, performance: "success", productionInputReachability: "mounted", reachabilityReason: "The entire input path is mounted." },
   { id: "athletic_changing_sport_workload", athleteContext: "Three-day athletic athlete with constrained capacity and increased sport workload", macrocycleGoal: "athletic_performance", daysPerWeek: 3, performance: "success", injectedEvidence: "sport_capacity_constrained", productionInputReachability: "simulation_only", reachabilityReason: "Initial sport workload is mounted, but no production writer records later workload/capacity changes." },
 ];
+const selectedScenarioId = process.env.ASC_P0_SCENARIO;
+const selectedScenarios = selectedScenarioId ? scenarios.filter((scenario) => scenario.id === selectedScenarioId) : scenarios;
+if (selectedScenarioId && selectedScenarios.length !== 1) throw new Error(`unknown_continuity_scenario:${selectedScenarioId}`);
 
 type Started = Readonly<{
   planId: string;
@@ -105,10 +111,8 @@ function must<T>(value: T | null | undefined, message: string): T {
 
 function createPlan(scenario: Scenario, suffix: string): string {
   const planId = `post-cert:${scenario.id}:${suffix}`;
-  const establishedLoads = scenario.established ? Object.fromEntries(exerciseLibrary.map((exercise) => [exercise.id, 80])) : undefined;
-  const loadEvidence = scenario.established ? Object.fromEntries(exerciseLibrary.map((exercise) => [exercise.id, loadEvidenceFor(exercise.id, 80)])) : undefined;
-  const result = canonicalActivePlanState.create({
-    planId,
+  const input = (id: string, establishedExerciseIds: readonly string[] = []) => ({
+    planId: id,
     createdAt,
     updatedAt: createdAt,
     goal: scenario.goal ?? "strength_hypertrophy",
@@ -121,9 +125,19 @@ function createPlan(scenario: Scenario, suffix: string): string {
     exercises: exerciseLibrary,
     limitations: scenario.limitations,
     history: [],
-    establishedLoads,
-    loadEvidence,
+    ...(establishedExerciseIds.length ? {
+      establishedLoads: Object.fromEntries(establishedExerciseIds.map((exerciseId) => [exerciseId, 80])),
+      loadEvidence: Object.fromEntries(establishedExerciseIds.map((exerciseId) => [exerciseId, loadEvidenceFor(exerciseId, 80)])),
+    } : {}),
   });
+  let establishedExerciseIds: readonly string[] = [];
+  if (scenario.established) {
+    const probe = canonicalActivePlanState.create(input(`${planId}:selection-probe`));
+    if (probe.hydration !== "hydrated" || !probe.model) throw new Error(`${scenario.id}:selection_probe:${probe.error ?? "unknown"}`);
+    establishedExerciseIds = [...new Set(probe.model.plannedSessions.flatMap((session) => sessionSlots(session.snapshot).map((slot) => String(slot.exerciseId))))].sort();
+    clearState();
+  }
+  const result = canonicalActivePlanState.create(input(planId, establishedExerciseIds));
   if (result.hydration !== "hydrated" || !result.model) throw new Error(`${scenario.id}:plan_creation:${result.error ?? "unknown"}`);
   return planId;
 }
@@ -398,12 +412,19 @@ function runLongitudinal(scenario: Scenario) {
       break;
     }
     const started = startNext(planId, ordinal);
-    if (scenario.injectedEvidence && scenario.injectedEvidence !== "prior_failure") addInjectedEvidence(started, scenario.injectedEvidence, ordinal);
+    if (!continuityMode && scenario.injectedEvidence && scenario.injectedEvidence !== "prior_failure") addInjectedEvidence(started, scenario.injectedEvidence, ordinal);
     if (scenario.injectedEvidence === "prior_failure" && ordinal === 0) addInjectedEvidence(started, "prior_failure", ordinal);
-    const performance = scenario.id === "repeated_stall" ? ordinal < 2 ? "failure" : "success" : scenario.performance;
+    const performance = scenario.id === "repeated_stall"
+      ? ordinal < 2 ? "failure" : "success"
+      : continuityMode && scenario.performance === "partial"
+        ? ordinal === 0 ? "partial" : "success"
+        : continuityMode && scenario.productionInputReachability === "simulation_only"
+          ? "success"
+          : scenario.performance;
     const before = futureSummary();
     const completion = performAndComplete(started, performance, scenario.established ? 80 : 60, ordinal);
     const decision = must(canonicalProgressDecisionRepository.list(planId).at(-1), `${scenario.id}:longitudinal_decision_missing:${ordinal}`);
+    const attempt = canonicalCoachingAttemptRepository.list(planId).at(-1);
     const after = futureSummary();
     decisions.push({
       ordinal: ordinal + 1,
@@ -412,12 +433,21 @@ function runLongitudinal(scenario: Scenario) {
       recordedSessionId: started.recordedSessionId,
       performance,
       completionStatus: completion.status,
+      completionReason: completion.reason,
+      attemptStatus: attempt?.status ?? null,
+      attemptReason: attempt?.reason ?? null,
       decisionType: decision.phaseOne?.decisionType ?? null,
-      result: decision.phaseOne?.result ?? null,
+      result: decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+        ? decision.phaseOneApplication.actualResult
+        : decision.phaseOne?.result ?? null,
       reasonCodes: decision.phaseOne?.reasonCodes ?? [],
+      boundaryResolution: decision.phaseOne?.boundaryResolution ?? null,
       applicationStatus: decision.phaseOneApplication?.status ?? null,
       priorRevision: decision.phaseOneApplication?.priorRevision ?? null,
       newRevision: decision.phaseOneApplication?.newRevision ?? null,
+      materialDeltas: decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+        ? decision.phaseOneApplication.materialDeltas
+        : [],
       futureSessionCountBefore: before.sessionIds.length,
       futureSessionCountAfter: after.sessionIds.length,
       numericalChanges: futureDiff(before, after).filter((change) => {
@@ -450,6 +480,7 @@ function runLongitudinal(scenario: Scenario) {
     });
     jsonStore.resetCache();
     canonicalActivePlanState.hydrate();
+    (globalThis as typeof globalThis & { gc?: () => void }).gc?.();
     ordinal += 1;
     highestWeek = Math.max(highestWeek, canonicalActivePlanState.getReadModel()?.microcycle.sequenceNumber ?? highestWeek);
   }
@@ -468,8 +499,11 @@ function runLongitudinal(scenario: Scenario) {
     noNextReason,
     finalDecision: finalDecision?.phaseOne ? {
       decisionType: finalDecision.phaseOne.decisionType,
-      result: finalDecision.phaseOne.result,
+      result: finalDecision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+        ? finalDecision.phaseOneApplication.actualResult
+        : finalDecision.phaseOne.result,
       reasonCodes: finalDecision.phaseOne.reasonCodes,
+      boundaryResolution: finalDecision.phaseOne.boundaryResolution ?? null,
       applicationStatus: finalDecision.phaseOneApplication?.status ?? null,
     } : null,
     decisionCounts: countBy(decisions.map((decision) => String(decision.decisionType))),
@@ -532,8 +566,8 @@ function countBy(values: readonly string[]): Record<string, number> {
 }
 
 mkdirSync(outputDirectory, { recursive: true });
-const firstOneStep = scenarios.map((scenario) => runOneStep(scenario, 1));
-const secondOneStep = scenarios.map((scenario) => runOneStep(scenario, 2));
+const firstOneStep = continuityMode ? [] : selectedScenarios.map((scenario) => runOneStep(scenario, 1));
+const secondOneStep = continuityMode ? [] : selectedScenarios.map((scenario) => runOneStep(scenario, 2));
 const firstSemantic = firstOneStep.map(semanticOneStep);
 const secondSemantic = secondOneStep.map(semanticOneStep);
 const oneStepDeterministic = JSON.stringify(firstSemantic) === JSON.stringify(secondSemantic);
@@ -554,22 +588,22 @@ const oneStep = {
   scenarios: firstOneStep,
   secondRunSemanticResults: secondSemantic,
 };
-writeFileSync(`${outputDirectory}/scenario-reproduction.json`, `${JSON.stringify(oneStep, null, 2)}\n`);
+if (!continuityMode) writeFileSync(`${outputDirectory}/scenario-reproduction.json`, `${JSON.stringify(oneStep, null, 2)}\n`);
 
-const longitudinalScenarios = scenarios.map(runLongitudinal);
+const longitudinalScenarios = selectedScenarios.map(runLongitudinal);
 const longitudinal = {
-  schemaVersion: "canonical_coaching_loop_post_remediation_longitudinal_v1",
-  auditedCommit: "2fe93443add4420aaa7d4e3a9a86fdc1a13c8da1",
+  schemaVersion: continuityMode ? "canonical_coaching_loop_p0_continuity_longitudinal_v1" : "canonical_coaching_loop_post_remediation_longitudinal_v1",
+  auditedCommit: continuityMode ? "7a5a21d40240fab407dbb17a47324dbedda32ff2+working-tree" : "2fe93443add4420aaa7d4e3a9a86fdc1a13c8da1",
   targetWeeks: 12,
   scenarioCount: longitudinalScenarios.length,
   scenariosReachingTwelveWeeks: longitudinalScenarios.filter((scenario) => scenario.reachedTwelveWeeks).length,
   deadlockedScenarioCount: longitudinalScenarios.filter((scenario) => scenario.deadlocked).length,
   scenarios: longitudinalScenarios,
 };
-writeFileSync(`${outputDirectory}/longitudinal-12-week-results.json`, `${JSON.stringify(longitudinal, null, 2)}\n`);
+writeFileSync(`${outputDirectory}/${continuityMode && selectedScenarioId ? `longitudinal-${selectedScenarioId}.json` : "longitudinal-12-week-results.json"}`, `${JSON.stringify(longitudinal, null, 2)}\n`);
 
-if (!oneStepDeterministic) throw new Error("one_step_semantic_determinism_failed");
-if (oneStep.reproducedCounts.futureChanges !== 5 || oneStep.reproducedCounts.explicitNoChangeOrReview !== 7 || oneStep.reproducedCounts.silentOmissions !== 0) {
+if (!continuityMode && !oneStepDeterministic) throw new Error("one_step_semantic_determinism_failed");
+if (!continuityMode && (oneStep.reproducedCounts.futureChanges !== 5 || oneStep.reproducedCounts.explicitNoChangeOrReview !== 7 || oneStep.reproducedCounts.silentOmissions !== 0)) {
   throw new Error(`one_step_count_mismatch:${JSON.stringify(oneStep.reproducedCounts)}`);
 }
 console.log(JSON.stringify({

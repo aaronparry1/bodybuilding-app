@@ -6,6 +6,8 @@ import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-p
 import { resolveCanonicalConstructionFacts } from "@/application/training/canonical-construction-facts";
 import { constructCanonicalActivePlanFromCanonicalInputs } from "@/application/training/canonical-active-plan-construction";
 import type { CanonicalPhaseOneApplicationReceipt } from "@/domain/training/canonical-progress-decision";
+import { compareCanonicalMaterialPrescriptions, type CanonicalMaterialPrescriptionDelta } from "@/domain/training/canonical-material-prescription-delta";
+import { mesocycleById, type MesocycleId } from "@/domain/training/mesocycle-library";
 
 export type CanonicalProgressDecisionApplicationCommand = Readonly<{ planId: string; expectedPlanRevision: number; macrocycleId: string; mesocycleId: string; microcycleId: string; decisionId: string; evaluationId: string; expectedEvidenceIds: readonly string[] }>;
 export type CanonicalProgressDecisionApplicationResult = Readonly<{ status: "unchanged" | "applied" | "rejected"; reason: string; planId: string; priorRevision: number; newRevision: number; decisionId: string; stateChanged: boolean; futureSessionsRegenerated: boolean; reviewRequired: boolean }>;
@@ -65,9 +67,13 @@ function applyPhaseOneDecision(
     const recorded = canonicalProgressDecisionRepository.recordApplication(command.decisionId, phaseOneReceipt(
       details,
       details.decisionType === "blocked" ? "blocked" : "unchanged",
+      details.decisionType === "blocked" ? "blocked_no_change" : "explicit_no_change",
+      details.decisionType === "blocked" ? "phase_one_adaptation_blocked" : "phase_one_prescription_maintained",
+      decision.explanation,
       currentRevision,
       currentRevision,
       details.priorFutureSessionIds,
+      [],
     ));
     if (recorded.status !== "saved" && recorded.status !== "duplicate") return rejected(command, currentRevision, "decision_application_receipt_failed");
     return { status: "unchanged", reason: details.decisionType === "blocked" ? "phase_one_adaptation_blocked" : "phase_one_prescription_maintained", planId: command.planId, priorRevision: currentRevision, newRevision: currentRevision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: false, reviewRequired: details.decisionType === "blocked" };
@@ -81,10 +87,14 @@ function applyPhaseOneDecision(
   const establishedLoads = Object.fromEntries(Object.entries(facts.facts.establishedLoads).filter(([exerciseId]) => !recalibrated.has(exerciseId)));
   const loadEvidence = Object.fromEntries(Object.entries(facts.facts.loadEvidence).filter(([exerciseId]) => !recalibrated.has(exerciseId)));
   const transition = details.decisionType === "transition";
-  const advance = details.decisionType === "advance_microcycle" || transition;
+  let appliedTransition = transition;
+  let appliedReason = `phase_one_${details.decisionType}_applied`;
+  let appliedExplanation = decision.explanation;
+  const boundaryContinuation = raw.carrier.plannedSessions.length === 0 && details.reasonCodes.includes("current_microcycle_completed");
+  const advance = details.decisionType === "advance_microcycle" || transition || boundaryContinuation;
   const selectedMesocycleId = transition ? decision.successorMesocycleId : raw.carrier.mesocycle.id;
   if (!selectedMesocycleId) return rejected(command, currentRevision, "successor_not_approved");
-  const constructed = constructCanonicalActivePlanFromCanonicalInputs({
+  const constructionInput = {
     planId: raw.carrier.planId,
     createdAt: raw.carrier.createdAt,
     updatedAt: details.decidedAt,
@@ -107,7 +117,44 @@ function applyPhaseOneDecision(
     history: facts.facts.history,
     establishedLoads,
     loadEvidence,
-  });
+  } satisfies Parameters<typeof constructCanonicalActivePlanFromCanonicalInputs>[0];
+  let constructed = constructCanonicalActivePlanFromCanonicalInputs(constructionInput);
+  if (constructed.status !== "constructed" && transition) {
+    const currentMesocycle = mesocycleById(raw.carrier.mesocycle.id as MesocycleId);
+    const completedMicrocycles = new Set([
+      raw.carrier.microcycle.id,
+      ...(raw.carrier.cycleLineage ?? [])
+        .filter((entry) => entry.mesocycleId === raw.carrier.mesocycle.id)
+        .map((entry) => entry.microcycleId),
+    ]).size;
+    if (currentMesocycle && completedMicrocycles < currentMesocycle.maximumWeeks) {
+      constructed = constructCanonicalActivePlanFromCanonicalInputs({
+        ...constructionInput,
+        selectedMesocycleId: raw.carrier.mesocycle.id as MesocycleId,
+      });
+      if (constructed.status === "constructed") {
+        appliedTransition = false;
+        appliedReason = "approved_successor_construction_unavailable_continued_within_horizon";
+        appliedExplanation = "The approved next phase could not produce a compatible prescription from the athlete's current facts, so training safely continues in the current phase within its certified maximum horizon.";
+      }
+    } else if (currentMesocycle && completedMicrocycles >= currentMesocycle.maximumWeeks) {
+      const reason = "approved_successor_construction_unavailable_at_maximum_horizon";
+      const explanation = "The current phase has reached its certified maximum horizon, but the approved next phase cannot produce a compatible prescription from the athlete's current facts. A compatible successor or updated athlete facts are required before training can continue.";
+      const recorded = canonicalProgressDecisionRepository.recordApplication(command.decisionId, phaseOneReceipt(
+        details,
+        "blocked",
+        "blocked_no_change",
+        reason,
+        explanation,
+        raw.carrier.revision,
+        raw.carrier.revision,
+        raw.carrier.plannedSessions.map((session) => session.id),
+        [],
+      ));
+      if (recorded.status !== "saved" && recorded.status !== "duplicate") return rejected(command, currentRevision, "decision_application_receipt_failed");
+      return { status: "unchanged", reason, planId: command.planId, priorRevision: raw.carrier.revision, newRevision: raw.carrier.revision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: false, reviewRequired: true };
+    }
+  }
   if (constructed.status !== "constructed") return rejected(command, currentRevision, `canonical_future_session_construction_failed:${constructed.reason}`);
   const retainedIndexes = new Set(raw.carrier.plannedSessions.map((session) => session.planSessionIndex));
   const plannedSessions = advance ? constructed.carrier.plannedSessions : constructed.carrier.plannedSessions.filter((session) => retainedIndexes.has(session.planSessionIndex));
@@ -117,7 +164,7 @@ function applyPhaseOneDecision(
   const newLineage = advance ? (constructed.carrier.cycleLineage ?? []).map((entry) => ({ ...entry, revision: nextRevision, status: "current" as const })) : [];
   const next = {
     ...constructed.carrier,
-    mesocycle: transition ? { ...constructed.carrier.mesocycle, position: raw.carrier.mesocycle.position + 1, transitionReference: decision.decisionId } : { ...constructed.carrier.mesocycle, position: raw.carrier.mesocycle.position },
+    mesocycle: appliedTransition ? { ...constructed.carrier.mesocycle, position: raw.carrier.mesocycle.position + 1, transitionReference: decision.decisionId } : { ...constructed.carrier.mesocycle, position: raw.carrier.mesocycle.position },
     plannedSessions,
     revision: nextRevision,
     progress: { ...constructed.carrier.progress, revision: nextRevision, decisionReference: decision.decisionId },
@@ -140,14 +187,42 @@ function applyPhaseOneDecision(
       changeReasons: [...details.reasonCodes, `decision:${decision.decisionId}`],
     },
   };
+  const material = compareCanonicalMaterialPrescriptions(raw.carrier.plannedSessions, plannedSessions);
+  if (material.status === "unchanged") {
+    const reason = "material_prescription_delta_absent";
+    const explanation = "The reviewed future prescription was already materially equivalent, so no plan revision was written.";
+    const recorded = canonicalProgressDecisionRepository.recordApplication(command.decisionId, phaseOneReceipt(
+      details,
+      "unchanged",
+      "explicit_no_change",
+      reason,
+      explanation,
+      raw.carrier.revision,
+      raw.carrier.revision,
+      raw.carrier.plannedSessions.map((session) => session.id),
+      [],
+    ));
+    if (recorded.status !== "saved" && recorded.status !== "duplicate") return rejected(command, currentRevision, "decision_application_receipt_failed");
+    return { status: "unchanged", reason, planId: command.planId, priorRevision: raw.carrier.revision, newRevision: raw.carrier.revision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: false, reviewRequired: false };
+  }
   const saved = canonicalActivePlanV2Repository.saveAtomically(next, raw.carrier.revision);
   if (saved.status !== "saved") return rejected(command, currentRevision, saved.status === "conflict" ? "stale_plan_revision" : "canonical_plan_save_failed");
-  const recorded = canonicalProgressDecisionRepository.recordApplication(command.decisionId, phaseOneReceipt(details, "applied", raw.carrier.revision, nextRevision, plannedSessions.map((session) => session.id)));
+  const recorded = canonicalProgressDecisionRepository.recordApplication(command.decisionId, phaseOneReceipt(
+    details,
+    "applied",
+    "future_prescription_change",
+    appliedReason,
+    appliedExplanation,
+    raw.carrier.revision,
+    nextRevision,
+    plannedSessions.map((session) => session.id),
+    material.deltas,
+  ));
   if (recorded.status !== "saved" && recorded.status !== "duplicate") {
     const rollback = canonicalActivePlanV2Repository.saveAtomically(raw.carrier, nextRevision);
     return rejected(command, rollback.status === "saved" ? raw.carrier.revision : nextRevision, rollback.status === "saved" ? "decision_application_receipt_failed" : "decision_receipt_rollback_failed");
   }
-  return { status: "applied", reason: `phase_one_${details.decisionType}_applied`, planId: command.planId, priorRevision: raw.carrier.revision, newRevision: nextRevision, decisionId: command.decisionId, stateChanged: true, futureSessionsRegenerated: true, reviewRequired: false };
+  return { status: "applied", reason: appliedReason, planId: command.planId, priorRevision: raw.carrier.revision, newRevision: nextRevision, decisionId: command.decisionId, stateChanged: true, futureSessionsRegenerated: true, reviewRequired: false };
 }
 
 function rejected(command: CanonicalProgressDecisionApplicationCommand, revision: number, reason: string): CanonicalProgressDecisionApplicationResult { return { status: "rejected", reason, planId: command.planId, priorRevision: revision, newRevision: revision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: false, reviewRequired: false }; }
@@ -158,16 +233,24 @@ function macrocycleGoalForCarrier(goal: string): Parameters<typeof constructCano
 function phaseOneReceipt(
   details: import("@/domain/training/canonical-progress-decision").CanonicalPhaseOneDecisionDetails,
   status: CanonicalPhaseOneApplicationReceipt["status"],
+  actualResult: "future_prescription_change" | "explicit_no_change" | "blocked_no_change",
+  reasonCode: string,
+  explanation: string,
   priorRevision: number,
   newRevision: number,
   resultingFutureSessionIds: readonly string[],
+  materialDeltas: readonly CanonicalMaterialPrescriptionDelta[],
 ): CanonicalPhaseOneApplicationReceipt {
   return {
-    schemaVersion: "canonical_coaching_application_receipt_v1",
+    schemaVersion: "canonical_coaching_application_receipt_v2",
     status,
+    actualResult,
+    reasonCode,
+    explanation,
     priorRevision,
     newRevision,
     resultingFutureSessionIds: [...resultingFutureSessionIds].sort(),
+    materialDeltas,
     appliedAt: details.decidedAt,
   };
 }

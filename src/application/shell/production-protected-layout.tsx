@@ -5,6 +5,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { useAuth } from "@/application/auth/auth-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { resumePendingCanonicalCoachingWork } from "@/application/training/canonical-completion-evidence-reconciliation";
 import { reconcileCanonicalReleaseState, type CanonicalReleaseReconciliationResult } from "@/application/training/canonical-release-reconciliation";
 import { colors, spacing } from "@/ui/theme";
 
@@ -20,7 +21,10 @@ export default function ProductionProtectedLayout() {
   useEffect(() => {
     const result = reconcileCanonicalReleaseState({ onboardingCompleted: settings.onboardingCompleted, updatedAt: new Date().toISOString() });
     setReconciliation(result);
-    if (result.status === "ready" || result.status === "reconstructed") canonicalActivePlanState.hydrate();
+    if (result.status === "ready" || result.status === "reconstructed") {
+      const hydrated = canonicalActivePlanState.hydrate();
+      if (hydrated.model) resumePendingCanonicalCoachingWork(hydrated.model.planId);
+    }
   }, [settings.onboardingCompleted]);
 
   if (isLoading) return <Loading />;

@@ -5,6 +5,10 @@ import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/
 import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 import { validateCanonicalCoachingIdentity, type CanonicalCoachingIdentity } from "@/domain/training/canonical-coaching-identity";
 import type { MesocycleSpec } from "@/domain/training/mesocycle-library";
+import {
+  resolveCanonicalCycleBoundary,
+  type CanonicalCycleBoundaryResolution,
+} from "@/domain/training/canonical-cycle-boundary-resolution";
 
 export type CanonicalProgressEvaluation = Readonly<{
   schemaVersion: "canonical_progress_evaluation_v1";
@@ -61,6 +65,7 @@ export type CanonicalPostWorkoutEvaluation = Readonly<{
   deloadEligible: false;
   calibrationCandidates: readonly CanonicalCalibrationCandidate[];
   affectedExerciseIds: readonly string[];
+  boundaryResolution?: CanonicalCycleBoundaryResolution;
 }>;
 
 export function evaluateCanonicalProgress(input: Readonly<{ plan: CanonicalActivePlanReadModel; evidence: readonly CanonicalProgressEvidence[] }>): CanonicalProgressEvaluation {
@@ -121,7 +126,8 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
     outcome: CanonicalPostWorkoutEvaluation["outcome"],
     reasonCodes: readonly string[],
     explanation: string,
-    facts: Pick<CanonicalPostWorkoutEvaluation, "targetCompletion" | "comparableExposureCount" | "repDropOff" | "recoveryEvidence" | "transitionEligible" | "calibrationCandidates" | "affectedExerciseIds">,
+    facts: Pick<CanonicalPostWorkoutEvaluation, "targetCompletion" | "comparableExposureCount" | "repDropOff" | "recoveryEvidence" | "transitionEligible" | "calibrationCandidates" | "affectedExerciseIds">
+      & Readonly<{ boundaryResolution?: CanonicalCycleBoundaryResolution }>,
   ): CanonicalPostWorkoutEvaluation => ({
     ...base,
     evaluationId: `${input.plan.planId}:post-workout:${input.session.recordedSessionId}:${input.session.version}:${outcome}:${evidenceIds.join(",")}`,
@@ -161,7 +167,37 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
   const comparableExposureCount = new Set(relevant.filter((item) => item.kind === "performance" && exerciseIds.has(String(item.observations.exerciseId)) && item.observations.completion === "complete").flatMap((item) => item.sessionId ? [item.sessionId] : [])).size;
   const recoveryEvidence = recoveryEvidenceState(relevant);
   const calibrationCandidates = slotAssessments.flatMap((item) => item.calibrationCandidate ? [item.calibrationCandidate] : []);
-  const facts = { targetCompletion, comparableExposureCount, repDropOff, recoveryEvidence, transitionEligible: false, calibrationCandidates, affectedExerciseIds: calibrationCandidates.map((item) => item.exerciseId).sort() };
+  const completeCycle = input.microcycleComplete
+    && input.completedPlannedSessionsInMicrocycle >= input.plan.microcycle.trainingDays;
+  const boundary = resolveCanonicalCycleBoundary({
+    microcycleComplete: completeCycle,
+    completedMicrocyclesInMesocycle: input.completedMicrocyclesInMesocycle,
+    mesocycle: input.mesocycle,
+    policy: input.policy,
+    targetCompletion,
+  });
+  const facts = {
+    targetCompletion,
+    comparableExposureCount,
+    repDropOff,
+    recoveryEvidence,
+    transitionEligible: boundary.status === "transition_approved",
+    calibrationCandidates,
+    affectedExerciseIds: calibrationCandidates.map((item) => item.exerciseId).sort(),
+    boundaryResolution: boundary,
+  };
+  const reconciliationBlock = sessionEvidence.find((item) =>
+    item.kind === "review_request"
+    && (item.observations.reasonCode === "performed_work_identity_unavailable" || item.observations.reasonCode === "performed_evidence_identity_conflict")
+  );
+  if (reconciliationBlock) {
+    return finish(
+      "blocked",
+      [String(reconciliationBlock.observations.reasonCode)],
+      "Your workout is saved, but its performed work needs an identity review before it can change a future prescription.",
+      facts,
+    );
+  }
   if (sessionEvidence.some((item) => item.kind === "pain" || item.kind === "review_request")) {
     return finish("blocked", ["safety_review_required"], "Your workout is saved. We are keeping the next prescription unchanged until the safety review is resolved.", facts);
   }
@@ -173,27 +209,51 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
     .map((assessment) => assessment.exerciseId)
     .sort();
   if (!successful && repeatedFailureExerciseIds.length) {
-    return finish("recalibrate", ["repeated_comparable_target_failure", "numeric_regression_not_automatically_authorised"], "Recent comparable targets were missed more than once, so the next matching exercise returns to load calibration.", { ...facts, affectedExerciseIds: repeatedFailureExerciseIds });
+    return finish(
+      "recalibrate",
+      [
+        "repeated_comparable_target_failure",
+        "numeric_regression_not_automatically_authorised",
+        ...(completeCycle ? ["current_microcycle_completed", "recalibration_continues_in_next_microcycle"] : []),
+      ],
+      completeCycle
+        ? "Recent comparable targets were missed more than once. The next training week remains in this phase and the affected exercise returns to load calibration."
+        : "Recent comparable targets were missed more than once, so the next matching exercise returns to load calibration.",
+      { ...facts, affectedExerciseIds: repeatedFailureExerciseIds },
+    );
   }
   if (!successful) {
+    if (completeCycle) {
+      return finish(
+        "advance_microcycle",
+        ["current_microcycle_completed", boundary.reasonCode, repDropOff ? "rep_drop_off_blocks_progression" : "partial_exposure_does_not_create_completed_evidence"],
+        "This training week is complete. The next week remains in the same phase without treating incomplete work as successful progression.",
+        facts,
+      );
+    }
     return finish("maintain", [repDropOff ? "rep_drop_off_blocks_progression" : "single_incomplete_exposure"], "We’re keeping the next target unchanged until there is another comparable session.", facts);
   }
 
-  const completeCycle = input.microcycleComplete
-    && input.completedPlannedSessionsInMicrocycle >= input.plan.microcycle.trainingDays;
   if (completeCycle) {
-    const defaultExposureCompleted = input.completedMicrocyclesInMesocycle >= input.mesocycle.defaultWeeks;
-    if (defaultExposureCompleted && input.policy.transition.approvedSuccessors.length) {
+    if (boundary.status === "transition_approved") {
+      return finish(
+        "transition_recommended",
+        [boundary.reasonCode, "approved_successor_available", `approved_successor:${boundary.successorMesocycleId}`],
+        "This phase has reached its canonical training horizon, so the approved next phase has been prepared.",
+        { ...facts, transitionEligible: true },
+      );
+    }
+    if (boundary.status === "review_required") {
       return finish(
         "blocked",
-        ["default_mesocycle_exposure_completed", "approved_successor_available", "machine_evaluable_objective_policy_missing"],
-        "This phase has reached its reviewed training duration. Your completed workout is saved, but the next phase needs review because the phase objective cannot yet be evaluated automatically.",
+        [boundary.reasonCode],
+        "Your completed workout is saved, but there is no approved next phase at the current maximum horizon.",
         facts,
       );
     }
     return finish(
       "advance_microcycle",
-      ["current_microcycle_completed", defaultExposureCompleted ? "approved_successor_unavailable" : "minimum_phase_exposure_continues"],
+      ["current_microcycle_completed", boundary.reasonCode],
       "This training week is complete, so the next week has been prepared from the same coaching phase.",
       facts,
     );

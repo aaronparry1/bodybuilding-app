@@ -20,11 +20,12 @@ export type CanonicalPhaseOneDecisionDetails = Readonly<{
     exerciseIds: readonly string[];
     numericLoadAdjustmentAuthorised: false;
   }>;
+  boundaryResolution?: import("@/domain/training/canonical-cycle-boundary-resolution").CanonicalCycleBoundaryResolution;
   contextIdentity: Readonly<{ macrocycleId: string; mesocycleId: string; microcycleId: string }>;
   decidedAt: string;
   idempotencyKey: string;
 }>;
-export type CanonicalPhaseOneApplicationReceipt = Readonly<{
+export type CanonicalPhaseOneApplicationReceiptV1 = Readonly<{
   schemaVersion: "canonical_coaching_application_receipt_v1";
   status: "applied" | "unchanged" | "blocked";
   priorRevision: number;
@@ -32,6 +33,21 @@ export type CanonicalPhaseOneApplicationReceipt = Readonly<{
   resultingFutureSessionIds: readonly string[];
   appliedAt: string;
 }>;
+export type CanonicalPhaseOneApplicationReceiptV2 = Readonly<{
+  schemaVersion: "canonical_coaching_application_receipt_v2";
+  status: "applied" | "unchanged" | "blocked";
+  actualResult: "future_prescription_change" | "explicit_no_change" | "blocked_no_change";
+  reasonCode: string;
+  explanation: string;
+  priorRevision: number;
+  newRevision: number;
+  resultingFutureSessionIds: readonly string[];
+  materialDeltas: readonly import("@/domain/training/canonical-material-prescription-delta").CanonicalMaterialPrescriptionDelta[];
+  appliedAt: string;
+}>;
+export type CanonicalPhaseOneApplicationReceipt =
+  | CanonicalPhaseOneApplicationReceiptV1
+  | CanonicalPhaseOneApplicationReceiptV2;
 export type CanonicalProgressDecision = Readonly<{
   schemaVersion: typeof CANONICAL_PROGRESS_DECISION_SCHEMA;
   decisionId: string;
@@ -82,6 +98,12 @@ export function validateCanonicalProgressDecision(value: unknown): { status: "va
       || !["establish_observed_calibration", "retain_prescription", "require_recalibration", "construct_next_microcycle", "construct_approved_successor", "none"].includes(String(details.boundedAdjustment.kind))
       || !Array.isArray(details.boundedAdjustment.exerciseIds) || details.boundedAdjustment.exerciseIds.some((id) => typeof id !== "string" || !id)
       || details.boundedAdjustment.numericLoadAdjustmentAuthorised !== false
+      || details.boundaryResolution !== undefined && (
+        details.boundaryResolution.schemaVersion !== "canonical_cycle_boundary_resolution_v1"
+        || !["not_at_boundary", "continue_current_phase", "transition_approved", "review_required"].includes(String(details.boundaryResolution.status))
+        || typeof details.boundaryResolution.reasonCode !== "string"
+        || !details.boundaryResolution.reasonCode
+      )
       || !details.contextIdentity || !details.contextIdentity.macrocycleId || !details.contextIdentity.mesocycleId || !details.contextIdentity.microcycleId
       || typeof details.decidedAt !== "string" || Number.isNaN(Date.parse(details.decidedAt))
       || typeof details.idempotencyKey !== "string" || !details.idempotencyKey) return { status: "invalid", reason: "invalid_phase_one_decision" };
@@ -90,12 +112,28 @@ export function validateCanonicalProgressDecision(value: unknown): { status: "va
   }
   if (c.phaseOneApplication !== undefined) {
     const receipt = c.phaseOneApplication as Partial<CanonicalPhaseOneApplicationReceipt>;
-    if (receipt.schemaVersion !== "canonical_coaching_application_receipt_v1"
+    const legacy = receipt.schemaVersion === "canonical_coaching_application_receipt_v1";
+    const current = receipt.schemaVersion === "canonical_coaching_application_receipt_v2";
+    if ((!legacy && !current)
       || !["applied", "unchanged", "blocked"].includes(String(receipt.status))
       || !Number.isInteger(receipt.priorRevision) || Number(receipt.priorRevision) < 0
       || !Number.isInteger(receipt.newRevision) || Number(receipt.newRevision) < Number(receipt.priorRevision)
       || !Array.isArray(receipt.resultingFutureSessionIds) || receipt.resultingFutureSessionIds.some((id) => typeof id !== "string" || !id)
       || typeof receipt.appliedAt !== "string" || Number.isNaN(Date.parse(receipt.appliedAt))) return { status: "invalid", reason: "invalid_phase_one_application_receipt" };
+    if (current) {
+      const value = receipt as Partial<CanonicalPhaseOneApplicationReceiptV2>;
+      if (!["future_prescription_change", "explicit_no_change", "blocked_no_change"].includes(String(value.actualResult))
+        || typeof value.reasonCode !== "string" || !value.reasonCode
+        || typeof value.explanation !== "string" || !value.explanation
+        || !Array.isArray(value.materialDeltas)
+        || value.materialDeltas.some((item) => !item || item.schemaVersion !== "canonical_material_prescription_delta_v1" || !item.sessionKey || !item.field)
+        || (value.status === "applied" && (value.actualResult !== "future_prescription_change" || value.materialDeltas.length === 0 || value.newRevision === value.priorRevision))
+        || (value.status === "unchanged" && value.actualResult !== "explicit_no_change")
+        || (value.status === "blocked" && value.actualResult !== "blocked_no_change")
+        || (value.status !== "applied" && (value.materialDeltas.length !== 0 || value.newRevision !== value.priorRevision))) {
+        return { status: "invalid", reason: "invalid_phase_one_application_receipt" };
+      }
+    }
   }
   return { status: "valid", decision: { ...(c as CanonicalProgressDecision), evidenceIds: [...(c.evidenceIds as string[])] } };
 }

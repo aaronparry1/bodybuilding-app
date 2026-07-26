@@ -8,6 +8,9 @@ import { pauseCanonicalRestTimer, resumeCanonicalRestTimer, startCanonicalRestTi
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
 import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 import { orchestrateCanonicalPostWorkoutAdaptation } from "@/application/training/canonical-post-workout-orchestrator";
+import { reconcileCanonicalCompletedSessionEvidence } from "@/application/training/canonical-completion-evidence-reconciliation";
+import { canonicalCoachingAttemptRepository } from "@/data/local/canonical-coaching-attempt-repository";
+import { canonicalCoachingOperationId } from "@/domain/training/canonical-coaching-identity";
 
 export type CanonicalStartSessionCommand = Readonly<{ planId: string; expectedPlanRevision: number; plannedSessionId: string; expectedPrescriptionHash: string; operationId: string; startedAt: string; provenance: string }>;
 export type CanonicalStartSessionResult = Readonly<{ status: "started" | "already_started" | "rejected" | "retryable"; reason: string; recordedSessionId?: string; planRevision?: number }>;
@@ -56,14 +59,19 @@ export function completeCanonicalSession(command: CanonicalRecordedLifecycleComm
   const aggregate = canonicalRecordedSessionLedger.get(command.recordedSessionId);
   if (aggregate.status !== "found") return { status: "rejected", reason: "recorded_session_not_found" };
   if (aggregate.session.status === "completed") {
-    const priorEvidence = canonicalProgressEvidenceRepository.list(command.planId)
-      .find((candidate) => candidate.kind === "completion" && candidate.sessionId === command.recordedSessionId);
-    const adaptation = priorEvidence && isPlannedRecordedSession(command.planId, command.recordedSessionId)
-      ? orchestrateCanonicalPostWorkoutAdaptation({ planId: command.planId, recordedSessionId: command.recordedSessionId, completionEvidenceId: priorEvidence.evidenceId, occurredAt: command.occurredAt })
+    const reconciled = reconcileCanonicalCompletedSessionEvidence({
+      planId: command.planId,
+      recordedSessionId: command.recordedSessionId,
+    });
+    const priorEvidence = reconciled.completionEvidenceId
+      ? canonicalProgressEvidenceRepository.get(reconciled.completionEvidenceId)
+      : { status: "not_found" as const };
+    const adaptation = priorEvidence.status === "found" && isPlannedRecordedSession(command.planId, command.recordedSessionId)
+      ? orchestrateCanonicalPostWorkoutAdaptation({ planId: command.planId, recordedSessionId: command.recordedSessionId, completionEvidenceId: priorEvidence.evidence.evidenceId, occurredAt: priorEvidence.evidence.observedAt })
       : null;
     return {
       status: "idempotent",
-      reason: adaptation?.status === "retryable" ? "completion_applied_adaptation_pending" : "completion_already_applied",
+      reason: reconciled.status === "retryable" || adaptation?.status === "retryable" ? "completion_applied_adaptation_pending" : "completion_already_applied",
       ledgerVersion: aggregate.session.version,
       ...(adaptation?.explanation ? { nextInstruction: adaptation.explanation } : {}),
     };
@@ -76,9 +84,31 @@ export function completeCanonicalSession(command: CanonicalRecordedLifecycleComm
   const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, { eventId: `${command.recordedSessionId}:completed:${command.operationId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "completed", occurredAt: command.occurredAt, operationId: command.operationId, payload: { summary } });
   if (appended.status !== "saved") return { status: "rejected", reason: appended.reason ?? "completion_conflict" };
   const completionEvidenceId = `${command.recordedSessionId}:completion-evidence:${appended.session!.version}`;
-  const evidence = canonicalProgressEvidenceRepository.record({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: completionEvidenceId, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}`, kind: "completion", observations: { plannedSessionId: aggregate.session.plannedSessionId, prescriptionHash: aggregate.session.prescriptionHash, completion: summary.completion, prescribedSets: prescribedWorkingSetCount(aggregate.session.prescriptionSnapshot), prescribedSlots: summary.prescribedSlots, completedSlots: summary.completedSlots.length, partialSlots: summary.partialSlots.length, skippedSlots: summary.skippedSlots.length, performedSets: summary.performedSets, performedReps: summary.performedReps, performedLoad: summary.performedLoad }, evidenceVersion: "progress_v1" });
+  const coachingOperationId = canonicalCoachingOperationId(command.planId, command.recordedSessionId, completionEvidenceId);
+  canonicalCoachingAttemptRepository.save({
+    schemaVersion: "canonical_coaching_attempt_v1",
+    operationId: coachingOperationId,
+    planId: command.planId,
+    recordedSessionId: command.recordedSessionId,
+    completionEvidenceId,
+    status: "pending",
+    reason: "durable_completion_recorded",
+    planRevisionAtCompletion: command.expectedPlanRevision,
+    completedLedgerVersion: appended.session!.version,
+    prescriptionHash: aggregate.session.prescriptionHash,
+    evidenceState: "pending",
+    decisionState: "pending",
+    applicationState: "pending",
+    retryIdentity: coachingOperationId,
+    updatedAt: command.occurredAt,
+  });
+  const evidence = reconcileCanonicalCompletedSessionEvidence({
+    planId: command.planId,
+    recordedSessionId: command.recordedSessionId,
+    planRevision: command.expectedPlanRevision,
+  });
   canonicalRestTimerRepository.clear(command.recordedSessionId);
-  if (evidence.status !== "saved" && evidence.status !== "duplicate") {
+  if (evidence.status !== "reconciled" && evidence.status !== "already_complete") {
     canonicalActivePlanState.hydrate();
     return { status: "retryable", reason: "completed_with_evidence_pending", ledgerVersion: appended.session!.version };
   }

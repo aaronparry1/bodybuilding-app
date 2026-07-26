@@ -119,7 +119,8 @@ describe("independent post-remediation coaching-loop certification", () => {
     ]);
     expect(mountedEvidenceWriters).toEqual([]);
     expect(evaluator).toContain("deloadEligible: false");
-    expect(evaluator).toContain("machine_evaluable_objective_policy_missing");
+    expect(evaluator).not.toContain("machine_evaluable_objective_policy_missing");
+    expect(evaluator).toContain("resolveCanonicalCycleBoundary");
     expect(onboarding).toMatch(/equipment:\s*\[[^\]]*"machine"[^\]]*"cable"/s);
   });
 
