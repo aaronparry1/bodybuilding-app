@@ -810,6 +810,85 @@ describe("mounted canonical coaching loop P0 remediation", () => {
     expect(new Set(results.map((result) => result.scenario)).size).toBe(12);
     expect(results.every((result) => result.decision && result.result)).toBe(true);
   }, 30_000);
+
+  it("recovers a transient first coaching-work-item write from the durable completed ledger", () => {
+    const started = createAndStart("post-continuity:attempt-write-fault");
+    const originalSave = canonicalCoachingAttemptRepository.save.bind(canonicalCoachingAttemptRepository);
+    let firstWriteRejected = false;
+    vi.spyOn(canonicalCoachingAttemptRepository, "save").mockImplementation((attempt) => {
+      if (!firstWriteRejected && attempt.reason === "durable_completion_recorded") {
+        firstWriteRejected = true;
+        return { status: "invalid" as const, reason: "fault_injected_attempt_write" };
+      }
+      return originalSave(attempt);
+    });
+
+    const completion = completeSuccessfulWorkout(started, 60);
+    expect(firstWriteRejected).toBe(true);
+    expect(completion.status).toBe("applied");
+    expect(canonicalRecordedSessionLedger.get(started.recordedSessionId)).toMatchObject({
+      status: "found",
+      session: { status: "completed" },
+    });
+    expect(canonicalCoachingAttemptRepository.list(started.planId)).toHaveLength(1);
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]?.status).toMatch(/applied|unchanged/);
+  });
+
+  it("exposes the unresolved crash window between carrier commit and application-receipt persistence", () => {
+    const started = createAndStart("post-continuity:receipt-crash-window");
+    const prior = canonicalActivePlanV2Repository.get();
+    if (prior.status !== "saved") throw new Error("prior carrier missing");
+    vi.spyOn(canonicalProgressDecisionRepository, "recordApplication").mockImplementation(() => {
+      throw new Error("fault_injected_process_termination_before_receipt");
+    });
+
+    expect(() => completeSuccessfulWorkout(started, 60)).toThrow("fault_injected_process_termination_before_receipt");
+    vi.restoreAllMocks();
+
+    const committedWithoutReceipt = canonicalActivePlanV2Repository.get();
+    if (committedWithoutReceipt.status !== "saved") throw new Error("carrier missing after injected crash");
+    expect(committedWithoutReceipt.carrier.revision).toBeGreaterThan(prior.carrier.revision);
+    const decision = canonicalProgressDecisionRepository.list(started.planId)[0];
+    expect(decision?.phaseOneApplication).toBeUndefined();
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]?.status).toBe("decision_persisted");
+
+    jsonStore.resetCache();
+    canonicalActivePlanState.hydrate();
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toHaveLength(1);
+    expect(canonicalProgressDecisionRepository.list(started.planId)[0]?.phaseOneApplication).toBeUndefined();
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]?.status).toBe("decision_persisted");
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toHaveLength(1);
+    expect(canonicalActivePlanV2Repository.get()).toEqual(committedWithoutReceipt);
+  });
+
+  it("exposes the unresolved final-session review boundary hidden by the continuity harness", () => {
+    const planId = "post-continuity:final-session-review";
+    let started = createAndStart(planId, { daysPerWeek: 3 });
+    completeSuccessfulWorkout(started, 60);
+    started = startNextExisting(planId, 1);
+    completeSuccessfulWorkout(started, 60);
+    started = startNextExisting(planId, 2);
+    addContextEvidence(started, "readiness", {
+      freshness: "fresh",
+      completeness: "complete",
+      recovery: "constrained",
+      fatigue: "systemic",
+    });
+    completeSuccessfulWorkout(started, 60);
+
+    const finalDecision = canonicalProgressDecisionRepository.list(planId).at(-1);
+    expect(finalDecision?.phaseOne).toMatchObject({
+      decisionType: "blocked",
+      result: "blocked_no_change",
+      reasonCodes: ["recovery_review_required"],
+    });
+    expect(finalDecision?.phaseOneApplication).toMatchObject({
+      status: "blocked",
+      actualResult: "blocked_no_change",
+    });
+    canonicalActivePlanState.hydrate();
+    expect(canonicalActivePlanState.getReadModel()?.nextSession).toBeNull();
+  });
 });
 
 type StartedFixture = {

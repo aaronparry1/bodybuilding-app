@@ -1,0 +1,5415 @@
+{
+  "schemaVersion": "canonical_coaching_loop_post_continuity_material_classification_v1",
+  "auditedCommit": "6a251343a3884c4fe2dda6d6d2bebad75e71f7e1",
+  "freshRunCount": 2,
+  "freshRunSemanticDeterminism": true,
+  "freshRunSemanticSha256": [
+    "89d1c6cab6678037a4c2a49a65ee595b2c6bf5754c7d6cad0de13985078e0e2f",
+    "89d1c6cab6678037a4c2a49a65ee595b2c6bf5754c7d6cad0de13985078e0e2f"
+  ],
+  "mechanicalAppliedReceiptCount": 157,
+  "truthfulMaterialTransactionCount": 155,
+  "generatedIdentityOnlyAppliedReceiptCount": 2,
+  "rawMaterialDeltaCount": 729,
+  "generatedIdentityDeltaCount": 6,
+  "numberToNumberBaseLoadDeltaCount": 0,
+  "transactionCategoryCounts": {
+    "approved_successor_failure_continuation": 5,
+    "approved_successor_transition": 22,
+    "generated_identity_only_false_positive": 2,
+    "load_state_recalibration": 1,
+    "observed_load_calibration": 10,
+    "ordinary_next_microcycle_construction": 117
+  },
+  "requestedFieldClassification": [
+    {
+      "field": "exercise_identity",
+      "deltaOrTransitionCount": 0,
+      "meaning": "No direct before/after exercise-id mutation. Exercise identities are embedded in 648 atomic new-session deltas."
+    },
+    {
+      "field": "sets",
+      "deltaOrTransitionCount": 0,
+      "meaning": "No retained future-session set count changed."
+    },
+    {
+      "field": "repetitions",
+      "deltaOrTransitionCount": 0,
+      "meaning": "No retained future-session target repetition changed."
+    },
+    {
+      "field": "load_state",
+      "deltaOrTransitionCount": 15,
+      "meaning": "Calibration establishment or recalibration only."
+    },
+    {
+      "field": "base_load",
+      "deltaOrTransitionCount": 15,
+      "meaning": "Null-to-observed or observed-to-null only; never number-to-number."
+    },
+    {
+      "field": "method",
+      "deltaOrTransitionCount": 0,
+      "meaning": "No method semantic changed. Six generated method-group identity deltas were recorded."
+    },
+    {
+      "field": "rest",
+      "deltaOrTransitionCount": 0,
+      "meaning": "No retained future-session rest rule changed."
+    },
+    {
+      "field": "progression_rule",
+      "deltaOrTransitionCount": 0,
+      "meaning": "No retained future-session progression rule changed."
+    },
+    {
+      "field": "stop_rule",
+      "deltaOrTransitionCount": 0,
+      "meaning": "No retained future-session stop rule changed."
+    },
+    {
+      "field": "substitution_constraints",
+      "deltaOrTransitionCount": 0,
+      "meaning": "No retained future-session substitution constraint changed."
+    },
+    {
+      "field": "session_identity",
+      "deltaOrTransitionCount": 648,
+      "meaning": "Atomic construction of new future sessions after the prior week was exhausted."
+    },
+    {
+      "field": "mesocycle_identity",
+      "deltaOrTransitionCount": 22,
+      "meaning": "Approved successor transitions; this identity is recorded by decision and lineage rather than a comparator field."
+    },
+    {
+      "field": "approved_successor_transition",
+      "deltaOrTransitionCount": 22,
+      "meaning": "Existing ordered approved-successor edge."
+    },
+    {
+      "field": "other_generated_identity",
+      "deltaOrTransitionCount": 6,
+      "meaning": "Method group IDs encode regenerated session identities; two transactions contain no other delta."
+    }
+  ],
+  "rawFieldDeltaCounts": {
+    "session": 648,
+    "slots[0].loadPrescription.baseUnit": 11,
+    "slots[0].loadPrescription.prescribedBaseLoad": 11,
+    "slots[0].loadPrescription.rounding": 11,
+    "slots[0].loadPrescription.state": 11,
+    "slots[0].prescribedLoad": 11,
+    "slots[1].methodStructure.groupId": 3,
+    "slots[2].methodStructure.groupId": 3,
+    "slots[4].loadPrescription.baseUnit": 4,
+    "slots[4].loadPrescription.prescribedBaseLoad": 4,
+    "slots[4].loadPrescription.rounding": 4,
+    "slots[4].loadPrescription.state": 4,
+    "slots[4].prescribedLoad": 4
+  },
+  "generatedIdentityOnlyApplications": [
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 16,
+      "microcycleSequence": 4,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "generated_identity_only_false_positive",
+      "truthfulMaterialPrescriptionDelta": false,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": false,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 2,
+      "fields": [
+        "slots[1].methodStructure.groupId",
+        "slots[2].methodStructure.groupId"
+      ],
+      "representativeDelta": {
+        "field": "slots[1].methodStructure.groupId",
+        "before": "method-group:canonical-session:powerbuilding_hypertrophy:post-cert:repeated_stall:longitudinal:microcycle:4:Push strength and hypertrophy:3:canonical_plan_v3:2026-08-15T09:40:00.000Z:slot:1:canonical-session:powerbuilding_hypertrophy:post-cert:repeated_stall:longitudinal:microcycle:4:Push strength and hypertrophy:3:canonical_plan_v3:2026-08-15T09:40:00.000Z:slot:2",
+        "after": "method-group:canonical-session:powerbuilding_hypertrophy:post-cert:repeated_stall:longitudinal:microcycle:4:Push strength and hypertrophy:3:canonical_plan_v3:2026-08-16T09:40:00.000Z:slot:1:canonical-session:powerbuilding_hypertrophy:post-cert:repeated_stall:longitudinal:microcycle:4:Push strength and hypertrophy:3:canonical_plan_v3:2026-08-16T09:40:00.000Z:slot:2"
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 2,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "generated_identity_only_false_positive",
+      "truthfulMaterialPrescriptionDelta": false,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": false,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 2,
+      "fields": [
+        "slots[1].methodStructure.groupId",
+        "slots[2].methodStructure.groupId"
+      ],
+      "representativeDelta": {
+        "field": "slots[1].methodStructure.groupId",
+        "before": "method-group:canonical-session:athletic_general:post-cert:athletic_changing_sport_workload:longitudinal:microcycle:1:Full body strength and power C:2:canonical_plan_v3:2026-08-01T09:40:00.000Z:slot:1:canonical-session:athletic_general:post-cert:athletic_changing_sport_workload:longitudinal:microcycle:1:Full body strength and power C:2:canonical_plan_v3:2026-08-01T09:40:00.000Z:slot:2",
+        "after": "method-group:canonical-session:athletic_general:post-cert:athletic_changing_sport_workload:longitudinal:microcycle:1:Full body strength and power C:2:canonical_plan_v3:2026-08-02T09:40:00.000Z:slot:1:canonical-session:athletic_general:post-cert:athletic_changing_sport_workload:longitudinal:microcycle:1:Full body strength and power C:2:canonical_plan_v3:2026-08-02T09:40:00.000Z:slot:2"
+      }
+    }
+  ],
+  "applications": [
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 1,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "observed_load_calibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": true,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": true,
+      "fieldCount": 5,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[0].loadPrescription.baseUnit",
+        "before": null,
+        "after": "kg"
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 2,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "observed_load_calibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": true,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": true,
+      "fieldCount": 5,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[0].loadPrescription.baseUnit",
+        "before": null,
+        "after": "kg"
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 5,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 10,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 3,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 20,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 25,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 35,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 40,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 45,
+      "microcycleSequence": 9,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 50,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 55,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "normal_responder",
+      "opportunityOrdinal": 60,
+      "microcycleSequence": 12,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 5,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 10,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 3,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 20,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 25,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 35,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 40,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 45,
+      "microcycleSequence": 9,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 50,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 55,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "high_responder",
+      "opportunityOrdinal": 60,
+      "microcycleSequence": 12,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 1,
+      "microcycleSequence": 1,
+      "decisionType": "recalibrate",
+      "attemptReason": "phase_one_recalibrate_applied",
+      "category": "load_state_recalibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[0].loadPrescription.baseUnit",
+        "before": "kg",
+        "after": null
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 5,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 10,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 3,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 16,
+      "microcycleSequence": 4,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "generated_identity_only_false_positive",
+      "truthfulMaterialPrescriptionDelta": false,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": false,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 2,
+      "fields": [
+        "slots[1].methodStructure.groupId",
+        "slots[2].methodStructure.groupId"
+      ],
+      "representativeDelta": {
+        "field": "slots[1].methodStructure.groupId",
+        "before": "method-group:canonical-session:powerbuilding_hypertrophy:post-cert:repeated_stall:longitudinal:microcycle:4:Push strength and hypertrophy:3:canonical_plan_v3:2026-08-15T09:40:00.000Z:slot:1:canonical-session:powerbuilding_hypertrophy:post-cert:repeated_stall:longitudinal:microcycle:4:Push strength and hypertrophy:3:canonical_plan_v3:2026-08-15T09:40:00.000Z:slot:2",
+        "after": "method-group:canonical-session:powerbuilding_hypertrophy:post-cert:repeated_stall:longitudinal:microcycle:4:Push strength and hypertrophy:3:canonical_plan_v3:2026-08-16T09:40:00.000Z:slot:1:canonical-session:powerbuilding_hypertrophy:post-cert:repeated_stall:longitudinal:microcycle:4:Push strength and hypertrophy:3:canonical_plan_v3:2026-08-16T09:40:00.000Z:slot:2"
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 20,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 25,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 35,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 40,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 45,
+      "microcycleSequence": 9,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 50,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 55,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "repeated_stall",
+      "opportunityOrdinal": 60,
+      "microcycleSequence": 12,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 1,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "observed_load_calibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": true,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[0].loadPrescription.baseUnit",
+        "before": null,
+        "after": "kg"
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 2,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "observed_load_calibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": true,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[0].loadPrescription.baseUnit",
+        "before": null,
+        "after": "kg"
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 5,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 10,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 3,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 20,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 25,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 35,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 40,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 45,
+      "microcycleSequence": 9,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 50,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 55,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "poor_recovery",
+      "opportunityOrdinal": 60,
+      "microcycleSequence": 12,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 5,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 10,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 3,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 20,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 25,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 35,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 40,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 45,
+      "microcycleSequence": 9,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 50,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 55,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "missed_sessions",
+      "opportunityOrdinal": 60,
+      "microcycleSequence": 12,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 1,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "observed_load_calibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": true,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[0].loadPrescription.baseUnit",
+        "before": null,
+        "after": "kg"
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 2,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "observed_load_calibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": true,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[0].loadPrescription.baseUnit",
+        "before": null,
+        "after": "kg"
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 5,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 10,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 3,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 20,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 25,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 35,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 40,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 45,
+      "microcycleSequence": 9,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 50,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 55,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "return_after_layoff",
+      "opportunityOrdinal": 60,
+      "microcycleSequence": 12,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 1,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "observed_load_calibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": true,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[0].loadPrescription.baseUnit",
+        "before": null,
+        "after": "kg"
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 2,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "observed_load_calibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": true,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[0].loadPrescription.baseUnit",
+        "before": null,
+        "after": "kg"
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 5,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-machine-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 10,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 3,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 20,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-machine-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 25,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 35,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-machine-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 40,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 45,
+      "microcycleSequence": 9,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 50,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-machine-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 55,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "pain_or_limitation",
+      "opportunityOrdinal": 60,
+      "microcycleSequence": 12,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 1,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "observed_load_calibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": true,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 15,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad",
+        "slots[4].loadPrescription.baseUnit",
+        "slots[4].loadPrescription.prescribedBaseLoad",
+        "slots[4].loadPrescription.rounding",
+        "slots[4].loadPrescription.state",
+        "slots[4].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[4].loadPrescription.baseUnit",
+        "before": null,
+        "after": "kg"
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 3,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 6,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 9,
+      "microcycleSequence": 3,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 12,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 18,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 21,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 24,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 27,
+      "microcycleSequence": 9,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 33,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "limited_equipment",
+      "opportunityOrdinal": 36,
+      "microcycleSequence": 12,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body powerbuilding A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-barbell-bench",
+            "ex-chest-supported-row",
+            "ex-single-leg-hip-thrust",
+            "ex-pallof-press"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 5,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs hypertrophy F",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 7,
+          "exerciseIds": [
+            "ex-stiff-leg-deadlift",
+            "ex-walking-lunge",
+            "ex-kneeling-leg-curl",
+            "ex-leg-extension",
+            "ex-hip-thrust-machine",
+            "ex-donkey-calf-raise",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 10,
+      "microcycleSequence": 2,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull hypertrophy E",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 6,
+          "exerciseIds": [
+            "ex-chest-supported-row",
+            "ex-lat-pulldown",
+            "ex-dorian-yates-row-machine",
+            "ex-cable-rear-delt-fly",
+            "ex-bayesian-curl",
+            "ex-lat-pulldown-machine"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 3,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push hypertrophy D",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 6,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-incline-dumbbell-press",
+            "ex-machine-shoulder-press",
+            "ex-cable-lateral-raise",
+            "ex-cable-rope-overhead-extension",
+            "ex-close-neutral-pushdown"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 20,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs hypertrophy C",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 6,
+          "exerciseIds": [
+            "ex-hack-squat-machine",
+            "ex-belt-squat",
+            "ex-stiff-leg-deadlift",
+            "ex-kneeling-leg-curl",
+            "ex-hip-thrust-machine",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 25,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull hypertrophy B",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 6,
+          "exerciseIds": [
+            "ex-chest-supported-row",
+            "ex-lat-pulldown",
+            "ex-dorian-yates-row-machine",
+            "ex-cable-rear-delt-fly",
+            "ex-bayesian-curl",
+            "ex-lat-pulldown-machine"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push hypertrophy A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 6,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-incline-dumbbell-press",
+            "ex-machine-shoulder-press",
+            "ex-cable-lateral-raise",
+            "ex-cable-rope-overhead-extension",
+            "ex-close-neutral-pushdown"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 35,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs hypertrophy F",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 7,
+          "exerciseIds": [
+            "ex-stiff-leg-deadlift",
+            "ex-walking-lunge",
+            "ex-kneeling-leg-curl",
+            "ex-leg-extension",
+            "ex-hip-thrust-machine",
+            "ex-donkey-calf-raise",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 40,
+      "microcycleSequence": 8,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull hypertrophy E",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 6,
+          "exerciseIds": [
+            "ex-chest-supported-row",
+            "ex-lat-pulldown",
+            "ex-dorian-yates-row-machine",
+            "ex-cable-rear-delt-fly",
+            "ex-bayesian-curl",
+            "ex-lat-pulldown-machine"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 45,
+      "microcycleSequence": 9,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push hypertrophy D",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 6,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-incline-dumbbell-press",
+            "ex-machine-shoulder-press",
+            "ex-cable-lateral-raise",
+            "ex-cable-rope-overhead-extension",
+            "ex-close-neutral-pushdown"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 50,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs hypertrophy C",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 6,
+          "exerciseIds": [
+            "ex-hack-squat-machine",
+            "ex-belt-squat",
+            "ex-stiff-leg-deadlift",
+            "ex-kneeling-leg-curl",
+            "ex-hip-thrust-machine",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 55,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull hypertrophy B",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 6,
+          "exerciseIds": [
+            "ex-chest-supported-row",
+            "ex-lat-pulldown",
+            "ex-dorian-yates-row-machine",
+            "ex-cable-rear-delt-fly",
+            "ex-bayesian-curl",
+            "ex-lat-pulldown-machine"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "advanced_five_day_hypertrophy",
+      "opportunityOrdinal": 60,
+      "microcycleSequence": 12,
+      "decisionType": "transition",
+      "attemptReason": "approved_successor_construction_unavailable_continued_within_horizon",
+      "category": "approved_successor_failure_continuation",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push hypertrophy A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 6,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-incline-dumbbell-press",
+            "ex-machine-shoulder-press",
+            "ex-cable-lateral-raise",
+            "ex-cable-rope-overhead-extension",
+            "ex-close-neutral-pushdown"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 3,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 6,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 9,
+      "microcycleSequence": 3,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 12,
+      "microcycleSequence": 4,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 18,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 21,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 24,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 27,
+      "microcycleSequence": 9,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 10,
+      "decisionType": "transition",
+      "attemptReason": "approved_successor_construction_unavailable_continued_within_horizon",
+      "category": "approved_successor_failure_continuation",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 33,
+      "microcycleSequence": 11,
+      "decisionType": "transition",
+      "attemptReason": "approved_successor_construction_unavailable_continued_within_horizon",
+      "category": "approved_successor_failure_continuation",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "strength_transition_boundary",
+      "opportunityOrdinal": 36,
+      "microcycleSequence": 12,
+      "decisionType": "transition",
+      "attemptReason": "approved_successor_construction_unavailable_continued_within_horizon",
+      "category": "approved_successor_failure_continuation",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 5,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 10,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 3,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 20,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 25,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 6,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 35,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 40,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 45,
+      "microcycleSequence": 9,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 50,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Legs strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-belt-squat",
+            "ex-hip-thrust-machine",
+            "ex-kneeling-leg-curl",
+            "ex-donkey-calf-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 55,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Pull strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-deadlift",
+            "ex-lat-pulldown",
+            "ex-kneeling-leg-curl",
+            "ex-chest-supported-row",
+            "ex-bayesian-curl"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "powerbuilding_athlete",
+      "opportunityOrdinal": 60,
+      "microcycleSequence": 12,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": true,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 5,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Push strength and hypertrophy",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-bench-press",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-cable-rope-overhead-extension",
+            "ex-cable-lateral-raise"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 1,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "observed_load_calibration",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": true,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 17,
+      "fields": [
+        "slots[0].loadPrescription.baseUnit",
+        "slots[0].loadPrescription.prescribedBaseLoad",
+        "slots[0].loadPrescription.rounding",
+        "slots[0].loadPrescription.state",
+        "slots[0].prescribedLoad",
+        "slots[1].methodStructure.groupId",
+        "slots[2].methodStructure.groupId",
+        "slots[4].loadPrescription.baseUnit",
+        "slots[4].loadPrescription.prescribedBaseLoad",
+        "slots[4].loadPrescription.rounding",
+        "slots[4].loadPrescription.state",
+        "slots[4].prescribedLoad"
+      ],
+      "representativeDelta": {
+        "field": "slots[4].loadPrescription.baseUnit",
+        "before": null,
+        "after": "kg"
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 2,
+      "microcycleSequence": 1,
+      "decisionType": "establish_calibration",
+      "attemptReason": "phase_one_establish_calibration_applied",
+      "category": "generated_identity_only_false_positive",
+      "truthfulMaterialPrescriptionDelta": false,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": false,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 2,
+      "fields": [
+        "slots[1].methodStructure.groupId",
+        "slots[2].methodStructure.groupId"
+      ],
+      "representativeDelta": {
+        "field": "slots[1].methodStructure.groupId",
+        "before": "method-group:canonical-session:athletic_general:post-cert:athletic_changing_sport_workload:longitudinal:microcycle:1:Full body strength and power C:2:canonical_plan_v3:2026-08-01T09:40:00.000Z:slot:1:canonical-session:athletic_general:post-cert:athletic_changing_sport_workload:longitudinal:microcycle:1:Full body strength and power C:2:canonical_plan_v3:2026-08-01T09:40:00.000Z:slot:2",
+        "after": "method-group:canonical-session:athletic_general:post-cert:athletic_changing_sport_workload:longitudinal:microcycle:1:Full body strength and power C:2:canonical_plan_v3:2026-08-02T09:40:00.000Z:slot:1:canonical-session:athletic_general:post-cert:athletic_changing_sport_workload:longitudinal:microcycle:1:Full body strength and power C:2:canonical_plan_v3:2026-08-02T09:40:00.000Z:slot:2"
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 3,
+      "microcycleSequence": 1,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 6,
+      "microcycleSequence": 2,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 9,
+      "microcycleSequence": 3,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 12,
+      "microcycleSequence": 4,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 15,
+      "microcycleSequence": 5,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 18,
+      "microcycleSequence": 6,
+      "decisionType": "transition",
+      "attemptReason": "phase_one_transition_applied",
+      "category": "approved_successor_transition",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 21,
+      "microcycleSequence": 7,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 24,
+      "microcycleSequence": 8,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 27,
+      "microcycleSequence": 9,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 30,
+      "microcycleSequence": 10,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 33,
+      "microcycleSequence": 11,
+      "decisionType": "advance_microcycle",
+      "attemptReason": "phase_one_advance_microcycle_applied",
+      "category": "ordinary_next_microcycle_construction",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioId": "athletic_changing_sport_workload",
+      "opportunityOrdinal": 36,
+      "microcycleSequence": 12,
+      "decisionType": "transition",
+      "attemptReason": "approved_successor_construction_unavailable_continued_within_horizon",
+      "category": "approved_successor_failure_continuation",
+      "truthfulMaterialPrescriptionDelta": true,
+      "athleteResponsive": false,
+      "mountedDistinguishingAthleteContext": false,
+      "changesTrainingDemand": true,
+      "justifiedByMountedAthleteEvidence": false,
+      "fieldCount": 3,
+      "fields": [
+        "session"
+      ],
+      "representativeDelta": {
+        "field": "session",
+        "before": null,
+        "after": {
+          "role": "Full body strength and power A",
+          "kind": "planned",
+          "sessionPurpose": null,
+          "slotCount": 5,
+          "exerciseIds": [
+            "ex-barbell-back-squat",
+            "ex-decline-plate-loaded-press",
+            "ex-chest-supported-row",
+            "ex-hip-thrust-machine",
+            "ex-cable-crunch"
+          ]
+        }
+      }
+    }
+  ]
+}
