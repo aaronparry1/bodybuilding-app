@@ -43,7 +43,23 @@ export type CanonicalPhaseOneApplicationReceiptV2 = Readonly<{
   newRevision: number;
   resultingFutureSessionIds: readonly string[];
   materialDeltas: readonly import("@/domain/training/canonical-material-prescription-delta").CanonicalMaterialPrescriptionDelta[];
+  boundaryState?: CanonicalCoachingBoundaryState;
   appliedAt: string;
+}>;
+export type CanonicalCoachingBoundaryState = Readonly<{
+  schemaVersion: "canonical_coaching_boundary_state_v1";
+  status: "review_required" | "terminal";
+  reasonCode: string;
+  missingFactOrPolicy: string;
+  currentTrainingSafelyUsable: boolean;
+  resolutionEvent: "canonical_progress_evidence_persisted" | "canonical_construction_facts_persisted" | "canonical_successor_policy_approved" | "none_terminal";
+  completedSessionId: string;
+  planId?: string;
+  macrocycleId: string;
+  mesocycleId: string;
+  microcycleId: string;
+  unresolvedBoundary: "ordinary_session" | "final_session" | "maximum_horizon";
+  resolutionFingerprint: string;
 }>;
 export type CanonicalPhaseOneApplicationReceipt =
   | CanonicalPhaseOneApplicationReceiptV1
@@ -132,6 +148,24 @@ export function validateCanonicalProgressDecision(value: unknown): { status: "va
         || (value.status === "blocked" && value.actualResult !== "blocked_no_change")
         || (value.status !== "applied" && (value.materialDeltas.length !== 0 || value.newRevision !== value.priorRevision))) {
         return { status: "invalid", reason: "invalid_phase_one_application_receipt" };
+      }
+      if (value.boundaryState !== undefined) {
+        const boundary = value.boundaryState as Partial<CanonicalCoachingBoundaryState>;
+        if (value.status !== "blocked"
+          || boundary.schemaVersion !== "canonical_coaching_boundary_state_v1"
+          || !["review_required", "terminal"].includes(String(boundary.status))
+          || typeof boundary.reasonCode !== "string" || !boundary.reasonCode
+          || typeof boundary.missingFactOrPolicy !== "string" || !boundary.missingFactOrPolicy
+          || typeof boundary.currentTrainingSafelyUsable !== "boolean"
+          || !["canonical_progress_evidence_persisted", "canonical_construction_facts_persisted", "canonical_successor_policy_approved", "none_terminal"].includes(String(boundary.resolutionEvent))
+          || typeof boundary.completedSessionId !== "string" || !boundary.completedSessionId
+          || typeof boundary.macrocycleId !== "string" || !boundary.macrocycleId
+          || typeof boundary.mesocycleId !== "string" || !boundary.mesocycleId
+          || typeof boundary.microcycleId !== "string" || !boundary.microcycleId
+          || !["ordinary_session", "final_session", "maximum_horizon"].includes(String(boundary.unresolvedBoundary))
+          || typeof boundary.resolutionFingerprint !== "string" || !boundary.resolutionFingerprint.startsWith("canonical_fingerprint_v1|")) {
+          return { status: "invalid", reason: "invalid_coaching_boundary_state" };
+        }
       }
     }
   }

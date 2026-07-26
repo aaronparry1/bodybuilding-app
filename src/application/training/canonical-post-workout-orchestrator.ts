@@ -11,6 +11,7 @@ import { evaluateCanonicalPostWorkoutProgress } from "@/domain/training/canonica
 import type { CanonicalPhaseOneDecisionDetails } from "@/domain/training/canonical-progress-decision";
 import { mesocycleById } from "@/domain/training/mesocycle-library";
 import { resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-prescription-policy";
+import { canonicalDeterministicFingerprint, canonicalDeterministicFingerprintId } from "@/domain/training/canonical-deterministic-fingerprint";
 
 export const CANONICAL_POST_WORKOUT_ORCHESTRATOR_VERSION = "canonical_post_workout_orchestrator_v1" as const;
 
@@ -47,7 +48,29 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
   if (raw.status !== "saved" || !plan || raw.carrier.planId !== input.planId || plan.planId !== input.planId) return pending(operationId, input, "canonical_plan_unavailable");
 
   const priorAttempt = canonicalCoachingAttemptRepository.get(operationId);
-  if (raw.carrier.progress.decisionReference === operationId || priorAttempt.status === "found" && (priorAttempt.attempt.status === "applied" || priorAttempt.attempt.status === "unchanged" || priorAttempt.attempt.status === "blocked")) {
+  if (priorAttempt.status === "found"
+    && (priorAttempt.attempt.status === "decision_persisted" || priorAttempt.attempt.status === "pending")
+    && priorAttempt.attempt.reason !== "boundary_resolution_event_detected"
+    && priorAttempt.attempt.decisionId) {
+    const persisted = canonicalProgressDecisionRepository.get(priorAttempt.attempt.decisionId);
+    if (persisted.status !== "found") return pending(operationId, input, "persisted_decision_unavailable", priorAttempt.attempt.evaluationId, priorAttempt.attempt.decisionId);
+    const applied = canonicalActivePlanState.applyProgressDecision({
+      planId: persisted.decision.planId,
+      expectedPlanRevision: persisted.decision.expectedPlanRevision,
+      macrocycleId: persisted.decision.macrocycleId,
+      mesocycleId: persisted.decision.mesocycleId,
+      microcycleId: persisted.decision.microcycleId,
+      decisionId: persisted.decision.decisionId,
+      evaluationId: persisted.decision.evaluationId,
+      expectedEvidenceIds: persisted.decision.evidenceIds,
+    });
+    if (applied.status === "rejected") {
+      if (isTerminalApplicationReconciliation(applied.reason)) return terminalApplicationBlock(operationId, input, persisted.decision, applied.reason);
+      return pending(operationId, input, applied.reason, persisted.decision.evaluationId, persisted.decision.decisionId);
+    }
+    return finalizeAttempt(operationId, input, persisted.decision, applied);
+  }
+  if (priorAttempt.status === "found" && (priorAttempt.attempt.status === "applied" || priorAttempt.attempt.status === "unchanged" || priorAttempt.attempt.status === "blocked")) {
     const decision = priorAttempt.status === "found" && priorAttempt.attempt.decisionId ? priorAttempt.attempt.decisionId : operationId;
     const persisted = canonicalProgressDecisionRepository.get(decision);
     const explanation = persisted.status === "found" && persisted.decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
@@ -99,9 +122,18 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     completedMicrocyclesInMesocycle,
     microcycleComplete,
   });
+  const decisionIdentity = priorAttempt.status === "found"
+    && priorAttempt.attempt.reason === "boundary_resolution_event_detected"
+    ? `${operationId}:review:${canonicalDeterministicFingerprintId({
+      evidence: canonicalProgressEvidenceRepository.list(input.planId),
+      revision: raw.carrier.revision,
+      mesocycleId: raw.carrier.mesocycle.id,
+      microcycleId: raw.carrier.microcycle.id,
+    })}`
+    : operationId;
   // The decision timestamp is part of its deterministic identity. Retries use
   // the durable completion evidence time, never the wall-clock retry time.
-  const details = phaseOneDecisionDetails(evaluation, raw.carrier.plannedSessions.map((session) => session.id), completionEvidence.evidence.observedAt, operationId);
+  const details = phaseOneDecisionDetails(evaluation, raw.carrier.plannedSessions.map((session) => session.id), completionEvidence.evidence.observedAt, decisionIdentity);
   const produced = produceCanonicalProgressDecision({
     planId: plan.planId,
     planRevision: plan.revision,
@@ -110,7 +142,7 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     microcycleId: plan.microcycle.id,
     evaluation,
     evidenceVersions: evaluation.evidenceVersions,
-    operationId,
+    operationId: decisionIdentity,
     phaseOne: details,
     ...(evaluation.outcome === "transition_recommended" && policy.policy.transition.approvedSuccessors[0]
       ? { requestedSuccessorMesocycleId: policy.policy.transition.approvedSuccessors[0] }
@@ -128,15 +160,106 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     evaluationId: evaluation.evaluationId,
     expectedEvidenceIds: evaluation.evidenceIds,
   });
-  if (applied.status === "rejected") return pending(operationId, input, applied.reason, evaluation.evaluationId, produced.decision.decisionId);
-  const finalStatus = evaluation.outcome === "blocked" ? "blocked" as const : applied.status === "applied" ? "applied" as const : "unchanged" as const;
-  canonicalCoachingAttemptRepository.save({ schemaVersion: "canonical_coaching_attempt_v1", operationId, planId: input.planId, recordedSessionId: input.recordedSessionId, completionEvidenceId: input.completionEvidenceId, status: finalStatus, reason: applied.reason, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, evidenceState: "complete", decisionState: "persisted", applicationState: finalStatus, retryIdentity: operationId, updatedAt: input.occurredAt });
+  if (applied.status === "rejected") {
+    if (isTerminalApplicationReconciliation(applied.reason)) return terminalApplicationBlock(operationId, input, produced.decision, applied.reason);
+    return pending(operationId, input, applied.reason, evaluation.evaluationId, produced.decision.decisionId);
+  }
+  const finalStatus = applied.receiptStatus === "blocked" || evaluation.outcome === "blocked" ? "blocked" as const : applied.receiptStatus === "applied" || applied.status === "applied" ? "applied" as const : "unchanged" as const;
+  canonicalCoachingAttemptRepository.save({ schemaVersion: "canonical_coaching_attempt_v1", operationId, planId: input.planId, recordedSessionId: input.recordedSessionId, completionEvidenceId: input.completionEvidenceId, status: finalStatus, reason: applied.reason, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, evidenceState: "complete", decisionState: "persisted", applicationState: finalStatus, retryIdentity: operationId, ...boundaryAttemptFields(produced.decision.decisionId, input.planId), updatedAt: input.occurredAt });
   canonicalActivePlanState.hydrate();
   const committed = canonicalProgressDecisionRepository.get(produced.decision.decisionId);
   const explanation = committed.status === "found" && committed.decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
     ? committed.decision.phaseOneApplication.explanation
     : evaluation.explanation;
   return { status: finalStatus, reason: applied.reason, operationId, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, explanation, priorRevision: applied.priorRevision, newRevision: applied.newRevision };
+}
+
+function finalizeAttempt(
+  operationId: string,
+  input: Readonly<{ planId: string; recordedSessionId: string; completionEvidenceId: string; occurredAt: string }>,
+  decision: import("@/domain/training/canonical-progress-decision").CanonicalProgressDecision,
+  applied: ReturnType<typeof canonicalActivePlanState.applyProgressDecision>,
+): CanonicalPostWorkoutOrchestrationResult {
+  const finalStatus = applied.receiptStatus === "blocked" || decision.phaseOne?.decisionType === "blocked"
+    ? "blocked" as const
+    : applied.receiptStatus === "applied" || applied.status === "applied"
+      ? "applied" as const
+      : "unchanged" as const;
+  canonicalCoachingAttemptRepository.save({
+    schemaVersion: "canonical_coaching_attempt_v1",
+    operationId,
+    planId: input.planId,
+    recordedSessionId: input.recordedSessionId,
+    completionEvidenceId: input.completionEvidenceId,
+    status: finalStatus,
+    reason: applied.reason,
+    evaluationId: decision.evaluationId,
+    decisionId: decision.decisionId,
+    evidenceState: "complete",
+    decisionState: "persisted",
+    applicationState: finalStatus,
+    retryIdentity: operationId,
+    ...boundaryAttemptFields(decision.decisionId, input.planId),
+    updatedAt: input.occurredAt,
+  });
+  canonicalActivePlanState.hydrate();
+  const committed = canonicalProgressDecisionRepository.get(decision.decisionId);
+  const explanation = committed.status === "found" && committed.decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+    ? committed.decision.phaseOneApplication.explanation
+    : decision.explanation;
+  return { status: finalStatus, reason: applied.reason, operationId, evaluationId: decision.evaluationId, decisionId: decision.decisionId, explanation, priorRevision: applied.priorRevision, newRevision: applied.newRevision };
+}
+
+function isTerminalApplicationReconciliation(reason: string): boolean {
+  return [
+    "application_intent_missing_for_committed_decision",
+    "application_intent_corrupt",
+    "application_intent_identity_conflict",
+    "committed_state_material_delta_ambiguous",
+    "application_state_conflict",
+  ].includes(reason);
+}
+
+function terminalApplicationBlock(
+  operationId: string,
+  input: Readonly<{ planId: string; recordedSessionId: string; completionEvidenceId: string; occurredAt: string }>,
+  decision: import("@/domain/training/canonical-progress-decision").CanonicalProgressDecision,
+  reason: string,
+): CanonicalPostWorkoutOrchestrationResult {
+  canonicalCoachingAttemptRepository.save({
+    schemaVersion: "canonical_coaching_attempt_v1",
+    operationId,
+    planId: input.planId,
+    recordedSessionId: input.recordedSessionId,
+    completionEvidenceId: input.completionEvidenceId,
+    status: "blocked",
+    reason,
+    evaluationId: decision.evaluationId,
+    decisionId: decision.decisionId,
+    evidenceState: "complete",
+    decisionState: "persisted",
+    applicationState: "blocked",
+    retryIdentity: operationId,
+    updatedAt: input.occurredAt,
+  });
+  return { status: "blocked", reason, operationId, evaluationId: decision.evaluationId, decisionId: decision.decisionId, explanation: "Your completed workout is safe. The coaching application could not be reconciled unambiguously, so no further change was attempted." };
+}
+
+function boundaryAttemptFields(decisionId: string, planId: string): Readonly<{ boundaryResolutionFingerprint?: string; boundaryResolutionEvent?: string }> {
+  const persisted = canonicalProgressDecisionRepository.get(decisionId);
+  const carrier = canonicalActivePlanV2Repository.get();
+  const receipt = persisted.status === "found" && persisted.decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+    ? persisted.decision.phaseOneApplication
+    : undefined;
+  return receipt?.boundaryState
+    ? {
+      boundaryResolutionFingerprint: canonicalDeterministicFingerprint({
+        evidence: canonicalProgressEvidenceRepository.list(planId),
+        carrierRevision: carrier.status === "saved" ? carrier.carrier.revision : null,
+      }),
+      boundaryResolutionEvent: receipt.boundaryState.resolutionEvent,
+    }
+    : {};
 }
 
 function phaseOneDecisionDetails(

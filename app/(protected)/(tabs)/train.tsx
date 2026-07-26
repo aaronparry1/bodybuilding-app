@@ -387,7 +387,13 @@ function CanonicalTrainExperience() {
     </TrainShell>;
   }
   if (aggregate.status !== "found" || !snapshot || !presentation) {
-    return <UnavailableState message="This session could not be restored safely." onReturn={leavePreview} onRestore={recordedId ? restoreRecorded : undefined} detail={message} />;
+    const boundary = plan.progress.latestDecision?.boundaryState;
+    return <UnavailableState
+      message={boundary ? "Your next training step needs review." : "This session could not be restored safely."}
+      onReturn={leavePreview}
+      onRestore={recordedId ? restoreRecorded : undefined}
+      detail={boundary ? plan.progress.latestDecision?.explanation : message}
+    />;
   }
 
   const activeExercise = presentation.exercises.find((exercise) => exercise.id === activeExerciseId) ?? presentation.exercises[0];

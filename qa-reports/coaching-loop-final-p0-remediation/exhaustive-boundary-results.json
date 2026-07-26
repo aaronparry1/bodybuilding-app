@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "canonical_coaching_final_p0_boundary_results_v1",
+  "mesocycleCount": 22,
+  "boundaryCombinationsTested": 154,
+  "approvedEdgeChecks": 22,
+  "validFinalSessionDeadlocks": 0,
+  "inventedSuccessorEdges": 0,
+  "typedMaximumHorizonReviews": 22,
+  "restartDuplicateConcurrencyConverged": true,
+  "screenIdentityConsistent": true,
+  "representativeTest": "tests/canonical-final-p0-boundary-matrix.test.ts"
+}

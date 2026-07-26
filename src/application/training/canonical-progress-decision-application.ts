@@ -1,16 +1,18 @@
 import { loadCanonicalActivePlan } from "@/application/training/canonical-active-plan-application";
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
+import { canonicalCoachingApplicationIntentRepository } from "@/data/local/canonical-coaching-application-intent-repository";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { resolveCanonicalMesocycleSuccessor } from "@/domain/training/canonical-mesocycle-successor";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { resolveCanonicalConstructionFacts } from "@/application/training/canonical-construction-facts";
 import { constructCanonicalActivePlanFromCanonicalInputs } from "@/application/training/canonical-active-plan-construction";
-import type { CanonicalPhaseOneApplicationReceipt } from "@/domain/training/canonical-progress-decision";
+import type { CanonicalPhaseOneApplicationReceipt, CanonicalPhaseOneApplicationReceiptV2 } from "@/domain/training/canonical-progress-decision";
 import { compareCanonicalMaterialPrescriptions, type CanonicalMaterialPrescriptionDelta } from "@/domain/training/canonical-material-prescription-delta";
+import { canonicalDeterministicFingerprint } from "@/domain/training/canonical-deterministic-fingerprint";
 import { mesocycleById, type MesocycleId } from "@/domain/training/mesocycle-library";
 
 export type CanonicalProgressDecisionApplicationCommand = Readonly<{ planId: string; expectedPlanRevision: number; macrocycleId: string; mesocycleId: string; microcycleId: string; decisionId: string; evaluationId: string; expectedEvidenceIds: readonly string[] }>;
-export type CanonicalProgressDecisionApplicationResult = Readonly<{ status: "unchanged" | "applied" | "rejected"; reason: string; planId: string; priorRevision: number; newRevision: number; decisionId: string; stateChanged: boolean; futureSessionsRegenerated: boolean; reviewRequired: boolean }>;
+export type CanonicalProgressDecisionApplicationResult = Readonly<{ status: "unchanged" | "applied" | "rejected"; receiptStatus?: "applied" | "unchanged" | "blocked"; reason: string; planId: string; priorRevision: number; newRevision: number; decisionId: string; stateChanged: boolean; futureSessionsRegenerated: boolean; reviewRequired: boolean }>;
 
 /** Coordinates canonical identity validation. Transition/regeneration remains owned by Mesocycle/Microcycle/Session Construction. */
 export function applyCanonicalProgressDecision(command: CanonicalProgressDecisionApplicationCommand): CanonicalProgressDecisionApplicationResult {
@@ -19,14 +21,18 @@ export function applyCanonicalProgressDecision(command: CanonicalProgressDecisio
   const plan = loaded.model;
   if (plan.planId !== command.planId) return rejected(command, plan.revision, "canonical_identity_mismatch");
   const currentCarrier = canonicalActivePlanV2Repository.get();
-  if (currentCarrier.status === "saved" && currentCarrier.carrier.progress.decisionReference === command.decisionId) {
-    canonicalProgressDecisionRepository.consume(command.decisionId);
-    return { status: "unchanged", reason: "decision_already_applied", planId: plan.planId, priorRevision: plan.revision, newRevision: plan.revision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: false, reviewRequired: false };
+  const decision = canonicalProgressDecisionRepository.get(command.decisionId);
+  if (decision.status !== "found") return rejected(command, plan.revision, "decision_not_found");
+  if (decision.decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2") {
+    const receipt = decision.decision.phaseOneApplication;
+    return { status: "unchanged", receiptStatus: receipt.status, reason: "decision_application_receipt_already_persisted", planId: plan.planId, priorRevision: receipt.priorRevision, newRevision: receipt.newRevision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: receipt.status === "applied", reviewRequired: receipt.status === "blocked" };
+  }
+  if (decision.decision.phaseOne && currentCarrier.status === "saved") {
+    const reconciled = reconcilePreparedApplication(command, currentCarrier.carrier);
+    if (reconciled) return reconciled;
   }
   if (plan.revision !== command.expectedPlanRevision) return rejected(command, plan.revision, "stale_plan_revision");
   if (plan.macrocycle.goal === "" || plan.mesocycle.id !== command.mesocycleId || plan.microcycle.id !== command.microcycleId) return rejected(command, plan.revision, "canonical_identity_mismatch");
-  const decision = canonicalProgressDecisionRepository.get(command.decisionId);
-  if (decision.status !== "found") return rejected(command, plan.revision, "decision_not_found");
   if (decision.decision.planId !== command.planId || decision.decision.expectedPlanRevision !== command.expectedPlanRevision || decision.decision.evaluationId !== command.evaluationId || decision.decision.mesocycleId !== command.mesocycleId || decision.decision.microcycleId !== command.microcycleId) return rejected(command, plan.revision, "decision_chain_mismatch");
   const expected = [...command.expectedEvidenceIds].sort();
   const actual = [...decision.decision.evidenceIds].sort();
@@ -205,9 +211,7 @@ function applyPhaseOneDecision(
     if (recorded.status !== "saved" && recorded.status !== "duplicate") return rejected(command, currentRevision, "decision_application_receipt_failed");
     return { status: "unchanged", reason, planId: command.planId, priorRevision: raw.carrier.revision, newRevision: raw.carrier.revision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: false, reviewRequired: false };
   }
-  const saved = canonicalActivePlanV2Repository.saveAtomically(next, raw.carrier.revision);
-  if (saved.status !== "saved") return rejected(command, currentRevision, saved.status === "conflict" ? "stale_plan_revision" : "canonical_plan_save_failed");
-  const recorded = canonicalProgressDecisionRepository.recordApplication(command.decisionId, phaseOneReceipt(
+  const receipt = phaseOneReceipt(
     details,
     "applied",
     "future_prescription_change",
@@ -217,12 +221,67 @@ function applyPhaseOneDecision(
     nextRevision,
     plannedSessions.map((session) => session.id),
     material.deltas,
-  ));
+  );
+  const prepared = canonicalCoachingApplicationIntentRepository.save({
+    schemaVersion: "canonical_coaching_application_intent_v1",
+    applicationAttemptId: command.decisionId,
+    coachingWorkItemId: command.decisionId,
+    decisionId: command.decisionId,
+    planId: command.planId,
+    expectedPreRevision: raw.carrier.revision,
+    expectedPreStateFingerprint: canonicalDeterministicFingerprint(raw.carrier),
+    resultingRevision: nextRevision,
+    resultingStateFingerprint: canonicalDeterministicFingerprint(next),
+    affectedFuturePrescriptionIdentities: material.deltas.map((item) => `${item.sessionKey}|${item.slotKey ?? ""}|${item.field}`).sort(),
+    exactIntendedMaterialDelta: material.deltas,
+    materialDeltaFingerprint: canonicalDeterministicFingerprint(material.deltas),
+    expectedPreCarrier: raw.carrier,
+    intendedResultCarrier: next,
+    truthfulReceipt: receipt,
+    status: "prepared",
+    preparedAt: details.decidedAt,
+  });
+  if (prepared.status !== "saved" && prepared.status !== "duplicate") return rejected(command, currentRevision, "decision_application_intent_failed");
+  const saved = canonicalActivePlanV2Repository.saveAtomically(next, raw.carrier.revision);
+  if (saved.status !== "saved") return rejected(command, currentRevision, saved.status === "conflict" ? "stale_plan_revision" : "canonical_plan_save_failed");
+  const recorded = canonicalProgressDecisionRepository.recordApplication(command.decisionId, receipt);
   if (recorded.status !== "saved" && recorded.status !== "duplicate") {
-    const rollback = canonicalActivePlanV2Repository.saveAtomically(raw.carrier, nextRevision);
-    return rejected(command, rollback.status === "saved" ? raw.carrier.revision : nextRevision, rollback.status === "saved" ? "decision_application_receipt_failed" : "decision_receipt_rollback_failed");
+    return rejected(command, nextRevision, "decision_application_receipt_reconciliation_required");
   }
+  canonicalCoachingApplicationIntentRepository.remove(command.decisionId);
   return { status: "applied", reason: appliedReason, planId: command.planId, priorRevision: raw.carrier.revision, newRevision: nextRevision, decisionId: command.decisionId, stateChanged: true, futureSessionsRegenerated: true, reviewRequired: false };
+}
+
+function reconcilePreparedApplication(
+  command: CanonicalProgressDecisionApplicationCommand,
+  current: import("@/domain/training/canonical-active-plan-carrier").CanonicalActivePlanCarrier,
+): CanonicalProgressDecisionApplicationResult | null {
+  const prepared = canonicalCoachingApplicationIntentRepository.get(command.decisionId);
+  if (prepared.status === "not_found") {
+    if (current.progress.decisionReference === command.decisionId) {
+      return rejected(command, current.revision, "application_intent_missing_for_committed_decision");
+    }
+    return null;
+  }
+  if (prepared.status !== "found") return rejected(command, current.revision, "application_intent_corrupt");
+  const intent = prepared.intent;
+  if (intent.planId !== command.planId || intent.expectedPreRevision !== command.expectedPlanRevision) return rejected(command, current.revision, "application_intent_identity_conflict");
+  const currentFingerprint = canonicalDeterministicFingerprint(current);
+  if (currentFingerprint === intent.resultingStateFingerprint) {
+    const actual = compareCanonicalMaterialPrescriptions(intent.expectedPreCarrier.plannedSessions, current.plannedSessions);
+    if (actual.status !== "changed" || canonicalDeterministicFingerprint(actual.deltas) !== intent.materialDeltaFingerprint) {
+      canonicalCoachingApplicationIntentRepository.save({ ...intent, status: "terminal_blocked", terminalReason: "committed_state_material_delta_ambiguous", resolvedAt: intent.truthfulReceipt.appliedAt });
+      return rejected(command, current.revision, "committed_state_material_delta_ambiguous");
+    }
+    const receipt = { ...intent.truthfulReceipt, materialDeltas: actual.deltas, resultingFutureSessionIds: current.plannedSessions.map((session) => session.id).sort() };
+    const recorded = canonicalProgressDecisionRepository.recordApplication(command.decisionId, receipt);
+    if (recorded.status !== "saved" && recorded.status !== "duplicate") return rejected(command, current.revision, "decision_application_receipt_failed");
+    canonicalCoachingApplicationIntentRepository.remove(command.decisionId);
+    return { status: "unchanged", receiptStatus: "applied", reason: "decision_application_receipt_reconstructed", planId: command.planId, priorRevision: intent.expectedPreRevision, newRevision: intent.resultingRevision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: true, reviewRequired: false };
+  }
+  if (currentFingerprint === intent.expectedPreStateFingerprint) return null;
+  canonicalCoachingApplicationIntentRepository.save({ ...intent, status: "terminal_blocked", terminalReason: "application_state_conflict", resolvedAt: intent.truthfulReceipt.appliedAt });
+  return rejected(command, current.revision, "application_state_conflict");
 }
 
 function rejected(command: CanonicalProgressDecisionApplicationCommand, revision: number, reason: string): CanonicalProgressDecisionApplicationResult { return { status: "rejected", reason, planId: command.planId, priorRevision: revision, newRevision: revision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: false, reviewRequired: false }; }
@@ -240,7 +299,7 @@ function phaseOneReceipt(
   newRevision: number,
   resultingFutureSessionIds: readonly string[],
   materialDeltas: readonly CanonicalMaterialPrescriptionDelta[],
-): CanonicalPhaseOneApplicationReceipt {
+): CanonicalPhaseOneApplicationReceiptV2 {
   return {
     schemaVersion: "canonical_coaching_application_receipt_v2",
     status,
@@ -251,6 +310,52 @@ function phaseOneReceipt(
     newRevision,
     resultingFutureSessionIds: [...resultingFutureSessionIds].sort(),
     materialDeltas,
+    ...(status === "blocked" ? {
+      boundaryState: {
+        schemaVersion: "canonical_coaching_boundary_state_v1" as const,
+        status: "review_required" as const,
+        reasonCode,
+        missingFactOrPolicy: missingBoundaryFact(reasonCode, details.reasonCodes),
+        currentTrainingSafelyUsable: details.priorFutureSessionIds.length > 0 && !details.reasonCodes.some((reason) => reason.includes("safety") || reason.includes("pain") || reason.includes("identity")),
+        resolutionEvent: boundaryResolutionEvent(reasonCode, details.reasonCodes),
+        completedSessionId: details.sourceRecordedSessionId,
+        macrocycleId: details.contextIdentity.macrocycleId,
+        mesocycleId: details.contextIdentity.mesocycleId,
+        microcycleId: details.contextIdentity.microcycleId,
+        unresolvedBoundary: reasonCode.includes("maximum_horizon")
+          ? "maximum_horizon" as const
+          : details.priorFutureSessionIds.length === 0
+            ? "final_session" as const
+            : "ordinary_session" as const,
+        resolutionFingerprint: canonicalDeterministicFingerprint({
+          reasonCode,
+          reasonCodes: [...details.reasonCodes].sort(),
+          evidenceSummary: details.evidenceSummary,
+          contextIdentity: details.contextIdentity,
+        }),
+      },
+    } : {}),
     appliedAt: details.decidedAt,
   };
+}
+
+function missingBoundaryFact(reasonCode: string, reasonCodes: readonly string[]): string {
+  const reasons = [reasonCode, ...reasonCodes];
+  if (reasons.some((reason) => reason.includes("successor"))) return "approved_constructible_successor";
+  if (reasons.some((reason) => reason.includes("recovery"))) return "resolved_recovery_evidence";
+  if (reasons.some((reason) => reason.includes("pain") || reason.includes("safety"))) return "resolved_safety_or_limitation_evidence";
+  if (reasons.some((reason) => reason.includes("identity"))) return "unambiguous_canonical_performed_work_identity";
+  if (reasons.some((reason) => reason.includes("construction_context"))) return "canonical_construction_facts";
+  if (reasons.some((reason) => reason.includes("completion"))) return "durable_completion_evidence";
+  return "policy_qualified_progress_evidence";
+}
+
+function boundaryResolutionEvent(
+  reasonCode: string,
+  reasonCodes: readonly string[],
+): "canonical_progress_evidence_persisted" | "canonical_construction_facts_persisted" | "canonical_successor_policy_approved" {
+  const reasons = [reasonCode, ...reasonCodes];
+  if (reasons.some((reason) => reason.includes("successor") || reason.includes("maximum_horizon"))) return "canonical_successor_policy_approved";
+  if (reasons.some((reason) => reason.includes("construction_context"))) return "canonical_construction_facts_persisted";
+  return "canonical_progress_evidence_persisted";
 }

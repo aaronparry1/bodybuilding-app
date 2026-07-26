@@ -8,7 +8,7 @@ export type CanonicalPlanProjection = Readonly<{
   plannedSessions: readonly Readonly<{ id: string; role: string; planSessionIndex: number; status: string }>[];
   nextActionableSession: Readonly<{ id: string; role: string }> | null;
   activeSession: Readonly<{ id: string; role: string; status: string }> | null;
-  progress: Readonly<{ evidenceVersion: string; revision: number }>;
+  progress: CanonicalActivePlanReadModel["progress"];
 }>;
 
 /** Read-only presentation projection; it performs no planning or prescription decisions. */
@@ -21,6 +21,20 @@ export function projectCanonicalPlan(readModel: CanonicalActivePlanReadModel): C
     plannedSessions: readModel.plannedSessions.map((session) => ({ id: session.id, role: session.role, planSessionIndex: session.planSessionIndex, status: session.status })),
     nextActionableSession: readModel.nextSession ? { ...readModel.nextSession } : null,
     activeSession: readModel.activeRecordedSession ? { id: readModel.activeRecordedSession.recordedSessionId, role: readModel.activeRecordedSession.role, status: readModel.activeRecordedSession.status } : null,
-    progress: { ...readModel.progress },
+    progress: {
+      ...readModel.progress,
+      ...(readModel.progress.latestDecision ? {
+        latestDecision: {
+          ...readModel.progress.latestDecision,
+          reasonCodes: [...readModel.progress.latestDecision.reasonCodes],
+          ...(readModel.progress.latestDecision.resultingFutureSessionIds
+            ? { resultingFutureSessionIds: [...readModel.progress.latestDecision.resultingFutureSessionIds] }
+            : {}),
+          ...(readModel.progress.latestDecision.boundaryState
+            ? { boundaryState: { ...readModel.progress.latestDecision.boundaryState } }
+            : {}),
+        },
+      } : {}),
+    },
   };
 }

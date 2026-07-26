@@ -18,6 +18,7 @@ import {
 } from "@/application/training/canonical-completion-evidence-reconciliation";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { canonicalCoachingAttemptRepository } from "@/data/local/canonical-coaching-attempt-repository";
+import { canonicalCoachingApplicationIntentRepository } from "@/data/local/canonical-coaching-application-intent-repository";
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
@@ -37,6 +38,7 @@ describe("mounted canonical coaching loop P0 remediation", () => {
     canonicalProgressEvidenceRepository.clear();
     canonicalProgressDecisionRepository.clear();
     canonicalCoachingAttemptRepository.clear();
+    canonicalCoachingApplicationIntentRepository.clear();
   });
 
   it("mounts durable completion through factual evidence, decision persistence and future Session Construction", () => {
@@ -650,7 +652,7 @@ describe("mounted canonical coaching loop P0 remediation", () => {
     expect(resumePendingCanonicalCoachingWork(started.planId)).toEqual([]);
   });
 
-  it("rolls back a future change when its application receipt fails and retries the same decision once", () => {
+  it("retains a committed future change and reconstructs its receipt exactly once after a receipt write failure", () => {
     const started = createAndStart("receipt-write-retry");
     const before = canonicalActivePlanV2Repository.get();
     if (before.status !== "saved") throw new Error("plan missing");
@@ -666,8 +668,8 @@ describe("mounted canonical coaching loop P0 remediation", () => {
     });
     const completion = completeSuccessfulWorkout(started, 67.5);
     expect(completion.reason).toBe("session_completed_adaptation_pending");
-    const rolledBack = canonicalActivePlanV2Repository.get();
-    expect(rolledBack.status === "saved" && JSON.stringify(rolledBack.carrier.plannedSessions)).toBe(priorFuture);
+    const committed = canonicalActivePlanV2Repository.get();
+    expect(committed.status === "saved" && JSON.stringify(committed.carrier.plannedSessions)).not.toBe(priorFuture);
     expect(canonicalProgressDecisionRepository.list(started.planId)[0]?.phaseOneApplication).toBeUndefined();
 
     vi.restoreAllMocks();
@@ -834,7 +836,7 @@ describe("mounted canonical coaching loop P0 remediation", () => {
     expect(canonicalCoachingAttemptRepository.list(started.planId)[0]?.status).toMatch(/applied|unchanged/);
   });
 
-  it("exposes the unresolved crash window between carrier commit and application-receipt persistence", () => {
+  it("reconciles the crash window between carrier commit and application-receipt persistence", () => {
     const started = createAndStart("post-continuity:receipt-crash-window");
     const prior = canonicalActivePlanV2Repository.get();
     if (prior.status !== "saved") throw new Error("prior carrier missing");
@@ -855,13 +857,111 @@ describe("mounted canonical coaching loop P0 remediation", () => {
     jsonStore.resetCache();
     canonicalActivePlanState.hydrate();
     expect(resumePendingCanonicalCoachingWork(started.planId)).toHaveLength(1);
-    expect(canonicalProgressDecisionRepository.list(started.planId)[0]?.phaseOneApplication).toBeUndefined();
-    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]?.status).toBe("decision_persisted");
-    expect(resumePendingCanonicalCoachingWork(started.planId)).toHaveLength(1);
+    expect(canonicalProgressDecisionRepository.list(started.planId)[0]?.phaseOneApplication).toMatchObject({
+      status: "applied",
+      actualResult: "future_prescription_change",
+    });
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]?.status).toBe("applied");
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toEqual([]);
     expect(canonicalActivePlanV2Repository.get()).toEqual(committedWithoutReceipt);
   });
 
-  it("exposes the unresolved final-session review boundary hidden by the continuity harness", () => {
+  it("retries safely after a crash immediately before CAS and commits one revision", () => {
+    const started = createAndStart("final-p0:crash-before-cas");
+    const prior = canonicalActivePlanV2Repository.get();
+    if (prior.status !== "saved") throw new Error("prior carrier missing");
+    const originalSave = canonicalActivePlanV2Repository.saveAtomically.bind(canonicalActivePlanV2Repository);
+    let interrupted = false;
+    vi.spyOn(canonicalActivePlanV2Repository, "saveAtomically").mockImplementation((carrier, revision) => {
+      if (!interrupted && carrier.progress.decisionReference) {
+        interrupted = true;
+        throw new Error("fault_injected_process_termination_before_cas");
+      }
+      return originalSave(carrier, revision);
+    });
+
+    expect(() => completeSuccessfulWorkout(started, 60)).toThrow("fault_injected_process_termination_before_cas");
+    vi.restoreAllMocks();
+    const attempt = canonicalCoachingAttemptRepository.list(started.planId)[0]!;
+    const intent = canonicalCoachingApplicationIntentRepository.get(attempt.decisionId!);
+    expect(intent).toMatchObject({
+      status: "found",
+      intent: { status: "prepared" },
+    });
+    if (intent.status !== "found") throw new Error("prepared intent missing");
+    const completedPreApplication = canonicalActivePlanV2Repository.get();
+    expect(completedPreApplication.status === "saved" ? completedPreApplication.carrier.revision : -1).toBe(intent.intent.expectedPreRevision);
+    expect(completedPreApplication.status === "saved" ? completedPreApplication.carrier.progress.decisionReference : undefined).not.toBe(attempt.decisionId);
+
+    jsonStore.resetCache();
+    canonicalActivePlanState.hydrate();
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toHaveLength(1);
+    const committed = canonicalActivePlanV2Repository.get();
+    expect(committed.status === "saved" ? committed.carrier.revision : -1).toBe(intent.intent.expectedPreRevision + 1);
+    expect(canonicalProgressDecisionRepository.list(started.planId)[0]?.phaseOneApplication?.status).toBe("applied");
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toEqual([]);
+  });
+
+  it("terminalises missing intent and newer-state ambiguity without reapplying", () => {
+    const started = createAndStart("final-p0:missing-intent");
+    vi.spyOn(canonicalProgressDecisionRepository, "recordApplication").mockImplementation(() => {
+      throw new Error("fault_injected_receipt_crash");
+    });
+    expect(() => completeSuccessfulWorkout(started, 60)).toThrow("fault_injected_receipt_crash");
+    vi.restoreAllMocks();
+    const committed = canonicalActivePlanV2Repository.get();
+    if (committed.status !== "saved") throw new Error("committed carrier missing");
+    const revision = committed.carrier.revision;
+    canonicalCoachingApplicationIntentRepository.clear();
+
+    jsonStore.resetCache();
+    canonicalActivePlanState.hydrate();
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toHaveLength(1);
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]).toMatchObject({
+      status: "blocked",
+      reason: "application_intent_missing_for_committed_decision",
+    });
+    expect(canonicalActivePlanV2Repository.get()).toEqual(committed);
+    expect(canonicalActivePlanState.getReadModel()?.revision).toBe(revision);
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toEqual([]);
+  });
+
+  it("fails closed when a newer carrier wins after the prepared application intent", () => {
+    const started = createAndStart("final-p0:newer-state-won");
+    vi.spyOn(canonicalProgressDecisionRepository, "recordApplication").mockImplementation(() => {
+      throw new Error("fault_injected_receipt_crash");
+    });
+    expect(() => completeSuccessfulWorkout(started, 60)).toThrow("fault_injected_receipt_crash");
+    vi.restoreAllMocks();
+    const committed = canonicalActivePlanV2Repository.get();
+    if (committed.status !== "saved") throw new Error("committed carrier missing");
+    const newer = {
+      ...committed.carrier,
+      revision: committed.carrier.revision + 1,
+      updatedAt: "2026-07-25T13:00:00.000Z",
+      progress: {
+        ...committed.carrier.progress,
+        revision: committed.carrier.revision + 1,
+        decisionReference: "different-newer-coaching-state",
+      },
+    };
+    expect(canonicalActivePlanV2Repository.saveAtomically(newer, committed.carrier.revision).status).toBe("saved");
+
+    jsonStore.resetCache();
+    canonicalActivePlanState.hydrate();
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toHaveLength(1);
+    expect(canonicalCoachingAttemptRepository.list(started.planId)[0]).toMatchObject({
+      status: "blocked",
+      reason: "application_state_conflict",
+    });
+    expect(canonicalActivePlanV2Repository.get()).toMatchObject({
+      status: "saved",
+      carrier: { revision: newer.revision, progress: { decisionReference: "different-newer-coaching-state" } },
+    });
+    expect(resumePendingCanonicalCoachingWork(started.planId)).toEqual([]);
+  });
+
+  it("persists a resolvable typed final-session review boundary outside the continuity harness", () => {
     const planId = "post-continuity:final-session-review";
     let started = createAndStart(planId, { daysPerWeek: 3 });
     completeSuccessfulWorkout(started, 60);
@@ -885,9 +985,43 @@ describe("mounted canonical coaching loop P0 remediation", () => {
     expect(finalDecision?.phaseOneApplication).toMatchObject({
       status: "blocked",
       actualResult: "blocked_no_change",
+      boundaryState: {
+        schemaVersion: "canonical_coaching_boundary_state_v1",
+        status: "review_required",
+        missingFactOrPolicy: "resolved_recovery_evidence",
+        resolutionEvent: "canonical_progress_evidence_persisted",
+        completedSessionId: started.recordedSessionId,
+        unresolvedBoundary: "final_session",
+      },
     });
     canonicalActivePlanState.hydrate();
-    expect(canonicalActivePlanState.getReadModel()?.nextSession).toBeNull();
+    const model = canonicalActivePlanState.getReadModel();
+    expect(model?.nextSession).toBeNull();
+    expect(model?.progress.latestDecision?.boundaryState).toEqual(finalDecision?.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+      ? finalDecision.phaseOneApplication.boundaryState
+      : undefined);
+    expect(projectCanonicalPlan(model!).progress.latestDecision?.boundaryState).toEqual(model?.progress.latestDecision?.boundaryState);
+
+    expect(canonicalProgressEvidenceRepository.record({
+      schemaVersion: "canonical_progress_evidence_v1",
+      evidenceId: `${planId}:readiness:resolved`,
+      planId,
+      planRevision: model!.revision,
+      macrocycleId: started.aggregate.session.macrocycleId,
+      mesocycleId: started.aggregate.session.mesocycleId as never,
+      microcycleId: started.aggregate.session.microcycleId,
+      sessionId: started.recordedSessionId,
+      athleteId: started.aggregate.session.athleteId,
+      observedAt: "2026-07-25T12:00:00.000Z",
+      source: "canonical_review_resolution",
+      kind: "readiness",
+      observations: { freshness: "fresh", completeness: "complete", recovery: "ready", fatigue: "stable" },
+      evidenceVersion: "progress_v1",
+    }).status).toBe("saved");
+    expect(resumePendingCanonicalCoachingWork(planId)).toHaveLength(1);
+    canonicalActivePlanState.hydrate();
+    expect(canonicalActivePlanState.getReadModel()?.nextSession).not.toBeNull();
+    expect(resumePendingCanonicalCoachingWork(planId)).toEqual([]);
   });
 });
 

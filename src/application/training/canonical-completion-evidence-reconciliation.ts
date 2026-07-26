@@ -7,6 +7,7 @@ import { canonicalCoachingOperationId } from "@/domain/training/canonical-coachi
 import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
 import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 import type { CanonicalProgressEvidence } from "@/domain/training/canonical-progress-evidence";
+import { canonicalDeterministicFingerprint } from "@/domain/training/canonical-deterministic-fingerprint";
 
 export const CANONICAL_COMPLETION_EVIDENCE_RECONCILIATION_VERSION = "canonical_completion_evidence_reconciliation_v1" as const;
 
@@ -161,7 +162,9 @@ export function reconcileCanonicalCompletedSessionEvidence(input: Readonly<{
       recordedSessionId: input.recordedSessionId,
       completionEvidenceId,
       status: existingAttempt.status === "found" ? existingAttempt.attempt.status : "pending",
-      reason: blockedReason ?? "completion_evidence_reconciled",
+      reason: existingAttempt.status === "found" && existingAttempt.attempt.reason === "boundary_resolution_event_detected"
+        ? existingAttempt.attempt.reason
+        : blockedReason ?? "completion_evidence_reconciled",
       planRevisionAtCompletion: Number(planRevision),
       completedLedgerVersion: aggregate.session.version,
       prescriptionHash: aggregate.session.prescriptionHash,
@@ -185,10 +188,28 @@ export function reconcileCanonicalCompletedSessionEvidence(input: Readonly<{
 
 /** Restart-safe coordinator. It only resumes durable completed ledger records. */
 export function resumePendingCanonicalCoachingWork(planId: string): readonly CanonicalCompletionEvidenceReconciliationResult[] {
+  const carrier = canonicalActivePlanV2Repository.get();
+  const currentBoundaryFingerprint = canonicalDeterministicFingerprint({
+    evidence: canonicalProgressEvidenceRepository.list(planId),
+    carrierRevision: carrier.status === "saved" ? carrier.carrier.revision : null,
+  });
   const pending = canonicalCoachingAttemptRepository.list(planId)
-    .filter((attempt) => attempt.status === "pending" || attempt.status === "decision_persisted")
+    .filter((attempt) => attempt.status === "pending"
+      || attempt.status === "decision_persisted"
+      || attempt.status === "blocked"
+        && Boolean(attempt.boundaryResolutionEvent)
+        && attempt.boundaryResolutionEvent !== "none_terminal"
+        && attempt.boundaryResolutionFingerprint !== currentBoundaryFingerprint)
     .sort((left, right) => left.operationId.localeCompare(right.operationId));
   return pending.flatMap((attempt) => {
+    if (attempt.status === "blocked") {
+      canonicalCoachingAttemptRepository.save({
+        ...attempt,
+        status: "pending",
+        reason: "boundary_resolution_event_detected",
+        applicationState: "pending",
+      });
+    }
     const reconciliation = reconcileCanonicalCompletedSessionEvidence({ planId, recordedSessionId: attempt.recordedSessionId });
     if ((reconciliation.status === "reconciled" || reconciliation.status === "already_complete") && reconciliation.completionEvidenceId) {
       const completion = canonicalProgressEvidenceRepository.get(reconciliation.completionEvidenceId);

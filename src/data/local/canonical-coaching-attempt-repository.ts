@@ -18,6 +18,8 @@ export type CanonicalCoachingAttempt = Readonly<{
   evidenceState?: "pending" | "complete";
   decisionState?: "pending" | "persisted";
   applicationState?: "pending" | "applied" | "unchanged" | "blocked";
+  boundaryResolutionFingerprint?: string;
+  boundaryResolutionEvent?: string;
   retryIdentity?: string;
   updatedAt: string;
 }>;
@@ -27,6 +29,8 @@ export const canonicalCoachingAttemptRepository = {
     if (attempt.schemaVersion !== "canonical_coaching_attempt_v1" || !attempt.operationId || !attempt.planId || !attempt.recordedSessionId || !attempt.completionEvidenceId || Number.isNaN(Date.parse(attempt.updatedAt))
       || attempt.planRevisionAtCompletion !== undefined && (!Number.isInteger(attempt.planRevisionAtCompletion) || attempt.planRevisionAtCompletion < 0)
       || attempt.completedLedgerVersion !== undefined && (!Number.isInteger(attempt.completedLedgerVersion) || attempt.completedLedgerVersion < 1)
+      || attempt.boundaryResolutionFingerprint !== undefined && !attempt.boundaryResolutionFingerprint.startsWith("canonical_fingerprint_v1|")
+      || attempt.boundaryResolutionEvent !== undefined && !attempt.boundaryResolutionEvent
       || attempt.retryIdentity !== undefined && attempt.retryIdentity !== attempt.operationId) return { status: "invalid" as const, reason: "invalid_coaching_attempt" };
     const all = jsonStore.get<Record<string, CanonicalCoachingAttempt>>(key, {});
     const existing = all[attempt.operationId];

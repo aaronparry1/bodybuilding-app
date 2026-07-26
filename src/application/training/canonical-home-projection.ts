@@ -175,6 +175,14 @@ export function projectCanonicalHome(input: Readonly<{
     primary,
     programme: { goal: trainingGoalDisplayName(model.macrocycle.goal), phase: mesocyclePurposeDisplayName(model.mesocycle.purpose), microcycle: `Week ${model.microcycle.sequenceNumber}`, sessionPosition, completionLabel },
     progress: progressSummary(historical.length, completedThisMicrocycle, evidenceStatus, reviewAvailable),
+    ...(model.progress.latestDecision?.boundaryState ? {
+      attention: {
+        tone: "warning" as const,
+        title: "Your next training step needs review",
+        detail: model.progress.latestDecision.explanation,
+        ...(reviewAvailable ? { action: progressAction } : {}),
+      },
+    } : {}),
     ...(model.conditioning?.status === "active" && model.conditioning.sessions[0] ? { conditioning: { title: cardioTitle(model.conditioning.sessions[0].kind), detail: cardioDetail(model.conditioning.sessions[0]), placement: placementLabel(model.conditioning.sessions[0].placement) } } : {}),
     ...(latest ? { recent: { title: sessionRoleDisplayName(latest.role), detail: `${latest.performedSets} sets · ${latest.performedReps} reps`, ...(latest.completedAt ? { completedAt: latest.completedAt } : {}) } } : {}),
     actions,

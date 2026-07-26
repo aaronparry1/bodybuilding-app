@@ -49,12 +49,20 @@ function sessionKey(session: CanonicalPlannedSessionSnapshot): string {
 
 function projectSession(session: CanonicalPlannedSessionSnapshot): unknown {
   const snapshot = session.prescriptionSnapshot as Record<string, unknown>;
-  const slots = Array.isArray(snapshot.slots)
+  const sourceSlots = Array.isArray(snapshot.slots)
     ? (snapshot.slots as Array<Record<string, unknown>>)
       .slice()
       .sort((left, right) => Number(left.index) - Number(right.index))
-      .map(projectSlot)
     : [];
+  const semanticGroupMembers = new Map<string, string[]>();
+  sourceSlots.forEach((slot) => {
+    const structure = isRecord(slot.methodStructure) ? slot.methodStructure : {};
+    const groupId = typeof structure.groupId === "string" ? structure.groupId : "";
+    if (!groupId) return;
+    const member = `${Number(slot.index)}:${String(slot.exerciseId)}`;
+    semanticGroupMembers.set(groupId, [...(semanticGroupMembers.get(groupId) ?? []), member].sort());
+  });
+  const slots = sourceSlots.map((slot) => projectSlot(slot, semanticGroupMembers));
   return {
     role: session.role,
     kind: session.kind,
@@ -63,14 +71,19 @@ function projectSession(session: CanonicalPlannedSessionSnapshot): unknown {
   };
 }
 
-function projectSlot(slot: Record<string, unknown>): unknown {
+function projectSlot(slot: Record<string, unknown>, semanticGroupMembers: ReadonlyMap<string, readonly string[]>): unknown {
+  const structure = isRecord(slot.methodStructure) ? slot.methodStructure : {};
+  const groupId = typeof structure.groupId === "string" ? structure.groupId : "";
+  const projectedStructure = materialObject(structure);
   return {
     slotKey: `${Number(slot.index)}:${String(slot.exerciseId)}`,
     index: slot.index,
     exerciseId: slot.exerciseId,
     lane: slot.lane,
     method: slot.method,
-    methodStructure: materialObject(slot.methodStructure),
+    methodStructure: isRecord(projectedStructure) && groupId
+      ? { ...projectedStructure, semanticGroupMembers: [...(semanticGroupMembers.get(groupId) ?? [])] }
+      : projectedStructure,
     exactTargets: slot.exactTargets,
     targetReps: slot.targetReps,
     settings: materialObject(slot.settings),
@@ -105,11 +118,37 @@ function materialObject(value: unknown): unknown {
   if (!value || typeof value !== "object") return value ?? null;
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>)
-      .filter(([key, item]) => item !== undefined && !["id", "version", "createdAt", "updatedAt", "staleRevision", "provenance", "reason", "label", "displayName", "unit"].includes(key))
+      .filter(([key, item]) => item !== undefined && !NON_MATERIAL_KEYS.has(key))
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([key, item]) => [key, materialObject(item)]),
   );
 }
+
+const NON_MATERIAL_KEYS = new Set([
+  "id",
+  "version",
+  "revision",
+  "staleRevision",
+  "createdAt",
+  "updatedAt",
+  "generatedAt",
+  "timestamp",
+  "sessionId",
+  "prescriptionId",
+  "exerciseInstanceId",
+  "slotId",
+  "carrierId",
+  "operationalIdentity",
+  "groupId",
+  "provenance",
+  "reason",
+  "reasonCodes",
+  "label",
+  "displayName",
+  "executionLabel",
+  "pairedExerciseName",
+  "unit",
+]);
 
 function compareValue(
   session: string,
