@@ -1,5 +1,5 @@
 import { createMacrocycle, macrocycleEngineForGoal } from "@/domain/training/macrocycle-engine";
-import { selectMesocycles } from "@/domain/training/mesocycle-library";
+import { selectMesocycles, type MesocycleId } from "@/domain/training/mesocycle-library";
 import { createMicrocycle, type CanonicalTrainingDaysPerWeek } from "@/domain/training/microcycle-scheduler";
 import { assembleCanonicalActivePlan, type CanonicalActivePlanCarrier, type CanonicalPlannedSessionSnapshot } from "@/domain/training/canonical-active-plan-carrier";
 import { resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-prescription-policy";
@@ -16,7 +16,7 @@ import type { RecoveryCardioPreference } from "@/domain/training/plan-setup";
 import { defaultCanonicalStartingVolumeContext, type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
 import { estimateCanonicalSessionDuration, normalizeCanonicalSessionDuration, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
 
-export type CanonicalConstructionInput = Readonly<{ planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: Parameters<typeof createMacrocycle>[0]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: Parameters<typeof createMicrocycle>[0]["split"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; recoveryCardioPreference?: RecoveryCardioPreference; availableSessionMinutes?: CanonicalSessionDurationMinutes; startingVolumeContext?: CanonicalStartingVolumeContext; microcycleSequenceNumber?: number; plannedSessions: readonly CanonicalPlannedSessionSnapshot[] }>;
+export type CanonicalConstructionInput = Readonly<{ planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: Parameters<typeof createMacrocycle>[0]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: Parameters<typeof createMicrocycle>[0]["split"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; recoveryCardioPreference?: RecoveryCardioPreference; availableSessionMinutes?: CanonicalSessionDurationMinutes; startingVolumeContext?: CanonicalStartingVolumeContext; microcycleSequenceNumber?: number; selectedMesocycleId?: MesocycleId; plannedSessions: readonly CanonicalPlannedSessionSnapshot[] }>;
 export type CanonicalConstructionResult = Readonly<{ status: "constructed"; carrier: CanonicalActivePlanCarrier } | { status: "invalid_input" | "no_initial_mesocycle" | "session_role_mismatch" | "carrier_validation_failed"; reason: string }>;
 
 export type CanonicalGeneratedPlanInput = Readonly<Omit<CanonicalConstructionInput, "plannedSessions"> & { exercises: readonly Exercise[]; limitations?: readonly string[]; exercisePreferences?: Readonly<Record<string, ExercisePreferenceRecord>>; history?: readonly WorkoutHistorySummary[]; establishedLoads?: Readonly<Record<string, number>>; loadEvidence?: Readonly<Record<string, CanonicalLoadEvidence>> }>;
@@ -29,7 +29,10 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
   const activation = validateCanonicalPlanningActivation({ goal: input.macrocycleGoal, experience: input.experienceLevel, daysPerWeek: input.daysPerWeek, preferredSplit: input.preferredSplit, equipment: effectiveEquipment, units: input.units, createdAt: input.createdAt, targetDate: input.targetDate, limitations: input.limitations });
   if (activation.status !== "valid") return { status: "invalid_input", reason: `${activation.reason}:${activation.detail}` };
   const macrocycle = createMacrocycle(input.macrocycleGoal, input.experienceLevel, input.targetDate, input.createdAt);
-  const mesocycle = selectMesocycles(macrocycleEngineForGoal(input.macrocycleGoal), input.experienceLevel)[0];
+  const eligibleMesocycles = selectMesocycles(macrocycleEngineForGoal(input.macrocycleGoal), input.experienceLevel);
+  const mesocycle = input.selectedMesocycleId
+    ? eligibleMesocycles.find((candidate) => candidate.id === input.selectedMesocycleId)
+    : eligibleMesocycles[0];
   if (!mesocycle) return { status: "no_initial_mesocycle", reason: "no_eligible_initial_mesocycle" };
   const policyResult = resolveMesocyclePrescriptionPolicy(mesocycle.id, { goal: input.macrocycleGoal });
   if (policyResult.status !== "resolved") return { status: "no_initial_mesocycle", reason: policyResult.reason };
@@ -95,14 +98,31 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
   if (result.status !== "constructed") return result;
   const strategyGoal = input.macrocycleGoal === "powerlifting_meet" ? "build_strength" : input.macrocycleGoal;
   const goalStrategyId = canonicalGoalStrategies.find((strategy) => strategy.goal === strategyGoal)?.strategyId ?? `unsupported_goal:${input.macrocycleGoal}`;
-  return { ...result, carrier: { ...result.carrier, constructionInputs: canonicalConstructionReferencesForPlan(result.carrier), planningRationale: { schemaVersion: "canonical_planning_rationale_v1", goalStrategyId, rotationReasons: [...activation.reasonCodes, `mesocycle:${mesocycle.id}`, `schedule:${microcycle.scheduleMode}`], sessionReasons: sessions.map((session) => ({ planSessionIndex: session.planSessionIndex, role: session.role, reasons: [`microcycle_role:${session.role}`, `mesocycle_purpose:${mesocycle.adaptation}`, ...((session.prescriptionSnapshot as import("@/domain/training/canonical-session-construction-pipeline").CanonicalSessionSnapshotV3).slots.map((slot) => `slot:${slot.index}:${slot.reason}`))] })), changeReasons: ["initial_canonical_construction", "no_progress_intervention_applied"] }, cycleLineage: [{ schemaVersion: "canonical_session_lineage_v1", planId: result.carrier.planId, macrocycleId: result.carrier.macrocycle.id, mesocycleId: result.carrier.mesocycle.id, microcycleId: result.carrier.microcycle.id, revision: result.carrier.revision, sequenceNumber: result.carrier.microcycle.output.sequenceNumber, status: "current" as const }] } };
+  return { ...result, carrier: {
+    ...result.carrier,
+    constructionInputs: canonicalConstructionReferencesForPlan(result.carrier),
+    constructionContext: {
+      schemaVersion: "canonical_construction_context_v1",
+      exerciseCatalogueIds: input.exercises.map((exercise) => exercise.id).sort(),
+      limitations: [...(input.limitations ?? [])],
+      exercisePreferences: { ...(input.exercisePreferences ?? {}) },
+      initialEstablishedLoads: { ...(input.establishedLoads ?? {}) },
+      initialLoadEvidence: { ...(input.loadEvidence ?? {}) },
+      recalibrationRequiredExerciseIds: [],
+    },
+    planningRationale: { schemaVersion: "canonical_planning_rationale_v1", goalStrategyId, rotationReasons: [...activation.reasonCodes, `mesocycle:${mesocycle.id}`, `schedule:${microcycle.scheduleMode}`], sessionReasons: sessions.map((session) => ({ planSessionIndex: session.planSessionIndex, role: session.role, reasons: [`microcycle_role:${session.role}`, `mesocycle_purpose:${mesocycle.adaptation}`, ...((session.prescriptionSnapshot as import("@/domain/training/canonical-session-construction-pipeline").CanonicalSessionSnapshotV3).slots.map((slot) => `slot:${slot.index}:${slot.reason}`))] })), changeReasons: ["initial_canonical_construction", "no_progress_intervention_applied"] },
+    cycleLineage: [{ schemaVersion: "canonical_session_lineage_v1", planId: result.carrier.planId, macrocycleId: result.carrier.macrocycle.id, mesocycleId: result.carrier.mesocycle.id, microcycleId: result.carrier.microcycle.id, revision: result.carrier.revision, sequenceNumber: result.carrier.microcycle.output.sequenceNumber, status: "current" as const }],
+  } };
 }
 
 /** Orchestrates existing owners; prescription snapshots must be supplied by Session Construction. */
 export function constructCanonicalActivePlan(input: CanonicalConstructionInput): CanonicalConstructionResult {
   if (!input.planId || !input.createdAt || !input.updatedAt || input.equipment.length === 0) return { status: "invalid_input", reason: "missing_required_identity_or_equipment" };
   const macrocycle = createMacrocycle(input.macrocycleGoal, input.experienceLevel, input.targetDate, input.createdAt);
-  const mesocycle = selectMesocycles(macrocycleEngineForGoal(input.macrocycleGoal), input.experienceLevel)[0];
+  const eligibleMesocycles = selectMesocycles(macrocycleEngineForGoal(input.macrocycleGoal), input.experienceLevel);
+  const mesocycle = input.selectedMesocycleId
+    ? eligibleMesocycles.find((candidate) => candidate.id === input.selectedMesocycleId)
+    : eligibleMesocycles[0];
   if (!mesocycle) return { status: "no_initial_mesocycle", reason: "no_eligible_initial_mesocycle" };
   const microcycle = createMicrocycle({ parentMesocycleId: mesocycle.id, trainingDays: input.daysPerWeek, split: input.preferredSplit, sequenceNumber: input.microcycleSequenceNumber });
   if (input.plannedSessions.some((session) => !microcycle.sessionRoles[session.planSessionIndex] || microcycle.sessionRoles[session.planSessionIndex] !== session.role)) return { status: "session_role_mismatch", reason: "planned_session_role_not_in_microcycle" };

@@ -1,8 +1,8 @@
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
-import type { CanonicalProgressEvaluation, CanonicalProgressEvaluationV2 } from "@/domain/training/canonical-progress-evaluator";
-import type { CanonicalProgressDecision } from "@/domain/training/canonical-progress-decision";
+import type { CanonicalPostWorkoutEvaluation, CanonicalProgressEvaluation, CanonicalProgressEvaluationV2 } from "@/domain/training/canonical-progress-evaluator";
+import type { CanonicalPhaseOneDecisionDetails, CanonicalProgressDecision } from "@/domain/training/canonical-progress-decision";
 import { resolveCanonicalMesocycleSuccessor } from "@/domain/training/canonical-mesocycle-successor";
 import type { CanonicalProgressIntervention } from "@/domain/training/canonical-progress-intervention";
 
@@ -12,10 +12,12 @@ export type CanonicalProgressDecisionProductionCommand = Readonly<{
   macrocycleId: string;
   mesocycleId: string;
   microcycleId: string;
-  evaluation: CanonicalProgressEvaluation | CanonicalProgressEvaluationV2;
+  evaluation: CanonicalProgressEvaluation | CanonicalProgressEvaluationV2 | CanonicalPostWorkoutEvaluation;
   evidenceVersions: Readonly<Record<string, string>>;
   operationId: string;
   intervention?: CanonicalProgressIntervention;
+  phaseOne?: CanonicalPhaseOneDecisionDetails;
+  requestedSuccessorMesocycleId?: string;
 }>;
 
 export type CanonicalProgressDecisionProductionResult = Readonly<{ status: "produced" | "rejected"; reason: string; decision?: CanonicalProgressDecision }>;
@@ -36,15 +38,22 @@ export function produceCanonicalProgressDecision(command: CanonicalProgressDecis
     if (evidence.status !== "found") return { status: "rejected", reason: "evidence_not_found" };
     if (evidence.evidence.planId !== command.planId || evidence.evidence.planRevision > command.planRevision || evidence.evidence.microcycleId !== command.microcycleId || command.evidenceVersions[evidenceId] !== evidence.evidence.evidenceVersion) return { status: "rejected", reason: "evidence_chain_mismatch" };
   }
-  const outcome = evaluation.schemaVersion === "canonical_progress_evaluation_v2" ? (evaluation.outcome === "transition_recommended" ? "transition" : evaluation.outcome === "deload_required" ? "deload" : evaluation.outcome) : evaluation.state === "review_required" ? "review_required" : evaluation.state === "ready" ? "continue" : "insufficient_evidence";
+  const outcome = evaluation.schemaVersion === "canonical_progress_evaluation_v3"
+    ? evaluation.outcome === "transition_recommended" ? "transition" : evaluation.outcome === "blocked" ? "review_required" : "continue"
+    : evaluation.schemaVersion === "canonical_progress_evaluation_v2"
+      ? (evaluation.outcome === "transition_recommended" ? "transition" : evaluation.outcome === "deload_required" ? "deload" : evaluation.outcome)
+      : evaluation.state === "review_required" ? "review_required" : evaluation.state === "ready" ? "continue" : "insufficient_evidence";
   let successorMesocycleId: string | undefined;
   if (outcome === "transition" || outcome === "deload") {
-    const successor = resolveCanonicalMesocycleSuccessor({ macrocycleId: command.macrocycleId, macrocycleEngine: plan.macrocycle.goal === "build_strength" ? "strength" : plan.macrocycle.goal === "build_muscle_and_strength" ? "powerbuilding" : plan.macrocycle.goal === "athletic_performance" ? "athletic_performance" : "hypertrophy", currentMesocycleId: command.mesocycleId as never, decisionId: command.operationId, evaluationId: evaluation.evaluationId, evidenceIds, outcome, sequenceNumber: plan.microcycle.sequenceNumber + 1, planRevision: plan.revision });
+    const successor = resolveCanonicalMesocycleSuccessor({ macrocycleId: command.macrocycleId, macrocycleEngine: plan.macrocycle.goal === "build_strength" ? "strength" : plan.macrocycle.goal === "build_muscle_and_strength" ? "powerbuilding" : plan.macrocycle.goal === "athletic_performance" ? "athletic_performance" : "hypertrophy", currentMesocycleId: command.mesocycleId as never, decisionId: command.operationId, evaluationId: evaluation.evaluationId, evidenceIds, outcome, ...(command.requestedSuccessorMesocycleId ? { successorMesocycleId: command.requestedSuccessorMesocycleId as never } : {}), sequenceNumber: plan.microcycle.sequenceNumber + 1, planRevision: plan.revision });
     if (successor.status !== "resolved") return { status: "rejected", reason: successor.reason };
     successorMesocycleId = successor.successorMesocycleId;
   }
   const decisionId = command.operationId;
-  const decision: CanonicalProgressDecision = { schemaVersion: "canonical_progress_decision_v1", decisionId, planId: command.planId, expectedPlanRevision: command.planRevision, macrocycleId: command.macrocycleId, mesocycleId: command.mesocycleId, microcycleId: command.microcycleId, evaluationId: evaluation.evaluationId, evidenceIds, outcome, ...(successorMesocycleId ? { successorMesocycleId } : {}), ...(command.intervention ? { intervention: command.intervention } : {}), owner: "mesocycle", reason: evaluation.reason, explanation: evaluation.explanation, status: "current" };
+  const reason = evaluation.schemaVersion === "canonical_progress_evaluation_v3"
+    ? evaluation.reasonCodes[0] ?? "post_workout_review"
+    : evaluation.reason;
+  const decision: CanonicalProgressDecision = { schemaVersion: "canonical_progress_decision_v1", decisionId, planId: command.planId, expectedPlanRevision: command.planRevision, macrocycleId: command.macrocycleId, mesocycleId: command.mesocycleId, microcycleId: command.microcycleId, evaluationId: evaluation.evaluationId, evidenceIds, outcome, ...(successorMesocycleId ? { successorMesocycleId } : {}), ...(command.intervention ? { intervention: command.intervention } : {}), ...(command.phaseOne ? { phaseOne: command.phaseOne } : {}), owner: "mesocycle", reason, explanation: evaluation.explanation, status: "current" };
   const existing = canonicalProgressDecisionRepository.get(decisionId);
   if (existing.status === "found") return JSON.stringify(existing.decision) === JSON.stringify(decision) ? { status: "produced", reason: "idempotent_retry", decision: existing.decision } : { status: "rejected", reason: "decision_id_conflict" };
   const saved = canonicalProgressDecisionRepository.save(decision);

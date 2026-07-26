@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "canonical_coaching_loop_counterfactual_results_v1",
+  "cases": [
+    {"pair":"successful calibration vs missing/partial evidence","differentOutcome":true,"successful":"establish_calibration","insufficient":"maintain_or_block"},
+    {"pair":"one failed exposure vs repeated comparable failure","differentOutcome":true,"one":"maintain","repeated":"recalibrate"},
+    {"pair":"stable targets vs excessive rep drop-off","differentOutcome":true,"stable":"calibrate_or_maintain","dropOff":"maintain"},
+    {"pair":"no recovery evidence vs constrained recovery","differentOutcome":true,"missing":"not_collected","constrained":"blocked_review"},
+    {"pair":"valid equipment vs missing equipment","differentOutcome":true,"valid":"evaluate","missing":"blocked_no_change"},
+    {"pair":"canonical base-unit evidence vs display-unit/substitution evidence","differentOutcome":true,"baseUnit":"exercise_load_available","incomparable":"ignored_for_established_load"},
+    {"pair":"first completion vs identical retry","differentOutcome":false,"first":"one persisted resolution","retry":"idempotent_no_second_mutation"},
+    {"pair":"historical snapshot before vs after application","differentOutcome":false,"result":"byte_equivalent_immutable_prescription"},
+    {"pair":"Home vs Plan vs Train future identity","differentOutcome":false,"result":"same_canonical_session_id"}
+  ],
+  "automaticDeloadEligibility": false,
+  "reason": "Production recovery evidence supports review-only behavior in Phase 1; no automatic deload application authority is fabricated."
+}

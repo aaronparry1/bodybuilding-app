@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "canonical_coaching_loop_longitudinal_results_v1",
+  "startingCommit": "2a68e6331a3ebfdf7202768148a1839e22e2e397",
+  "productionEntrypoint": "completeCanonicalSession -> orchestrateCanonicalPostWorkoutAdaptation",
+  "scenarioCount": 12,
+  "futureChangeCount": 5,
+  "explicitNoChangeOrBlockedCount": 7,
+  "silentNonAdaptationCount": 0,
+  "scenarios": [
+    {"id":"normal_responder","evidence":"complete stable first calibration","decision":"establish_calibration","result":"future_prescription_change","reason":"stable_completed_calibration"},
+    {"id":"high_responder","evidence":"successful established exposure","decision":"maintain","result":"explicit_no_change","reason":"automatic_numeric_adjustment_not_authorised"},
+    {"id":"repeated_stall","evidence":"two comparable below-target exposures","decision":"recalibrate","result":"future_prescription_change","reason":"repeated_comparable_target_failure"},
+    {"id":"poor_recovery","evidence":"fresh complete constrained recovery/systemic fatigue","decision":"blocked","result":"blocked_no_change","reason":"recovery_review_required"},
+    {"id":"missed_sessions","evidence":"completed session with factual skipped prescribed slots","decision":"maintain","result":"explicit_no_change","reason":"single_incomplete_exposure"},
+    {"id":"return_after_layoff","evidence":"returning capacity fact plus successful calibration","decision":"establish_calibration","result":"future_prescription_change","reason":"stable_completed_calibration"},
+    {"id":"pain_or_limitation","evidence":"typed limitation plus unresolved pain evidence","decision":"blocked","result":"blocked_no_change","reason":"safety_review_required"},
+    {"id":"limited_equipment","evidence":"barbell/dumbbell/bodyweight/bands context plus stable calibration","decision":"establish_calibration","result":"future_prescription_change","reason":"exercise_identity_verified"},
+    {"id":"advanced_five_day_hypertrophy","evidence":"advanced five-day complete stable calibration","decision":"establish_calibration","result":"future_prescription_change","reason":"stable_completed_calibration"},
+    {"id":"strength_transition_boundary","evidence":"four complete canonical strength Microcycles","decision":"blocked","result":"blocked_no_change","reason":"machine_evaluable_objective_policy_missing"},
+    {"id":"powerbuilding_athlete","evidence":"successful established powerbuilding exposure","decision":"maintain","result":"explicit_no_change","reason":"automatic_numeric_adjustment_not_authorised"},
+    {"id":"athletic_changing_sport_workload","evidence":"fresh complete constrained capacity with increased sport workload","decision":"blocked","result":"blocked_no_change","reason":"recovery_review_required"}
+  ],
+  "determinism": {
+    "identicalCompletionRetry": "idempotent",
+    "restart": "decision and exact future identities persisted",
+    "numericAutomaticAdjustmentAuthorised": false
+  }
+}

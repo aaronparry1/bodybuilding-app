@@ -9,6 +9,8 @@ import type { RecoveryCardioPreference } from "@/domain/training/plan-setup";
 import type { CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
 import { isCanonicalStartingVolumeContext, type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
 import { resolveCanonicalSessionDuration } from "@/domain/training/canonical-session-duration";
+import type { ExercisePreferenceRecord } from "@/domain/training/exercise-preferences";
+import type { CanonicalLoadEvidence } from "@/domain/training/canonical-load-prescription";
 
 /** Persisted migration target. This module stores owner outputs; it makes no training decisions. */
 export const CANONICAL_ACTIVE_PLAN_SCHEMA = "canonical_plan_v2" as const;
@@ -44,6 +46,21 @@ export type CanonicalPlanningRationale = Readonly<{
   changeReasons: readonly string[];
 }>;
 
+/**
+ * Facts that must survive future Session Construction. References alone are
+ * not sufficient because an absent limitation/preference value is different
+ * from an explicitly empty value.
+ */
+export type CanonicalConstructionContext = Readonly<{
+  schemaVersion: "canonical_construction_context_v1";
+  exerciseCatalogueIds: readonly string[];
+  limitations: readonly string[];
+  exercisePreferences: Readonly<Record<string, ExercisePreferenceRecord>>;
+  initialEstablishedLoads: Readonly<Record<string, number>>;
+  initialLoadEvidence: Readonly<Record<string, CanonicalLoadEvidence>>;
+  recalibrationRequiredExerciseIds: readonly string[];
+}>;
+
 export type CanonicalActivePlanCarrier = Readonly<{
   schema: CanonicalActivePlanSchema;
   planId: string;
@@ -71,6 +88,7 @@ export type CanonicalActivePlanCarrier = Readonly<{
   }>;
   operational: Readonly<{ openWorkoutId?: string; migrationId?: string; recoverySourceReference?: string; syncRevision?: string }>;
   constructionInputs?: Readonly<{ schemaVersion: "canonical_construction_inputs_v1"; athleteId: string; exerciseCatalogueSource: string; equipmentSource: string; limitationsSource: string; preferencesSource: string; progressEvidenceScope: string; establishedLoadSource: string }>;
+  constructionContext?: CanonicalConstructionContext;
   planningRationale?: CanonicalPlanningRationale;
   cycleLineage?: readonly import("@/domain/training/canonical-session-lineage").CanonicalCycleLineage[];
   recordedSessionReferences?: readonly import("@/domain/training/canonical-session-lineage").CanonicalRecordedSessionReference[];
@@ -155,12 +173,54 @@ export function validateCanonicalActivePlan(value: unknown): CanonicalCarrierVal
   if (candidate.constraints?.startingVolumeContext !== undefined && !isCanonicalStartingVolumeContext(candidate.constraints.startingVolumeContext)) return { status: "invalid", reason: "invalid_progress_reference", path: "constraints.startingVolumeContext" };
   if (candidate.conditioning && (candidate.conditioning.schemaVersion !== "canonical_cardio_prescription_v1" || candidate.conditioning.policyId !== "canonical_concurrent_training_policy_v1" || !Array.isArray(candidate.conditioning.sessions) || candidate.conditioning.sessions.length !== candidate.conditioning.weeklyFrequency)) return { status: "invalid", reason: "invalid_progress_reference", path: "conditioning" };
   if (candidate.planningRationale && (candidate.planningRationale.schemaVersion !== "canonical_planning_rationale_v1" || !candidate.planningRationale.goalStrategyId || !Array.isArray(candidate.planningRationale.rotationReasons) || !Array.isArray(candidate.planningRationale.sessionReasons) || !Array.isArray(candidate.planningRationale.changeReasons))) return { status: "invalid", reason: "invalid_progress_reference", path: "planningRationale" };
+  if (candidate.constructionContext) {
+    const context = candidate.constructionContext;
+    if (context.schemaVersion !== "canonical_construction_context_v1"
+      || !Array.isArray(context.exerciseCatalogueIds)
+      || context.exerciseCatalogueIds.some((id) => typeof id !== "string" || !id)
+      || new Set(context.exerciseCatalogueIds).size !== context.exerciseCatalogueIds.length
+      || !Array.isArray(context.limitations)
+      || context.limitations.some((item) => typeof item !== "string")
+      || !context.exercisePreferences || typeof context.exercisePreferences !== "object"
+      || !context.initialEstablishedLoads || typeof context.initialEstablishedLoads !== "object"
+      || !context.initialLoadEvidence || typeof context.initialLoadEvidence !== "object"
+      || Object.entries(context.exercisePreferences).some(([exerciseId, preference]) => !isCanonicalExercisePreference(exerciseId, preference))
+      || Object.entries(context.initialEstablishedLoads).some(([exerciseId, load]) => !exerciseId || !Number.isFinite(load) || Number(load) <= 0)
+      || Object.entries(context.initialLoadEvidence).some(([exerciseId, evidence]) => !isCanonicalLoadEvidence(exerciseId, evidence))
+      || !Array.isArray(context.recalibrationRequiredExerciseIds)
+      || context.recalibrationRequiredExerciseIds.some((id) => typeof id !== "string" || !id)) {
+      return { status: "invalid", reason: "invalid_progress_reference", path: "constructionContext" };
+    }
+  }
   if (candidate.progress.revision !== candidate.revision) return { status: "invalid", reason: "invalid_progress_reference", path: "progress.revision" };
   if (candidate.cycleLineage || candidate.recordedSessionReferences) {
     const lineageError = validateCanonicalLineage(candidate.cycleLineage ?? [], candidate.recordedSessionReferences ?? []);
     if (lineageError) return { status: "invalid", reason: lineageError as CanonicalCarrierValidationCode };
   }
   return { status: "valid", carrier: value as CanonicalActivePlanCarrier };
+}
+
+function isCanonicalLoadEvidence(exerciseId: string, evidence: CanonicalLoadEvidence): boolean {
+  return Boolean(exerciseId)
+    && evidence.exerciseId === exerciseId
+    && Boolean(evidence.evidenceId)
+    && Boolean(evidence.evidenceVersion)
+    && Boolean(evidence.athleteId)
+    && Number.isFinite(evidence.observedLoad) && evidence.observedLoad > 0
+    && Number.isFinite(evidence.observedReps) && evidence.observedReps > 0
+    && evidence.baseUnit === "kg"
+    && Number.isInteger(evidence.freshnessVersion) && evidence.freshnessVersion > 0
+    && ["established", "sparse", "stale"].includes(evidence.calibrationStatus);
+}
+
+function isCanonicalExercisePreference(exerciseId: string, preference: ExercisePreferenceRecord): boolean {
+  return Boolean(exerciseId)
+    && preference.avoidedExerciseId === exerciseId
+    && ["swap", "remove", "skip"].includes(preference.action)
+    && Number.isInteger(preference.count) && preference.count > 0
+    && !Number.isNaN(Date.parse(preference.firstAt))
+    && !Number.isNaN(Date.parse(preference.lastAt))
+    && !Number.isNaN(Date.parse(preference.recency));
 }
 
 function isCompleteSessionSnapshot(snapshot: Record<string, unknown>, requiresLoadPrescription = false): boolean {
