@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "canonical_final_p0_independent_field_isolation_v1",
+  "auditedCommit": "f335cb1ba6d42b4bb4341ea96f230ae3dc48b637",
+  "verdict": "CONTRADICTED",
+  "ignoredOnlyCasesPassed": 18,
+  "materialControlCasesPassed": 12,
+  "generatedIdentityFailureClasses": 1,
+  "failingCase": {
+    "name": "migrated grouped method with generated groupId absent",
+    "completeCarrierValidation": "valid",
+    "partiallyPopulatedCarrierValidation": "valid",
+    "generatedFieldsRemoved": 4,
+    "productionComparisonStatus": "changed",
+    "materialDeltaCount": 4,
+    "materialFields": [
+      "slots[1].methodStructure.semanticGroupMembers",
+      "slots[2].methodStructure.semanticGroupMembers",
+      "slots[1].methodStructure.semanticGroupMembers",
+      "slots[2].methodStructure.semanticGroupMembers"
+    ],
+    "applicationBranch": "applied",
+    "reason": "semantic membership is derived from generated groupId rather than independently stable grouping identity"
+  },
+  "passedIgnoredCases": [
+    "prescription persistence id",
+    "session persistence id",
+    "mesocycle persistence id",
+    "exercise instance id",
+    "slot and set persistence ids",
+    "carrier work-item and attempt ids",
+    "timestamps",
+    "revision metadata",
+    "display metadata",
+    "display-unit conversion",
+    "ordering normalisation",
+    "regenerated nested object key order",
+    "regenerated complete group ids",
+    "missing legacy prescription id",
+    "missing legacy session id",
+    "missing legacy exercise-instance id",
+    "missing legacy slot id",
+    "generated churn with rounded request removed"
+  ],
+  "passedMaterialControls": [
+    "exercise substitution",
+    "set count",
+    "prescribed repetitions",
+    "numeric load",
+    "load state",
+    "rest",
+    "method",
+    "progression rule",
+    "stop rule",
+    "substitution constraint",
+    "semantic rest change plus generated-id churn",
+    "genuine group-membership change"
+  ]
+}

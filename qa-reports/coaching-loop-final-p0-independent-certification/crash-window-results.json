@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "canonical_final_p0_independent_crash_results_v1",
+  "auditedCommit": "f335cb1ba6d42b4bb4341ea96f230ae3dc48b637",
+  "verdict": "NOT PROVEN",
+  "status": "not_executed_due_to_mandatory_semantic_identity_stop",
+  "pathsExecuted": 0,
+  "convergingPaths": null,
+  "nonConvergingPaths": null,
+  "duplicateApplications": null,
+  "contradictoryReceipts": null
+}
