@@ -12,8 +12,10 @@ export type CanonicalMaterialPrescriptionDelta = Readonly<{
 }>;
 
 export type CanonicalMaterialPrescriptionComparison = Readonly<{
-  status: "changed" | "unchanged";
+  status: "changed" | "unchanged" | "ambiguous";
   deltas: readonly CanonicalMaterialPrescriptionDelta[];
+  reason?: "grouped_method_semantics_ambiguous";
+  ambiguousPaths?: readonly string[];
 }>;
 
 /**
@@ -29,10 +31,21 @@ export function compareCanonicalMaterialPrescriptions(
   const next = new Map(after.map((session) => [sessionKey(session), projectSession(session)]));
   const deltas: CanonicalMaterialPrescriptionDelta[] = [];
   const keys = [...new Set([...prior.keys(), ...next.keys()])].sort();
+  const ambiguousPaths = [...prior, ...next]
+    .flatMap(([key, projection]) => projection.ambiguousPaths.map((path) => `${key}:${path}`))
+    .sort();
+  if (ambiguousPaths.length) {
+    return {
+      status: "ambiguous",
+      deltas: [],
+      reason: "grouped_method_semantics_ambiguous",
+      ambiguousPaths,
+    };
+  }
 
   for (const key of keys) {
-    const left = prior.get(key);
-    const right = next.get(key);
+    const left = prior.get(key)?.value;
+    const right = next.get(key)?.value;
     if (!left || !right) {
       deltas.push(delta(key, undefined, "session", left ?? null, right ?? null));
       continue;
@@ -47,33 +60,28 @@ function sessionKey(session: CanonicalPlannedSessionSnapshot): string {
   return `${session.planSessionIndex}:${session.role}:${session.kind}`;
 }
 
-function projectSession(session: CanonicalPlannedSessionSnapshot): unknown {
+function projectSession(session: CanonicalPlannedSessionSnapshot): Readonly<{ value: unknown; ambiguousPaths: readonly string[] }> {
   const snapshot = session.prescriptionSnapshot as Record<string, unknown>;
   const sourceSlots = Array.isArray(snapshot.slots)
     ? (snapshot.slots as Array<Record<string, unknown>>)
       .slice()
       .sort((left, right) => Number(left.index) - Number(right.index))
     : [];
-  const semanticGroupMembers = new Map<string, string[]>();
-  sourceSlots.forEach((slot) => {
-    const structure = isRecord(slot.methodStructure) ? slot.methodStructure : {};
-    const groupId = typeof structure.groupId === "string" ? structure.groupId : "";
-    if (!groupId) return;
-    const member = `${Number(slot.index)}:${String(slot.exerciseId)}`;
-    semanticGroupMembers.set(groupId, [...(semanticGroupMembers.get(groupId) ?? []), member].sort());
-  });
-  const slots = sourceSlots.map((slot) => projectSlot(slot, semanticGroupMembers));
+  const grouping = deriveSemanticGroupMembership(sourceSlots);
+  const slots = sourceSlots.map((slot, index) => projectSlot(slot, grouping.membersBySlotIndex.get(index)));
   return {
-    role: session.role,
-    kind: session.kind,
-    sessionPurpose: snapshot.sessionPurpose ?? snapshot.purpose ?? null,
-    slots,
+    value: {
+      role: session.role,
+      kind: session.kind,
+      sessionPurpose: snapshot.sessionPurpose ?? snapshot.purpose ?? null,
+      slots,
+    },
+    ambiguousPaths: grouping.ambiguousPaths,
   };
 }
 
-function projectSlot(slot: Record<string, unknown>, semanticGroupMembers: ReadonlyMap<string, readonly string[]>): unknown {
+function projectSlot(slot: Record<string, unknown>, semanticGroupMembers?: readonly string[]): unknown {
   const structure = isRecord(slot.methodStructure) ? slot.methodStructure : {};
-  const groupId = typeof structure.groupId === "string" ? structure.groupId : "";
   const projectedStructure = materialObject(structure);
   return {
     slotKey: `${Number(slot.index)}:${String(slot.exerciseId)}`,
@@ -81,8 +89,8 @@ function projectSlot(slot: Record<string, unknown>, semanticGroupMembers: Readon
     exerciseId: slot.exerciseId,
     lane: slot.lane,
     method: slot.method,
-    methodStructure: isRecord(projectedStructure) && groupId
-      ? { ...projectedStructure, semanticGroupMembers: [...(semanticGroupMembers.get(groupId) ?? [])] }
+    methodStructure: isRecord(projectedStructure) && semanticGroupMembers
+      ? { ...projectedStructure, semanticGroupMembers: [...semanticGroupMembers] }
       : projectedStructure,
     exactTargets: slot.exactTargets,
     targetReps: slot.targetReps,
@@ -95,6 +103,94 @@ function projectSlot(slot: Record<string, unknown>, semanticGroupMembers: Readon
     stopRule: materialObject(slot.stopRule),
     substitutionConstraints: slot.substitutionConstraints,
   };
+}
+
+function deriveSemanticGroupMembership(slots: readonly Record<string, unknown>[]): Readonly<{
+  membersBySlotIndex: ReadonlyMap<number, readonly string[]>;
+  ambiguousPaths: readonly string[];
+}> {
+  const membersBySlotIndex = new Map<number, readonly string[]>();
+  const ambiguousPaths: string[] = [];
+  const consumed = new Set<number>();
+
+  for (let index = 0; index < slots.length; index += 1) {
+    if (consumed.has(index)) continue;
+    const slot = slots[index]!;
+    const structure = isRecord(slot.methodStructure) ? slot.methodStructure : {};
+    if (!isGroupedStructure(structure)) continue;
+
+    const groupSize = positiveInteger(structure.groupSize)
+      ?? (structure.kind === "linked_pair" ? 2 : undefined);
+    const position = positiveInteger(structure.position)
+      ?? (structure.kind === "linked_pair" ? 1 : undefined);
+
+    if (groupSize && position === 1) {
+      const candidates = slots.slice(index, index + groupSize);
+      const valid = candidates.length === groupSize
+        && candidates.every((candidate, offset) => {
+          const candidateStructure = isRecord(candidate.methodStructure) ? candidate.methodStructure : {};
+          const candidateSize = positiveInteger(candidateStructure.groupSize)
+            ?? (candidateStructure.kind === "linked_pair" ? 2 : undefined);
+          const candidatePosition = positiveInteger(candidateStructure.position)
+            ?? (candidateStructure.kind === "linked_pair" ? offset + 1 : undefined);
+          return isGroupedStructure(candidateStructure)
+            && candidateSize === groupSize
+            && candidatePosition === offset + 1
+            && candidateStructure.kind === structure.kind
+            && candidateStructure.method === structure.method;
+        });
+      if (valid) {
+        const members = candidates.map((candidate) => semanticSlotMember(candidate));
+        candidates.forEach((_candidate, offset) => {
+          membersBySlotIndex.set(index + offset, members);
+          consumed.add(index + offset);
+        });
+        continue;
+      }
+    }
+
+    const groupId = typeof structure.groupId === "string" && structure.groupId ? structure.groupId : undefined;
+    if (groupId) {
+      const groupedIndexes = slots.flatMap((candidate, candidateIndex) => {
+        const candidateStructure = isRecord(candidate.methodStructure) ? candidate.methodStructure : {};
+        return candidateStructure.groupId === groupId ? [candidateIndex] : [];
+      });
+      if (groupedIndexes.length > 0) {
+        const ordered = groupedIndexes
+          .slice()
+          .sort((left, right) => {
+            const leftStructure = isRecord(slots[left]!.methodStructure) ? slots[left]!.methodStructure as Record<string, unknown> : {};
+            const rightStructure = isRecord(slots[right]!.methodStructure) ? slots[right]!.methodStructure as Record<string, unknown> : {};
+            return (positiveInteger(leftStructure.position) ?? left) - (positiveInteger(rightStructure.position) ?? right);
+          });
+        const members = ordered.map((candidateIndex) => semanticSlotMember(slots[candidateIndex]!));
+        ordered.forEach((candidateIndex) => {
+          membersBySlotIndex.set(candidateIndex, members);
+          consumed.add(candidateIndex);
+        });
+        continue;
+      }
+    }
+
+    ambiguousPaths.push(`slots[${index}].methodStructure`);
+  }
+
+  return { membersBySlotIndex, ambiguousPaths: [...new Set(ambiguousPaths)].sort() };
+}
+
+function isGroupedStructure(value: Readonly<Record<string, unknown>>): boolean {
+  return value.kind === "linked_rounds"
+    || value.kind === "linked_pair"
+    || positiveInteger(value.groupSize) !== undefined
+    || positiveInteger(value.position) !== undefined;
+}
+
+function positiveInteger(value: unknown): number | undefined {
+  return Number.isInteger(value) && Number(value) > 0 ? Number(value) : undefined;
+}
+
+function semanticSlotMember(slot: Readonly<Record<string, unknown>>): string {
+  return `${Number(slot.index)}:${String(slot.exerciseId)}`;
 }
 
 function materialLoadPrescription(value: unknown): unknown {

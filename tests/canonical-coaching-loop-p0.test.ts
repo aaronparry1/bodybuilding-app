@@ -23,6 +23,7 @@ import { canonicalProgressDecisionRepository } from "@/data/local/canonical-prog
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { jsonStore } from "@/data/local/json-store";
+import { validateCanonicalActivePlan, type CanonicalActivePlanCarrier } from "@/domain/training/canonical-active-plan-carrier";
 import type { CanonicalLoadEvidence } from "@/domain/training/canonical-load-prescription";
 import { compareCanonicalMaterialPrescriptions } from "@/domain/training/canonical-material-prescription-delta";
 import { validateCanonicalProgressDecision } from "@/domain/training/canonical-progress-decision";
@@ -360,6 +361,99 @@ describe("mounted canonical coaching loop P0 remediation", () => {
     expect(firstReplay).toMatchObject({ status: "unchanged", priorRevision: receipt.priorRevision, newRevision: receipt.priorRevision });
     expect(concurrentReplay).toEqual(firstReplay);
     expect(canonicalActivePlanV2Repository.get()).toEqual(after);
+  });
+
+  it("keeps the independent grouped-method groupId-removal probe on the no-op branch", () => {
+    const complete = constructGroupedCarrier("grouped-independent-probe");
+    const migrated = removeGeneratedGroupIds(structuredClone(complete));
+    expect(countGroupedSlots(complete)).toBe(4);
+    expect(validateCanonicalActivePlan(complete)).toMatchObject({ status: "valid" });
+    expect(validateCanonicalActivePlan(migrated)).toMatchObject({ status: "valid" });
+    expect(compareCanonicalMaterialPrescriptions(migrated.plannedSessions, complete.plannedSessions)).toEqual({
+      status: "unchanged",
+      deltas: [],
+    });
+    expect(compareCanonicalMaterialPrescriptions(complete.plannedSessions, migrated.plannedSessions)).toEqual({
+      status: "unchanged",
+      deltas: [],
+    });
+
+    expect(canonicalActivePlanV2Repository.saveAtomically(migrated).status).toBe("saved");
+    const hydrated = canonicalActivePlanState.hydrate();
+    if (!hydrated.model?.nextSession) throw new Error("grouped probe next session missing");
+    const planned = hydrated.model.plannedSessions.find((session) => session.id === hydrated.model!.nextSession!.id);
+    if (!planned) throw new Error("grouped probe planned session missing");
+    const startedResult = startCanonicalSession({
+      planId: migrated.planId,
+      expectedPlanRevision: hydrated.model.revision,
+      plannedSessionId: planned.id,
+      expectedPrescriptionHash: prescriptionHash(planned.snapshot),
+      operationId: "grouped-independent-probe:start",
+      startedAt: "2026-07-26T09:00:00.000Z",
+      provenance: "canonical_grouped_identity_probe",
+    });
+    if (!startedResult.recordedSessionId || startedResult.planRevision === undefined) throw new Error(startedResult.reason);
+    const aggregate = canonicalRecordedSessionLedger.get(startedResult.recordedSessionId);
+    if (aggregate.status !== "found") throw new Error("grouped probe recorded session missing");
+    const beforeApplication = canonicalActivePlanV2Repository.get();
+    if (beforeApplication.status !== "saved") throw new Error("grouped probe active plan missing");
+    const regenerated = regenerateGeneratedGroupIds(structuredClone(beforeApplication.carrier));
+    expect(validateCanonicalActivePlan(regenerated)).toMatchObject({ status: "valid" });
+    expect(compareCanonicalMaterialPrescriptions(beforeApplication.carrier.plannedSessions, regenerated.plannedSessions)).toEqual({
+      status: "unchanged",
+      deltas: [],
+    });
+    vi.spyOn(canonicalConstruction, "constructCanonicalActivePlanFromCanonicalInputs").mockReturnValue({
+      status: "constructed",
+      carrier: regenerated,
+    });
+
+    const startedFixture = {
+      planId: migrated.planId,
+      planRevision: startedResult.planRevision,
+      recordedSessionId: startedResult.recordedSessionId,
+      aggregate,
+    };
+    addPriorFailedExposure(startedFixture);
+    const completion = completeWorkout(startedFixture, ({ targetReps }) => ({
+      load: 60,
+      reps: Math.max(0, targetReps - 2),
+    }));
+    const decision = canonicalProgressDecisionRepository.list(migrated.planId)[0];
+    const receipt = decision?.phaseOneApplication;
+    expect(receipt).toMatchObject({
+      schemaVersion: "canonical_coaching_application_receipt_v2",
+      status: "unchanged",
+      actualResult: "explicit_no_change",
+      reasonCode: "material_prescription_delta_absent",
+      materialDeltas: [],
+    });
+    if (receipt?.schemaVersion !== "canonical_coaching_application_receipt_v2") throw new Error("grouped probe receipt missing");
+    expect(receipt.newRevision).toBe(receipt.priorRevision);
+    expect(completion.nextInstruction).toMatch(/materially equivalent/i);
+    expect(completion.nextInstruction).not.toMatch(/progress|increas|advanced|changed training demand/i);
+    expect(canonicalCoachingApplicationIntentRepository.get(decision!.decisionId)).toEqual({ status: "not_found" });
+    const afterApplication = canonicalActivePlanV2Repository.get();
+    expect(afterApplication.status === "saved" ? afterApplication.carrier.revision : -1).toBe(receipt.priorRevision);
+
+    const command = {
+      planId: decision!.planId,
+      expectedPlanRevision: receipt.priorRevision,
+      macrocycleId: decision!.macrocycleId,
+      mesocycleId: decision!.mesocycleId,
+      microcycleId: decision!.microcycleId,
+      decisionId: decision!.decisionId,
+      evaluationId: decision!.evaluationId,
+      expectedEvidenceIds: decision!.evidenceIds,
+    };
+    const replay = canonicalActivePlanState.applyProgressDecision(command);
+    expect(replay).toMatchObject({
+      status: "unchanged",
+      receiptStatus: "unchanged",
+      newRevision: receipt.priorRevision,
+      stateChanged: false,
+    });
+    expect(canonicalActivePlanState.applyProgressDecision(command)).toEqual(replay);
   });
 
   it("ignores generated metadata but detects exact prescription changes", () => {
@@ -1216,6 +1310,62 @@ function loadEvidenceFor(exerciseId: string, load: number): CanonicalLoadEvidenc
     freshnessVersion: 1,
     calibrationStatus: "established",
   };
+}
+
+function constructGroupedCarrier(planId: string): CanonicalActivePlanCarrier {
+  const result = canonicalConstruction.constructCanonicalActivePlanFromCanonicalInputs({
+    planId,
+    createdAt: "2026-07-26T08:00:00.000Z",
+    updatedAt: "2026-07-26T08:00:00.000Z",
+    goal: "strength_hypertrophy",
+    macrocycleGoal: "build_muscle_and_strength",
+    experienceLevel: "intermediate",
+    daysPerWeek: 5,
+    preferredSplit: "let_app_choose",
+    equipment: ["barbell", "dumbbell", "machine", "cable", "bodyweight"],
+    units: "kg",
+    selectedMesocycleId: "powerbuilding_hypertrophy",
+    microcycleSequenceNumber: 4,
+    exercises: exerciseLibrary,
+    limitations: [],
+    exercisePreferences: {},
+    history: [],
+    establishedLoads: Object.fromEntries(exerciseLibrary.map((exercise) => [exercise.id, 60])),
+    loadEvidence: Object.fromEntries(exerciseLibrary.map((exercise) => [exercise.id, loadEvidenceFor(exercise.id, 60)])),
+  });
+  if (result.status !== "constructed") throw new Error(result.reason);
+  return result.carrier;
+}
+
+function countGroupedSlots(carrier: CanonicalActivePlanCarrier): number {
+  return carrier.plannedSessions.reduce((count, session) => count + sessionSlots(session.prescriptionSnapshot)
+    .filter((slot) => (slot.methodStructure as Record<string, unknown> | undefined)?.kind === "linked_rounds").length, 0);
+}
+
+function removeGeneratedGroupIds(carrier: CanonicalActivePlanCarrier): CanonicalActivePlanCarrier {
+  carrier.plannedSessions.forEach((session) => {
+    sessionSlots(session.prescriptionSnapshot).forEach((slot) => {
+      const structure = slot.methodStructure as Record<string, unknown> | undefined;
+      if (structure?.kind === "linked_rounds") delete structure.groupId;
+    });
+  });
+  return carrier;
+}
+
+function regenerateGeneratedGroupIds(carrier: CanonicalActivePlanCarrier): CanonicalActivePlanCarrier {
+  carrier.plannedSessions.forEach((session) => {
+    const remap = new Map<string, string>();
+    let structuralGroup = 0;
+    sessionSlots(session.prescriptionSnapshot).forEach((slot) => {
+      const structure = slot.methodStructure as Record<string, unknown> | undefined;
+      if (structure?.kind !== "linked_rounds") return;
+      if (Number(structure.position) === 1) structuralGroup += 1;
+      const semanticKey = `${session.planSessionIndex}:${structuralGroup}`;
+      if (!remap.has(semanticKey)) remap.set(semanticKey, `regenerated-group:${semanticKey}`);
+      structure.groupId = remap.get(semanticKey);
+    });
+  });
+  return carrier;
 }
 
 function addPriorFailedExposure(started: StartedFixture): void {

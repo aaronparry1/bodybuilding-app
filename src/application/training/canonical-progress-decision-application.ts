@@ -194,6 +194,23 @@ function applyPhaseOneDecision(
     },
   };
   const material = compareCanonicalMaterialPrescriptions(raw.carrier.plannedSessions, plannedSessions);
+  if (material.status === "ambiguous") {
+    const reason = "grouped_method_semantic_identity_ambiguous";
+    const explanation = "The reviewed future prescription was not changed because its grouped-method identity could not be reconstructed unambiguously.";
+    const recorded = canonicalProgressDecisionRepository.recordApplication(command.decisionId, phaseOneReceipt(
+      details,
+      "blocked",
+      "blocked_no_change",
+      reason,
+      explanation,
+      raw.carrier.revision,
+      raw.carrier.revision,
+      raw.carrier.plannedSessions.map((session) => session.id),
+      [],
+    ));
+    if (recorded.status !== "saved" && recorded.status !== "duplicate") return rejected(command, currentRevision, "decision_application_receipt_failed");
+    return { status: "unchanged", receiptStatus: "blocked", reason, planId: command.planId, priorRevision: raw.carrier.revision, newRevision: raw.carrier.revision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: false, reviewRequired: true };
+  }
   if (material.status === "unchanged") {
     const reason = "material_prescription_delta_absent";
     const explanation = "The reviewed future prescription was already materially equivalent, so no plan revision was written.";
@@ -341,6 +358,7 @@ function phaseOneReceipt(
 
 function missingBoundaryFact(reasonCode: string, reasonCodes: readonly string[]): string {
   const reasons = [reasonCode, ...reasonCodes];
+  if (reasons.some((reason) => reason.includes("grouped_method_semantic"))) return "unambiguous_grouped_method_prescription_semantics";
   if (reasons.some((reason) => reason.includes("successor"))) return "approved_constructible_successor";
   if (reasons.some((reason) => reason.includes("recovery"))) return "resolved_recovery_evidence";
   if (reasons.some((reason) => reason.includes("pain") || reason.includes("safety"))) return "resolved_safety_or_limitation_evidence";
@@ -356,6 +374,6 @@ function boundaryResolutionEvent(
 ): "canonical_progress_evidence_persisted" | "canonical_construction_facts_persisted" | "canonical_successor_policy_approved" {
   const reasons = [reasonCode, ...reasonCodes];
   if (reasons.some((reason) => reason.includes("successor") || reason.includes("maximum_horizon"))) return "canonical_successor_policy_approved";
-  if (reasons.some((reason) => reason.includes("construction_context"))) return "canonical_construction_facts_persisted";
+  if (reasons.some((reason) => reason.includes("construction_context") || reason.includes("grouped_method_semantic"))) return "canonical_construction_facts_persisted";
   return "canonical_progress_evidence_persisted";
 }

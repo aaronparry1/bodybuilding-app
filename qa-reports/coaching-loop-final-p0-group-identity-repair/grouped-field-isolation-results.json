@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "canonical_grouped_semantic_identity_repair_results_v1",
+  "startingCommit": "9025e483e38b868af0d89ef5ffac37fbfd63f90d",
+  "productionConstructedFixture": true,
+  "requestedCases": 30,
+  "generatedIdentityNoOpCases": 16,
+  "genuineMaterialCases": 14,
+  "generatedIdentityFalseApplications": 0,
+  "falseSemanticGroupMemberDeltas": 0,
+  "ambiguousMembershipFailsClosed": true,
+  "noOpCases": [
+    "different groupId values only",
+    "groupId removed from candidate only",
+    "groupId removed from committed only",
+    "groupId absent from both",
+    "all generated groupIds regenerated",
+    "session slot exercise-instance and group IDs regenerated",
+    "timestamp and revision metadata with group churn",
+    "nested grouped objects regenerated",
+    "partially missing optional legacy identity",
+    "production-valid original versus migrated carrier",
+    "duplicate replay",
+    "concurrent equivalent regeneration",
+    "restart before comparison",
+    "restart after persisted no-change receipt",
+    "display-unit conversion with group churn",
+    "rounded or swallowed request with group churn"
+  ],
+  "materialCases": [
+    "member added",
+    "member removed",
+    "members reordered",
+    "two groups merged",
+    "one group split",
+    "member position changed",
+    "group size changed",
+    "exercise substituted",
+    "rounds changed",
+    "between-exercise rest changed",
+    "between-round rest changed",
+    "method changed",
+    "execution policy changed",
+    "semantic change with complete generated-ID churn"
+  ],
+  "focusedTestResult": {
+    "filesPassed": 3,
+    "testsPassed": 69,
+    "testsFailed": 0
+  }
+}
