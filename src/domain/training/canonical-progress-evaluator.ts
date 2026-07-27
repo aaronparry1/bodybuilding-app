@@ -9,6 +9,10 @@ import {
   resolveCanonicalCycleBoundary,
   type CanonicalCycleBoundaryResolution,
 } from "@/domain/training/canonical-cycle-boundary-resolution";
+import {
+  deriveCanonicalNumericPrescriptionDecisions,
+  type CanonicalNumericPrescriptionDecision,
+} from "@/domain/training/canonical-comparable-exposure-policy";
 
 export type CanonicalProgressEvaluation = Readonly<{
   schemaVersion: "canonical_progress_evaluation_v1";
@@ -65,6 +69,7 @@ export type CanonicalPostWorkoutEvaluation = Readonly<{
   deloadEligible: false;
   calibrationCandidates: readonly CanonicalCalibrationCandidate[];
   affectedExerciseIds: readonly string[];
+  numericDecisions: readonly CanonicalNumericPrescriptionDecision[];
   boundaryResolution?: CanonicalCycleBoundaryResolution;
 }>;
 
@@ -109,6 +114,7 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
     .sort((a, b) => a.evidenceId.localeCompare(b.evidenceId));
   const sessionEvidence = relevant.filter((item) => item.sessionId === input.session.recordedSessionId);
   const evidenceIds = sessionEvidence.map((item) => item.evidenceId);
+  let numericDecisions: readonly CanonicalNumericPrescriptionDecision[] = [];
   const base = {
     schemaVersion: CANONICAL_POST_WORKOUT_EVALUATION_VERSION,
     planId: input.plan.planId,
@@ -130,11 +136,16 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
       & Readonly<{ boundaryResolution?: CanonicalCycleBoundaryResolution }>,
   ): CanonicalPostWorkoutEvaluation => ({
     ...base,
-    evaluationId: `${input.plan.planId}:post-workout:${input.session.recordedSessionId}:${input.session.version}:${outcome}:${evidenceIds.join(",")}`,
+    evidenceIds: [...new Set([...evidenceIds, ...numericDecisions.flatMap((item) => item.evidenceIds)])].sort(),
+    evidenceVersions: Object.fromEntries(relevant
+      .filter((item) => evidenceIds.includes(item.evidenceId) || numericDecisions.some((decision) => decision.evidenceIds.includes(item.evidenceId)))
+      .map((item) => [item.evidenceId, item.evidenceVersion])),
+    evaluationId: `${input.plan.planId}:post-workout:${input.session.recordedSessionId}:${input.session.version}:${outcome}:${[...new Set([...evidenceIds, ...numericDecisions.flatMap((item) => item.evidenceIds)])].sort().join(",")}`,
     outcome,
     reasonCodes,
     explanation,
     deloadEligible: false,
+    numericDecisions,
     ...facts,
   });
   const emptyFacts = {
@@ -159,6 +170,11 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
   if (!completionEvidence) return finish("blocked", ["completion_evidence_missing"], "Your workout is saved. Coaching review will retry when its completion evidence is available.", emptyFacts);
 
   const slotAssessments = assessSessionSlots(input.session, input.events, sessionEvidence);
+  numericDecisions = deriveCanonicalNumericPrescriptionDecisions({
+    session: input.session,
+    evidence: relevant,
+    policy: input.policy,
+  });
   const successful = slotAssessments.length > 0 && slotAssessments.every((item) => item.successful);
   const anyPerformed = slotAssessments.some((item) => item.performedSets > 0);
   const repDropOff = slotAssessments.some((item) => item.repDropOff);
@@ -183,7 +199,12 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
     recoveryEvidence,
     transitionEligible: boundary.status === "transition_approved",
     calibrationCandidates,
-    affectedExerciseIds: calibrationCandidates.map((item) => item.exerciseId).sort(),
+    affectedExerciseIds: [...new Set([
+      ...calibrationCandidates.map((item) => item.exerciseId),
+      ...numericDecisions
+        .filter((item) => item.after)
+        .map((item) => item.exerciseId),
+    ])].sort(),
     boundaryResolution: boundary,
   };
   const reconciliationBlock = sessionEvidence.find((item) =>
@@ -208,7 +229,22 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
     .filter((assessment) => !assessment.successful && failedComparableExposureCount(relevant, assessment.exerciseId, input.session.recordedSessionId) >= 2)
     .map((assessment) => assessment.exerciseId)
     .sort();
+  const authorisedRegressions = numericDecisions.filter((item) =>
+    item.after && (item.outcome === "regress_load" || item.outcome === "regress_repetitions"));
   if (!successful && repeatedFailureExerciseIds.length) {
+    if (authorisedRegressions.length) {
+      return finish(
+        completeCycle ? "advance_microcycle" : "maintain",
+        [
+          ...(completeCycle ? ["current_microcycle_completed", boundary.reasonCode] : []),
+          ...authorisedRegressions.map((item) => item.reasonCode),
+        ],
+        completeCycle
+          ? "This training week is complete. Repeated comparable underperformance supports one bounded reduction in the next matching prescription."
+          : "Repeated comparable underperformance supports one bounded reduction when the next training week is prepared.",
+        facts,
+      );
+    }
     return finish(
       "recalibrate",
       [
@@ -253,8 +289,14 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
     }
     return finish(
       "advance_microcycle",
-      ["current_microcycle_completed", boundary.reasonCode],
-      "This training week is complete, so the next week has been prepared from the same coaching phase.",
+      [
+        "current_microcycle_completed",
+        boundary.reasonCode,
+        ...numericDecisions.filter((item) => item.after).map((item) => item.reasonCode),
+      ],
+      numericDecisions.some((item) => item.after)
+        ? "This training week is complete. Comparable completed training supports a bounded change in the next matching prescription."
+        : "This training week is complete, so the next week has been prepared from the same coaching phase.",
       facts,
     );
   }

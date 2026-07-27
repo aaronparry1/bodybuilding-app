@@ -12,6 +12,8 @@ import type { CanonicalPhaseOneDecisionDetails } from "@/domain/training/canonic
 import { mesocycleById } from "@/domain/training/mesocycle-library";
 import { resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-prescription-policy";
 import { canonicalDeterministicFingerprint, canonicalDeterministicFingerprintId } from "@/domain/training/canonical-deterministic-fingerprint";
+import type { CanonicalPostWorkoutEvaluation } from "@/domain/training/canonical-progress-evaluator";
+import type { CanonicalNumericPrescriptionDecision } from "@/domain/training/canonical-comparable-exposure-policy";
 
 export const CANONICAL_POST_WORKOUT_ORCHESTRATOR_VERSION = "canonical_post_workout_orchestrator_v1" as const;
 
@@ -109,7 +111,7 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     ...(raw.carrier.cycleLineage ?? []).filter((entry) => entry.mesocycleId === raw.carrier.mesocycle.id).map((entry) => entry.microcycleId),
     raw.carrier.microcycle.id,
   ]).size);
-  const evaluation = evaluateCanonicalPostWorkoutProgress({
+  const currentEvaluation = evaluateCanonicalPostWorkoutProgress({
     plan,
     session: aggregate.session,
     events: aggregate.events,
@@ -122,6 +124,7 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     completedMicrocyclesInMesocycle,
     microcycleComplete,
   });
+  const evaluation = includePendingMicrocycleNumericDecisions(currentEvaluation, aggregate.session.version);
   const decisionIdentity = priorAttempt.status === "found"
     && priorAttempt.attempt.reason === "boundary_resolution_event_detected"
     ? `${operationId}:review:${canonicalDeterministicFingerprintId({
@@ -172,6 +175,71 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     ? committed.decision.phaseOneApplication.explanation
     : evaluation.explanation;
   return { status: finalStatus, reason: applied.reason, operationId, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, explanation, priorRevision: applied.priorRevision, newRevision: applied.newRevision };
+}
+
+/**
+ * Numeric intent from an earlier session in the same Microcycle is durable in
+ * its persisted coaching decision. At the final session boundary, this
+ * coordinator carries only those already-evaluated intents into the one
+ * existing application authority. It does not reevaluate performance.
+ */
+function includePendingMicrocycleNumericDecisions(
+  evaluation: CanonicalPostWorkoutEvaluation,
+  recordedSessionVersion: number,
+): CanonicalPostWorkoutEvaluation {
+  if (evaluation.outcome !== "advance_microcycle") return evaluation;
+  const prior = canonicalProgressDecisionRepository.list(evaluation.planId)
+    .filter((decision) =>
+      decision.mesocycleId === evaluation.mesocycleId
+      && decision.microcycleId === evaluation.microcycleId)
+    .flatMap((decision) => decision.phaseOne?.boundedAdjustment.numericDecisions ?? [])
+    .filter(isActionableNumericDecision);
+  const latestByKey = new Map<string, CanonicalNumericPrescriptionDecision>();
+  for (const decision of [...prior, ...evaluation.numericDecisions]) {
+    const existing = latestByKey.get(decision.comparableExposureKey);
+    if (!existing
+      || decision.exposureCount > existing.exposureCount
+      || decision.exposureCount === existing.exposureCount
+        && decision.evidenceIds.join(",").localeCompare(existing.evidenceIds.join(",")) >= 0) {
+      latestByKey.set(decision.comparableExposureKey, decision);
+    }
+  }
+  const numericDecisions = [...latestByKey.values()].sort((left, right) =>
+    left.comparableExposureKey.localeCompare(right.comparableExposureKey));
+  const evidenceIds = [...new Set([
+    ...evaluation.evidenceIds,
+    ...numericDecisions.flatMap((decision) => decision.evidenceIds),
+  ])].sort();
+  const evidenceVersions = Object.fromEntries(evidenceIds.flatMap((evidenceId) => {
+    const found = canonicalProgressEvidenceRepository.get(evidenceId);
+    return found.status === "found" ? [[evidenceId, found.evidence.evidenceVersion] as const] : [];
+  }));
+  const actionable = numericDecisions.filter(isActionableNumericDecision);
+  return {
+    ...evaluation,
+    evaluationId: `${evaluation.planId}:post-workout:${evaluation.recordedSessionId}:${recordedSessionVersion}:${evaluation.outcome}:${evidenceIds.join(",")}`,
+    evidenceIds,
+    evidenceVersions,
+    numericDecisions,
+    affectedExerciseIds: [...new Set([
+      ...evaluation.affectedExerciseIds,
+      ...actionable.map((decision) => decision.exerciseId),
+    ])].sort(),
+    reasonCodes: [...new Set([
+      ...evaluation.reasonCodes,
+      ...actionable.map((decision) => decision.reasonCode),
+    ])],
+    explanation: actionable.length
+      ? "This training week is complete. Comparable completed training supports bounded changes in the next matching prescriptions."
+      : evaluation.explanation,
+  };
+}
+
+function isActionableNumericDecision(
+  decision: CanonicalNumericPrescriptionDecision,
+): boolean {
+  return Boolean(decision.after)
+    && ["progress_load", "progress_repetitions", "regress_load", "regress_repetitions"].includes(decision.outcome);
 }
 
 function finalizeAttempt(
@@ -290,7 +358,12 @@ function phaseOneDecisionDetails(
     },
     priorFutureSessionIds: [...priorFutureSessionIds].sort(),
     result: decisionType === "blocked" ? "blocked_no_change" : decisionType === "maintain" ? "explicit_no_change" : "future_prescription_change",
-    boundedAdjustment: { kind, exerciseIds: [...evaluation.affectedExerciseIds].sort(), numericLoadAdjustmentAuthorised: false },
+    boundedAdjustment: {
+      kind,
+      exerciseIds: [...evaluation.affectedExerciseIds].sort(),
+      numericLoadAdjustmentAuthorised: decisionType === "advance_microcycle" && evaluation.numericDecisions.some((item) => item.after),
+      numericDecisions: evaluation.numericDecisions,
+    },
     ...(evaluation.boundaryResolution ? { boundaryResolution: evaluation.boundaryResolution } : {}),
     contextIdentity: { macrocycleId: evaluation.macrocycleId, mesocycleId: evaluation.mesocycleId, microcycleId: evaluation.microcycleId },
     decidedAt,

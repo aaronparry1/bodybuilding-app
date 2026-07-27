@@ -59,6 +59,7 @@ export type CanonicalConstructionContext = Readonly<{
   initialEstablishedLoads: Readonly<Record<string, number>>;
   initialLoadEvidence: Readonly<Record<string, CanonicalLoadEvidence>>;
   recalibrationRequiredExerciseIds: readonly string[];
+  pendingNumericDecisions?: readonly import("@/domain/training/canonical-comparable-exposure-policy").CanonicalNumericPrescriptionDecision[];
 }>;
 
 export type CanonicalActivePlanCarrier = Readonly<{
@@ -188,7 +189,16 @@ export function validateCanonicalActivePlan(value: unknown): CanonicalCarrierVal
       || Object.entries(context.initialEstablishedLoads).some(([exerciseId, load]) => !exerciseId || !Number.isFinite(load) || Number(load) <= 0)
       || Object.entries(context.initialLoadEvidence).some(([exerciseId, evidence]) => !isCanonicalLoadEvidence(exerciseId, evidence))
       || !Array.isArray(context.recalibrationRequiredExerciseIds)
-      || context.recalibrationRequiredExerciseIds.some((id) => typeof id !== "string" || !id)) {
+      || context.recalibrationRequiredExerciseIds.some((id) => typeof id !== "string" || !id)
+      || context.pendingNumericDecisions !== undefined && (
+        !Array.isArray(context.pendingNumericDecisions)
+        || context.pendingNumericDecisions.some((item) => !item
+          || item.schemaVersion !== "canonical_numeric_prescription_decision_v1"
+          || typeof item.comparableExposureKey !== "string"
+          || !item.after
+          || !Number.isFinite(item.after.prescribedBaseLoad)
+          || !Array.isArray(item.after.exactTargets))
+      )) {
       return { status: "invalid", reason: "invalid_progress_reference", path: "constructionContext" };
     }
   }

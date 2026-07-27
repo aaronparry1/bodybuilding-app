@@ -8,6 +8,7 @@ import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-co
 import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 import type { CanonicalProgressEvidence } from "@/domain/training/canonical-progress-evidence";
 import { canonicalDeterministicFingerprint } from "@/domain/training/canonical-deterministic-fingerprint";
+import { comparableExposureObservationFacts } from "@/domain/training/canonical-comparable-exposure-policy";
 
 export const CANONICAL_COMPLETION_EVIDENCE_RECONCILIATION_VERSION = "canonical_completion_evidence_reconciliation_v1" as const;
 
@@ -258,6 +259,10 @@ function performanceEvidence(input: Readonly<{
       exerciseId: String(input.event.payload.exerciseId),
       slotId: String(input.event.payload.slotId),
       prescriptionHash: input.session.prescriptionHash,
+      ...comparableExposureObservationFacts({
+        ...(input.session.prescriptionSnapshot as Record<string, unknown>),
+        mesocycleId: input.session.mesocycleId,
+      }, input.slot),
       loadingMode: String(loadPrescription?.loadingMode ?? input.slot.loadingMode ?? "unavailable"),
       method: String(input.slot.method ?? "straight_sets"),
       methodExecutionKind: String(structure?.kind ?? "standalone"),

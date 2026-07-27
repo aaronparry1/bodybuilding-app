@@ -18,7 +18,8 @@ export type CanonicalPhaseOneDecisionDetails = Readonly<{
   boundedAdjustment: Readonly<{
     kind: "establish_observed_calibration" | "retain_prescription" | "require_recalibration" | "construct_next_microcycle" | "construct_approved_successor" | "none";
     exerciseIds: readonly string[];
-    numericLoadAdjustmentAuthorised: false;
+    numericLoadAdjustmentAuthorised: boolean;
+    numericDecisions?: readonly import("@/domain/training/canonical-comparable-exposure-policy").CanonicalNumericPrescriptionDecision[];
   }>;
   boundaryResolution?: import("@/domain/training/canonical-cycle-boundary-resolution").CanonicalCycleBoundaryResolution;
   contextIdentity: Readonly<{ macrocycleId: string; mesocycleId: string; microcycleId: string }>;
@@ -113,7 +114,22 @@ export function validateCanonicalProgressDecision(value: unknown): { status: "va
       || !details.boundedAdjustment
       || !["establish_observed_calibration", "retain_prescription", "require_recalibration", "construct_next_microcycle", "construct_approved_successor", "none"].includes(String(details.boundedAdjustment.kind))
       || !Array.isArray(details.boundedAdjustment.exerciseIds) || details.boundedAdjustment.exerciseIds.some((id) => typeof id !== "string" || !id)
-      || details.boundedAdjustment.numericLoadAdjustmentAuthorised !== false
+      || typeof details.boundedAdjustment.numericLoadAdjustmentAuthorised !== "boolean"
+      || details.boundedAdjustment.numericDecisions !== undefined && (
+        !Array.isArray(details.boundedAdjustment.numericDecisions)
+        || details.boundedAdjustment.numericDecisions.some((item) => !item
+          || item.schemaVersion !== "canonical_numeric_prescription_decision_v1"
+          || typeof item.comparableExposureKey !== "string"
+          || typeof item.exerciseId !== "string"
+          || !Array.isArray(item.evidenceIds)
+          || !item.before
+          || !Number.isFinite(item.before.prescribedBaseLoad)
+          || !Array.isArray(item.before.exactTargets))
+      )
+      || details.boundedAdjustment.numericLoadAdjustmentAuthorised !== Boolean(
+        details.decisionType === "advance_microcycle"
+        && details.boundedAdjustment.numericDecisions?.some((item) => item.after),
+      )
       || details.boundaryResolution !== undefined && (
         details.boundaryResolution.schemaVersion !== "canonical_cycle_boundary_resolution_v1"
         || !["not_at_boundary", "continue_current_phase", "transition_approved", "review_required"].includes(String(details.boundaryResolution.status))

@@ -10,6 +10,7 @@ import type { CanonicalPhaseOneApplicationReceipt, CanonicalPhaseOneApplicationR
 import { compareCanonicalMaterialPrescriptions, type CanonicalMaterialPrescriptionDelta } from "@/domain/training/canonical-material-prescription-delta";
 import { canonicalDeterministicFingerprint } from "@/domain/training/canonical-deterministic-fingerprint";
 import { mesocycleById, type MesocycleId } from "@/domain/training/mesocycle-library";
+import { applyCanonicalNumericDecisionsToPlannedSessions } from "@/domain/training/canonical-comparable-exposure-policy";
 
 export type CanonicalProgressDecisionApplicationCommand = Readonly<{ planId: string; expectedPlanRevision: number; macrocycleId: string; mesocycleId: string; microcycleId: string; decisionId: string; evaluationId: string; expectedEvidenceIds: readonly string[] }>;
 export type CanonicalProgressDecisionApplicationResult = Readonly<{ status: "unchanged" | "applied" | "rejected"; receiptStatus?: "applied" | "unchanged" | "blocked"; reason: string; planId: string; priorRevision: number; newRevision: number; decisionId: string; stateChanged: boolean; futureSessionsRegenerated: boolean; reviewRequired: boolean }>;
@@ -163,7 +164,38 @@ function applyPhaseOneDecision(
   }
   if (constructed.status !== "constructed") return rejected(command, currentRevision, `canonical_future_session_construction_failed:${constructed.reason}`);
   const retainedIndexes = new Set(raw.carrier.plannedSessions.map((session) => session.planSessionIndex));
-  const plannedSessions = advance ? constructed.carrier.plannedSessions : constructed.carrier.plannedSessions.filter((session) => retainedIndexes.has(session.planSessionIndex));
+  const constructedPlannedSessions = advance ? constructed.carrier.plannedSessions : constructed.carrier.plannedSessions.filter((session) => retainedIndexes.has(session.planSessionIndex));
+  const currentNumericDecisions = details.boundedAdjustment.numericDecisions ?? [];
+  const retainedPendingNumericDecisions = raw.carrier.constructionContext?.pendingNumericDecisions ?? [];
+  const numericCandidates = [...new Map(
+    [...retainedPendingNumericDecisions, ...currentNumericDecisions]
+      .filter((item) => item.after)
+      .map((item) => [item.comparableExposureKey, item] as const),
+  ).values()];
+  const numericApplication = numericCandidates.length
+    ? applyCanonicalNumericDecisionsToPlannedSessions(
+      constructedPlannedSessions,
+      numericCandidates,
+    )
+    : { sessions: constructedPlannedSessions, applied: [], unresolved: [] };
+  const plannedSessions = numericApplication.sessions;
+  if (numericApplication.unresolved.length) {
+    if (appliedReason === `phase_one_${details.decisionType}_applied`) {
+      appliedReason = "phase_one_numeric_target_unavailable_structural_continuation_applied";
+      appliedExplanation = "The next training week was prepared, but the completed exercise no longer had one unambiguous comparable slot, so no numeric change was made.";
+    }
+  } else if (numericApplication.applied.length && appliedReason === `phase_one_${details.decisionType}_applied`) {
+    appliedReason = "phase_one_bounded_numeric_adjustment_applied";
+    appliedExplanation = numericApplication.applied.map((item) =>
+      item.outcome === "progress_load"
+        ? `${item.exerciseId}: load progressed from ${item.before.prescribedBaseLoad} kg to ${item.after!.prescribedBaseLoad} kg.`
+        : item.outcome === "regress_load"
+          ? `${item.exerciseId}: load reduced from ${item.before.prescribedBaseLoad} kg to ${item.after!.prescribedBaseLoad} kg after repeated comparable underperformance.`
+          : item.outcome === "progress_repetitions"
+            ? `${item.exerciseId}: exact repetition targets progressed from ${item.before.exactTargets.join("/")} to ${item.after!.exactTargets.join("/")}.`
+            : `${item.exerciseId}: exact repetition targets reduced from ${item.before.exactTargets.join("/")} to ${item.after!.exactTargets.join("/")} after repeated comparable underperformance.`
+    ).join(" ");
+  }
   if (!advance && plannedSessions.length !== raw.carrier.plannedSessions.length) return rejected(command, currentRevision, "future_session_identity_mismatch");
   const nextRevision = raw.carrier.revision + 1;
   const priorLineage = (raw.carrier.cycleLineage ?? []).map((entry) => advance && entry.microcycleId === raw.carrier.microcycle.id ? { ...entry, status: "predecessor" as const, transitionDecisionId: decision.decisionId } : entry);
@@ -179,6 +211,11 @@ function applyPhaseOneDecision(
       ...(raw.carrier.constructionContext ?? constructed.carrier.constructionContext!),
       initialEstablishedLoads: establishedLoads,
       initialLoadEvidence: loadEvidence,
+      // An unresolved adjustment may wait for the alternating comparable slot
+      // only inside the same Mesocycle. A successor boundary retains the
+      // factual history but drops an unmatched phase-specific prescription
+      // intent rather than inventing cross-phase compatibility.
+      pendingNumericDecisions: transition ? [] : numericApplication.unresolved,
       recalibrationRequiredExerciseIds: [
         ...new Set([
           ...((raw.carrier.constructionContext?.recalibrationRequiredExerciseIds ?? []).filter((exerciseId) => !establishedNow.has(exerciseId))),
@@ -228,6 +265,44 @@ function applyPhaseOneDecision(
     if (recorded.status !== "saved" && recorded.status !== "duplicate") return rejected(command, currentRevision, "decision_application_receipt_failed");
     return { status: "unchanged", reason, planId: command.planId, priorRevision: raw.carrier.revision, newRevision: raw.carrier.revision, decisionId: command.decisionId, stateChanged: false, futureSessionsRegenerated: false, reviewRequired: false };
   }
+  const numericDeltas: CanonicalMaterialPrescriptionDelta[] = numericApplication.applied.flatMap((item) => {
+    const sessionKey = `${item.planSessionIndex}:${item.sessionRole}:planned`;
+    const slotKey = `${item.exerciseId}:${item.constructionRole}:${item.lane}`;
+    const deltas: CanonicalMaterialPrescriptionDelta[] = [];
+    if (item.after && item.before.prescribedBaseLoad !== item.after.prescribedBaseLoad) {
+      deltas.push({
+        schemaVersion: "canonical_material_prescription_delta_v1",
+        sessionKey,
+        slotKey,
+        field: "loadPrescription.prescribedBaseLoad",
+        before: item.before.prescribedBaseLoad,
+        after: item.after.prescribedBaseLoad,
+      });
+    }
+    if (item.after && JSON.stringify(item.before.exactTargets) !== JSON.stringify(item.after.exactTargets)) {
+      deltas.push({
+        schemaVersion: "canonical_material_prescription_delta_v1",
+        sessionKey,
+        slotKey,
+        field: "exactTargets",
+        before: item.before.exactTargets,
+        after: item.after.exactTargets,
+      });
+    }
+    return deltas;
+  });
+  const truthfulDeltas = [...new Map(
+    [...material.deltas, ...numericDeltas].map((delta) => [
+      canonicalDeterministicFingerprint({
+        sessionKey: delta.sessionKey,
+        slotKey: delta.slotKey,
+        field: delta.field,
+        before: delta.before,
+        after: delta.after,
+      }),
+      delta,
+    ] as const),
+  ).values()];
   const receipt = phaseOneReceipt(
     details,
     "applied",
@@ -237,7 +312,7 @@ function applyPhaseOneDecision(
     raw.carrier.revision,
     nextRevision,
     plannedSessions.map((session) => session.id),
-    material.deltas,
+    truthfulDeltas,
   );
   const prepared = canonicalCoachingApplicationIntentRepository.save({
     schemaVersion: "canonical_coaching_application_intent_v1",
@@ -249,9 +324,9 @@ function applyPhaseOneDecision(
     expectedPreStateFingerprint: canonicalDeterministicFingerprint(raw.carrier),
     resultingRevision: nextRevision,
     resultingStateFingerprint: canonicalDeterministicFingerprint(next),
-    affectedFuturePrescriptionIdentities: material.deltas.map((item) => `${item.sessionKey}|${item.slotKey ?? ""}|${item.field}`).sort(),
-    exactIntendedMaterialDelta: material.deltas,
-    materialDeltaFingerprint: canonicalDeterministicFingerprint(material.deltas),
+    affectedFuturePrescriptionIdentities: truthfulDeltas.map((item) => `${item.sessionKey}|${item.slotKey ?? ""}|${item.field}`).sort(),
+    exactIntendedMaterialDelta: truthfulDeltas,
+    materialDeltaFingerprint: canonicalDeterministicFingerprint(truthfulDeltas),
     expectedPreCarrier: raw.carrier,
     intendedResultCarrier: next,
     truthfulReceipt: receipt,
@@ -286,11 +361,26 @@ function reconcilePreparedApplication(
   const currentFingerprint = canonicalDeterministicFingerprint(current);
   if (currentFingerprint === intent.resultingStateFingerprint) {
     const actual = compareCanonicalMaterialPrescriptions(intent.expectedPreCarrier.plannedSessions, current.plannedSessions);
-    if (actual.status !== "changed" || canonicalDeterministicFingerprint(actual.deltas) !== intent.materialDeltaFingerprint) {
+    const intendedDeltaFingerprints = new Set(intent.exactIntendedMaterialDelta.map((delta) =>
+      canonicalDeterministicFingerprint(delta)));
+    const actualDeltasAreRepresented = actual.status === "changed"
+      && actual.deltas.every((delta) => intendedDeltaFingerprints.has(canonicalDeterministicFingerprint(delta)));
+    const intendedDeltasAreIntact = canonicalDeterministicFingerprint(intent.exactIntendedMaterialDelta) === intent.materialDeltaFingerprint
+      && canonicalDeterministicFingerprint(intent.truthfulReceipt.materialDeltas) === intent.materialDeltaFingerprint;
+    if (!actualDeltasAreRepresented || !intendedDeltasAreIntact) {
       canonicalCoachingApplicationIntentRepository.save({ ...intent, status: "terminal_blocked", terminalReason: "committed_state_material_delta_ambiguous", resolvedAt: intent.truthfulReceipt.appliedAt });
       return rejected(command, current.revision, "committed_state_material_delta_ambiguous");
     }
-    const receipt = { ...intent.truthfulReceipt, materialDeltas: actual.deltas, resultingFutureSessionIds: current.plannedSessions.map((session) => session.id).sort() };
+    // The resulting carrier fingerprint proves the exact intended carrier was
+    // committed. Session-level reconstruction may intentionally collapse
+    // nested numeric fields into one structural session delta, so retain the
+    // pre-CAS field-level deltas after verifying that the independently
+    // reconstructed committed deltas are a subset of that durable intent.
+    const receipt = {
+      ...intent.truthfulReceipt,
+      materialDeltas: intent.exactIntendedMaterialDelta,
+      resultingFutureSessionIds: current.plannedSessions.map((session) => session.id).sort(),
+    };
     const recorded = canonicalProgressDecisionRepository.recordApplication(command.decisionId, receipt);
     if (recorded.status !== "saved" && recorded.status !== "duplicate") return rejected(command, current.revision, "decision_application_receipt_failed");
     canonicalCoachingApplicationIntentRepository.remove(command.decisionId);

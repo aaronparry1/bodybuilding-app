@@ -109,6 +109,7 @@ export function constructCanonicalActivePlanFromCanonicalInputs(input: Canonical
       initialEstablishedLoads: { ...(input.establishedLoads ?? {}) },
       initialLoadEvidence: { ...(input.loadEvidence ?? {}) },
       recalibrationRequiredExerciseIds: [],
+      pendingNumericDecisions: [],
     },
     planningRationale: { schemaVersion: "canonical_planning_rationale_v1", goalStrategyId, rotationReasons: [...activation.reasonCodes, `mesocycle:${mesocycle.id}`, `schedule:${microcycle.scheduleMode}`], sessionReasons: sessions.map((session) => ({ planSessionIndex: session.planSessionIndex, role: session.role, reasons: [`microcycle_role:${session.role}`, `mesocycle_purpose:${mesocycle.adaptation}`, ...((session.prescriptionSnapshot as import("@/domain/training/canonical-session-construction-pipeline").CanonicalSessionSnapshotV3).slots.map((slot) => `slot:${slot.index}:${slot.reason}`))] })), changeReasons: ["initial_canonical_construction", "no_progress_intervention_applied"] },
     cycleLineage: [{ schemaVersion: "canonical_session_lineage_v1", planId: result.carrier.planId, macrocycleId: result.carrier.macrocycle.id, mesocycleId: result.carrier.mesocycle.id, microcycleId: result.carrier.microcycle.id, revision: result.carrier.revision, sequenceNumber: result.carrier.microcycle.output.sequenceNumber, status: "current" as const }],

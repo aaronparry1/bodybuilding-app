@@ -87,6 +87,8 @@ function projectSlot(slot: Record<string, unknown>, semanticGroupMembers?: reado
     slotKey: `${Number(slot.index)}:${String(slot.exerciseId)}`,
     index: slot.index,
     exerciseId: slot.exerciseId,
+    exerciseRole: slot.exerciseRole,
+    constructionRole: slot.constructionRole,
     lane: slot.lane,
     method: slot.method,
     methodStructure: isRecord(projectedStructure) && semanticGroupMembers

@@ -32,11 +32,16 @@ export function produceCanonicalProgressDecision(command: CanonicalProgressDecis
   if (evaluation.planId !== command.planId || evaluation.planRevision !== command.planRevision || evaluation.mesocycleId !== command.mesocycleId || evaluation.microcycleId !== command.microcycleId) return { status: "rejected", reason: "evaluation_chain_mismatch" };
   if (evaluation.schemaVersion === "canonical_progress_evaluation_v1" && evaluation.evaluationId !== `${command.planId}:progress:${command.planRevision}:${evaluation.evidenceIds.join(",")}`) return { status: "rejected", reason: "evaluation_chain_mismatch" };
   const evidenceIds = [...evaluation.evidenceIds].sort();
+  const numericEvidenceIds = new Set(command.phaseOne?.boundedAdjustment.numericDecisions?.flatMap((item) => item.evidenceIds) ?? []);
   if (new Set(evidenceIds).size !== evidenceIds.length) return { status: "rejected", reason: "duplicate_evidence" };
   for (const evidenceId of evidenceIds) {
     const evidence = canonicalProgressEvidenceRepository.get(evidenceId);
     if (evidence.status !== "found") return { status: "rejected", reason: "evidence_not_found" };
-    if (evidence.evidence.planId !== command.planId || evidence.evidence.planRevision > command.planRevision || evidence.evidence.microcycleId !== command.microcycleId || command.evidenceVersions[evidenceId] !== evidence.evidence.evidenceVersion) return { status: "rejected", reason: "evidence_chain_mismatch" };
+    if (evidence.evidence.planId !== command.planId
+      || evidence.evidence.planRevision > command.planRevision
+      || (evidence.evidence.microcycleId !== command.microcycleId
+        && (!numericEvidenceIds.has(evidenceId) || evidence.evidence.mesocycleId !== command.mesocycleId))
+      || command.evidenceVersions[evidenceId] !== evidence.evidence.evidenceVersion) return { status: "rejected", reason: "evidence_chain_mismatch" };
   }
   const outcome = evaluation.schemaVersion === "canonical_progress_evaluation_v3"
     ? evaluation.outcome === "transition_recommended" ? "transition" : evaluation.outcome === "blocked" ? "review_required" : "continue"
