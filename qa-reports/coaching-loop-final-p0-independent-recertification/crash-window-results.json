@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "canonical_final_p0_independent_recertification_crash_windows_v1",
+  "auditedImplementation": "db8f10d",
+  "verdict": "PROVEN",
+  "pathsTested": 13,
+  "convergedPaths": 13,
+  "nonConvergingPaths": 0,
+  "duplicateApplications": 0,
+  "contradictoryReceipts": 0,
+  "paths": [
+    "CAS conflict before commit",
+    "process termination immediately before CAS",
+    "process termination immediately after CAS before receipt",
+    "returned receipt persistence failure",
+    "restart from prepared pre-state",
+    "restart from exact committed result",
+    "duplicate restart after receipt reconstruction",
+    "concurrent equivalent application replay",
+    "semantic no-op",
+    "missing intent after committed decision",
+    "newer coaching state won",
+    "conflicting committed state",
+    "receipt already persisted"
+  ],
+  "exactCommittedResult": "receipt_reconstructed_once",
+  "unchangedPreState": "retried_safely",
+  "semanticNoOp": "unchanged_without_intent",
+  "ambiguousOrConflictingState": "typed_terminal_block",
+  "completedHistoryRolledBack": false,
+  "representativeTest": "tests/canonical-coaching-loop-p0.test.ts"
+}

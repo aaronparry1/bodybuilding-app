@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "canonical_final_p0_independent_recertification_longitudinal_v1",
+  "auditedImplementation": "db8f10d",
+  "verdict": "PROVEN",
+  "freshRunCount": 2,
+  "semanticDeterminism": true,
+  "semanticSha256": "976a8f652de01d11256d46c789c1cbc3e44a8554ae598695e754be93627f55d5",
+  "targetWeeks": 12,
+  "scenarioCount": 12,
+  "scenariosReachingTwelveWeeks": 12,
+  "deadlockedScenarios": 0,
+  "coachingOpportunitiesPerRun": 648,
+  "materialApplicationsPerRun": 155,
+  "explicitNoChangePerRun": 493,
+  "blockedFinalOutcomesPerRun": 0,
+  "generatedIdentityOnlyApplicationsPerRun": 0,
+  "semanticallyFalseApplicationsPerRun": 0,
+  "rawMaterialDeltasPerRun": 723,
+  "numericProgressionsPerRun": 0,
+  "numericRegressionsPerRun": 0,
+  "missedNumericAdaptationOpportunitiesPerRun": 452,
+  "transactionCategoryCountsPerRun": {
+    "ordinary_next_microcycle_construction": 117,
+    "approved_successor_transition": 22,
+    "approved_successor_failure_continuation": 5,
+    "observed_load_calibration": 10,
+    "load_state_recalibration": 1
+  },
+  "noChangeReasonCountsPerRun": {
+    "successful_exposure_retained+automatic_numeric_adjustment_not_authorised": 452,
+    "stable_completed_calibration+exercise_identity_verified": 39,
+    "rep_drop_off_blocks_progression": 1,
+    "single_incomplete_exposure": 1
+  },
+  "scenarios": [
+    { "id": "normal_responder", "inputReachability": "mounted", "sessions": 60, "applied": 14, "unchanged": 46 },
+    { "id": "high_responder", "inputReachability": "mounted", "sessions": 60, "applied": 12, "unchanged": 48 },
+    { "id": "repeated_stall", "inputReachability": "simulation_only", "sessions": 60, "applied": 13, "unchanged": 47 },
+    { "id": "poor_recovery", "inputReachability": "simulation_only", "sessions": 60, "applied": 14, "unchanged": 46 },
+    { "id": "missed_sessions", "inputReachability": "mounted_partial_work_proxy", "sessions": 60, "applied": 12, "unchanged": 48 },
+    { "id": "return_after_layoff", "inputReachability": "simulation_only", "sessions": 60, "applied": 14, "unchanged": 46 },
+    { "id": "pain_or_limitation", "inputReachability": "simulation_only", "sessions": 60, "applied": 14, "unchanged": 46 },
+    { "id": "limited_equipment", "inputReachability": "simulation_only", "sessions": 36, "applied": 13, "unchanged": 23 },
+    { "id": "advanced_five_day_hypertrophy", "inputReachability": "mounted", "sessions": 60, "applied": 12, "unchanged": 48 },
+    { "id": "strength_transition_boundary", "inputReachability": "mounted", "sessions": 36, "applied": 12, "unchanged": 24 },
+    { "id": "powerbuilding_athlete", "inputReachability": "mounted", "sessions": 60, "applied": 12, "unchanged": 48 },
+    { "id": "athletic_changing_sport_workload", "inputReachability": "simulation_only", "sessions": 36, "applied": 13, "unchanged": 23 }
+  ]
+}

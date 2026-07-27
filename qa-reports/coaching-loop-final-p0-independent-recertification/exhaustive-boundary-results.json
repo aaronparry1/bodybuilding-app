@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "canonical_final_p0_independent_recertification_boundary_v1",
+  "auditedImplementation": "db8f10d",
+  "verdict": "PROVEN",
+  "mesocycleCount": 22,
+  "uniqueEquivalenceCasesExecuted": 394,
+  "ordinaryCases": 66,
+  "partialOrFailedBoundaryCases": 128,
+  "successfulBoundaryCases": 200,
+  "declaredPoliciesInspected": 22,
+  "inventedSuccessorEdges": 0,
+  "permanentDeadlocks": 0,
+  "minimumExplicitMaximumHorizonReviewCases": 22,
+  "canonicalTerminalProgrammeCases": 0,
+  "finalSessionReviewCounterexample": "resolved_after_declared_evidence_event",
+  "completedPhaseImmutable": true,
+  "restartDuplicateConcurrencyConverged": true,
+  "screenStateConsistent": true,
+  "representativeTests": [
+    "tests/canonical-final-p0-independent-recertification.test.ts",
+    "tests/canonical-final-p0-boundary-matrix.test.ts",
+    "tests/canonical-cycle-boundary-continuity.test.ts",
+    "tests/canonical-coaching-loop-p0.test.ts"
+  ]
+}

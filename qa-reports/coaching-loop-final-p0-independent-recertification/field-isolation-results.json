@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "canonical_final_p0_independent_recertification_field_isolation_v1",
+  "auditedImplementation": "db8f10d",
+  "verdict": "PROVEN",
+  "requestedCases": 30,
+  "generatedIdentityNoOpCases": 16,
+  "genuineMaterialCases": 14,
+  "generatedIdentityOnlyApplicationCount": 0,
+  "semanticallyFalseDeltaCount": 0,
+  "semanticallyFalseApplicationCount": 0,
+  "semanticGroupMemberDeltaCountInLongitudinalRun": 0,
+  "generatedGroupIdDeltaCountInLongitudinalRun": 0,
+  "ambiguousMembershipResult": "typed_blocked_no_change",
+  "symmetryVerified": true,
+  "restartVerified": true,
+  "duplicateVerified": true,
+  "concurrencyVerified": true,
+  "representativeTests": [
+    "tests/canonical-grouped-method-semantic-identity.test.ts",
+    "tests/canonical-material-prescription-identity.test.ts",
+    "tests/canonical-coaching-loop-p0.test.ts"
+  ]
+}
