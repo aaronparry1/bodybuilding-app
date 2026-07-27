@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "canonical_p1a_bodyweight_certification_v1",
+  "overallVerdict": "UNREACHABLE",
+  "productionMounted": {
+    "unweightedEntry": "PROVEN",
+    "weightedAddedLoadEntry": "PROVEN",
+    "assistanceEntry": "PROVEN",
+    "kgLbNormalization": "PROVEN",
+    "zeroOrNegativeExternalValueRejection": "PROVEN"
+  },
+  "numericCoaching": {
+    "unweightedRepetitionProgression": "NOT PROVEN",
+    "weightedBodyweight": "UNREACHABLE",
+    "assistedBodyweight": "UNREACHABLE",
+    "counterweightedMachine": "UNREACHABLE",
+    "mixedBodyweightExternal": "UNREACHABLE",
+    "bodyweightChange": "UNREACHABLE",
+    "missingBodyweight": "UNREACHABLE"
+  },
+  "currentPolicyOutcome": {
+    "bodyweight": "hold:bodyweight_numeric_state_not_mounted",
+    "weighted_bodyweight": "hold:bodyweight_numeric_state_not_mounted",
+    "assisted_bodyweight": "hold:bodyweight_numeric_state_not_mounted"
+  },
+  "falseApplications": 0,
+  "unsafeApplications": 0
+}

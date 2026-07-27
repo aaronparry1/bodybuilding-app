@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "canonical_p1a_numeric_count_reconciliation_v1",
+  "successfulComparableJourney": {
+    "evaluatorDecisions": 9,
+    "progressionDecisionRecords": 24,
+    "regressionDecisionRecords": 0,
+    "holdDecisionRecords": 0,
+    "applicationIntents": 3,
+    "successfulCasApplications": 3,
+    "affectedExercises": 13,
+    "affectedFuturePrescriptions": 13,
+    "affectedFutureSessions": 3,
+    "materialFieldDeltas": 13,
+    "progressionFieldDeltas": 13,
+    "regressionFieldDeltas": 0,
+    "receipts": 9,
+    "duplicateOrReplayedDecisions": 0
+  },
+  "repeatedUnderperformanceJourney": {
+    "evaluatorDecisions": 21,
+    "progressionDecisionRecords": 76,
+    "regressionDecisionRecords": 24,
+    "holdDecisionRecords": 22,
+    "applicationIntents": 7,
+    "successfulCasApplications": 7,
+    "affectedExercises": 17,
+    "affectedFuturePrescriptions": 17,
+    "affectedFutureSessions": 3,
+    "materialFieldDeltas": 56,
+    "progressionFieldDeltas": 43,
+    "regressionFieldDeltas": 13,
+    "receipts": 21,
+    "duplicateOrReplayedDecisions": 0
+  },
+  "aggregateTargetedExecutions": {
+    "evaluatorDecisions": 30,
+    "progressionDecisionRecords": 100,
+    "regressionDecisionRecords": 24,
+    "holdDecisionRecords": 22,
+    "applicationIntents": 10,
+    "successfulCasApplications": 10,
+    "affectedExerciseObservationsAcrossIndependentRuns": 30,
+    "affectedFuturePrescriptionObservationsAcrossIndependentRuns": 30,
+    "materialFieldDeltas": 69,
+    "progressionFieldDeltas": 56,
+    "regressionFieldDeltas": 13,
+    "receipts": 30,
+    "duplicateOrReplayedDecisions": 0
+  }
+}

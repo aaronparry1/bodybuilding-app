@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "canonical_p1a_cross_mesocycle_certification_v1",
+  "overallVerdict": "NOT PROVEN",
+  "cases": [
+    {"id":"same_exercise_method_new_mesocycle","result":"new_streak","verdict":"PROVEN"},
+    {"id":"changed_repetitions","result":"historical_not_directly_comparable","verdict":"PROVEN"},
+    {"id":"changed_set_structure","result":"different_key","verdict":"PROVEN"},
+    {"id":"changed_method","result":"different_key","verdict":"PROVEN"},
+    {"id":"primary_to_secondary","result":"different_key","verdict":"PROVEN"},
+    {"id":"hypertrophy_to_strength","result":"different_key","verdict":"PROVEN"},
+    {"id":"strength_to_hypertrophy","result":"different_key","verdict":"PROVEN"},
+    {"id":"deload_and_return","result":"old_same_mesocycle_streak_can_be_reused","verdict":"CONTRADICTED"},
+    {"id":"taper_peak_and_return","result":"old_same_mesocycle_streak_can_be_reused","verdict":"CONTRADICTED"},
+    {"id":"removed_and_restored","result":"no_recency_qualification","verdict":"NOT PROVEN"},
+    {"id":"equipment_change_and_return","result":"current change excluded; later reuse not freshness-qualified","verdict":"PARTIALLY PROVEN"},
+    {"id":"generated_id_churn","result":"non_semantic","verdict":"PROVEN"},
+    {"id":"restart_transition","result":"history_persists","verdict":"PROVEN"},
+    {"id":"duplicate_transition","result":"P0_idempotency_preserved","verdict":"PROVEN"},
+    {"id":"screen_consistency","result":"committed_identity_consistent","verdict":"PROVEN"}
+  ],
+  "immutableHistoryPreserved": true,
+  "successFailureStreakResetImplemented": false,
+  "recencyQualificationImplemented": false,
+  "falseApplicationsObserved": 0
+}
