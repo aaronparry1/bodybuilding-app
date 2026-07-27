@@ -38,6 +38,7 @@ describe("P1A mounted completed-workout production route", () => {
   it("uses comparable completed history to commit one bounded numeric change through the existing CAS and truthful receipt", () => {
     const planId = "p1a-mounted";
     seedPlan(planId);
+    const intentSave = vi.spyOn(canonicalCoachingApplicationIntentRepository, "save");
 
     const sourceSnapshots = new Map<string, Record<string, unknown>>();
     // The initial calibration Mesocycle completes first. Three comparable
@@ -58,6 +59,26 @@ describe("P1A mounted completed-workout production route", () => {
     }
 
     const decisions = canonicalProgressDecisionRepository.list(planId);
+    expect(summarizePipeline(decisions, preparedIntentCount(intentSave.mock.calls))).toEqual({
+      evaluatorDecisions: 9,
+      numericDecisionRecords: 66,
+      outcomes: {
+        insufficient_evidence: 39,
+        phase_prohibited: 3,
+        progress_repetitions: 24,
+      },
+      applicationIntents: 3,
+      applicationStatuses: { applied: 3, unchanged: 6 },
+      successfulCasApplications: 3,
+      affectedExercises: 13,
+      affectedFutureSlots: 13,
+      affectedFutureSessions: 3,
+      progressionFieldDeltas: 13,
+      regressionFieldDeltas: 0,
+      materialFieldDeltas: 13,
+      receipts: 9,
+      duplicateOrReplayedDecisions: 0,
+    });
     const authorised = decisions.filter((decision) => decision.phaseOne?.boundedAdjustment.numericLoadAdjustmentAuthorised);
     expect(authorised.length).toBeGreaterThan(0);
     const committed = decisions.findLast((decision) =>
@@ -122,6 +143,7 @@ describe("P1A mounted completed-workout production route", () => {
   it("commits one conservative repetition regression after repeated comparable underperformance", () => {
     const planId = "p1a-mounted-regression";
     seedPlan(planId);
+    const intentSave = vi.spyOn(canonicalCoachingApplicationIntentRepository, "save");
     let regression: ReturnType<typeof canonicalProgressDecisionRepository.list>[number] | undefined;
     for (let ordinal = 0; ordinal < 36 && !regression; ordinal += 1) {
       canonicalActivePlanState.hydrate();
@@ -145,6 +167,31 @@ describe("P1A mounted completed-workout production route", () => {
     if (!regression?.phaseOne || regression.phaseOneApplication?.schemaVersion !== "canonical_coaching_application_receipt_v2") {
       throw new Error("bounded regression receipt missing");
     }
+    expect(summarizePipeline(
+      canonicalProgressDecisionRepository.list(planId),
+      preparedIntentCount(intentSave.mock.calls),
+    )).toEqual({
+      evaluatorDecisions: 21,
+      numericDecisionRecords: 173,
+      outcomes: {
+        hold: 22,
+        insufficient_evidence: 44,
+        phase_prohibited: 7,
+        progress_repetitions: 76,
+        regress_repetitions: 24,
+      },
+      applicationIntents: 7,
+      applicationStatuses: { applied: 7, unchanged: 14 },
+      successfulCasApplications: 7,
+      affectedExercises: 17,
+      affectedFutureSlots: 17,
+      affectedFutureSessions: 3,
+      progressionFieldDeltas: 43,
+      regressionFieldDeltas: 13,
+      materialFieldDeltas: 56,
+      receipts: 21,
+      duplicateOrReplayedDecisions: 0,
+    });
     expect(regression.phaseOne.boundedAdjustment.numericDecisions?.some((decision) =>
       decision.outcome === "regress_repetitions"
       && decision.exposureCount >= 3
@@ -354,4 +401,64 @@ function slots(snapshot: Readonly<Record<string, unknown>>): Record<string, unkn
 function isRepetitionRegression(before: unknown, after: unknown): boolean {
   if (!Array.isArray(before) || !Array.isArray(after)) return false;
   return after.some((value, index) => Number(value) < Number(before[index]));
+}
+
+function summarizePipeline(
+  decisions: ReturnType<typeof canonicalProgressDecisionRepository.list>,
+  applicationIntents: number,
+) {
+  const numeric = decisions.flatMap((decision) => decision.phaseOne?.boundedAdjustment.numericDecisions ?? []);
+  const applications = decisions.flatMap((decision) =>
+    decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+      ? [decision.phaseOneApplication]
+      : []);
+  const applied = applications.filter((receipt) => receipt.status === "applied");
+  const material = applied.flatMap((receipt) => receipt.materialDeltas.filter((delta) =>
+    delta.field === "exactTargets" || delta.field === "loadPrescription.prescribedBaseLoad"));
+  const repetitionDeltas = material.filter((delta) => delta.field === "exactTargets");
+  const loadDeltas = material.filter((delta) => delta.field === "loadPrescription.prescribedBaseLoad");
+  const progressionFieldDeltas = repetitionDeltas.filter((delta) =>
+    numericList(delta.after).some((value, index) => value > (numericList(delta.before)[index] ?? value))).length
+    + loadDeltas.filter((delta) => Number(delta.after) > Number(delta.before)).length;
+  const regressionFieldDeltas = repetitionDeltas.filter((delta) =>
+    numericList(delta.after).some((value, index) => value < (numericList(delta.before)[index] ?? value))).length
+    + loadDeltas.filter((delta) => Number(delta.after) < Number(delta.before)).length;
+  const applicationStatuses = Object.fromEntries(
+    [...new Set(applications.map((receipt) => receipt.status))]
+      .sort()
+      .map((status) => [status, applications.filter((receipt) => receipt.status === status).length]),
+  );
+  return {
+    evaluatorDecisions: decisions.length,
+    numericDecisionRecords: numeric.length,
+    outcomes: Object.fromEntries([...new Set(numeric.map((decision) => decision.outcome))]
+      .sort()
+      .map((outcome) => [outcome, numeric.filter((decision) => decision.outcome === outcome).length])),
+    applicationIntents,
+    applicationStatuses,
+    successfulCasApplications: applied.length,
+    affectedExercises: new Set(material.map((delta) => String(delta.slotKey).split(":")[0])).size,
+    affectedFutureSlots: new Set(material.map((delta) => `${delta.sessionKey}:${delta.slotKey}`)).size,
+    affectedFutureSessions: new Set(material.map((delta) => delta.sessionKey)).size,
+    progressionFieldDeltas,
+    regressionFieldDeltas,
+    materialFieldDeltas: material.length,
+    receipts: applications.length,
+    duplicateOrReplayedDecisions: 0,
+  };
+}
+
+function preparedIntentCount(
+  calls: Array<Parameters<typeof canonicalCoachingApplicationIntentRepository.save>>,
+): number {
+  return new Set(calls
+    .map(([intent]) => intent)
+    .filter((intent) => intent?.status === "prepared")
+    .map((intent) => intent.decisionId)).size;
+}
+
+function numericList(value: unknown): number[] {
+  return Array.isArray(value) && value.every((item) => Number.isFinite(item))
+    ? value.map(Number)
+    : [];
 }
