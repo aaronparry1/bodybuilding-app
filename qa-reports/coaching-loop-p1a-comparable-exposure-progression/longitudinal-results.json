@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "canonical_p1a_longitudinal_results_v1",
+  "observationWindowWeeks": 12,
+  "observationWindowIsProgrammeLimit": false,
+  "requestedScenarioCount": 12,
+  "productionMountedScenarios": 6,
+  "simulationAssistedScenarios": 6,
+  "fullTwelveScenarioProductionReplayVerdict": "NOT PROVEN",
+  "freshRunCount": 0,
+  "reason": "The prior certification did not retain an executable per-opportunity longitudinal harness, and its six simulation-assisted scenarios depend on facts not mounted by production. This audit does not convert aggregate historical claims into new P1A evidence.",
+  "targetedMountedJourneys": {
+    "successfulComparableTraining": "PROVEN",
+    "repeatedComparableUnderperformance": "PROVEN",
+    "postCasRestart": "PROVEN"
+  },
+  "dedicatedProgressionJourneyDeltas": 13,
+  "allTargetedJourneyProgressionDeltas": 56,
+  "numericRegressions": 13,
+  "holds": 22,
+  "calibrations": 0,
+  "insufficientEvidenceDecisionsObserved": 83,
+  "phaseProhibitedDecisionsObserved": 10,
+  "missedActionableOpportunities": "NOT PROVEN",
+  "falseApplications": 0,
+  "unsafeApplications": 0,
+  "verdict": "PARTIALLY PROVEN"
+}

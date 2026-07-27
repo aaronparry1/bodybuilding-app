@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "canonical_p1a_missed_opportunity_classification_v1",
+  "sourceArtifact": "qa-reports/coaching-loop-final-p0-independent-recertification/longitudinal-results.json",
+  "baselineMissedOpportunities": 452,
+  "classificationTotal": 452,
+  "allWerePreviouslyPolicyGapCandidates": true,
+  "baselineClassification": {
+    "numeric_adjustment_not_authorised": 452,
+    "eligible_progression": 0,
+    "eligible_regression": 0,
+    "legitimate_hold": 0,
+    "calibration": 0,
+    "insufficient_history": 0,
+    "incomparable_exposure": 0,
+    "phase_prohibited": 0,
+    "safety_prohibited": 0,
+    "missing_athlete_fact": 0,
+    "policy_ambiguity": 0,
+    "implementation_defect": 0
+  },
+  "individualReclassificationAfterP1A": "NOT PROVEN",
+  "reason": "The prior durable artifact retained only the aggregate reason count, not 452 per-opportunity evidence records. Reclassifying individual opportunities without replay would invent evidence.",
+  "verdict": "PARTIALLY PROVEN"
+}

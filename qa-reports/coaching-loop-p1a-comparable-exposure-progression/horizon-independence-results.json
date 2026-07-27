@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "canonical_p1a_horizon_independence_v1",
+  "simulationClassification": "accelerated_policy_only",
+  "weeksCompleted": 104,
+  "maxObservedWeek": 104,
+  "microcyclesCompleted": 104,
+  "mesocyclesCompleted": 24,
+  "macrocyclesCompleted": 0,
+  "authorisedContinuations": 80,
+  "successorTransitions": 24,
+  "reviewStates": 0,
+  "terminalStates": 0,
+  "deadlocks": 0,
+  "weekOneResets": 0,
+  "duplicateTransitions": 0,
+  "weekTwelveWasArtificialTerminal": false,
+  "transitionedAtWeeks": [6, 10, 13, 19, 23, 26, 32, 36, 39, 45, 49, 52, 58, 62, 65, 71, 75, 78, 84, 88, 91, 97, 101, 104],
+  "successorMacrocycleConstructionVerdict": "NOT PROVEN",
+  "continuousCoachingVerdict": "PARTIALLY PROVEN"
+}

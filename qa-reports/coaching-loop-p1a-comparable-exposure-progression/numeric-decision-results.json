@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "canonical_p1a_numeric_decision_results_v1",
+  "implementationCommit": "a04b47eb1ecc58f0981a4c10cc6f515818a9898a",
+  "verdict": "PARTIALLY PROVEN",
+  "generatedIdentityOnlyApplications": 0,
+  "falseApplications": 0,
+  "unsafeApplications": 0,
+  "dedicatedProgressionJourneyDeltas": 13,
+  "allTargetedJourneyProgressionDeltas": 56,
+  "mountedRegressionDeltas": 13,
+  "mountedProgressionJourney": {
+    "coachingDecisions": 9,
+    "committedNumericReceipts": 1,
+    "committedNumericDeltas": 13,
+    "progressions": 13,
+    "regressions": 0
+  },
+  "mountedRegressionJourney": {
+    "coachingDecisions": 21,
+    "committedNumericReceipts": 5,
+    "committedNumericDeltas": 56,
+    "progressionsBeforeTheInducedRegressionWindow": 43,
+    "regressions": 13
+  },
+  "postCasPathsTested": 1,
+  "postCasPathsConverged": 1,
+  "duplicateApplications": 0,
+  "contradictoryReceipts": 0,
+  "authorityCount": 1,
+  "competingAuthorityCount": 0,
+  "limits": [
+    "Counts are isolated deterministic journey observations, not population estimates.",
+    "Bodyweight, weighted-bodyweight and assisted numeric adjustment remain unsupported because production has no exact external/assistance prescription carrier.",
+    "The full prior 452-opportunity matrix was not durably replayed per opportunity."
+  ]
+}
