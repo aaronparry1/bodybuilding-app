@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "build_45_discard_certification_v1",
+  "productionRepairCommit": "3c26d5002a103a14121a7a34eb74b67065cbc98d",
+  "contract": "restore_exact_planned_session_and_remove_mutable_attempt",
+  "cases": [
+    {"id": 1, "case": "discard immediately after starting", "verdict": "PROVEN"},
+    {"id": 2, "case": "discard after one set", "verdict": "PROVEN"},
+    {"id": 3, "case": "discard after multiple sets", "verdict": "PROVEN"},
+    {"id": 4, "case": "discard with running rest timer", "verdict": "PROVEN"},
+    {"id": 5, "case": "discard with paused rest timer", "verdict": "PROVEN"},
+    {"id": 6, "case": "discard after pause and resume", "verdict": "PROVEN"},
+    {"id": 7, "case": "cancel confirmation", "verdict": "PROVEN"},
+    {"id": 8, "case": "confirm once", "verdict": "PROVEN"},
+    {"id": 9, "case": "deliver confirmation twice", "verdict": "PROVEN"},
+    {"id": 10, "case": "rapid repeated confirmation delivery", "verdict": "PROVEN"},
+    {"id": 11, "case": "restart before confirmation", "verdict": "PROVEN"},
+    {"id": 12, "case": "restart after confirmation before navigation", "verdict": "PROVEN"},
+    {"id": 13, "case": "restart after persistence commit", "verdict": "PROVEN"},
+    {"id": 14, "case": "interruption during transaction", "verdict": "PROVEN"},
+    {"id": 15, "case": "discard after completed-set editing", "verdict": "PROVEN"},
+    {"id": 16, "case": "discard after exercise replacement evidence", "verdict": "PARTIALLY PROVEN"},
+    {"id": 17, "case": "discard recovered active workout", "verdict": "PROVEN"},
+    {"id": 18, "case": "discard already discarded workout", "verdict": "PROVEN"},
+    {"id": 19, "case": "reject completed workout discard", "verdict": "PROVEN"},
+    {"id": 20, "case": "start later valid workout", "verdict": "PROVEN"},
+    {"id": 21, "case": "Home Plan Train agreement", "verdict": "PROVEN"},
+    {"id": 22, "case": "no comparable-exposure evidence", "verdict": "PROVEN"},
+    {"id": 23, "case": "no progression or regression influence", "verdict": "PROVEN"},
+    {"id": 24, "case": "no ghost after full restart", "verdict": "PROVEN"},
+    {"id": 25, "case": "planned timeline remains exact", "verdict": "PROVEN"}
+  ],
+  "summary": {
+    "proven": 24,
+    "partiallyProven": 1,
+    "notProven": 0,
+    "permanentGhosts": 0,
+    "duplicateMutations": 0,
+    "discardedEvidenceRecords": 0
+  },
+  "limitation": "Case 16 proves substituted performed-work evidence is isolated, but the mounted Train UI has no exercise-replacement control to render or exercise."
+}
