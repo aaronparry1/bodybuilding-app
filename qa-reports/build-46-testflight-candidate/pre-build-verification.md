@@ -12,5 +12,6 @@ Verdict: **PROVEN**
 - Competing coaching authorities: `0`.
 - UI adaptation authorities: `0`.
 - Diff from the certified checkpoint contains no workout prescription or coaching-policy change.
+- After Apple's version-train rejection, the Build 45/RC artifact tests passed (`2` files, `3` tests), TypeScript passed again, and production public config resolved `1.0.15 (47)`, the existing bundle identifier, Android version code `1`, and `app-production`.
 
 Dependency inventory resolves without missing packages. `expo install --check` reports existing patch-level compatibility recommendations for eight Expo-related packages; no upgrade is authorised in this task. Expo Doctor also emitted two existing Metro option warnings and did not complete before being stopped. The prior `1.0.14 (45)` store build succeeded with this dependency line, and the protected behavioral/configuration gates above are green.

@@ -1,10 +1,12 @@
 # Build command and resolution
 
-Current verdict: **PARTIALLY PROVEN**
+Verdict: **PROVEN**
 
-Planned command:
+Executed command:
 
-`npx eas-cli@latest build --platform ios --profile production --non-interactive --wait`
+`EAS_NO_VCS=1 EAS_SKIP_AUTO_FINGERPRINT=1 npx eas-cli@latest build --platform ios --profile production --non-interactive --wait`
+
+The normal VCS archive route and its automatic fingerprint step stalled in local Git pack processing before any paid build was created. The bounded no-VCS route archived the clean, committed working tree successfully. Skipping the optional fingerprint avoided the same local Git pack defect; it did not change the production bundle.
 
 Resolved route:
 
@@ -15,12 +17,15 @@ Resolved route:
 - Scheme: `AdaptiveStrengthCoach`
 - Configuration: `Release`
 - Bundle identifier: `com.aaronparry.adaptivestrengthcoach`
-- Marketing version: `1.0.14`
-- Candidate build number: `46`
+- Marketing version: `1.0.15`
+- Candidate build number: `47`
 - Version source: EAS remote
 - Auto-increment: enabled
 - Credentials source: EAS remote
 - Production router root: `app-production`
 - Development/profiling client dependency: absent
 
-The exact committed Git revision will be recorded before starting the build.
+- Committed source revision: `553cbf5f5e99aeeca2c948dc07d88912958d2929`
+- EAS build: `f186502a-3695-4b7a-abb0-2854e996b8ac`
+
+EAS used the existing remote App Store distribution certificate, active provisioning profile and server-held App Store Connect API key. Credential contents were not copied into artifacts.

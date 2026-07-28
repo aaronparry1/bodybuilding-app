@@ -1,9 +1,15 @@
-# Build 46 TestFlight candidate
+# TestFlight release candidate
 
-Current verdict: **PARTIALLY PROVEN**
+Verdict: **PROVEN** for build and upload; genuine iPhone verification remains **NOT PROVEN**.
 
-The certified source checkpoint is `f91d4ba554debd853e9fec442d836a5cf4e47b42`. The only production metadata change prepared for this candidate is the iOS build-number increment from `45` to `46`; marketing version `1.0.14`, bundle identity, product behavior, Android metadata, coaching authority and prescriptions remain unchanged.
+The certified source checkpoint is `f91d4ba554debd853e9fec442d836a5cf4e47b42`. The initial `1.0.14 (46)` archive built successfully, but Apple validation proved that the approved `1.0.14` train was closed (`ITMS-90062` and `ITMS-90186`). In accordance with the task's version exception, the accepted candidate is therefore `1.0.15 (47)`.
 
-Source certification, automated certification and production payload isolation are **PROVEN**. The production build, TestFlight upload, Apple processing and genuine iPhone verification remain **NOT PROVEN** until the external workflow completes.
+The accepted candidate contains the certified repair plus release metadata only. Bundle identity, product behavior, Android metadata, coaching authority and workout prescriptions remain unchanged.
 
-No App Review submission or public release is authorised.
+- Source and automated certification: **PROVEN**
+- Production App Store build: **PROVEN**
+- App Store Connect/TestFlight upload: **PROVEN**
+- Apple receipt: accepted and processing
+- Genuine iPhone verification: **NOT PROVEN**
+
+No App Review submission, public release, pricing, availability or rollout action occurred.

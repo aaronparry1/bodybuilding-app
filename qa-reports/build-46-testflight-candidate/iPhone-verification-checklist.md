@@ -1,5 +1,7 @@
 # Genuine iPhone verification checklist
 
+Install `1.0.15 (47)` from the internal TestFlight app after Apple processing exposes it.
+
 1. Fresh launch and authenticated Home state.
 2. Confirm Home, Plan and Train identify the same next workout.
 3. Open the planned workout preview.
@@ -21,4 +23,4 @@
 19. Record screenshots and exact reproduction steps for any visual or lifecycle defect.
 20. Record programming-quality concerns separately from this repair.
 
-Uploading a binary does not complete this checklist.
+Uploading and processing a binary do not complete this checklist.
