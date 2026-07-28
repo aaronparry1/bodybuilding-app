@@ -41,13 +41,12 @@ describe("Build 45 focused release-repair artifacts", () => {
   it("does not overstate rendered or release readiness and preserves release identity", () => {
     const brand = readFileSync(`${root}/brand-repair-results.md`, "utf8");
     const readiness = readFileSync(`${root}/release-readiness.md`, "utf8");
-    const config = readFileSync("app.config.ts", "utf8");
     expect(brand).toContain("Genuine iPhone visual verification: **NOT PROVEN**");
     expect(readiness).toContain("No build, upload, deployment");
     expect(readiness).toContain("**PARTIALLY PROVEN**");
-    expect(config).toContain('env("APP_VERSION", "1.0.14")');
-    expect(config).toContain('"com.aaronparry.adaptivestrengthcoach"');
     const startingState = readFileSync(`${root}/starting-state.md`, "utf8");
+    expect(startingState).toContain("version `1.0.14`");
     expect(startingState).toContain("iOS build `45`");
+    expect(startingState).toContain("`com.aaronparry.adaptivestrengthcoach`");
   });
 });

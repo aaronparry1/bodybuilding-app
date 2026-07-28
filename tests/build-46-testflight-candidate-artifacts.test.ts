@@ -23,8 +23,8 @@ describe("Build 46 TestFlight candidate artifacts", () => {
     const metadata = readFileSync(`${root}/release-metadata.md`, "utf8");
     const upload = readFileSync(`${root}/upload-result.md`, "utf8");
     const checklist = readFileSync(`${root}/iPhone-verification-checklist.md`, "utf8");
-    expect(config).toContain('env("APP_VERSION", "1.0.14")');
-    expect(config).toContain('env("APP_IOS_BUILD_NUMBER", "46")');
+    expect(config).toContain('env("APP_VERSION", "1.0.15")');
+    expect(config).toContain('env("APP_IOS_BUILD_NUMBER", "47")');
     expect(metadata).toContain("`com.aaronparry.adaptivestrengthcoach`");
     expect(metadata).toContain("| Android version code | `1` | unchanged |");
     expect(upload).toContain("App Review submission and public release remain prohibited");
