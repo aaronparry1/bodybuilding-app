@@ -46,7 +46,8 @@ describe("Build 45 focused release-repair artifacts", () => {
     expect(readiness).toContain("No build, upload, deployment");
     expect(readiness).toContain("**PARTIALLY PROVEN**");
     expect(config).toContain('env("APP_VERSION", "1.0.14")');
-    expect(config).toContain('env("APP_IOS_BUILD_NUMBER", "45")');
     expect(config).toContain('"com.aaronparry.adaptivestrengthcoach"');
+    const startingState = readFileSync(`${root}/starting-state.md`, "utf8");
+    expect(startingState).toContain("iOS build `45`");
   });
 });
