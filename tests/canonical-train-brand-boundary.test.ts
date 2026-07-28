@@ -4,16 +4,21 @@ import { colors, workoutColors } from "@/ui/theme";
 
 const trainPath = "app/(protected)/(tabs)/train.tsx";
 const productionTrainPath = "app-production/(protected)/(tabs)/train.tsx";
+const completionSummaryPath = "app/(protected)/completion-summary.tsx";
 const source = readFileSync(trainPath, "utf8");
 const productionSource = readFileSync(productionTrainPath, "utf8");
+const completionSummarySource = readFileSync(completionSummaryPath, "utf8");
 
 describe("canonical Train brand boundary", () => {
   it("uses the shared semantic workout palette without raw colour literals or a duplicate local theme", () => {
-    expect(source).toContain('import { colors, type, workoutColors } from "@/ui/theme"');
+    expect(source).toContain('import { type, workoutColors } from "@/ui/theme"');
     expect(source).toContain("const TRAIN = workoutColors");
     expect(source).not.toMatch(/#[\da-f]{3,8}\b|rgba?\(|hsla?\(/i);
     expect(source).not.toMatch(/const\s+TRAIN\s*=\s*\{/);
     expect(productionSource).toContain('export { default } from "../../../app/(protected)/(tabs)/train"');
+    expect(completionSummarySource).toContain('import { spacing, type, workoutColors } from "@/ui/theme"');
+    expect(completionSummarySource).toContain("const TRAIN = workoutColors");
+    expect(completionSummarySource).not.toMatch(/#[\da-f]{3,8}\b|rgba?\(|hsla?\(/i);
   });
 
   it("keeps distinct active, completed, warning, destructive, disabled and rest semantics", () => {
@@ -43,4 +48,36 @@ describe("canonical Train brand boundary", () => {
     expect(source).toContain('{nextInstruction ? <Text testID="train-next-instruction"');
     expect(source).not.toContain("{expired && nextInstruction ?");
   });
+
+  it("keeps branded workout foreground/background pairs above normal-text contrast", () => {
+    const pairs = [
+      [workoutColors.text, workoutColors.background],
+      [workoutColors.text, workoutColors.surface],
+      [workoutColors.muted, workoutColors.background],
+      [workoutColors.accent, workoutColors.accentSoft],
+      [workoutColors.success, workoutColors.successSoft],
+      [workoutColors.warning, workoutColors.warningSoft],
+      [workoutColors.danger, workoutColors.dangerSoft],
+      [workoutColors.background, workoutColors.accent],
+      [workoutColors.background, workoutColors.danger],
+    ] as const;
+    for (const [foreground, background] of pairs) {
+      expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
 });
+
+function contrastRatio(foreground: string, background: string): number {
+  const foregroundLuminance = relativeLuminance(foreground);
+  const backgroundLuminance = relativeLuminance(background);
+  return (Math.max(foregroundLuminance, backgroundLuminance) + 0.05)
+    / (Math.min(foregroundLuminance, backgroundLuminance) + 0.05);
+}
+
+function relativeLuminance(hex: string): number {
+  const channels = [1, 3, 5].map((offset) => Number.parseInt(hex.slice(offset, offset + 2), 16) / 255)
+    .map((channel) => channel <= 0.03928
+      ? channel / 12.92
+      : ((channel + 0.055) / 1.055) ** 2.4);
+  return (0.2126 * channels[0]!) + (0.7152 * channels[1]!) + (0.0722 * channels[2]!);
+}

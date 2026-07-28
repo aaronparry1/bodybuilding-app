@@ -16,6 +16,8 @@ import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-p
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
+import { canonicalWorkoutDiscardIntentRepository } from "@/data/local/canonical-workout-discard-intent-repository";
+import { jsonStore } from "@/data/local/json-store";
 import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
 import { exerciseLibrary } from "@/domain/training/presets";
 
@@ -26,6 +28,7 @@ describe("canonical active Train lifecycle", () => {
     canonicalRecordedSessionLedger.clear();
     canonicalProgressEvidenceRepository.clear();
     canonicalRestTimerRepository.clear();
+    canonicalWorkoutDiscardIntentRepository.clear();
   });
 
   it("pauses and restores its persisted rest timer, then discards only the active attempt", () => {
@@ -129,6 +132,124 @@ describe("canonical active Train lifecycle", () => {
     expect(result).toEqual({ status: "retryable", reason: "discard_carrier_update_pending" });
     expect(canonicalRecordedSessionLedger.get(started.recordedSessionId)).toEqual(aggregate);
     expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession?.recordedSessionId).toBe(started.recordedSessionId);
+  });
+
+  it("reconciles a process interruption after ledger deletion and before carrier CAS", () => {
+    const started = startNext("discard-crash-window");
+    recordFirstSet(started, "discard-crash-work", 72.5, 8);
+    const before = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    if (before.status !== "found") throw new Error("recorded session missing");
+
+    vi.spyOn(canonicalActivePlanV2Repository, "saveAtomically").mockImplementationOnce(() => {
+      throw new Error("simulated_process_interruption_after_ledger_delete");
+    });
+    expect(() =>
+      discardLatestCanonicalSessionAttempt(latestDiscard(started, "discard-crash-confirm")),
+    ).toThrow("simulated_process_interruption_after_ledger_delete");
+    expect(canonicalRecordedSessionLedger.get(started.recordedSessionId).status).toBe("not_found");
+    expect(canonicalWorkoutDiscardIntentRepository.get(started.recordedSessionId).status).toBe("found");
+    expect(canonicalActivePlanV2Repository.get()).toMatchObject({
+      status: "saved",
+      carrier: {
+        revision: started.planRevision,
+        recordedSessionReferences: expect.arrayContaining([
+          expect.objectContaining({ sessionId: started.recordedSessionId }),
+        ]),
+      },
+    });
+
+    vi.restoreAllMocks();
+    jsonStore.resetCache();
+    canonicalActivePlanState.hydrate();
+    expect(canonicalWorkoutDiscardIntentRepository.get(started.recordedSessionId).status).toBe("not_found");
+    expect(canonicalRecordedSessionLedger.get(started.recordedSessionId).status).toBe("not_found");
+    expect(canonicalProgressEvidenceRepository.list(started.planId).some(
+      (evidence) => evidence.sessionId === started.recordedSessionId,
+    )).toBe(false);
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).toBeNull();
+    expect(canonicalActivePlanState.getReadModel()?.plannedSessions.filter(
+      (session) => session.id === started.plannedSessionId,
+    )).toHaveLength(1);
+  });
+
+  it("finishes cleanup after the carrier commits and cleanup is interrupted", () => {
+    const started = startNext("discard-cleanup-window");
+    recordFirstSet(started, "discard-cleanup-work", 60, 10);
+    vi.spyOn(canonicalProgressEvidenceRepository, "removeSession").mockImplementation(() => {
+      throw new Error("simulated_cleanup_interruption");
+    });
+
+    expect(discardLatestCanonicalSessionAttempt(
+      latestDiscard(started, "discard-cleanup-confirm"),
+    )).toMatchObject({ status: "retryable", reason: "discard_cleanup_pending" });
+    expect(canonicalWorkoutDiscardIntentRepository.get(started.recordedSessionId).status).toBe("found");
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).toBeNull();
+    expect(canonicalActivePlanState.getReadModel()?.plannedSessions.some(
+      (session) => session.id === started.plannedSessionId,
+    )).toBe(true);
+
+    vi.restoreAllMocks();
+    jsonStore.resetCache();
+    canonicalActivePlanState.hydrate();
+    expect(canonicalWorkoutDiscardIntentRepository.get(started.recordedSessionId).status).toBe("not_found");
+    expect(canonicalProgressEvidenceRepository.list(started.planId).some(
+      (evidence) => evidence.sessionId === started.recordedSessionId,
+    )).toBe(false);
+    expect(canonicalRestTimerRepository.get(started.recordedSessionId)).toBeNull();
+  });
+
+  it("preserves the exact planned prescription after edited and substituted work is discarded", () => {
+    const started = startNext("discard-edited-substituted");
+    const beforePlan = canonicalActivePlanState.getPlannedSession(started.plannedSessionId);
+    expect(beforePlan).toBeNull();
+    const performed = recordFirstSet(started, "discard-edited-work", 65, 9);
+    const aggregate = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    if (aggregate.status !== "found") throw new Error("recorded session missing");
+    const slot = firstSlot(aggregate.session.prescriptionSnapshot);
+    const setId = `${String(slot.id)}:set:1`;
+    expect(editCanonicalPerformedWork({
+      ...command(started.planId, started.planRevision, started.recordedSessionId, performed.ledgerVersion!, "discard-edit"),
+      slotId: String(slot.id),
+      exerciseId: String(slot.exerciseId),
+      setId,
+      setOrder: 1,
+      reps: 8,
+      load: 62.5,
+      unit: "kg",
+      completion: "complete",
+      substitutionId: "replacement-exercise-evidence",
+    }).status).toBe("applied");
+
+    const immutableSnapshot = aggregate.session.prescriptionSnapshot;
+    expect(discardLatestCanonicalSessionAttempt(
+      latestDiscard(started, "discard-edited-confirm"),
+    )).toMatchObject({ status: "applied", reason: "session_attempt_discarded" });
+    const restored = canonicalActivePlanState.getPlannedSession(started.plannedSessionId);
+    expect(restored?.prescriptionSnapshot).toEqual(immutableSnapshot);
+    expect(canonicalProgressEvidenceRepository.list(started.planId).filter(
+      (evidence) => evidence.sessionId === started.recordedSessionId,
+    )).toHaveLength(0);
+  });
+
+  it("allows the same planned workout to start cleanly after discard without duplicate timeline entries", () => {
+    const started = startNext("discard-restart-later");
+    expect(discardLatestCanonicalSessionAttempt(
+      latestDiscard(started, "discard-restart-later-confirm"),
+    ).status).toBe("applied");
+    const model = canonicalActivePlanState.getReadModel();
+    expect(model?.plannedSessions.filter(
+      (session) => session.id === started.plannedSessionId,
+    )).toHaveLength(1);
+
+    const restarted = startNext("discard-restart-later-new-attempt");
+    expect(restarted.plannedSessionId).toBe(started.plannedSessionId);
+    expect(canonicalRecordedSessionLedger.get(restarted.recordedSessionId)).toMatchObject({
+      status: "found",
+      session: { status: "started", version: 1 },
+    });
+    expect(canonicalProgressEvidenceRepository.list(restarted.planId).filter(
+      (evidence) => evidence.sessionId === restarted.recordedSessionId,
+    )).toHaveLength(0);
   });
 
   it("rejects stale low-level revisions and never discards completed history", () => {

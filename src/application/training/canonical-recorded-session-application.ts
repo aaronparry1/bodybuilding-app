@@ -12,6 +12,10 @@ import { orchestrateCanonicalPostWorkoutAdaptation } from "@/application/trainin
 import { reconcileCanonicalCompletedSessionEvidence } from "@/application/training/canonical-completion-evidence-reconciliation";
 import { canonicalCoachingAttemptRepository } from "@/data/local/canonical-coaching-attempt-repository";
 import { canonicalCoachingOperationId } from "@/domain/training/canonical-coaching-identity";
+import {
+  discardCanonicalWorkoutAttempt,
+  reconcileCanonicalWorkoutDiscard,
+} from "@/application/training/canonical-workout-discard-transaction";
 
 export type CanonicalStartSessionCommand = Readonly<{ planId: string; expectedPlanRevision: number; plannedSessionId: string; expectedPrescriptionHash: string; operationId: string; startedAt: string; provenance: string }>;
 export type CanonicalStartSessionResult = Readonly<{ status: "started" | "already_started" | "rejected" | "retryable"; reason: string; recordedSessionId?: string; planRevision?: number }>;
@@ -193,88 +197,28 @@ export type CanonicalLatestDiscardSessionCommand = Readonly<{
  * render-time revision.
  */
 export function discardLatestCanonicalSessionAttempt(command: CanonicalLatestDiscardSessionCommand): CanonicalRecordedLifecycleResult {
+  const reconciled = reconcileCanonicalWorkoutDiscard(command.recordedSessionId);
+  if (reconciled) return reconciled;
   const loaded = canonicalActivePlanV2Repository.get();
   if (loaded.status !== "saved" || loaded.carrier.planId !== command.planId) return { status: "rejected", reason: "canonical_plan_unavailable" };
   const aggregate = canonicalRecordedSessionLedger.get(command.recordedSessionId);
-  if (aggregate.status !== "found") {
-    const plannedSessionId = loaded.carrier.recordedSessionReferences?.find((item) => item.sessionId === command.recordedSessionId)?.recordReference.replace("canonical-recorded-session:", "")
-      ?? plannedSessionIdForRecordedId(command.planId, command.recordedSessionId);
-    const restored = plannedSessionId && loaded.carrier.plannedSessions.some((session) => session.id === plannedSessionId);
-    if (restored) {
-      const cleanup = cleanupDiscardedAttempt(command.planId, command.recordedSessionId);
-      return cleanup ? { status: "idempotent", reason: "discard_already_applied", planRevision: loaded.carrier.revision } : { status: "retryable", reason: "discard_cleanup_pending", planRevision: loaded.carrier.revision };
-    }
-    return { status: "rejected", reason: "recorded_session_not_found" };
-  }
   return discardCanonicalSessionAttempt({
     ...command,
     expectedPlanRevision: loaded.carrier.revision,
-    expectedLedgerVersion: aggregate.session.version,
+    expectedLedgerVersion: aggregate.status === "found" ? aggregate.session.version : 0,
   });
 }
 
 export function discardCanonicalSessionAttempt(command: CanonicalDiscardSessionCommand): CanonicalRecordedLifecycleResult {
-  const loaded = canonicalActivePlanV2Repository.get();
-  if (loaded.status !== "saved") return { status: "rejected", reason: "canonical_plan_unavailable" };
-  if (loaded.carrier.planId !== command.planId || loaded.carrier.revision !== command.expectedPlanRevision) return { status: "rejected", reason: "stale_plan_revision" };
-  const aggregate = canonicalRecordedSessionLedger.get(command.recordedSessionId);
-  if (aggregate.status !== "found") {
-    const restored = loaded.carrier.plannedSessions.some((session) => session.id === command.recordedSessionId.replace(`${command.planId}:recorded:`, ""));
-    if (!restored) return { status: "rejected", reason: "recorded_session_not_found" };
-    return cleanupDiscardedAttempt(command.planId, command.recordedSessionId)
-      ? { status: "idempotent", reason: "discard_already_applied", planRevision: loaded.carrier.revision }
-      : { status: "retryable", reason: "discard_cleanup_pending", planRevision: loaded.carrier.revision };
-  }
-  if (aggregate.session.version !== command.expectedLedgerVersion) return { status: "rejected", reason: "stale_ledger_version" };
-  if (!["pending", "started", "paused"].includes(aggregate.session.status)) return { status: "rejected", reason: "completed_history_cannot_be_discarded" };
-  const reference = loaded.carrier.recordedSessionReferences?.find((item) => item.sessionId === command.recordedSessionId);
-  const snapshot = aggregate.session.prescriptionSnapshot as Record<string, unknown>;
-  const planSessionIndex = Number(snapshot.planSessionIndex);
-  if (!Number.isInteger(planSessionIndex) || planSessionIndex < 0 || aggregate.session.prescriptionHash !== prescriptionHash(snapshot)) return { status: "rejected", reason: "discard_prescription_integrity_mismatch" };
-  const alreadyRestored = loaded.carrier.plannedSessions.some((session) => session.id === aggregate.session.plannedSessionId);
-  if (!reference && !alreadyRestored) return { status: "rejected", reason: "recorded_session_linkage_missing" };
-  const nextRevision = loaded.carrier.revision + 1;
-  const restoredPlanned = { id: aggregate.session.plannedSessionId, microcycleId: aggregate.session.microcycleId, planSessionIndex, role: aggregate.session.role, kind: "planned" as const, status: "planned" as const, constructionVersion: aggregate.session.provenance.constructionVersion ?? "canonical_plan_v3", revision: aggregate.session.startRevision, prescriptionSnapshot: aggregate.session.prescriptionSnapshot };
-  const next = {
-    ...loaded.carrier,
-    revision: nextRevision,
-    updatedAt: command.occurredAt,
-    plannedSessions: (alreadyRestored ? loaded.carrier.plannedSessions : [...loaded.carrier.plannedSessions, restoredPlanned]).slice().sort((left, right) => left.planSessionIndex - right.planSessionIndex),
-    recordedSessionReferences: (loaded.carrier.recordedSessionReferences ?? []).filter((item) => item.sessionId !== command.recordedSessionId),
-    progress: { ...loaded.carrier.progress, revision: nextRevision },
-  };
-  // Remove the mutable attempt first, then commit the immutable planned-session
-  // restoration. If the carrier CAS fails, restore the exact ledger aggregate.
-  const deleted = canonicalRecordedSessionLedger.deleteActive(command.recordedSessionId, command.expectedLedgerVersion);
-  if (deleted.status !== "deleted" && deleted.status !== "not_found") return { status: "retryable", reason: deleted.reason ?? "discard_ledger_cleanup_pending" };
-  const saved = canonicalActivePlanV2Repository.saveAtomically(next, loaded.carrier.revision);
-  if (saved.status !== "saved") {
-    const restored = canonicalRecordedSessionLedger.restorePlan([{ session: aggregate.session, events: aggregate.events }]);
-    return restored.status === "restored"
-      ? { status: "retryable", reason: "discard_carrier_update_pending" }
-      : { status: "retryable", reason: "discard_compensation_failed" };
-  }
-  if (!cleanupDiscardedAttempt(command.planId, command.recordedSessionId)) return { status: "retryable", reason: "discard_cleanup_pending", planRevision: nextRevision };
-  canonicalActivePlanState.hydrate();
-  return { status: "applied", reason: "session_attempt_discarded", planRevision: nextRevision };
-}
-
-function cleanupDiscardedAttempt(planId: string, recordedSessionId: string): boolean {
-  try {
-    canonicalProgressEvidenceRepository.removeSession(planId, recordedSessionId);
-    canonicalRestTimerRepository.clear(recordedSessionId);
+  const result = discardCanonicalWorkoutAttempt(command);
+  if (
+    result.status === "applied"
+    || result.status === "idempotent"
+    || result.reason === "discard_cleanup_pending"
+  ) {
     canonicalActivePlanState.hydrate();
-    return true;
-  } catch {
-    return false;
   }
-}
-
-function plannedSessionIdForRecordedId(planId: string, recordedSessionId: string): string | null {
-  const prefix = `${planId}:recorded:`;
-  return recordedSessionId.startsWith(prefix) && recordedSessionId.length > prefix.length
-    ? recordedSessionId.slice(prefix.length)
-    : null;
+  return result;
 }
 
 function isPlannedRecordedSession(planId: string, recordedSessionId: string): boolean {

@@ -4,6 +4,8 @@ import { restoreCanonicalRecordedSession, type CanonicalRestorationResult, type 
 import type { CanonicalPlannedSessionSnapshot } from "@/domain/training/canonical-active-plan-carrier";
 import { applyCanonicalProgressDecision, type CanonicalProgressDecisionApplicationCommand, type CanonicalProgressDecisionApplicationResult } from "@/application/training/canonical-progress-decision-application";
 import { commitCanonicalOnboardingPlan, type CanonicalOnboardingPlanCommitResult } from "@/application/training/canonical-release-reconciliation";
+import { reconcilePendingCanonicalWorkoutDiscards } from "@/application/training/canonical-workout-discard-transaction";
+import { canonicalWorkoutDiscardIntentRepository } from "@/data/local/canonical-workout-discard-intent-repository";
 
 export type CanonicalActivePlanState = Readonly<{ hydration: "empty" | "hydrated" | "error"; model: CanonicalActivePlanReadModel | null; error?: string }>;
 
@@ -16,13 +18,13 @@ export function createCanonicalActivePlanStateStore(): CanonicalActivePlanStateS
   const store: CanonicalActivePlanStateStore = {
     getState: () => state,
     subscribe: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
-    hydrate: () => { const result = loadCanonicalActivePlan(); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : result.reason === "canonical_plan_missing" || result.reason === "missing" ? { hydration: "empty", model: null } : { hydration: "error", model: null, error: result.reason }; publish(); return state; },
+    hydrate: () => { reconcilePendingCanonicalWorkoutDiscards(); const result = loadCanonicalActivePlan(); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : result.reason === "canonical_plan_missing" || result.reason === "missing" ? { hydration: "empty", model: null } : { hydration: "error", model: null, error: result.reason }; publish(); return state; },
     create: (command) => { const result = createCanonicalActivePlan(command); state = result.status === "ok" ? { hydration: "hydrated", model: result.model } : { hydration: "error", model: null, error: result.reason }; publish(); return state; },
     completeOnboarding: (command) => { const result = commitCanonicalOnboardingPlan(command); if (result.status === "saved") store.hydrate(); else { state = { hydration: "error", model: null, error: result.reason }; publish(); } return result; },
     changeSessionDuration: (command) => { const result = changeCanonicalSessionDuration(command); if (result.status === "applied" || result.status === "unchanged") store.hydrate(); return result; },
     applyProgressDecision: (command) => { const result = applyCanonicalProgressDecision(command); if (result.status === "applied" || result.status === "unchanged") store.hydrate(); return result; },
     refresh: () => store.hydrate(),
-    clear: () => { canonicalActivePlanV2Repository.clear(); state = { hydration: "empty", model: null }; publish(); return state; },
+    clear: () => { canonicalWorkoutDiscardIntentRepository.clear(); canonicalActivePlanV2Repository.clear(); state = { hydration: "empty", model: null }; publish(); return state; },
     getReadModel: () => state.model,
     getPlannedSession: (id) => { const session = state.model?.plannedSessions.find((candidate) => candidate.id === id); return session ? { id: session.id, microcycleId: session.microcycleId, planSessionIndex: session.planSessionIndex, role: session.role, kind: "planned", status: session.status as "planned" | "open" | "completed", constructionVersion: session.constructionVersion, revision: session.revision, prescriptionSnapshot: session.snapshot } : null; },
     getNextActionableSession: () => { const session = state.model?.nextSession; return session ? store.getPlannedSession(session.id) : null; },

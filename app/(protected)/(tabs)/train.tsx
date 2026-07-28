@@ -57,7 +57,7 @@ import { useSubscription } from "@/application/billing/subscription-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { hapticFeedback } from "@/application/training/haptic-feedback";
 import { AppScreen, PrimaryButton, SecondaryButton, stableUiIdentifier } from "@/ui/primitives";
-import { colors, type, workoutColors } from "@/ui/theme";
+import { type, workoutColors } from "@/ui/theme";
 
 type RouteParams = Readonly<{
   planId?: string;
@@ -239,8 +239,8 @@ function CanonicalTrainExperience() {
         provenance: "canonical_train",
       });
       setMessage(friendlyReason(result.reason));
-      canonicalActivePlanState.refresh();
       if (result.status === "applied" || result.status === "idempotent") {
+        canonicalActivePlanState.refresh();
         setRecordedId(undefined);
         setModal(null);
         router.replace("/(protected)/(tabs)");
@@ -632,26 +632,26 @@ function NumericTextInput(props: React.ComponentProps<typeof TextInput> & Readon
 }
 function Stat({ label, value }: Readonly<{ label: string; value: string }>) { return <View style={styles.stat}><Text style={styles.statValue}>{value}</Text><Text style={styles.tinyMuted}>{label}</Text></View>; }
 
-function UnavailableState({ message, detail, onReturn, onRestore }: Readonly<{ message: string; detail?: string | null; onReturn(): void; onRestore?: () => void }>) { return <AppScreen><Text style={{ color: colors.text, fontSize: 28, fontWeight: "900" }}>Train safely</Text><Text style={{ color: colors.textMuted }}>{message}</Text>{detail ? <Text style={{ color: colors.textMuted }}>{detail}</Text> : null}{onRestore ? <SecondaryButton label="Restore workout" onPress={onRestore} /> : null}<SecondaryButton label="Return to Home" onPress={onReturn} /></AppScreen>; }
+function UnavailableState({ message, detail, onReturn, onRestore }: Readonly<{ message: string; detail?: string | null; onReturn(): void; onRestore?: () => void }>) { return <AppScreen><Text style={{ color: TRAIN.text, fontSize: 28, fontWeight: "900" }}>Train safely</Text><Text style={{ color: TRAIN.muted }}>{message}</Text>{detail ? <Text style={{ color: TRAIN.muted }}>{detail}</Text> : null}{onRestore ? <SecondaryButton label="Restore workout" onPress={onRestore} /> : null}<SecondaryButton label="Return to Home" onPress={onReturn} /></AppScreen>; }
 
 function TrainPaywall({ onRestore }: Readonly<{ onRestore(): void }>) {
   return <AppScreen>
-    <Text style={{ color: colors.text, ...type.hero }}>Build More Muscle.</Text>
-    <Text style={{ color: colors.text, ...type.hero }}>Get Stronger.</Text>
-    <Text style={{ color: colors.text, ...type.hero }}>Stop Guessing.</Text>
-    <Text style={{ color: colors.textMuted }}>Your adaptive training plan is ready. Start your free trial to unlock coached workouts, progression, and recovery guidance.</Text>
-    <Text style={{ color: colors.accent, ...type.section }}>14-day free trial</Text>
-    <Text style={{ color: colors.textMuted }}>Cancel anytime.</Text>
-    <Text style={{ color: colors.text }}>Know exactly what to do every workout</Text>
-    <Text style={{ color: colors.text }}>Adaptive progression based on your performance</Text>
-    <Text style={{ color: colors.text }}>Warm-Up Sets and Session Prep included</Text>
-    <Text style={{ color: colors.text }}>Strength Dashboard, PRs, and e1RM tracking</Text>
-    <Text style={{ color: colors.text }}>Recovery & Capacity guidance</Text>
+    <Text style={{ color: TRAIN.text, ...type.hero }}>Build More Muscle.</Text>
+    <Text style={{ color: TRAIN.text, ...type.hero }}>Get Stronger.</Text>
+    <Text style={{ color: TRAIN.text, ...type.hero }}>Stop Guessing.</Text>
+    <Text style={{ color: TRAIN.muted }}>Your adaptive training plan is ready. Start your free trial to unlock coached workouts, progression, and recovery guidance.</Text>
+    <Text style={{ color: TRAIN.accent, ...type.section }}>14-day free trial</Text>
+    <Text style={{ color: TRAIN.muted }}>Cancel anytime.</Text>
+    <Text style={{ color: TRAIN.text }}>Know exactly what to do every workout</Text>
+    <Text style={{ color: TRAIN.text }}>Adaptive progression based on your performance</Text>
+    <Text style={{ color: TRAIN.text }}>Warm-Up Sets and Session Prep included</Text>
+    <Text style={{ color: TRAIN.text }}>Strength Dashboard, PRs, and e1RM tracking</Text>
+    <Text style={{ color: TRAIN.text }}>Recovery & Capacity guidance</Text>
     <PrimaryButton label="Start 14-Day Free Trial" onPress={() => router.push("/(protected)/paywall")} />
     <SecondaryButton label="Restore Purchases" onPress={onRestore} />
     <SecondaryButton label="View Plan" onPress={() => router.push("/(protected)/(tabs)/programmes")} />
-    <Text style={{ color: colors.textMuted }}>Checking your plan access</Text>
-    <Text style={{ color: colors.textMuted }}>Managed securely through your App Store or Google Play account.</Text>
+    <Text style={{ color: TRAIN.muted }}>Checking your plan access</Text>
+    <Text style={{ color: TRAIN.muted }}>Managed securely through your App Store or Google Play account.</Text>
   </AppScreen>;
 }
 

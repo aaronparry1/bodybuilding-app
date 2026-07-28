@@ -40,9 +40,12 @@ describe("canonical coaching-loop production boundary", () => {
 
   it("retains protected transactional, Discard and method-policy boundaries", () => {
     const recorded = source("src/application/training/canonical-recorded-session-application.ts");
+    const discardTransaction = source("src/application/training/canonical-workout-discard-transaction.ts");
     const methodPolicy = source("src/domain/training/canonical-training-method-policy.ts");
     expect(recorded).toContain("discardCanonicalSessionAttempt");
-    expect(recorded).toContain("discard_compensation_failed");
+    expect(recorded).toContain("discardCanonicalWorkoutAttempt");
+    expect(discardTransaction).toContain("discard_compensation_failed");
+    expect(discardTransaction).toContain("canonicalWorkoutDiscardIntentRepository");
     expect(recorded).toContain("performed_work_already_recorded");
     expect(methodPolicy).toContain("canonical_training_method_policy_v1");
     expect(methodPolicy).toContain("unsupported");
