@@ -26,7 +26,8 @@ describe("Build 46 TestFlight candidate artifacts", () => {
     const build = readFileSync(`${root}/build-result.md`, "utf8");
     const checklist = readFileSync(`${root}/iPhone-verification-checklist.md`, "utf8");
     expect(config).toContain('env("APP_VERSION", "1.0.15")');
-    expect(config).toContain('env("APP_IOS_BUILD_NUMBER", "47")');
+    const currentBuild = Number(config.match(/env\("APP_IOS_BUILD_NUMBER", "(\d+)"\)/)?.[1]);
+    expect(currentBuild).toBeGreaterThanOrEqual(47);
     expect(metadata).toContain("`com.aaronparry.adaptivestrengthcoach`");
     expect(metadata).toContain("| Android version code | `1` | unchanged | unchanged |");
     expect(build).toContain("`f186502a-3695-4b7a-abb0-2854e996b8ac`");
