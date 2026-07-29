@@ -31,7 +31,7 @@ describe("training frequency", () => {
     expect(deriveTrainingFrequency(3).canChangeDuringCycle).toBe(true);
   });
 
-  it("updates onboarding wording without exposing one or seven day choices", () => {
+  it("keeps the future schedule at two to six while labelling one-to-seven only as conditional history", () => {
     const source = readFileSync("app/(protected)/onboarding.tsx", "utf8");
 
     expect(source).toContain('schedule: "What fits your week?"');
@@ -39,7 +39,9 @@ describe("training frequency", () => {
     expect(source).toContain("Workout length");
     expect(source).toContain("Choose the number you can consistently achieve. You can change this later and ASC will adjust your programme.");
     expect(source).toContain("trainingFrequencyOptions.map");
-    expect(source).not.toContain("[1, 2, 3, 4, 5, 6, 7]");
+    expect(source).toContain('continuity === "currently_training" ? (');
+    expect(source).toContain("per week recently");
+    expect(source).toContain("it does not change your new schedule");
   });
 
   it("lets Settings update the stored weekly session budget only", () => {

@@ -115,7 +115,8 @@ describe("final canonical adaptive-planning product rules", () => {
     expect(source).not.toMatch(/ASC Recommended|Body-Part Split|Bench\/Squat\/Deadlift|asc_recommended|body_part_split|bench_squat_deadlift/);
     expect(source).toContain("trainingExperiences.map");
     expect(source).toContain('recent_training: "What has your recent training looked like?"');
-    expect(source).toContain("Recent training days");
+    expect(source).toContain("Your recent routine");
+    expect(source).toContain("it does not change your new schedule");
     expect(source).toContain("Sport outside the gym");
     expect(source).toContain("startingVolumeContext");
     expect(readFileSync(new URL("../src/domain/training/training-experience.ts", import.meta.url), "utf8")).toContain('id: "advanced"');
