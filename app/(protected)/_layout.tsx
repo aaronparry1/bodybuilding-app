@@ -5,25 +5,42 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/application/auth/auth-context";
 import { useAppSettings } from "@/application/settings/app-settings";
+import { useSubscription } from "@/application/billing/subscription-context";
 import { getActiveDesignQaFixture, subscribeDesignQaFixture } from "@/application/design-qa/design-qa-fixtures";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { backfillExistingUserOnboardingMetadata } from "@/application/training/canonical-onboarding-setup";
 import { resumePendingCanonicalCoachingWork } from "@/application/training/canonical-completion-evidence-reconciliation";
 import { reconcileCanonicalReleaseState, type CanonicalReleaseReconciliationResult } from "@/application/training/canonical-release-reconciliation";
+import { resolveCanonicalStartupHydration } from "@/application/training/canonical-startup-hydration";
 import { getAppEnvironment } from "@/application/runtime/app-environment";
 import { isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/design-qa/design-qa-runtime";
 import { colors, spacing } from "@/ui/theme";
+import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
+import { PrimaryButton } from "@/ui/primitives";
 
 export default function ProtectedLayout() {
   const insets = useSafeAreaInsets();
   const { user, isLoading, isOfflineMode } = useAuth();
+  const { dataHydrationStatus, dataHydrationError, retryDataHydration } = useSubscription();
   const { settings } = useAppSettings();
   const segments = useSegments();
-  const { qaChrome } = useGlobalSearchParams<{ qaChrome?: string }>();
+  const { qaChrome, restart } = useGlobalSearchParams<{ qaChrome?: string; restart?: string }>();
   const designQaRuntimeAvailable = isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested();
   const [activeFixture, setActiveFixture] = useState(() => designQaRuntimeAvailable ? getActiveDesignQaFixture() : null);
   const [reconciliation, setReconciliation] = useState<CanonicalReleaseReconciliationResult | null>(null);
   const isOnboardingRoute = segments.includes("onboarding");
+  const explicitSetupRestart = isOnboardingRoute && restart === "1";
   const showDesignQaChrome = Boolean(activeFixture) && qaChrome === "1" && designQaRuntimeAvailable;
+  const localPlanStatus = canonicalActivePlanV2Repository.get().status;
+  const startupHydration = resolveCanonicalStartupHydration({
+    authLoading: isLoading,
+    authenticatedUserId: user?.id ?? null,
+    localPlanStatus,
+    accountDataStatus: dataHydrationStatus,
+  });
+  const waitingForAccountRestore = startupHydration.status === "waiting"
+    && startupHydration.reason === "account_data_restoring";
+  const accountRestoreFailedWithoutLocalPlan = startupHydration.status === "retry_required";
 
   useEffect(() => {
     if (!designQaRuntimeAvailable) { setActiveFixture(null); return; }
@@ -31,13 +48,28 @@ export default function ProtectedLayout() {
   }, [designQaRuntimeAvailable]);
   useEffect(() => {
     if (activeFixture) { canonicalActivePlanState.hydrate(); return; }
-    const result = reconcileCanonicalReleaseState({ onboardingCompleted: settings.onboardingCompleted, updatedAt: new Date().toISOString() });
+    if (waitingForAccountRestore || accountRestoreFailedWithoutLocalPlan) {
+      setReconciliation(null);
+      return;
+    }
+    const result = reconcileCanonicalReleaseState({
+      onboardingCompleted: settings.onboardingCompleted,
+      updatedAt: new Date().toISOString(),
+      authenticatedUserId: user?.id ?? null,
+      accessMode: user ? "authenticated" : "offline",
+    });
     setReconciliation(result);
+    if (result.onboardingMetadataBackfillRequired && result.planVisible) {
+      const backfill = backfillExistingUserOnboardingMetadata();
+      if (backfill.status === "rejected" && process.env.NODE_ENV !== "production") {
+        console.info("[startup:onboarding-metadata] backfill failed", backfill.reason);
+      }
+    }
     if (result.status === "ready" || result.status === "reconstructed") {
       const hydrated = canonicalActivePlanState.hydrate();
       if (hydrated.model) resumePendingCanonicalCoachingWork(hydrated.model.planId);
     }
-  }, [activeFixture, settings.onboardingCompleted]);
+  }, [accountRestoreFailedWithoutLocalPlan, activeFixture, settings.onboardingCompleted, user?.id, waitingForAccountRestore]);
 
   if (isLoading) {
     return (
@@ -48,12 +80,22 @@ export default function ProtectedLayout() {
   }
 
   if (!user && !isOfflineMode) return <Redirect href="/(auth)" />;
+  if (!activeFixture && accountRestoreFailedWithoutLocalPlan) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", backgroundColor: colors.background, padding: spacing.xl, gap: spacing.md }}>
+        <Text accessibilityRole="header" style={{ color: colors.text, fontSize: 24, fontWeight: "900" }}>We couldn’t restore your training yet</Text>
+        <Text style={{ color: colors.textMuted, fontSize: 16, lineHeight: 23 }}>
+          Your local data has not been changed. Check your connection and try again before setting up a new programme.
+        </Text>
+        {dataHydrationError && process.env.NODE_ENV !== "production" ? <Text style={{ color: colors.textSubtle }}>{dataHydrationError}</Text> : null}
+        <PrimaryButton label="Try again" onPress={retryDataHydration} />
+      </View>
+    );
+  }
   if (!activeFixture && reconciliation === null) return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.background }}><ActivityIndicator color={colors.accent} /></View>;
-  // The protected tabs are never a substitute for onboarding. A stale carrier from an
-  // interrupted setup may exist, but it must not make the old plan visible or startable.
-  if (!settings.onboardingCompleted && !isOnboardingRoute && !activeFixture) return <Redirect href="/(protected)/onboarding" />;
-  if (settings.onboardingCompleted && !activeFixture && reconciliation?.status === "setup_required" && !isOnboardingRoute) return <Redirect href="/(protected)/onboarding" />;
-  if (settings.onboardingCompleted && !activeFixture && reconciliation && ["recovery_required", "retry_required", "infeasible"].includes(reconciliation.status) && !isOnboardingRoute) {
+  if (!activeFixture && reconciliation?.planVisible && isOnboardingRoute && !explicitSetupRestart) return <Redirect href="/(protected)/(tabs)" />;
+  if (!activeFixture && ["onboarding_required", "setup_required"].includes(reconciliation?.status ?? "") && !isOnboardingRoute) return <Redirect href="/(protected)/onboarding" />;
+  if (!activeFixture && reconciliation && ["recovery_required", "retry_required", "infeasible"].includes(reconciliation.status)) {
     return <View style={{ flex: 1, justifyContent: "center", backgroundColor: colors.background, padding: spacing.xl, gap: spacing.md }}><Text accessibilityRole="header" style={{ color: colors.text, fontSize: 24, fontWeight: "900" }}>Training needs a safe refresh</Text><Text style={{ color: colors.textMuted, fontSize: 16, lineHeight: 23 }}>{reconciliation.customerGuidance ?? "Your recorded history has not been changed. Try again before starting another workout."}</Text></View>;
   }
 

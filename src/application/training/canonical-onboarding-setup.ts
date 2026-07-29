@@ -5,6 +5,7 @@ import {
 import { appSettingsStore, type AppSettings } from "@/application/settings/app-settings";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
+import { canonicalActivePlanOwnerRepository } from "@/data/local/canonical-active-plan-owner-repository";
 import type { CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
 import {
   getSelectableFrameworkOptionsForGoal,
@@ -100,10 +101,13 @@ export function normalizeRecentTrainingInput(input: Readonly<{
   continuity: CanonicalStartingVolumeContext["continuity"];
   recentTrainingDaysPerWeek: CanonicalStartingVolumeContext["recentTrainingDaysPerWeek"];
 }> {
-  if (input.recentTrainingDaysPerWeek === 0) {
-    return { ...input, continuity: input.continuity === "currently_training" ? "short_layoff" : input.continuity };
+  if (input.continuity !== "currently_training") {
+    return { continuity: input.continuity, recentTrainingDaysPerWeek: 0 };
   }
-  return input;
+  return {
+    continuity: input.continuity,
+    recentTrainingDaysPerWeek: input.recentTrainingDaysPerWeek === 0 ? 1 : input.recentTrainingDaysPerWeek,
+  };
 }
 
 export function onboardingStepKeys(input: Readonly<{
@@ -118,6 +122,31 @@ export function onboardingStepKeys(input: Readonly<{
   return steps;
 }
 
+export function createCanonicalOnboardingSubmissionGate() {
+  let state: Readonly<{ status: "idle" | "in_flight" | "committed"; fingerprint?: string }> = { status: "idle" };
+  return {
+    begin(fingerprint: string): "started" | "in_flight" | "already_committed" {
+      if (state.status === "in_flight") return "in_flight";
+      if (state.status === "committed" && state.fingerprint === fingerprint) return "already_committed";
+      state = { status: "in_flight", fingerprint };
+      return "started";
+    },
+    commit(fingerprint: string): void {
+      if (state.status === "in_flight" && state.fingerprint === fingerprint) {
+        state = { status: "committed", fingerprint };
+      }
+    },
+    retry(fingerprint: string): void {
+      if (state.status === "in_flight" && state.fingerprint === fingerprint) {
+        state = { status: "idle" };
+      }
+    },
+    inspect(): Readonly<{ status: "idle" | "in_flight" | "committed"; fingerprint?: string }> {
+      return state;
+    },
+  };
+}
+
 /**
  * Makes plan persistence and onboarding completion one user-visible commit.
  * Construction remains in memory until the canonical carrier save succeeds;
@@ -125,6 +154,7 @@ export function onboardingStepKeys(input: Readonly<{
  */
 export function completeCanonicalOnboardingSetup(input: Readonly<{
   command: CanonicalGeneratedPlanInput;
+  ownerUserId?: string | null;
   settings: Pick<
     AppSettings,
     | "unit"
@@ -136,7 +166,17 @@ export function completeCanonicalOnboardingSetup(input: Readonly<{
   >;
 }>): CanonicalOnboardingSetupCommitResult {
   const priorPlan = canonicalActivePlanV2Repository.get();
+  const priorOwner = canonicalActivePlanOwnerRepository.get();
   const priorSettings = appSettingsStore.get();
+  if (priorOwner.status === "invalid") {
+    return {
+      status: "rejected",
+      reason: `unrestorable_owner_record:${priorOwner.reason}`,
+      priorRevision: priorPlan.status === "saved" ? priorPlan.carrier.revision : null,
+      newRevision: priorPlan.status === "saved" ? priorPlan.carrier.revision : null,
+      rollback: "not_required",
+    };
+  }
   const committed = canonicalActivePlanState.completeOnboarding(input.command);
   if (committed.status !== "saved") {
     canonicalActivePlanState.refresh();
@@ -144,9 +184,20 @@ export function completeCanonicalOnboardingSetup(input: Readonly<{
   }
 
   try {
+    if (input.ownerUserId) {
+      const committedPlan = canonicalActivePlanV2Repository.get();
+      if (committedPlan.status !== "saved") throw new Error("onboarding_owner_persistence_failed");
+      const owner = canonicalActivePlanOwnerRepository.save({
+        planId: committedPlan.carrier.planId,
+        ownerUserId: input.ownerUserId,
+        boundAt: input.command.updatedAt,
+        provenance: "authenticated_onboarding",
+      });
+      if (owner.status !== "owned") throw new Error("onboarding_owner_persistence_failed");
+    }
     appSettingsStore.patch({ ...input.settings, onboardingCompleted: true });
     return { ...committed, rollback: "not_required" };
-  } catch {
+  } catch (error) {
     try {
       if (priorPlan.status === "saved") {
         const restored = canonicalActivePlanV2Repository.save(priorPlan.carrier);
@@ -154,11 +205,24 @@ export function completeCanonicalOnboardingSetup(input: Readonly<{
       } else {
         canonicalActivePlanV2Repository.clear();
       }
+      if (priorOwner.status === "owned") {
+        const restoredOwner = canonicalActivePlanOwnerRepository.save({
+          planId: priorOwner.record.planId,
+          ownerUserId: priorOwner.record.ownerUserId,
+          boundAt: priorOwner.record.boundAt,
+          provenance: priorOwner.record.provenance,
+        });
+        if (restoredOwner.status !== "owned") throw new Error("owner_rollback_failed");
+      } else {
+        canonicalActivePlanOwnerRepository.clear();
+      }
       appSettingsStore.set(priorSettings);
       canonicalActivePlanState.refresh();
       return {
         status: "rejected",
-        reason: "onboarding_settings_persistence_failed",
+        reason: error instanceof Error && error.message === "onboarding_owner_persistence_failed"
+          ? "onboarding_owner_persistence_failed"
+          : "onboarding_settings_persistence_failed",
         priorRevision: priorPlan.status === "saved" ? priorPlan.carrier.revision : null,
         newRevision: priorPlan.status === "saved" ? priorPlan.carrier.revision : null,
         rollback: "restored",
@@ -173,6 +237,33 @@ export function completeCanonicalOnboardingSetup(input: Readonly<{
         rollback: "failed",
       };
     }
+  }
+}
+
+export function backfillExistingUserOnboardingMetadata(): Readonly<{
+  status: "backfilled" | "unchanged" | "rejected";
+  reason: string;
+}> {
+  const loaded = canonicalActivePlanV2Repository.get();
+  if (loaded.status !== "saved") return { status: "rejected", reason: loaded.status === "missing" ? "canonical_plan_missing" : loaded.reason };
+  const current = appSettingsStore.get();
+  const patch = {
+    onboardingCompleted: true,
+    unit: loaded.carrier.constraints.units,
+    trainingGoal: loaded.carrier.constraints.goal,
+    experienceLevel: loaded.carrier.constraints.experienceLevel,
+    recoveryCardioPreference: loaded.carrier.constraints.recoveryCardioPreference,
+    availableSessionMinutes: loaded.carrier.constraints.availableSessionMinutes,
+    startingVolumeContext: loaded.carrier.constraints.startingVolumeContext,
+  };
+  if (Object.entries(patch).every(([key, value]) => JSON.stringify(current[key as keyof AppSettings]) === JSON.stringify(value))) {
+    return { status: "unchanged", reason: "metadata_already_current" };
+  }
+  try {
+    appSettingsStore.patch(patch);
+    return { status: "backfilled", reason: "derived_from_validated_active_plan_constraints" };
+  } catch {
+    return { status: "rejected", reason: "onboarding_metadata_backfill_failed" };
   }
 }
 

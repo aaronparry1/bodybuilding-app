@@ -42,13 +42,20 @@ describe("release-start canonical plan reconciliation", () => {
     jsonStore.resetCache();
   });
 
-  it("never lets a stale carrier bypass incomplete onboarding", () => {
+  it("lets a validated existing carrier outrank stale onboarding metadata while preserving history", () => {
     const carrier = makeFutureHistorical("construction");
-    const before = JSON.stringify(carrier);
-    expect(reconcileCanonicalReleaseState({ onboardingCompleted: false, updatedAt: now })).toMatchObject({ status: "onboarding_required", planVisible: false, historyPreserved: true, regeneratedFutureSessions: 0 });
+    expect(reconcileCanonicalReleaseState({ onboardingCompleted: false, updatedAt: now })).toMatchObject({
+      status: "reconstructed",
+      planVisible: true,
+      historyPreserved: true,
+      onboardingMetadataBackfillRequired: true,
+    });
     const after = canonicalActivePlanV2Repository.get();
     expect(after.status).toBe("saved");
-    if (after.status === "saved") expect(JSON.stringify(after.carrier)).toBe(before);
+    if (after.status === "saved") {
+      expect(after.carrier.planId).toBe(carrier.planId);
+      expect(after.carrier.recordedSessionReferences ?? []).toEqual(carrier.recordedSessionReferences ?? []);
+    }
   });
 
   it("routes completed onboarding with no plan to setup without fabricating history", () => {

@@ -1,6 +1,7 @@
 import { constructCanonicalActivePlanFromCanonicalInputs, type CanonicalGeneratedPlanInput } from "@/application/training/canonical-active-plan-construction";
 import { resolveCanonicalConstructionFacts } from "@/application/training/canonical-construction-facts";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
+import { canonicalActivePlanOwnerRepository } from "@/data/local/canonical-active-plan-owner-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import type { CanonicalActivePlanCarrier } from "@/domain/training/canonical-active-plan-carrier";
 import { validateCanonicalLoadPrescription } from "@/domain/training/canonical-load-prescription";
@@ -16,6 +17,8 @@ export type CanonicalReleaseReconciliationResult = Readonly<{
   priorRevision?: number;
   newRevision?: number;
   regeneratedFutureSessions: number;
+  onboardingMetadataBackfillRequired?: boolean;
+  ownerBinding?: "unchanged" | "bound_from_existing_authenticated_device" | "not_applicable";
   customerGuidance?: string;
 }>;
 
@@ -77,23 +80,48 @@ export function commitCanonicalOnboardingPlan(command: CanonicalGeneratedPlanInp
  * the ledger, and reconstructs stale future prescriptions through the current
  * canonical owners. Completed ledger aggregates are never rewritten.
  */
-export function reconcileCanonicalReleaseState(input: Readonly<{ onboardingCompleted: boolean; updatedAt: string }>): CanonicalReleaseReconciliationResult {
+export function reconcileCanonicalReleaseState(input: Readonly<{
+  onboardingCompleted: boolean;
+  updatedAt: string;
+  authenticatedUserId?: string | null;
+  accessMode?: "authenticated" | "offline" | "unscoped_test";
+}>): CanonicalReleaseReconciliationResult {
   const loaded = canonicalActivePlanV2Repository.get();
-  if (!input.onboardingCompleted) {
+  if (loaded.status === "invalid") return result("recovery_required", `canonical_plan_unrestorable:${loaded.reason}`, false, true, "unsafe", 0, { customerGuidance: "Your programme needs recovery before training can continue. Your recorded workout history has not been changed." });
+  if (loaded.status === "missing" && !input.onboardingCompleted) {
     return result("onboarding_required", "onboarding_must_complete_before_plan_activation", false, true, "none", 0, {
       customerGuidance: "Complete setup before starting a programme.",
     });
   }
   if (loaded.status === "missing") return result("setup_required", "canonical_plan_missing_after_onboarding", false, true, "none", 0, { customerGuidance: "Set up your programme to continue." });
-  if (loaded.status === "invalid") return result("recovery_required", `canonical_plan_unrestorable:${loaded.reason}`, false, true, "unsafe", 0, { customerGuidance: "Your programme needs recovery before training can continue. Your recorded workout history has not been changed." });
+
+  const ownership = reconcileOwnerScope({
+    planId: loaded.carrier.planId,
+    authenticatedUserId: input.authenticatedUserId ?? null,
+    accessMode: input.accessMode ?? "unscoped_test",
+    updatedAt: input.updatedAt,
+  });
+  if (ownership.status === "blocked") {
+    return result("recovery_required", ownership.reason, false, true, "none", 0, {
+      priorRevision: loaded.carrier.revision,
+      newRevision: loaded.carrier.revision,
+      customerGuidance: ownership.reason === "active_plan_belongs_to_different_account"
+        ? "This device contains training data for another account. Sign back into that account; no programme or history has been changed."
+        : "Your programme ownership record could not be verified safely. No programme or history has been changed.",
+    });
+  }
+  const common = {
+    onboardingMetadataBackfillRequired: !input.onboardingCompleted,
+    ownerBinding: ownership.binding,
+  } as const;
 
   const active = inspectActiveAttempt(loaded.carrier);
-  if (active.status === "unsafe") return result("recovery_required", active.reason, false, true, "unsafe", 0, { priorRevision: loaded.carrier.revision, newRevision: loaded.carrier.revision, customerGuidance: "This workout cannot be resumed safely. Your recorded work remains stored for recovery." });
+  if (active.status === "unsafe") return result("recovery_required", active.reason, false, true, "unsafe", 0, { ...common, priorRevision: loaded.carrier.revision, newRevision: loaded.carrier.revision, customerGuidance: "This workout cannot be resumed safely. Your recorded work remains stored for recovery." });
   const current = inspectFuturePrescriptions(loaded.carrier);
-  if (current.status === "current") return result("ready", active.status === "resumable" ? "current_plan_with_compatible_active_attempt" : "current_plan", true, true, active.status, 0, { priorRevision: loaded.carrier.revision, newRevision: loaded.carrier.revision });
+  if (current.status === "current") return result("ready", active.status === "resumable" ? "current_plan_with_compatible_active_attempt" : !input.onboardingCompleted ? "current_plan_with_compatible_onboarding_metadata_backfill" : "current_plan", true, true, active.status, 0, { ...common, priorRevision: loaded.carrier.revision, newRevision: loaded.carrier.revision });
 
   const facts = resolveCanonicalConstructionFacts(loaded.carrier);
-  if (facts.status !== "ready") return result("recovery_required", facts.reason, false, true, active.status, 0, { priorRevision: loaded.carrier.revision, newRevision: loaded.carrier.revision, customerGuidance: "The exercise catalogue needed to rebuild future workouts is unavailable. Recorded history remains unchanged." });
+  if (facts.status !== "ready") return result("recovery_required", facts.reason, false, true, active.status, 0, { ...common, priorRevision: loaded.carrier.revision, newRevision: loaded.carrier.revision, customerGuidance: "The exercise catalogue needed to rebuild future workouts is unavailable. Recorded history remains unchanged." });
   const constructed = constructCanonicalActivePlanFromCanonicalInputs({
     planId: loaded.carrier.planId,
     createdAt: loaded.carrier.createdAt,
@@ -118,6 +146,7 @@ export function reconcileCanonicalReleaseState(input: Readonly<{ onboardingCompl
   if (constructed.status !== "constructed") {
     const infeasible = constructed.reason.includes("chronic_volume_floor_unmet");
     return result(infeasible ? "infeasible" : "recovery_required", `future_reconstruction_failed:${constructed.reason}`, false, true, active.status, 0, {
+      ...common,
       priorRevision: loaded.carrier.revision,
       newRevision: loaded.carrier.revision,
       customerGuidance: infeasible
@@ -137,8 +166,39 @@ export function reconcileCanonicalReleaseState(input: Readonly<{ onboardingCompl
     operational: active.status === "resumable" ? loaded.carrier.operational : constructed.carrier.operational,
   };
   const saved = canonicalActivePlanV2Repository.saveAtomically(next, loaded.carrier.revision);
-  if (saved.status !== "saved") return result("retry_required", saved.status === "conflict" ? "stale_plan_revision" : "atomic_reconstruction_failed", false, true, active.status, 0, { priorRevision: loaded.carrier.revision, newRevision: loaded.carrier.revision, customerGuidance: "Programme recovery was interrupted before anything changed. Try again." });
-  return result("reconstructed", current.reason, true, true, active.status, saved.carrier.plannedSessions.length, { priorRevision: loaded.carrier.revision, newRevision: nextRevision });
+  if (saved.status !== "saved") return result("retry_required", saved.status === "conflict" ? "stale_plan_revision" : "atomic_reconstruction_failed", false, true, active.status, 0, { ...common, priorRevision: loaded.carrier.revision, newRevision: loaded.carrier.revision, customerGuidance: "Programme recovery was interrupted before anything changed. Try again." });
+  return result("reconstructed", current.reason, true, true, active.status, saved.carrier.plannedSessions.length, { ...common, priorRevision: loaded.carrier.revision, newRevision: nextRevision });
+}
+
+function reconcileOwnerScope(input: Readonly<{
+  planId: string;
+  authenticatedUserId: string | null;
+  accessMode: "authenticated" | "offline" | "unscoped_test";
+  updatedAt: string;
+}>): Readonly<
+  { status: "ready"; binding: "unchanged" | "bound_from_existing_authenticated_device" | "not_applicable" }
+  | { status: "blocked"; reason: string }
+> {
+  if (input.accessMode === "unscoped_test") return { status: "ready", binding: "not_applicable" };
+  const ownership = canonicalActivePlanOwnerRepository.get();
+  if (ownership.status === "invalid") return { status: "blocked", reason: ownership.reason };
+  if (ownership.status === "owned") {
+    if (ownership.record.planId !== input.planId) return { status: "blocked", reason: "active_plan_owner_identity_mismatch" };
+    if (!input.authenticatedUserId || ownership.record.ownerUserId !== input.authenticatedUserId) {
+      return { status: "blocked", reason: "active_plan_belongs_to_different_account" };
+    }
+    return { status: "ready", binding: "unchanged" };
+  }
+  if (input.accessMode === "offline" || !input.authenticatedUserId) return { status: "ready", binding: "not_applicable" };
+  const bound = canonicalActivePlanOwnerRepository.save({
+    planId: input.planId,
+    ownerUserId: input.authenticatedUserId,
+    boundAt: input.updatedAt,
+    provenance: "existing_authenticated_device_migration",
+  });
+  return bound.status === "owned"
+    ? { status: "ready", binding: "bound_from_existing_authenticated_device" }
+    : { status: "blocked", reason: bound.status === "invalid" ? bound.reason : "owner_storage_write_failed" };
 }
 
 export function inspectFuturePrescriptions(carrier: CanonicalActivePlanCarrier): Readonly<{ status: "current" | "stale"; reason: string }> {

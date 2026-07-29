@@ -18,6 +18,7 @@ import type { Exercise, Programme, WorkoutSession } from "@/domain/training/mode
 import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
+import { canonicalActivePlanOwnerRepository } from "@/data/local/canonical-active-plan-owner-repository";
 
 const cloudBackupSchema = "adaptive-strength-coach-cloud-backup";
 const cloudBackupVersion = 1;
@@ -52,6 +53,8 @@ export interface CloudDataRestoreResult {
   restoredSettings: boolean;
   restoredActivePlan: boolean;
   restoredTrainingYear: boolean;
+  settingsReadStatus: "complete" | "failed" | "unavailable";
+  accountScopeBlocked: boolean;
 }
 
 export interface CloudDataSyncResult {
@@ -108,19 +111,25 @@ function resolveRepositories(dependencies: CloudDataSyncDependencies, client: Ap
   };
 }
 
-export function buildCloudUserDataBackup(dependencies: CloudDataSyncDependencies = {}): CloudUserDataBackup {
+export function buildCloudUserDataBackup(dependencies: CloudDataSyncDependencies = {}, ownerUserId?: string): CloudUserDataBackup {
   const settingsStore = dependencies.localSettingsStore ?? appSettingsStore;
   const canonical = canonicalActivePlanV2Repository.get();
+  const ownership = canonicalActivePlanOwnerRepository.get();
+  const canonicalMaySync = canonical.status === "saved"
+    && (!ownerUserId
+      || (ownership.status === "owned"
+        && ownership.record.ownerUserId === ownerUserId
+        && ownership.record.planId === canonical.carrier.planId));
   return {
     schema: cloudBackupSchema,
     version: cloudBackupVersion,
     updatedAt: now(),
     appSettings: settingsStore.get(),
     activeTrainingPlan: null,
-    canonicalActivePlan: canonical.status === "saved" ? serializeCanonicalActivePlan(canonical.carrier) : null,
-    canonicalActivePlanRevision: canonical.status === "saved" ? canonical.carrier.revision : undefined,
-    canonicalRecordedSessions: canonical.status === "saved" ? canonicalRecordedSessionLedger.exportPlan(canonical.carrier.planId) : [],
-    canonicalProgressEvidence: canonical.status === "saved" ? canonicalProgressEvidenceRepository.list(canonical.carrier.planId) : [],
+    canonicalActivePlan: canonicalMaySync && canonical.status === "saved" ? serializeCanonicalActivePlan(canonical.carrier) : null,
+    canonicalActivePlanRevision: canonicalMaySync && canonical.status === "saved" ? canonical.carrier.revision : undefined,
+    canonicalRecordedSessions: canonicalMaySync && canonical.status === "saved" ? canonicalRecordedSessionLedger.exportPlan(canonical.carrier.planId) : [],
+    canonicalProgressEvidence: canonicalMaySync && canonical.status === "saved" ? canonicalProgressEvidenceRepository.list(canonical.carrier.planId) : [],
     trainingYear: (dependencies.localTrainingYearRepository ?? legacyTrainingYearArchive).read(),
     recoveryCapacityIgnore: (dependencies.localRecoveryIgnoreRepository ?? recoveryCapacityIgnoreRepository).get(),
   };
@@ -173,6 +182,8 @@ export async function restoreCloudDataForUser(
       restoredSettings: false,
       restoredActivePlan: false,
       restoredTrainingYear: false,
+      settingsReadStatus: "unavailable",
+      accountScopeBlocked: false,
     };
   }
 
@@ -183,6 +194,7 @@ export async function restoreCloudDataForUser(
     userSettingsCloudRepository,
   } = resolveRepositories(dependencies, client);
 
+  let settingsReadStatus: CloudDataRestoreResult["settingsReadStatus"] = "complete";
   const [cloudProgrammes, cloudExercises, cloudSettings] = await Promise.all([
     programmeCloudRepository.loadProgrammes(userId).catch((error) => {
       logSyncStage("programme restore skipped", error);
@@ -194,9 +206,28 @@ export async function restoreCloudDataForUser(
     }),
     userSettingsCloudRepository.loadUserSettingsBlob(userId).catch((error) => {
       logSyncStage("settings restore skipped", error);
+      settingsReadStatus = "failed";
       return null;
     }),
   ]);
+
+  const localCanonicalPlan = canonicalActivePlanV2Repository.get();
+  const localCanonicalOwner = canonicalActivePlanOwnerRepository.get();
+  const accountScopeMismatch = localCanonicalOwner.status === "owned"
+    && localCanonicalOwner.record.ownerUserId !== userId;
+  if (accountScopeMismatch) {
+    logSyncStage("account-scoped restore blocked by existing canonical plan ownership");
+    return {
+      restoredSessions: 0,
+      restoredExercises: 0,
+      restoredProgrammes: 0,
+      restoredSettings: false,
+      restoredActivePlan: false,
+      restoredTrainingYear: false,
+      settingsReadStatus,
+      accountScopeBlocked: true,
+    };
+  }
 
   // Canonical recorded sessions are restored atomically from the versioned
   // backup envelope below. Legacy workout history is migration input only and
@@ -230,22 +261,31 @@ export async function restoreCloudDataForUser(
     if (cloudSettings.canonicalActivePlan) {
       const parsed = validateCanonicalActivePlan(cloudSettings.canonicalActivePlan);
       if (parsed.status === "valid") {
-        const ledgerRestore = canonicalRecordedSessionLedger.restorePlan(cloudSettings.canonicalRecordedSessions ?? []);
-        if (ledgerRestore.status !== "restored") {
-          logSyncStage("canonical ledger restore rejected", ledgerRestore);
+        const ownershipAllowsRestore = localCanonicalOwner.status === "owned"
+          ? localCanonicalOwner.record.ownerUserId === userId
+          : localCanonicalPlan.status === "missing";
+        if (!ownershipAllowsRestore) {
+          logSyncStage("canonical plan restore deferred to local ownership migration");
         } else {
-          for (const evidence of cloudSettings.canonicalProgressEvidence ?? []) canonicalProgressEvidenceRepository.record(evidence);
-        }
-        const local = canonicalActivePlanV2Repository.get();
-        const referencesResolve = (parsed.carrier.recordedSessionReferences ?? []).every((reference) => canonicalRecordedSessionLedger.get(reference.sessionId).status === "found");
-        if (ledgerRestore.status === "restored" && referencesResolve && (local.status !== "saved" || parsed.carrier.revision > local.carrier.revision)) {
-          const saved = canonicalActivePlanV2Repository.saveAtomically(parsed.carrier, local.status === "saved" ? local.carrier.revision : undefined);
-          if (saved.status === "saved") {
-            canonicalActivePlanState.hydrate();
+          const ledgerRestore = canonicalRecordedSessionLedger.restorePlan(cloudSettings.canonicalRecordedSessions ?? []);
+          if (ledgerRestore.status !== "restored") {
+            logSyncStage("canonical ledger restore rejected", ledgerRestore);
+          } else {
+            for (const evidence of cloudSettings.canonicalProgressEvidence ?? []) canonicalProgressEvidenceRepository.record(evidence);
+          }
+          const local = canonicalActivePlanV2Repository.get();
+          const referencesResolve = (parsed.carrier.recordedSessionReferences ?? []).every((reference) => canonicalRecordedSessionLedger.get(reference.sessionId).status === "found");
+          if (ledgerRestore.status === "restored" && referencesResolve && (local.status !== "saved" || parsed.carrier.revision > local.carrier.revision)) {
+            const saved = canonicalActivePlanV2Repository.saveAtomically(parsed.carrier, local.status === "saved" ? local.carrier.revision : undefined);
+            if (saved.status === "saved") {
+              canonicalActivePlanOwnerRepository.save({ planId: saved.carrier.planId, ownerUserId: userId, boundAt: now(), provenance: "cloud_restore" });
+              canonicalActivePlanState.hydrate();
+              restoredActivePlan = true;
+            }
+          } else if (ledgerRestore.status === "restored" && referencesResolve && local.status === "saved" && parsed.carrier.revision === local.carrier.revision) {
+            canonicalActivePlanOwnerRepository.save({ planId: local.carrier.planId, ownerUserId: userId, boundAt: now(), provenance: "cloud_restore" });
             restoredActivePlan = true;
           }
-        } else if (ledgerRestore.status === "restored" && referencesResolve && local.status === "saved" && parsed.carrier.revision === local.carrier.revision) {
-          restoredActivePlan = true;
         }
       }
     } else if (cloudSettings.activeTrainingPlan) {
@@ -271,6 +311,8 @@ export async function restoreCloudDataForUser(
     restoredSettings,
     restoredActivePlan,
     restoredTrainingYear,
+    settingsReadStatus,
+    accountScopeBlocked: false,
   };
 }
 
@@ -299,7 +341,7 @@ export function enqueueLocalDataForAutomaticSync(
     queue.enqueue("programme", programme.id, { ...programme, createdByUserId: programme.createdByUserId ?? userId }, userId);
   });
 
-  queue.enqueue("user_settings", userId, buildCloudUserDataBackup(dependencies), userId);
+  queue.enqueue("user_settings", userId, buildCloudUserDataBackup(dependencies, userId), userId);
   return queue.count();
 }
 

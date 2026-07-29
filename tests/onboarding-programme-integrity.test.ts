@@ -106,13 +106,13 @@ describe("onboarding programme integrity", () => {
     expect(after).toEqual(before);
   });
 
-  it("normalizes the contradictory consistent-training and zero-days pair", () => {
+  it("normalizes contradictory recent-training state without asking layoff users for a second frequency", () => {
     expect(normalizeRecentTrainingInput({
       continuity: "currently_training",
       recentTrainingDaysPerWeek: 0,
     })).toEqual({
-      continuity: "short_layoff",
-      recentTrainingDaysPerWeek: 0,
+      continuity: "currently_training",
+      recentTrainingDaysPerWeek: 1,
     });
     expect(normalizeRecentTrainingInput({
       continuity: "currently_training",
@@ -120,6 +120,13 @@ describe("onboarding programme integrity", () => {
     })).toEqual({
       continuity: "currently_training",
       recentTrainingDaysPerWeek: 3,
+    });
+    expect(normalizeRecentTrainingInput({
+      continuity: "short_layoff",
+      recentTrainingDaysPerWeek: 3,
+    })).toEqual({
+      continuity: "short_layoff",
+      recentTrainingDaysPerWeek: 0,
     });
   });
 

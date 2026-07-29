@@ -30,7 +30,10 @@ export default function SettingsScreen() {
   const accountError = customerSafeServiceMessage(error, environment, "Account backup is unavailable right now.");
   const billingError = customerSafeServiceMessage(subscriptionError, environment, "Subscription status could not refresh right now.");
   const dataSafety = buildDataSafetyStatus({ userEmail: user?.email, isOfflineMode, subscription, syncStatus, unsyncedQueueCount: syncQueueCount });
-  const restartSetup = () => { updateSettings({ onboardingCompleted: false }); router.replace("/(protected)/onboarding"); };
+  const restartSetup = () => {
+    updateSettings({ onboardingCompleted: false });
+    router.replace({ pathname: "/(protected)/onboarding", params: { restart: "1" } });
+  };
   const changeDuration = (availableSessionMinutes: CanonicalSessionDurationMinutes) => {
     if (!plan) { updateSettings({ availableSessionMinutes }); return; }
     const result = canonicalActivePlanState.changeSessionDuration({ planId: plan.planId, expectedRevision: plan.revision, availableSessionMinutes, updatedAt: new Date().toISOString() });

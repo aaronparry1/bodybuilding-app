@@ -10,7 +10,8 @@ describe("onboarding final programme screen", () => {
     expect(source).toContain('title: step === "review" ? "Your Programme" : "Welcome"');
     expect(source).toContain('review: "Your Programme"');
     expect(source).toContain("ASC will use these choices to build your first programme.");
-    expect(source).toContain('creationPending ? "Creating Programme…" : "Create Programme"');
+    expect(source).toContain('creationPending ? "Creating Programme…"');
+    expect(source).toContain('creationCommitted ? "Open Programme" : "Create Programme"');
   });
 
   it("shows all programme summary rows", () => {

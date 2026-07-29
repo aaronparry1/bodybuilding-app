@@ -6,6 +6,7 @@ import { applyCanonicalProgressDecision, type CanonicalProgressDecisionApplicati
 import { commitCanonicalOnboardingPlan, type CanonicalOnboardingPlanCommitResult } from "@/application/training/canonical-release-reconciliation";
 import { reconcilePendingCanonicalWorkoutDiscards } from "@/application/training/canonical-workout-discard-transaction";
 import { canonicalWorkoutDiscardIntentRepository } from "@/data/local/canonical-workout-discard-intent-repository";
+import { canonicalActivePlanOwnerRepository } from "@/data/local/canonical-active-plan-owner-repository";
 
 export type CanonicalActivePlanState = Readonly<{ hydration: "empty" | "hydrated" | "error"; model: CanonicalActivePlanReadModel | null; error?: string }>;
 
@@ -24,7 +25,7 @@ export function createCanonicalActivePlanStateStore(): CanonicalActivePlanStateS
     changeSessionDuration: (command) => { const result = changeCanonicalSessionDuration(command); if (result.status === "applied" || result.status === "unchanged") store.hydrate(); return result; },
     applyProgressDecision: (command) => { const result = applyCanonicalProgressDecision(command); if (result.status === "applied" || result.status === "unchanged") store.hydrate(); return result; },
     refresh: () => store.hydrate(),
-    clear: () => { canonicalWorkoutDiscardIntentRepository.clear(); canonicalActivePlanV2Repository.clear(); state = { hydration: "empty", model: null }; publish(); return state; },
+    clear: () => { canonicalWorkoutDiscardIntentRepository.clear(); canonicalActivePlanOwnerRepository.clear(); canonicalActivePlanV2Repository.clear(); state = { hydration: "empty", model: null }; publish(); return state; },
     getReadModel: () => state.model,
     getPlannedSession: (id) => { const session = state.model?.plannedSessions.find((candidate) => candidate.id === id); return session ? { id: session.id, microcycleId: session.microcycleId, planSessionIndex: session.planSessionIndex, role: session.role, kind: "planned", status: session.status as "planned" | "open" | "completed", constructionVersion: session.constructionVersion, revision: session.revision, prescriptionSnapshot: session.snapshot } : null; },
     getNextActionableSession: () => { const session = state.model?.nextSession; return session ? store.getPlannedSession(session.id) : null; },

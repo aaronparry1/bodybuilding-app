@@ -35,11 +35,11 @@ describe("global application shell and Home boundary", () => {
     expect(homeUi).not.toContain("projection.greeting.eyebrow");
   });
 
-  it("keeps protected navigation behind completed onboarding", () => {
-    const gate = protectedLayout.indexOf("!settings.onboardingCompleted");
-    const shell = protectedLayout.indexOf("return (", gate);
-    expect(gate).toBeGreaterThan(0);
-    expect(protectedLayout.slice(gate, shell)).toContain('<Redirect href="/(protected)/onboarding"');
+  it("keeps protected navigation behind reconciled programme or genuine onboarding state", () => {
+    expect(protectedLayout).toContain('["onboarding_required", "setup_required"].includes');
+    expect(protectedLayout).toContain('<Redirect href="/(protected)/onboarding"');
+    expect(protectedLayout).toContain('reconciliation?.planVisible && isOnboardingRoute');
+    expect(protectedLayout).toContain('<Redirect href="/(protected)/(tabs)"');
     expect(protectedLayout).toContain("canonicalActivePlanState.hydrate");
   });
 

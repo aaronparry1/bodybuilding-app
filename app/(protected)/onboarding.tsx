@@ -2,8 +2,10 @@ import { Stack, router } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useAppSettings } from "@/application/settings/app-settings";
+import { useAuth } from "@/application/auth/auth-context";
 import {
   completeCanonicalOnboardingSetup,
+  createCanonicalOnboardingSubmissionGate,
   normalizeRecentTrainingInput,
   onboardingStepKeys,
   resolveExecutableOnboardingFrameworks,
@@ -89,7 +91,9 @@ const concurrentSportOptions: Array<{ value: CanonicalStartingVolumeContext["con
 
 export default function OnboardingScreen() {
   const { settings } = useAppSettings();
+  const { user } = useAuth();
   const scrollRef = useRef<ScrollView | null>(null);
+  const submissionGateRef = useRef(createCanonicalOnboardingSubmissionGate());
   const [stepIndex, setStepIndex] = useState(0);
   const [unit, setUnit] = useState<UnitSystem>(settings.unit);
   const [setupGoal, setSetupGoal] = useState<TrainingSetupGoal>("build_muscle");
@@ -108,6 +112,7 @@ export default function OnboardingScreen() {
   const [concurrentSport, setConcurrentSport] = useState<CanonicalStartingVolumeContext["concurrentSport"]>(settings.startingVolumeContext.concurrentSport);
   const [creationError, setCreationError] = useState<string | null>(null);
   const [creationPending, setCreationPending] = useState(false);
+  const [creationCommitted, setCreationCommitted] = useState(false);
   const [creationAttempt, setCreationAttempt] = useState<Readonly<{ fingerprint: string; timestamp: string }> | null>(null);
 
   const trainingGoalId = trainingGoalIdForSetup(setupGoal);
@@ -183,11 +188,10 @@ export default function OnboardingScreen() {
   };
   const chooseRecentTrainingDays = (days: CanonicalStartingVolumeContext["recentTrainingDaysPerWeek"]) => {
     setRecentTrainingDaysPerWeek(days);
-    if (days === 0 && continuity === "currently_training") setContinuity("short_layoff");
   };
   const chooseContinuity = (value: CanonicalStartingVolumeContext["continuity"]) => {
     setContinuity(value);
-    if (value === "currently_training" && recentTrainingDaysPerWeek === 0) setRecentTrainingDaysPerWeek(1);
+    setRecentTrainingDaysPerWeek((days) => value === "currently_training" ? (days === 0 ? 1 : days) : 0);
   };
 
   useEffect(() => {
@@ -200,10 +204,8 @@ export default function OnboardingScreen() {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
   }, [step]);
 
-  const finish = () => {
-    if (creationPending) return;
+  const finish = async () => {
     setCreationError(null);
-    setCreationPending(true);
     const fingerprint = JSON.stringify({
       setupGoal,
       targetDate: trainingCommitment.targetDate,
@@ -215,38 +217,56 @@ export default function OnboardingScreen() {
       recoveryCardioPreference,
       startingVolumeContext,
     });
+    const gateResult = submissionGateRef.current.begin(fingerprint);
+    if (gateResult === "in_flight") return;
+    if (gateResult === "already_committed") {
+      router.replace("/(protected)/(tabs)");
+      return;
+    }
+    setCreationPending(true);
+    await yieldForOnboardingFeedback();
     const attempt = creationAttempt?.fingerprint === fingerprint
       ? creationAttempt
       : { fingerprint, timestamp: new Date().toISOString() };
     if (creationAttempt?.fingerprint !== fingerprint) setCreationAttempt(attempt);
     const trainingGoal = programmeGoalForSetup(setupGoal, experienceLevel);
-    const committed = completeCanonicalOnboardingSetup({
-      command: {
-        planId: `canonical-plan:${attempt.timestamp}`,
-        createdAt: attempt.timestamp,
-        updatedAt: attempt.timestamp,
-        goal: trainingGoal,
-        macrocycleGoal: setupGoal,
-        targetDate: trainingCommitment.targetDate,
-        daysPerWeek,
-        preferredSplit,
-        experienceLevel,
-        equipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight", "bands", "other"],
-        units: unit,
-        recoveryCardioPreference,
-        availableSessionMinutes,
-        startingVolumeContext,
-        exercises: exerciseLibrary,
-      },
-      settings: {
-        unit,
-        trainingGoal,
-        experienceLevel,
-        recoveryCardioPreference,
-        availableSessionMinutes,
-        startingVolumeContext,
-      },
-    });
+    let committed;
+    try {
+      committed = completeCanonicalOnboardingSetup({
+        command: {
+          planId: `canonical-plan:${attempt.timestamp}`,
+          createdAt: attempt.timestamp,
+          updatedAt: attempt.timestamp,
+          goal: trainingGoal,
+          macrocycleGoal: setupGoal,
+          targetDate: trainingCommitment.targetDate,
+          daysPerWeek,
+          preferredSplit,
+          experienceLevel,
+          equipment: ["barbell", "dumbbell", "machine", "cable", "smith", "bodyweight", "bands", "other"],
+          units: unit,
+          recoveryCardioPreference,
+          availableSessionMinutes,
+          startingVolumeContext,
+          exercises: exerciseLibrary,
+        },
+        ownerUserId: user?.id ?? null,
+        settings: {
+          unit,
+          trainingGoal,
+          experienceLevel,
+          recoveryCardioPreference,
+          availableSessionMinutes,
+          startingVolumeContext,
+        },
+      });
+    } catch (error) {
+      console.error("[onboarding:programme-creation]", { reason: "unexpected_completion_error", errorType: error instanceof Error ? error.name : "unknown" });
+      setCreationError("Your programme was not changed. Please try again.");
+      submissionGateRef.current.retry(fingerprint);
+      setCreationPending(false);
+      return;
+    }
     if (committed.status !== "saved") {
       const durationFailure = committed.reason.includes("chronic_volume_floor_unmet");
       const activeAttemptFailure = committed.reason === "active_attempt_must_be_completed_or_discarded";
@@ -261,11 +281,18 @@ export default function OnboardingScreen() {
         : activeAttemptFailure
           ? "Finish or discard your current workout, then return here to create this programme. Your choices are still saved on this screen."
           : `Your programme was not changed (${programmeCreationReason(committed.reason)}). Review your choices and try again.`);
+      submissionGateRef.current.retry(fingerprint);
       setCreationPending(false);
       return;
     }
-    setCreationPending(false);
-    router.replace("/(protected)");
+    submissionGateRef.current.commit(fingerprint);
+    setCreationCommitted(true);
+    try {
+      router.replace("/(protected)/(tabs)");
+    } catch {
+      setCreationError("Your programme is ready, but this screen could not close. Tap Open Programme to continue.");
+      setCreationPending(false);
+    }
   };
 
   return (
@@ -321,15 +348,15 @@ export default function OnboardingScreen() {
       {step === "recent_training" ? (
         <View style={{ gap: spacing.lg }}>
           <OptionList<CanonicalStartingVolumeContext["continuity"]> options={continuityOptions} selected={continuity} onSelect={chooseContinuity} />
-          <PremiumCard>
-            <Text selectable style={{ ...type.label, color: colors.textSubtle }}>Recent training days</Text>
-            <OptionList<CanonicalStartingVolumeContext["recentTrainingDaysPerWeek"]>
-              options={([0, 1, 2, 3, 4, 5, 6, 7] as const).map((days) => ({ value: days, label: `${days} ${days === 1 ? "day" : "days"} per week` }))}
-              selected={recentTrainingDaysPerWeek}
-              onSelect={chooseRecentTrainingDays}
-              guidance="Choose your actual recent average, not your intended schedule."
-            />
-          </PremiumCard>
+          {continuity === "currently_training" ? (
+            <PremiumCard>
+              <Text selectable style={{ ...type.section, color: colors.text }}>Your recent routine</Text>
+              <Text selectable style={{ ...type.body, color: colors.textMuted }}>
+                Before today, how many days per week were you usually lifting? This helps choose the starting workload; it does not change your new schedule.
+              </Text>
+              <CompactDayOptions selected={recentTrainingDaysPerWeek} onSelect={chooseRecentTrainingDays} />
+            </PremiumCard>
+          ) : null}
           <PremiumCard>
             <Text selectable style={{ ...type.label, color: colors.textSubtle }}>Typical recent workout</Text>
             <OptionList<CanonicalStartingVolumeContext["recentSessionWorkload"]> options={recentWorkloadOptions} selected={recentSessionWorkload} onSelect={setRecentSessionWorkload} />
@@ -347,7 +374,6 @@ export default function OnboardingScreen() {
       {step === "recovery" ? (
         <OptionList<RecoveryCardioPreference> options={recoveryCardioOptions} selected={recoveryCardioPreference} onSelect={setRecoveryCardioPreference} />
       ) : null}
-      {creationError ? <PremiumCard><Text accessibilityRole="alert" style={{ color: colors.danger, ...type.body }}>{creationError}</Text></PremiumCard> : null}
       {step === "review" ? (
         <ReviewPanel
           goal={labelFor(goalOptions, setupGoal)}
@@ -356,25 +382,69 @@ export default function OnboardingScreen() {
           availableSessionMinutes={availableSessionMinutes}
           framework={frameworkSummary}
           experience={labelForExperience(experienceLevel)}
-          recentTraining={`${labelFor(continuityOptions, continuity)} · ${recentTrainingDaysPerWeek} days/week · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`}
+          recentTraining={continuity === "currently_training"
+            ? `${labelFor(continuityOptions, continuity)} · previously ${recentTrainingDaysPerWeek} days/week · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`
+            : `${labelFor(continuityOptions, continuity)} · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`}
           recoveryCapacity={labelFor(recoveryCardioOptions, recoveryCardioPreference)}
           unit={unit}
           unitLabel={labelFor(unitOptions, unit)}
           onSelectUnit={setUnit}
         />
       ) : null}
+      {creationError ? <PremiumCard tone="danger"><Text accessibilityRole="alert" style={{ color: colors.danger, ...type.body }}>{creationError}</Text></PremiumCard> : null}
 
       <View style={{ flexDirection: "row", gap: spacing.sm }}>
         {stepIndex > 0 ? <SecondaryButton label="Back" onPress={goBack} /> : null}
         <View style={{ flex: 1 }}>
           <PrimaryButton
-            label={step === "review" ? creationPending ? "Creating Programme…" : "Create Programme" : "Continue"}
+            label={step === "review" ? creationPending ? "Creating Programme…" : creationCommitted ? "Open Programme" : "Create Programme" : "Continue"}
             onPress={step === "review" ? finish : goNext}
             disabled={creationPending || (step === "split" && splitOptions.length === 0)}
+            testID={step === "review" ? "onboarding-create-programme" : undefined}
           />
         </View>
       </View>
     </AppScreen>
+  );
+}
+
+function CompactDayOptions({
+  selected,
+  onSelect,
+}: {
+  selected: CanonicalStartingVolumeContext["recentTrainingDaysPerWeek"];
+  onSelect(value: CanonicalStartingVolumeContext["recentTrainingDaysPerWeek"]): void;
+}) {
+  return (
+    <View accessibilityRole="radiogroup" style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm }}>
+      {([1, 2, 3, 4, 5, 6, 7] as const).map((days) => {
+        const active = days === selected;
+        return (
+          <Pressable
+            key={days}
+            accessibilityLabel={`${days} ${days === 1 ? "day" : "days"} per week recently`}
+            accessibilityRole="radio"
+            accessibilityState={{ checked: active }}
+            onPress={() => onSelect(days)}
+            testID={`recent-routine-${days}`}
+            style={{
+              minWidth: 48,
+              minHeight: 44,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: radius.md,
+              borderCurve: "continuous",
+              borderWidth: 1,
+              borderColor: active ? colors.accent : colors.line,
+              backgroundColor: active ? colors.accentSoft : colors.surfaceMuted,
+              paddingHorizontal: spacing.md,
+            }}
+          >
+            <Text style={{ color: active ? colors.accent : colors.text, fontSize: 16, fontWeight: "900" }}>{days}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
   );
 }
 
@@ -425,6 +495,16 @@ function OptionList<T extends string | number>({
       {guidance ? <Text selectable style={{ ...type.body, color: colors.textMuted }}>{guidance}</Text> : null}
     </View>
   );
+}
+
+async function yieldForOnboardingFeedback(): Promise<void> {
+  await new Promise<void>((resolve) => {
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(() => resolve());
+      return;
+    }
+    setTimeout(resolve, 0);
+  });
 }
 
 function ReviewPanel({
@@ -603,6 +683,8 @@ function programmeGoalForSetup(goal: TrainingSetupGoal, experienceLevel: Experie
 function programmeCreationReason(reason: string): string {
   if (reason === "stale_plan_revision") return "the programme changed while it was being saved";
   if (reason === "atomic_onboarding_commit_failed") return "local storage did not confirm the save";
+  if (reason === "onboarding_owner_persistence_failed") return "this device could not confirm the programme belongs to your account";
+  if (reason.startsWith("unrestorable_owner_record:")) return "the saved account link needs recovery first";
   if (reason.startsWith("unrestorable_existing_plan:")) return "the existing programme needs recovery first";
   if (reason.includes("unsupported_framework")) return "the selected framework is no longer compatible";
   return "the programme could not be validated";

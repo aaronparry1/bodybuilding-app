@@ -3,7 +3,7 @@ import { AppState } from "react-native";
 import { useAuth } from "@/application/auth/auth-context";
 import { createSubscriptionGateway } from "@/application/billing/billing-gateway";
 import { MockRevenueCatGateway } from "@/application/billing/mock-revenuecat";
-import { restoreAndSyncUserData, syncLocalDataForUser } from "@/application/sync/cloud-data-sync";
+import { restoreCloudDataForUser, syncLocalDataForUser } from "@/application/sync/cloud-data-sync";
 import { cacheSubscription, getCachedSubscription, getOfflineEntitlementFallback } from "@/application/billing/subscription-cache";
 import {
   canAccess,
@@ -47,6 +47,9 @@ interface SubscriptionContextValue {
   restorePurchases(): Promise<RestorePurchasesResult>;
   restoreStatus: RestorePurchasesStatus;
   restoreMessage: string | null;
+  dataHydrationStatus: "idle" | "restoring" | "ready" | "error";
+  dataHydrationError: string | null;
+  retryDataHydration(): void;
   presentPaywall(): Promise<void>;
   presentCustomerCenter(): Promise<void>;
   setMockStatus(status: SubscriptionStatus): Promise<void>;
@@ -72,7 +75,15 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [isRevenueCatConfigured, setIsRevenueCatConfigured] = useState(false);
   const [restoreStatus, setRestoreStatus] = useState<RestorePurchasesStatus>("idle");
   const [restoreMessage, setRestoreMessage] = useState<string | null>(null);
+  const [dataHydrationStatus, setDataHydrationStatus] = useState<SubscriptionContextValue["dataHydrationStatus"]>("idle");
+  const [dataHydrationError, setDataHydrationError] = useState<string | null>(null);
+  const [dataHydrationAttempt, setDataHydrationAttempt] = useState(0);
   const lastRestoredUserId = useRef<string | null>(null);
+  const subscriptionRef = useRef(subscription);
+
+  useEffect(() => {
+    subscriptionRef.current = subscription;
+  }, [subscription]);
 
   useEffect(() => {
     try {
@@ -168,19 +179,48 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   }, [authLoading, loadPackages, refreshSubscription, user?.id]);
 
   useEffect(() => {
-    if (!user?.id) {
-      lastRestoredUserId.current = null;
+    if (authLoading) {
+      setDataHydrationStatus("idle");
+      setDataHydrationError(null);
       return;
     }
-    if (lastRestoredUserId.current === user.id) return;
+    if (!user?.id) {
+      lastRestoredUserId.current = null;
+      setDataHydrationStatus("ready");
+      setDataHydrationError(null);
+      return;
+    }
+    const restorationIdentity = `${user.id}:${dataHydrationAttempt}`;
+    if (lastRestoredUserId.current === restorationIdentity) return;
 
-    lastRestoredUserId.current = user.id;
-    restoreAndSyncUserData(user.id, subscription).catch((nextError) => {
-      if (process.env.NODE_ENV !== "production") {
-        console.info("[sync] startup restore/sync failed", nextError);
-      }
-    });
-  }, [subscription, user?.id]);
+    let cancelled = false;
+    lastRestoredUserId.current = restorationIdentity;
+    setDataHydrationStatus("restoring");
+    setDataHydrationError(null);
+    restoreCloudDataForUser(user.id)
+      .then((restore) => {
+        if (cancelled) return;
+        if (restore.settingsReadStatus === "failed") {
+          setDataHydrationStatus("error");
+          setDataHydrationError("account_data_restore_failed");
+          return;
+        }
+        setDataHydrationStatus("ready");
+        if (restore.accountScopeBlocked) return;
+        syncLocalDataForUser(user.id, subscriptionRef.current).catch((nextError) => {
+          if (process.env.NODE_ENV !== "production") console.info("[sync] startup sync failed", nextError);
+        });
+      })
+      .catch((nextError) => {
+        if (cancelled) return;
+        setDataHydrationStatus("error");
+        setDataHydrationError(nextError instanceof Error ? nextError.message : "account_data_restore_failed");
+        if (process.env.NODE_ENV !== "production") console.info("[sync] startup restore failed", nextError);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, dataHydrationAttempt, user?.id]);
 
   useEffect(() => {
     if (!user?.id) return undefined;
@@ -319,6 +359,9 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       restoreAvailable: subscription.restoreAvailable ?? true,
       restoreStatus,
       restoreMessage,
+      dataHydrationStatus,
+      dataHydrationError,
+      retryDataHydration: () => setDataHydrationAttempt((attempt) => attempt + 1),
       refreshSubscription,
       entitlement,
       canAccess: canAccessEntitlement,
@@ -330,6 +373,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     }),
     [
       canAccessEntitlement,
+      dataHydrationError,
+      dataHydrationStatus,
       entitlement,
       error,
       isLoading,
