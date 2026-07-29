@@ -77,7 +77,7 @@ const config: ExpoConfig = {
           ? "com.aaronparry.adaptivestrengthcoach.staging"
           : "com.aaronparry.adaptivestrengthcoach.dev",
     ),
-    buildNumber: env("APP_IOS_BUILD_NUMBER", "47"),
+    buildNumber: env("APP_IOS_BUILD_NUMBER", "48"),
     associatedDomains: ["applinks:adaptivestrengthcoach.com"],
     infoPlist: {
       CFBundleDisplayName: env("APP_IOS_DISPLAY_NAME", appName),
