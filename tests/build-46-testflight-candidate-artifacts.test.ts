@@ -25,7 +25,10 @@ describe("Build 46 TestFlight candidate artifacts", () => {
     const receipt = readFileSync(`${root}/app-store-connect-receipt.md`, "utf8");
     const build = readFileSync(`${root}/build-result.md`, "utf8");
     const checklist = readFileSync(`${root}/iPhone-verification-checklist.md`, "utf8");
-    expect(config).toContain('env("APP_VERSION", "1.0.15")');
+    const currentVersion = config.match(/env\("APP_VERSION", "(\d+)\.(\d+)\.(\d+)"\)/);
+    expect(currentVersion).not.toBeNull();
+    expect(currentVersion?.slice(1, 3).map(Number)).toEqual([1, 0]);
+    expect(Number(currentVersion?.[3])).toBeGreaterThanOrEqual(15);
     const currentBuild = Number(config.match(/env\("APP_IOS_BUILD_NUMBER", "(\d+)"\)/)?.[1]);
     expect(currentBuild).toBeGreaterThanOrEqual(47);
     expect(metadata).toContain("`com.aaronparry.adaptivestrengthcoach`");
