@@ -1,8 +1,9 @@
-import { Stack, router } from "expo-router";
+import { Stack, router, useGlobalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { useAuth } from "@/application/auth/auth-context";
+import { useSubscription } from "@/application/billing/subscription-context";
 import {
   completeCanonicalOnboardingSetup,
   createCanonicalOnboardingSubmissionGate,
@@ -10,6 +11,12 @@ import {
   onboardingStepKeys,
   resolveExecutableOnboardingFrameworks,
 } from "@/application/training/canonical-onboarding-setup";
+import {
+  inspectCanonicalRetainedTrainingPresence,
+  resolveCanonicalExistingUserRoute,
+} from "@/application/training/canonical-existing-user-routing";
+import { reconcileCanonicalReleaseState } from "@/application/training/canonical-release-reconciliation";
+import { resolveCanonicalStartupHydration } from "@/application/training/canonical-startup-hydration";
 import { exerciseLibrary } from "@/domain/training/presets";
 import type { ExperienceLevel, ProgrammeGoal, UnitSystem } from "@/domain/training/models";
 import {
@@ -91,7 +98,9 @@ const concurrentSportOptions: Array<{ value: CanonicalStartingVolumeContext["con
 
 export default function OnboardingScreen() {
   const { settings } = useAppSettings();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
+  const { dataHydrationStatus, retryDataHydration } = useSubscription();
+  const { restart } = useGlobalSearchParams<{ restart?: string }>();
   const scrollRef = useRef<ScrollView | null>(null);
   const submissionGateRef = useRef(createCanonicalOnboardingSubmissionGate());
   const [stepIndex, setStepIndex] = useState(0);
@@ -113,6 +122,7 @@ export default function OnboardingScreen() {
   const [creationError, setCreationError] = useState<string | null>(null);
   const [creationPending, setCreationPending] = useState(false);
   const [creationCommitted, setCreationCommitted] = useState(false);
+  const [creationRecoveryRequired, setCreationRecoveryRequired] = useState(false);
   const [creationAttempt, setCreationAttempt] = useState<Readonly<{ fingerprint: string; timestamp: string }> | null>(null);
 
   const trainingGoalId = trainingGoalIdForSetup(setupGoal);
@@ -206,6 +216,27 @@ export default function OnboardingScreen() {
 
   const finish = async () => {
     setCreationError(null);
+    setCreationRecoveryRequired(false);
+    const existingTrainingRoute = resolveExistingTrainingBeforeCreation({
+      authLoading,
+      authenticatedUserId: user?.id ?? null,
+      dataHydrationStatus,
+      onboardingCompleted: settings.onboardingCompleted,
+      explicitSetupRestart: restart === "1",
+    });
+    if (existingTrainingRoute.status === "authenticated") {
+      router.replace(existingTrainingRoute.destination === "active_workout"
+        ? "/(protected)/(tabs)/train"
+        : "/(protected)/(tabs)");
+      return;
+    }
+    if (existingTrainingRoute.status === "waiting" || existingTrainingRoute.status === "recovery") {
+      setCreationRecoveryRequired(true);
+      setCreationError(existingTrainingRoute.status === "waiting"
+        ? "Your existing training is still being restored. Nothing has been changed."
+        : "We found existing training but could not restore it safely yet. Nothing has been changed.");
+      return;
+    }
     const fingerprint = JSON.stringify({
       setupGoal,
       targetDate: trainingCommitment.targetDate,
@@ -276,10 +307,28 @@ export default function OnboardingScreen() {
         requestedDays: daysPerWeek,
         requestedDuration: availableSessionMinutes,
       });
+      if (activeAttemptFailure) {
+        const retryRoute = resolveExistingTrainingBeforeCreation({
+          authLoading,
+          authenticatedUserId: user?.id ?? null,
+          dataHydrationStatus,
+          onboardingCompleted: settings.onboardingCompleted,
+          explicitSetupRestart: restart === "1",
+        });
+        if (retryRoute.status === "authenticated") {
+          submissionGateRef.current.retry(fingerprint);
+          setCreationPending(false);
+          router.replace(retryRoute.destination === "active_workout"
+            ? "/(protected)/(tabs)/train"
+            : "/(protected)/(tabs)");
+          return;
+        }
+        setCreationRecoveryRequired(true);
+      }
       setCreationError(durationFailure
         ? `This ${availableSessionMinutes}-minute, ${daysPerWeek}-day schedule cannot retain the required rolling training coverage. Choose longer workouts or fewer training days.`
         : activeAttemptFailure
-          ? "Finish or discard your current workout, then return here to create this programme. Your choices are still saved on this screen."
+          ? "We found your current workout but could not open it safely yet. Nothing has been changed; try restoring your training."
           : `Your programme was not changed (${programmeCreationReason(committed.reason)}). Review your choices and try again.`);
       submissionGateRef.current.retry(fingerprint);
       setCreationPending(false);
@@ -397,8 +446,25 @@ export default function OnboardingScreen() {
         {stepIndex > 0 ? <SecondaryButton label="Back" onPress={goBack} /> : null}
         <View style={{ flex: 1 }}>
           <PrimaryButton
-            label={step === "review" ? creationPending ? "Creating Programme…" : creationCommitted ? "Open Programme" : "Create Programme" : "Continue"}
-            onPress={step === "review" ? finish : goNext}
+            label={step === "review"
+              ? creationRecoveryRequired
+                ? "Try restoring training"
+                : creationPending
+                  ? "Creating Programme…"
+                  : creationCommitted
+                    ? "Open Programme"
+                    : "Create Programme"
+              : "Continue"}
+            onPress={step === "review"
+              ? creationRecoveryRequired
+                ? () => {
+                    setCreationError(null);
+                    setCreationRecoveryRequired(false);
+                    retryDataHydration();
+                    router.replace("/(protected)/(tabs)");
+                  }
+                : finish
+              : goNext}
             disabled={creationPending || (step === "split" && splitOptions.length === 0)}
             testID={step === "review" ? "onboarding-create-programme" : undefined}
           />
@@ -495,6 +561,37 @@ function OptionList<T extends string | number>({
       {guidance ? <Text selectable style={{ ...type.body, color: colors.textMuted }}>{guidance}</Text> : null}
     </View>
   );
+}
+
+function resolveExistingTrainingBeforeCreation(input: Readonly<{
+  authLoading: boolean;
+  authenticatedUserId: string | null;
+  dataHydrationStatus: "idle" | "restoring" | "ready" | "error";
+  onboardingCompleted: boolean;
+  explicitSetupRestart: boolean;
+}>) {
+  const retainedTraining = inspectCanonicalRetainedTrainingPresence(input.authenticatedUserId);
+  const hydration = resolveCanonicalStartupHydration({
+    authLoading: input.authLoading,
+    authenticatedUserId: input.authenticatedUserId,
+    localPlanStatus: retainedTraining.localPlanStatus,
+    retainedTrainingStatus: retainedTraining.status,
+    accountDataStatus: input.dataHydrationStatus,
+  });
+  const reconciliation = hydration.status === "ready"
+    ? reconcileCanonicalReleaseState({
+        onboardingCompleted: input.onboardingCompleted,
+        updatedAt: new Date().toISOString(),
+        authenticatedUserId: input.authenticatedUserId,
+        accessMode: input.authenticatedUserId ? "authenticated" : "offline",
+      })
+    : null;
+  return resolveCanonicalExistingUserRoute({
+    hydration,
+    reconciliation,
+    isOnboardingRoute: true,
+    explicitSetupRestart: input.explicitSetupRestart,
+  });
 }
 
 async function yieldForOnboardingFeedback(): Promise<void> {

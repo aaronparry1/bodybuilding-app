@@ -36,9 +36,11 @@ describe("global application shell and Home boundary", () => {
   });
 
   it("keeps protected navigation behind reconciled programme or genuine onboarding state", () => {
-    expect(protectedLayout).toContain('["onboarding_required", "setup_required"].includes');
+    expect(protectedLayout).toContain("resolveCanonicalExistingUserRoute");
+    expect(protectedLayout).toContain("inspectCanonicalRetainedTrainingPresence");
     expect(protectedLayout).toContain('<Redirect href="/(protected)/onboarding"');
-    expect(protectedLayout).toContain('reconciliation?.planVisible && isOnboardingRoute');
+    expect(protectedLayout).toContain('routeDecision.status === "authenticated" && isOnboardingRoute');
+    expect(protectedLayout).toContain('routeDecision.destination === "active_workout"');
     expect(protectedLayout).toContain('<Redirect href="/(protected)/(tabs)"');
     expect(protectedLayout).toContain("canonicalActivePlanState.hydrate");
   });

@@ -7,6 +7,19 @@ export const canonicalRecordedSessionLedger = {
   append(recordedSessionId: string, event: CanonicalRecordedSessionEvent) { const store = jsonStore.get<Store>(key, {}); const aggregate = store[recordedSessionId]; if (!aggregate) return { status: "not_found" as const }; if (event.expectedVersion !== aggregate.session.version) return { status: "stale" as const, reason: "aggregate_version_mismatch" }; if (!allowedRecordedSessionTransition(aggregate.session.status, event.type)) return { status: "rejected" as const, reason: "invalid_lifecycle_transition" }; const nextStatus = event.type === "started" || event.type === "resumed" ? "started" : event.type === "paused" ? "paused" : event.type === "completed" ? "completed" : event.type === "historical" ? "historical" : aggregate.session.status; const next = { ...aggregate.session, status: nextStatus as CanonicalRecordedSession["status"], version: aggregate.session.version + 1, ...(event.type === "started" ? { startedAt: event.occurredAt } : {}) }; const updated = { session: next, events: [...aggregate.events, event] }; jsonStore.set(key, { ...store, [recordedSessionId]: updated }); return { status: "saved" as const, session: next }; },
   get(recordedSessionId: string) { const value = jsonStore.get<Store>(key, {})[recordedSessionId]; return value ? { status: "found" as const, session: value.session, events: [...value.events] } : { status: "not_found" as const }; },
   list(planId: string) { return Object.values(jsonStore.get<Store>(key, {})).filter((value) => value.session.planId === planId).map((value) => value.session).sort((a, b) => a.recordedSessionId.localeCompare(b.recordedSessionId)); },
+  inspectActive() {
+    try {
+      const sessions = Object.values(jsonStore.get<Store>(key, {}))
+        .map((value) => value.session)
+        .filter((session) => session.status === "pending" || session.status === "started" || session.status === "paused")
+        .sort((left, right) => left.recordedSessionId.localeCompare(right.recordedSessionId));
+      if (sessions.length === 0) return { status: "none" as const, sessions };
+      if (sessions.length === 1) return { status: "found" as const, sessions };
+      return { status: "invalid" as const, reason: "multiple_active_workouts", sessions };
+    } catch {
+      return { status: "invalid" as const, reason: "active_workout_storage_read_failed", sessions: [] };
+    }
+  },
   exportPlan(planId: string) { return Object.values(jsonStore.get<Store>(key, {})).filter((value) => value.session.planId === planId).sort((a, b) => a.session.recordedSessionId.localeCompare(b.session.recordedSessionId)).map((value) => ({ session: value.session, events: value.events.slice() })); },
   deleteActive(recordedSessionId: string, expectedVersion: number) {
     try {

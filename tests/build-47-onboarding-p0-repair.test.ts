@@ -137,7 +137,9 @@ describe("Build 47 emergency onboarding P0 repair", () => {
     const settings = readFileSync("app/(protected)/settings.tsx", "utf8");
     expect(settings).toContain('params: { restart: "1" }');
     expect(layout).toContain('const explicitSetupRestart = isOnboardingRoute && restart === "1"');
-    expect(layout).toContain("reconciliation?.planVisible && isOnboardingRoute && !explicitSetupRestart");
+    expect(layout).toContain("resolveCanonicalExistingUserRoute");
+    expect(layout).toContain("explicitSetupRestart");
+    expect(layout).toContain('routeDecision.destination === "active_workout"');
   });
 
   it("waits through delayed authentication and account hydration without routing to onboarding", () => {
@@ -431,7 +433,8 @@ describe("Build 47 emergency onboarding P0 repair", () => {
     expect(source).toContain("accountRestoreFailedWithoutLocalPlan");
     expect(source).toContain("We couldn’t restore your training yet");
     expect(source).toContain("retryDataHydration");
-    expect(source).toContain("reconciliation?.planVisible && isOnboardingRoute");
+    expect(source).toContain("resolveCanonicalExistingUserRoute");
+    expect(source).toContain('routeDecision.status === "authenticated" && isOnboardingRoute');
     expect(source).not.toContain("settings.onboardingCompleted && !activeFixture && reconciliation");
   });
 });

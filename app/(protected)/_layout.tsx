@@ -8,6 +8,10 @@ import { useAppSettings } from "@/application/settings/app-settings";
 import { useSubscription } from "@/application/billing/subscription-context";
 import { getActiveDesignQaFixture, subscribeDesignQaFixture } from "@/application/design-qa/design-qa-fixtures";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import {
+  inspectCanonicalRetainedTrainingPresence,
+  resolveCanonicalExistingUserRoute,
+} from "@/application/training/canonical-existing-user-routing";
 import { backfillExistingUserOnboardingMetadata } from "@/application/training/canonical-onboarding-setup";
 import { resumePendingCanonicalCoachingWork } from "@/application/training/canonical-completion-evidence-reconciliation";
 import { reconcileCanonicalReleaseState, type CanonicalReleaseReconciliationResult } from "@/application/training/canonical-release-reconciliation";
@@ -15,7 +19,6 @@ import { resolveCanonicalStartupHydration } from "@/application/training/canonic
 import { getAppEnvironment } from "@/application/runtime/app-environment";
 import { isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/design-qa/design-qa-runtime";
 import { colors, spacing } from "@/ui/theme";
-import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { PrimaryButton } from "@/ui/primitives";
 
 export default function ProtectedLayout() {
@@ -31,16 +34,23 @@ export default function ProtectedLayout() {
   const isOnboardingRoute = segments.includes("onboarding");
   const explicitSetupRestart = isOnboardingRoute && restart === "1";
   const showDesignQaChrome = Boolean(activeFixture) && qaChrome === "1" && designQaRuntimeAvailable;
-  const localPlanStatus = canonicalActivePlanV2Repository.get().status;
+  const retainedTraining = inspectCanonicalRetainedTrainingPresence(user?.id ?? null);
   const startupHydration = resolveCanonicalStartupHydration({
     authLoading: isLoading,
     authenticatedUserId: user?.id ?? null,
-    localPlanStatus,
+    localPlanStatus: retainedTraining.localPlanStatus,
+    retainedTrainingStatus: retainedTraining.status,
     accountDataStatus: dataHydrationStatus,
   });
   const waitingForAccountRestore = startupHydration.status === "waiting"
     && startupHydration.reason === "account_data_restoring";
   const accountRestoreFailedWithoutLocalPlan = startupHydration.status === "retry_required";
+  const routeDecision = resolveCanonicalExistingUserRoute({
+    hydration: startupHydration,
+    reconciliation,
+    isOnboardingRoute,
+    explicitSetupRestart,
+  });
 
   useEffect(() => {
     if (!designQaRuntimeAvailable) { setActiveFixture(null); return; }
@@ -92,11 +102,12 @@ export default function ProtectedLayout() {
       </View>
     );
   }
-  if (!activeFixture && reconciliation === null) return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.background }}><ActivityIndicator color={colors.accent} /></View>;
-  if (!activeFixture && reconciliation?.planVisible && isOnboardingRoute && !explicitSetupRestart) return <Redirect href="/(protected)/(tabs)" />;
-  if (!activeFixture && ["onboarding_required", "setup_required"].includes(reconciliation?.status ?? "") && !isOnboardingRoute) return <Redirect href="/(protected)/onboarding" />;
-  if (!activeFixture && reconciliation && ["recovery_required", "retry_required", "infeasible"].includes(reconciliation.status)) {
-    return <View style={{ flex: 1, justifyContent: "center", backgroundColor: colors.background, padding: spacing.xl, gap: spacing.md }}><Text accessibilityRole="header" style={{ color: colors.text, fontSize: 24, fontWeight: "900" }}>Training needs a safe refresh</Text><Text style={{ color: colors.textMuted, fontSize: 16, lineHeight: 23 }}>{reconciliation.customerGuidance ?? "Your recorded history has not been changed. Try again before starting another workout."}</Text></View>;
+  if (!activeFixture && routeDecision.status === "waiting") return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.background }}><ActivityIndicator color={colors.accent} /></View>;
+  if (!activeFixture && routeDecision.status === "authenticated" && routeDecision.destination === "active_workout" && !segments.includes("train")) return <Redirect href="/(protected)/(tabs)/train" />;
+  if (!activeFixture && routeDecision.status === "authenticated" && isOnboardingRoute) return <Redirect href="/(protected)/(tabs)" />;
+  if (!activeFixture && routeDecision.status === "onboarding" && !isOnboardingRoute) return <Redirect href="/(protected)/onboarding" />;
+  if (!activeFixture && routeDecision.status === "recovery") {
+    return <View style={{ flex: 1, justifyContent: "center", backgroundColor: colors.background, padding: spacing.xl, gap: spacing.md }}><Text accessibilityRole="header" style={{ color: colors.text, fontSize: 24, fontWeight: "900" }}>We found training that needs restoring</Text><Text style={{ color: colors.textMuted, fontSize: 16, lineHeight: 23 }}>{reconciliation?.customerGuidance ?? "Your programme and workout have not been changed. Try restoring them again before setting up anything new."}</Text><PrimaryButton label="Try restoring training" onPress={retryDataHydration} /></View>;
   }
 
   return (
