@@ -300,9 +300,15 @@ describe("product flow architecture", () => {
     expect(source).toContain('step === "review" ? "Your Programme" : "Welcome"');
     expect(source).toContain("Programme summary");
     expect(source).toContain("ASC will use these choices to build your first programme.");
-    expect(source).toContain('creationPending ? "Creating Programme…" : creationCommitted ? "Open Programme" : "Create Programme"');
+    expect(source).toContain('creationRecoveryRequired');
+    expect(source).toContain('"Try restoring training"');
+    expect(source).toContain('"Creating Programme…"');
+    expect(source).toContain('"Open Programme"');
+    expect(source).toContain('"Create Programme"');
     expect(source).toContain(': "Continue"');
-    expect(source).toContain("onPress={step === \"review\" ? finish : goNext}");
+    expect(source).toContain('onPress={step === "review"');
+    expect(source).toContain(": finish");
+    expect(source).toContain(": goNext}");
     expect(source).not.toContain("blocks.join");
     expect(source).not.toContain('label="Blocks"');
     expect(source).not.toContain(" -> ");
