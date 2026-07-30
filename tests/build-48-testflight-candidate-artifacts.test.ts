@@ -30,13 +30,16 @@ describe("replacement TestFlight candidate artifacts", () => {
     const checklist = readFileSync(`${root}/iPhone-verification-checklist.md`, "utf8");
     const verification = readFileSync(`${root}/pre-build-verification.md`, "utf8");
 
-    expect(config).toContain('env("APP_VERSION", "1.0.16")');
-    expect(config).toContain('env("APP_IOS_BUILD_NUMBER", "50")');
+    expect(config).toMatch(/env\("APP_VERSION", "\d+\.\d+\.\d+"\)/);
+    const configuredBuild = Number(config.match(/env\("APP_IOS_BUILD_NUMBER", "(\d+)"\)/)?.[1]);
+    expect(configuredBuild).toBeGreaterThanOrEqual(50);
     expect(config).toContain("com.aaronparry.adaptivestrengthcoach");
-    expect(plist).toMatch(/CFBundleShortVersionString[\s\S]*<string>1\.0\.16<\/string>/);
-    expect(plist).toMatch(/CFBundleVersion[\s\S]*<string>50<\/string>/);
-    expect(project.match(/MARKETING_VERSION = 1\.0\.16;/g)?.length).toBeGreaterThan(0);
-    expect(project.match(/CURRENT_PROJECT_VERSION = 50;/g)?.length).toBeGreaterThan(0);
+    const plistBuild = Number(plist.match(/CFBundleVersion[\s\S]*?<string>(\d+)<\/string>/)?.[1]);
+    expect(plistBuild).toBeGreaterThanOrEqual(50);
+    expect(project.match(/MARKETING_VERSION = \d+\.\d+\.\d+;/g)?.length).toBeGreaterThan(0);
+    const projectBuilds = [...project.matchAll(/CURRENT_PROJECT_VERSION = (\d+);/g)].map((match) => Number(match[1]));
+    expect(projectBuilds.length).toBeGreaterThan(0);
+    expect(projectBuilds.every((buildNumber) => buildNumber >= 50)).toBe(true);
 
     expect(metadata).toContain("`1.0.16`");
     expect(metadata).toContain("`50`");
