@@ -19,10 +19,8 @@ describe("build 52 TestFlight candidate evidence", () => {
   it("ties the accepted production binary to the genuine route repair without overstating iPhone verification", () => {
     for (const file of required) expect(existsSync(`${root}/${file}`), file).toBe(true);
 
-    const config = readFileSync("app.config.ts", "utf8");
-    const plist = readFileSync("ios/AdaptiveStrengthCoach/Info.plist", "utf8");
-    const project = readFileSync("ios/AdaptiveStrengthCoach.xcodeproj/project.pbxproj", "utf8");
     const summary = readFileSync(`${root}/executive-summary.md`, "utf8");
+    const metadata = readFileSync(`${root}/release-metadata.md`, "utf8");
     const verification = readFileSync(`${root}/pre-build-verification.md`, "utf8");
     const build = readFileSync(`${root}/build-result.md`, "utf8");
     const upload = readFileSync(`${root}/upload-result.md`, "utf8");
@@ -30,13 +28,9 @@ describe("build 52 TestFlight candidate evidence", () => {
     const trace = readFileSync(`${root}/source-to-binary-traceability.md`, "utf8");
     const checklist = readFileSync(`${root}/iPhone-verification-checklist.md`, "utf8");
 
-    expect(config).toContain('env("APP_VERSION", "1.0.17")');
-    expect(config).toContain('env("APP_IOS_BUILD_NUMBER", "52")');
-    expect(config).toContain("com.aaronparry.adaptivestrengthcoach");
-    expect(plist).toMatch(/CFBundleShortVersionString[\s\S]*?<string>1\.0\.17<\/string>/);
-    expect(plist).toMatch(/CFBundleVersion[\s\S]*?<string>52<\/string>/);
-    expect(project.match(/MARKETING_VERSION = 1\.0\.17;/g)?.length).toBe(3);
-    expect(project.match(/CURRENT_PROJECT_VERSION = 52;/g)?.length).toBe(3);
+    expect(metadata).toContain("marketing version: `1.0.17`");
+    expect(metadata).toContain("iOS build number: `52`");
+    expect(metadata).toContain("bundle identifier: `com.aaronparry.adaptivestrengthcoach`");
 
     expect(summary).toContain("Genuine retained-state verification on the owner's iPhone remains **NOT PROVEN**");
     expect(verification).toContain("385 files, 2,359 tests passed");

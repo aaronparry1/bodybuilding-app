@@ -61,7 +61,7 @@ const revenueCatAnnualProductId = env("EXPO_PUBLIC_REVENUECAT_ANNUAL_PRODUCT_ID"
 const config: ExpoConfig = {
   name: appName,
   slug: env("APP_SLUG", "hypertrophy-app"),
-  version: env("APP_VERSION", "1.0.17"),
+  version: env("APP_VERSION", "1.0.18"),
   orientation: "portrait",
   icon: "./assets/icon.png",
   scheme: env("APP_SCHEME", isProduction ? "ironlogic" : isStaging ? "ironlogic-staging" : "ironlogic-dev"),
@@ -77,7 +77,7 @@ const config: ExpoConfig = {
           ? "com.aaronparry.adaptivestrengthcoach.staging"
           : "com.aaronparry.adaptivestrengthcoach.dev",
     ),
-    buildNumber: env("APP_IOS_BUILD_NUMBER", "52"),
+    buildNumber: env("APP_IOS_BUILD_NUMBER", "53"),
     associatedDomains: ["applinks:adaptivestrengthcoach.com"],
     infoPlist: {
       CFBundleDisplayName: env("APP_IOS_DISPLAY_NAME", appName),
