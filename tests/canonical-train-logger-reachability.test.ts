@@ -5,9 +5,11 @@ import { describe, expect, it } from "vitest";
 describe("canonical Train logger reachability", () => {
   it("mounts Train through canonical lifecycle owners only", () => {
     const source = readFileSync(resolve(process.cwd(), "app/(protected)/(tabs)/train.tsx"), "utf8");
+    const navigation = readFileSync(resolve(process.cwd(), "src/application/training/canonical-train-navigation.ts"), "utf8");
     expect(source).toContain("startCanonicalSession");
     expect(source).toContain("recordCanonicalPerformedWork");
-    expect(source).toContain("pauseCanonicalSession");
+    expect(source).toContain("minimiseCanonicalActiveWorkout");
+    expect(navigation).toContain("pauseCanonicalSession");
     expect(source).toContain("resumeCanonicalSession");
     expect(source).toContain("completeCanonicalSession");
     expect(source).not.toContain("useWorkoutLogger");

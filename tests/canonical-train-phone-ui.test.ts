@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { canonicalTrainCloseActions, canonicalTrainNarrowLayout, validateCanonicalCalibrationEntry, validateCanonicalTrainSetEntry } from "@/application/training/canonical-train-interaction";
+import { canonicalTrainNarrowLayout, canonicalTrainWorkoutActions, resolveCanonicalTrainCompletionAffordance, validateCanonicalCalibrationEntry, validateCanonicalTrainSetEntry } from "@/application/training/canonical-train-interaction";
 import { projectCanonicalWorkoutPresentation } from "@/application/training/canonical-workout-presentation";
 
 const trainSource = readFileSync("app/(protected)/(tabs)/train.tsx", "utf8");
@@ -8,19 +8,22 @@ const tabsSource = readFileSync("app/(protected)/(tabs)/_layout.tsx", "utf8");
 
 describe("phone-first canonical Train UI", () => {
   it("keeps preview read-only until its explicit Start action", () => {
-    const preview = trainSource.slice(trainSource.indexOf("function WorkoutPreview"), trainSource.indexOf("function ExerciseRail"));
+    const preview = trainSource.slice(trainSource.indexOf("function WorkoutPreview"), trainSource.indexOf("function ExerciseNavigator"));
     expect(preview).toContain("Start workout");
     expect(preview).not.toContain("startCanonicalSession");
     expect(preview).not.toContain("recordCanonicalPerformedWork");
   });
 
-  it("offers a safe close flow and routes system back through it", () => {
-    expect(canonicalTrainCloseActions.map((action) => action.label)).toEqual(["Continue workout", "Pause and leave", "Discard workout"]);
+  it("offers distinct minimise, finish-early, and discard actions and routes system back through minimise", () => {
+    expect(canonicalTrainWorkoutActions.map((action) => action.label)).toEqual(["Resume later", "Finish early", "Discard workout"]);
     expect(trainSource).toContain("BackHandler.addEventListener");
-    expect(trainSource).toContain('setModal("close")');
+    expect(trainSource).toContain("pauseAndLeave()");
+    expect(trainSource).toContain('setModal("actions")');
+    expect(trainSource).toContain("Minimise workout and return to Home");
     expect(trainSource).toContain("Discard active attempt?");
     expect(tabsSource).toMatch(/name="train" options=\{\{ title: "Train", headerShown: false/);
-    expect(tabsSource).toContain("focusedWorkoutActive");
+    expect(tabsSource).toContain("minimiseBeforeLeavingTrain");
+    expect(tabsSource).not.toContain("focusedWorkoutActive ? null");
   });
 
   it("uses a bounded four-column set row with a non-wrapping accessible completion control", () => {
@@ -60,11 +63,22 @@ describe("phone-first canonical Train UI", () => {
     expect(trainSource).toContain("Confirm starting load");
   });
 
-  it("wires persisted rest controls, completed-set editing, and explained finish eligibility", () => {
-    for (const token of ["restoreCanonicalRestTimer", "pauseCanonicalRestTimer", "resumeCanonicalRestTimer", "addCanonicalRestTime", "skipCanonicalRestTimer", "editCanonicalPerformedWork", "Finish workout unavailable"]) expect(trainSource).toContain(token);
+  it("wires persisted rest controls, completed-set editing, and truthful completion affordances", () => {
+    for (const token of ["restoreCanonicalRestTimer", "pauseCanonicalRestTimer", "resumeCanonicalRestTimer", "addCanonicalRestTime", "skipCanonicalRestTimer", "editCanonicalPerformedWork", "Finish early?"]) expect(trainSource).toContain(token);
     expect(trainSource).toContain("Edit completed set");
     expect(trainSource).toContain("Save edits to set");
-    expect(trainSource).toContain("Your recorded working sets are ready to complete.");
+    expect(resolveCanonicalTrainCompletionAffordance(1, 22, true)).toEqual({ normalFinishAvailable: false, earlyFinishAvailable: true, completedSets: 1, remainingSets: 21 });
+    expect(resolveCanonicalTrainCompletionAffordance(22, 22, true)).toEqual({ normalFinishAvailable: true, earlyFinishAvailable: false, completedSets: 22, remainingSets: 0 });
+    expect(trainSource).not.toContain("Your recorded working sets are ready to complete.");
+  });
+
+  it("keeps the current exercise focused and opens the full list only on demand", () => {
+    expect(trainSource).toContain("function ExerciseNavigator");
+    expect(trainSource).toContain("function ExerciseSwitcherModal");
+    expect(trainSource).toContain('testID="train-exercise-switcher-open"');
+    expect(trainSource).toContain('testID="train-all-sets-toggle"');
+    expect(trainSource).not.toContain("function ExerciseRail");
+    expect(trainSource).not.toContain("<ExerciseRail");
   });
 
   it("rejects legacy authority and raw internal labels recursively", () => {

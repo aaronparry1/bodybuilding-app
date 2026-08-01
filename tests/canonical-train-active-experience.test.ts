@@ -12,6 +12,9 @@ import {
   startCanonicalSession,
 } from "@/application/training/canonical-recorded-session-application";
 import { projectCanonicalWorkoutPresentation } from "@/application/training/canonical-workout-presentation";
+import { minimiseCanonicalActiveWorkout } from "@/application/training/canonical-train-navigation";
+import { readCanonicalHomeProjection } from "@/application/training/canonical-home-projection";
+import { inspectCanonicalRetainedTrainingPresence } from "@/application/training/canonical-existing-user-routing";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
@@ -58,6 +61,79 @@ describe("canonical active Train lifecycle", () => {
     expect(model?.plannedSessions.some((session) => session.id === second.plannedSessionId && session.status === "planned")).toBe(true);
     const preserved = canonicalRecordedSessionLedger.get(first.recordedSessionId);
     expect(preserved.status === "found" && preserved.session.status).toBe("completed");
+  });
+
+  it("minimises to authenticated tabs without losing identity and resumes the same attempt after two restarts", () => {
+    const started = startNext("minimise-start");
+    const performed = recordFirstSet(started, "minimise-work", 72.5, 8);
+    const before = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    if (before.status !== "found") throw new Error("recorded session missing");
+    const immutablePrescription = JSON.stringify(before.session.prescriptionSnapshot);
+
+    const minimised = minimiseCanonicalActiveWorkout({
+      planId: started.planId,
+      planRevision: started.planRevision,
+      recordedSessionId: started.recordedSessionId,
+      ledgerVersion: performed.ledgerVersion!,
+      lifecycle: "started",
+      operationId: "minimise-active-attempt",
+      occurredAt: "2026-01-01T11:00:00.000Z",
+      provenance: "canonical_train_navigation_test",
+    });
+    expect(minimised.status).toBe("applied");
+    expect(canonicalRecordedSessionLedger.get(started.recordedSessionId)).toMatchObject({ status: "found", session: { status: "paused" } });
+    expect(inspectCanonicalRetainedTrainingPresence(null)).toMatchObject({ activeRecordedSessionId: started.recordedSessionId, activeRecordedSessionStatus: "paused" });
+    expect(canonicalRestTimerRepository.get(started.recordedSessionId)?.state).toBe("paused");
+    expect(readCanonicalHomeProjection().primary).toMatchObject({ kind: "active", ctaLabel: "Resume workout", action: { type: "resume_recorded_session", sessionId: started.recordedSessionId } });
+
+    const pausedAggregate = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    if (pausedAggregate.status !== "found") throw new Error("paused session missing");
+    expect(minimiseCanonicalActiveWorkout({
+      planId: started.planId,
+      planRevision: minimised.planRevision!,
+      recordedSessionId: started.recordedSessionId,
+      ledgerVersion: pausedAggregate.session.version,
+      lifecycle: "paused",
+      operationId: "minimise-active-attempt-repeat",
+      occurredAt: "2026-01-01T11:01:00.000Z",
+      provenance: "canonical_train_navigation_test",
+    }).status).toBe("idempotent");
+
+    for (let restart = 0; restart < 2; restart += 1) {
+      jsonStore.resetCache();
+      canonicalActivePlanState.hydrate();
+      const restored = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+      expect(restored).toMatchObject({ status: "found", session: { status: "paused" } });
+      if (restored.status === "found") expect(JSON.stringify(restored.session.prescriptionSnapshot)).toBe(immutablePrescription);
+      expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession?.recordedSessionId).toBe(started.recordedSessionId);
+    }
+
+    const restored = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    if (restored.status !== "found") throw new Error("restored session missing");
+    const resumed = resumeCanonicalSession(command(started.planId, canonicalActivePlanState.getReadModel()!.revision, started.recordedSessionId, restored.session.version, "minimise-resume"));
+    expect(resumed.status).toBe("applied");
+    expect(canonicalRecordedSessionLedger.get(started.recordedSessionId)).toMatchObject({ status: "found", session: { status: "started" } });
+  });
+
+  it("records an explicitly early finish as partial without inventing the remaining work", () => {
+    const started = startNext("finish-early-start");
+    const performed = recordFirstSet(started, "finish-early-work", 70, 8);
+    const before = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    if (before.status !== "found") throw new Error("recorded session missing");
+    const presentation = projectCanonicalWorkoutPresentation({ session: before.session, snapshot: before.session.prescriptionSnapshot, events: before.events });
+    expect(presentation.completedSets).toBe(1);
+    expect(presentation.totalSets).toBeGreaterThan(1);
+    expect(deriveCanonicalCompletionSummary(before.session, before.events).completion).toBe("partial");
+
+    const completed = completeCanonicalSession(command(started.planId, started.planRevision, started.recordedSessionId, performed.ledgerVersion!, "finish-early-confirm"));
+    expect(completed.status).toBe("applied");
+    const after = canonicalRecordedSessionLedger.get(started.recordedSessionId);
+    if (after.status !== "found") throw new Error("completed session missing");
+    expect(after.session.status).toBe("completed");
+    const completion = after.events.find((event) => event.type === "completed");
+    expect(completion?.payload.summary).toMatchObject({ completion: "partial", performedSets: 1 });
+    expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).toBeNull();
+    expect(completeCanonicalSession(command(started.planId, canonicalActivePlanState.getReadModel()!.revision, started.recordedSessionId, after.session.version, "finish-early-duplicate"))).toMatchObject({ status: "idempotent" });
   });
 
   it("repairs one exact completed set without duplicating ledger, evidence, completion, or display facts", () => {

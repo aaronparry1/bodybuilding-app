@@ -16,11 +16,12 @@ describe("global application shell and Home boundary", () => {
     expect(readFileSync("src/ui/app-shell.tsx", "utf8")).toContain('accessibilityLabel="Open settings"');
   });
 
-  it("hides tabs only while the focused canonical workout is active", () => {
+  it("keeps tabs available and persists the active workout before leaving Train", () => {
     expect(tabs).toContain('const trainFocused = segments.includes("train")');
-    expect(tabs).toContain("trainFocused && Boolean(planState.model?.activeRecordedSession)");
-    expect(tabs).toContain("focusedWorkoutActive ? null : <CompactTabBar");
-    expect(tabs).not.toContain("workoutRoute ? null");
+    expect(tabs).toContain("minimiseBeforeLeavingTrain");
+    expect(tabs).toContain("minimiseCanonicalActiveWorkout");
+    expect(tabs).toContain("onBeforeNavigate?.(route.name)");
+    expect(tabs).not.toContain("focusedWorkoutActive ? null");
   });
 
   it("keeps Home projection-only and lifecycle-mutation free", () => {
@@ -40,7 +41,7 @@ describe("global application shell and Home boundary", () => {
     expect(protectedLayout).toContain("inspectCanonicalRetainedTrainingPresence");
     expect(protectedLayout).toContain('<Redirect href="/(protected)/onboarding"');
     expect(protectedLayout).toContain('routeDecision.status === "authenticated" && isOnboardingRoute');
-    expect(protectedLayout).toContain('routeDecision.destination === "active_workout"');
+    expect(protectedLayout).toContain("shouldAutoEnterCanonicalActiveWorkout");
     expect(protectedLayout).toContain('<Redirect href="/(protected)/(tabs)"');
     expect(protectedLayout).toContain("canonicalActivePlanState.hydrate");
   });

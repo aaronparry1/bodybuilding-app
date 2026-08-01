@@ -16,6 +16,7 @@ export type CanonicalRetainedTrainingPresence = Readonly<{
   reason: string;
   planId?: string;
   activeRecordedSessionId?: string;
+  activeRecordedSessionStatus?: "started" | "paused";
 }>;
 
 export type CanonicalExistingUserRouteDecision =
@@ -23,6 +24,17 @@ export type CanonicalExistingUserRouteDecision =
   | Readonly<{ status: "authenticated"; destination: "tabs" | "active_workout"; reason: string }>
   | Readonly<{ status: "onboarding"; reason: string }>
   | Readonly<{ status: "recovery"; reason: string }>;
+
+export function shouldAutoEnterCanonicalActiveWorkout(input: Readonly<{
+  routeDecision: CanonicalExistingUserRouteDecision;
+  retainedTraining: CanonicalRetainedTrainingPresence;
+  isTrainRoute: boolean;
+}>): boolean {
+  return input.routeDecision.status === "authenticated"
+    && input.routeDecision.destination === "active_workout"
+    && !input.isTrainRoute
+    && input.retainedTraining.activeRecordedSessionStatus !== "paused";
+}
 
 /**
  * Read-only retained-state probe. It prevents a durable workout from being
@@ -56,7 +68,7 @@ export function inspectCanonicalRetainedTrainingPresence(
         status: "account_mismatch",
         reason: "retained_training_belongs_to_different_account",
         planId: owner.record.planId,
-        ...(activeSession ? { activeRecordedSessionId: activeSession.recordedSessionId } : {}),
+        ...(activeSession ? { activeRecordedSessionId: activeSession.recordedSessionId, activeRecordedSessionStatus: activeSession.status as "started" | "paused" } : {}),
       };
     }
     if (plan.status === "saved" && owner.record.planId !== plan.carrier.planId) {
@@ -69,6 +81,7 @@ export function inspectCanonicalRetainedTrainingPresence(
         reason: "active_workout_owner_identity_mismatch",
         planId: owner.record.planId,
         activeRecordedSessionId: activeSession.recordedSessionId,
+        activeRecordedSessionStatus: activeSession.status as "started" | "paused",
       };
     }
   }
@@ -81,6 +94,7 @@ export function inspectCanonicalRetainedTrainingPresence(
         reason: "active_workout_plan_identity_mismatch",
         planId: plan.carrier.planId,
         activeRecordedSessionId: activeSession.recordedSessionId,
+        activeRecordedSessionStatus: activeSession.status as "started" | "paused",
       };
     }
     return {
@@ -88,7 +102,7 @@ export function inspectCanonicalRetainedTrainingPresence(
       status: activeSession ? "plan_with_active_workout" : "plan",
       reason: activeSession ? "retained_plan_and_active_workout_found" : "retained_plan_found",
       planId: plan.carrier.planId,
-      ...(activeSession ? { activeRecordedSessionId: activeSession.recordedSessionId } : {}),
+      ...(activeSession ? { activeRecordedSessionId: activeSession.recordedSessionId, activeRecordedSessionStatus: activeSession.status as "started" | "paused" } : {}),
     };
   }
 
@@ -101,6 +115,7 @@ export function inspectCanonicalRetainedTrainingPresence(
         : "active_workout_ownership_unresolved",
       planId: activeSession.planId,
       activeRecordedSessionId: activeSession.recordedSessionId,
+      activeRecordedSessionStatus: activeSession.status as "started" | "paused",
     };
   }
 

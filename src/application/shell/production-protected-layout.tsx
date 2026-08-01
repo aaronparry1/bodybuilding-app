@@ -9,6 +9,7 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import {
   inspectCanonicalRetainedTrainingPresence,
   resolveCanonicalExistingUserRoute,
+  shouldAutoEnterCanonicalActiveWorkout,
 } from "@/application/training/canonical-existing-user-routing";
 import { backfillExistingUserOnboardingMetadata } from "@/application/training/canonical-onboarding-setup";
 import { resumePendingCanonicalCoachingWork } from "@/application/training/canonical-completion-evidence-reconciliation";
@@ -95,7 +96,7 @@ export default function ProductionProtectedLayout() {
       </View>
     );
   }
-  if (routeDecision.status === "authenticated" && routeDecision.destination === "active_workout" && !isTrainRoute) {
+  if (shouldAutoEnterCanonicalActiveWorkout({ routeDecision, retainedTraining, isTrainRoute })) {
     return <Redirect href="/(protected)/(tabs)/train" />;
   }
   if (routeDecision.status === "authenticated" && isOnboardingRoute) return <Redirect href="/(protected)/(tabs)" />;

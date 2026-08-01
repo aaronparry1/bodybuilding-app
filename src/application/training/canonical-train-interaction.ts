@@ -38,8 +38,31 @@ export function canonicalTrainNarrowLayout(viewportWidth: number, fontScale = 1)
   return { rowGap: narrow ? 6 : 8, setWidth: narrow ? 36 : 42, doneWidth: 48, minimumHitSize: 44, horizontalOverflow: false, completionCanWrap: false };
 }
 
-export const canonicalTrainCloseActions = [
-  { id: "continue", label: "Continue workout", effect: "none" },
-  { id: "pause_leave", label: "Pause and leave", effect: "persist_and_pause" },
+export type CanonicalTrainCompletionAffordance = Readonly<{
+  normalFinishAvailable: boolean;
+  earlyFinishAvailable: boolean;
+  completedSets: number;
+  remainingSets: number;
+}>;
+
+export function resolveCanonicalTrainCompletionAffordance(
+  completedSets: number,
+  totalSets: number,
+  finishAllowed: boolean,
+): CanonicalTrainCompletionAffordance {
+  const boundedCompleted = Math.max(0, Math.min(completedSets, Math.max(0, totalSets)));
+  const remainingSets = Math.max(0, totalSets - boundedCompleted);
+  const normalFinishAvailable = totalSets > 0 && remainingSets === 0 && finishAllowed;
+  return {
+    normalFinishAvailable,
+    earlyFinishAvailable: finishAllowed && boundedCompleted > 0 && remainingSets > 0,
+    completedSets: boundedCompleted,
+    remainingSets,
+  };
+}
+
+export const canonicalTrainWorkoutActions = [
+  { id: "minimise", label: "Resume later", effect: "persist_and_pause" },
+  { id: "finish_early", label: "Finish early", effect: "complete_partial_truthfully" },
   { id: "discard", label: "Discard workout", effect: "clear_active_attempt_only" },
 ] as const;

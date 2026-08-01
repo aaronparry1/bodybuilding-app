@@ -11,6 +11,7 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import {
   inspectCanonicalRetainedTrainingPresence,
   resolveCanonicalExistingUserRoute,
+  shouldAutoEnterCanonicalActiveWorkout,
 } from "@/application/training/canonical-existing-user-routing";
 import { backfillExistingUserOnboardingMetadata } from "@/application/training/canonical-onboarding-setup";
 import { resumePendingCanonicalCoachingWork } from "@/application/training/canonical-completion-evidence-reconciliation";
@@ -103,7 +104,7 @@ export default function ProtectedLayout() {
     );
   }
   if (!activeFixture && routeDecision.status === "waiting") return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.background }}><ActivityIndicator color={colors.accent} /></View>;
-  if (!activeFixture && routeDecision.status === "authenticated" && routeDecision.destination === "active_workout" && !segments.includes("train")) return <Redirect href="/(protected)/(tabs)/train" />;
+  if (!activeFixture && shouldAutoEnterCanonicalActiveWorkout({ routeDecision, retainedTraining, isTrainRoute: segments.includes("train") })) return <Redirect href="/(protected)/(tabs)/train" />;
   if (!activeFixture && routeDecision.status === "authenticated" && isOnboardingRoute) return <Redirect href="/(protected)/(tabs)" />;
   if (!activeFixture && routeDecision.status === "onboarding" && !isOnboardingRoute) return <Redirect href="/(protected)/onboarding" />;
   if (!activeFixture && routeDecision.status === "recovery") {

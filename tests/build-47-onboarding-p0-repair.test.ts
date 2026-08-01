@@ -139,7 +139,7 @@ describe("Build 47 emergency onboarding P0 repair", () => {
     expect(layout).toContain('const explicitSetupRestart = isOnboardingRoute && restart === "1"');
     expect(layout).toContain("resolveCanonicalExistingUserRoute");
     expect(layout).toContain("explicitSetupRestart");
-    expect(layout).toContain('routeDecision.destination === "active_workout"');
+    expect(layout).toContain("shouldAutoEnterCanonicalActiveWorkout");
   });
 
   it("waits through delayed authentication and account hydration without routing to onboarding", () => {

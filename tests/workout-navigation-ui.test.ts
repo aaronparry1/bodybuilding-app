@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const train = readFileSync("app/(protected)/(tabs)/train.tsx", "utf8");
 const home = readFileSync("app/(protected)/(tabs)/index.tsx", "utf8");
+const trainNavigation = readFileSync("src/application/training/canonical-train-navigation.ts", "utf8");
 
 describe("canonical Train navigation and lifecycle boundary", () => {
   it("accepts canonical planned and recorded identities only", () => {
@@ -16,7 +17,8 @@ describe("canonical Train navigation and lifecycle boundary", () => {
   it("uses the immutable snapshot and canonical ledger operations", () => {
     expect(train).toContain("prescriptionSnapshot");
     expect(train).toContain("canonicalRecordedSessionLedger");
-    expect(train).toContain("pauseCanonicalSession");
+    expect(train).toContain("minimiseCanonicalActiveWorkout");
+    expect(trainNavigation).toContain("pauseCanonicalSession");
     expect(train).toContain("resumeCanonicalSession");
     expect(train).toContain("completeCanonicalSession");
     expect(train).toContain("recordCanonicalPerformedWork");
