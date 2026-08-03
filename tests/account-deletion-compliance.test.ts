@@ -141,6 +141,32 @@ describe("public account deletion compliance", () => {
     expect(isAllowedRequestOrigin("https://attacker.example")).toBe(false);
   });
 
+  it("accepts WebKit's opaque Origin only for a same-site form navigation to the canonical host", async () => {
+    const provider = vi.fn(async () => new Response("{}", { status: 200 }));
+    const server = createWebsiteServer({ fetchImpl: provider, config, rateLimiter: createDeletionRateLimiter() });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server address unavailable");
+    try {
+      const submit = (site: string, host: string) => fetch(`http://127.0.0.1:${address.port}/api/delete-account/request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-Forwarded-Host": host,
+          Origin: "null",
+          "Sec-Fetch-Site": site,
+        },
+        body: new URLSearchParams({ email: "private@example.com" }),
+      });
+      expect((await submit("same-origin", "adaptivestrengthcoach.com")).status).toBe(202);
+      expect((await submit("cross-site", "adaptivestrengthcoach.com")).status).toBe(403);
+      expect((await submit("same-origin", "attacker.example")).status).toBe(403);
+      expect(provider).toHaveBeenCalledTimes(1);
+    } finally {
+      await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+    }
+  });
+
   it("serves a JavaScript-free valid request confirmation without reflecting the email", async () => {
     const provider = vi.fn(async () => new Response("{}", { status: 200 }));
     const server = createWebsiteServer({ fetchImpl: provider, config, rateLimiter: createDeletionRateLimiter() });

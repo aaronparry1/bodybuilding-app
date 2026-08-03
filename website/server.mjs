@@ -62,7 +62,7 @@ export function createWebsiteServer({ fetchImpl = fetch, config = deletionConfig
 }
 
 async function handleDeletionRequest({ request, response, fetchImpl, config, rateLimiter }) {
-  if (!isAllowedRequestOrigin(request.headers.origin, config.siteOrigin)) {
+  if (!isAllowedRequestOrigin(request.headers.origin, config.siteOrigin) && !isTrustedOpaqueFormNavigation(request, config.siteOrigin)) {
     sendHtml(response, 403, deletionResponsePage("Request blocked", "Open the account deletion page directly and try again."));
     return;
   }
@@ -105,6 +105,17 @@ async function handleDeletionRequest({ request, response, fetchImpl, config, rat
     return;
   }
   sendHtml(response, 202, deletionResponsePage("Check your email", genericRequestMessage));
+}
+
+function isTrustedOpaqueFormNavigation(request, siteOrigin) {
+  if (request.headers.origin !== "null" || request.headers["sec-fetch-site"] !== "same-origin") return false;
+  try {
+    const expectedHost = new URL(siteOrigin).host;
+    const actualHost = request.headers["x-forwarded-host"]?.split(",")[0]?.trim() || request.headers.host || "";
+    return expectedHost === actualHost;
+  } catch {
+    return false;
+  }
 }
 
 async function handleDeletionConfirmation({ request, response, fetchImpl, config, rateLimiter }) {
