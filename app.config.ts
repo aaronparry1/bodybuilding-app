@@ -156,7 +156,7 @@ const config: ExpoConfig = {
     },
     privacyPolicyUrl: env("APP_PRIVACY_POLICY_URL", "https://adaptivestrengthcoach.com/privacy"),
     termsUrl: env("APP_TERMS_URL", "https://adaptivestrengthcoach.com/terms"),
-    supportEmail: env("APP_SUPPORT_EMAIL", "support@example.com"),
+    supportEmail: env("APP_SUPPORT_EMAIL", "support@adaptivestrengthcoach.com"),
     appDownloadUrl,
     appStoreUrl,
     googlePlayUrl,

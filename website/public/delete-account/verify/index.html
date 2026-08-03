@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Confirm account deletion | Adaptive Strength Coach</title>
+    <link rel="icon" href="/assets/favicon.png" />
+    <link rel="stylesheet" href="/styles.css?v=20260803" />
+    <script src="/delete-account/verify.js?v=20260803" defer></script>
+  </head>
+  <body>
+    <main class="section legal-page deletion-page">
+      <section class="page-hero">
+        <p class="eyebrow">Secure verification</p>
+        <h1>Confirm permanent deletion</h1>
+        <p class="lede">This permanently deletes your Adaptive Strength Coach account and associated cloud data. It does not cancel an Apple App Store or Google Play subscription.</p>
+      </section>
+      <section class="legal-card" data-deletion-verification>
+        <noscript><p class="alert">JavaScript is required only for the final verified deletion step because the one-time access token is held securely in the URL fragment and is never sent in a page URL or server log.</p></noscript>
+        <div data-verification-pending>
+          <h2>Ready to verify</h2>
+          <p>The link must be opened from the verification email sent to the account owner.</p>
+        </div>
+        <div data-verification-confirm hidden>
+          <h2>Delete account and cloud data?</h2>
+          <p>This cannot be undone. Your local copy on this device is separate; uninstall or clear app storage to remove it.</p>
+          <button class="button button--danger" type="button" data-confirm-deletion>Delete account permanently</button>
+        </div>
+        <div data-verification-result role="status" aria-live="polite" hidden></div>
+        <div class="actions"><a class="button button--secondary" href="/delete-account/">Cancel and return</a></div>
+      </section>
+    </main>
+  </body>
+</html>

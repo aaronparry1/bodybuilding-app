@@ -3,23 +3,103 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Delete Account | Adaptive Strength Coach</title>
-    <meta name="description" content="How to request Adaptive Strength Coach account deletion." />
+    <title>Delete your Adaptive Strength Coach account | Arx Algorithms</title>
+    <meta name="description" content="Request permanent deletion of your Adaptive Strength Coach account and associated cloud data from Arx Algorithms." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://adaptivestrengthcoach.com/delete-account/" />
     <link rel="icon" href="/assets/favicon.png" />
-    <link rel="stylesheet" href="/styles.css?v=20260625" />
+    <link rel="stylesheet" href="/styles.css?v=20260803" />
   </head>
   <body>
-    <main class="section">
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a class="brand" href="/">
+          <img src="/assets/logo.png" alt="Adaptive Strength Coach logo" />
+          <span class="brand__text">
+            <span class="brand__name">Adaptive Strength Coach</span>
+            <span class="brand__sub">by Arx Algorithms</span>
+          </span>
+        </a>
+        <nav class="nav" aria-label="Primary navigation">
+          <a href="/privacy/">Privacy</a>
+          <a href="/support/">Support</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="section legal-page deletion-page">
       <div class="page-hero">
         <p class="eyebrow">Account deletion</p>
-        <h1>Delete your account.</h1>
-        <p class="lede">To request deletion of your Adaptive Strength Coach account and associated cloud training data, email support@adaptivestrengthcoach.com from the email address used for the account.</p>
-        <p>Store subscriptions must still be cancelled through the App Store or Google Play account where the subscription was created.</p>
-        <div class="actions">
-          <a class="button button--primary" href="mailto:support@adaptivestrengthcoach.com?subject=Adaptive%20Strength%20Coach%20account%20deletion">Request deletion</a>
-          <a class="button button--secondary" href="/">Home</a>
-        </div>
+        <h1>Delete your Adaptive Strength Coach account</h1>
+        <p class="lede">Adaptive Strength Coach is provided by Arx Algorithms. You can start permanent account deletion here without reinstalling or opening the app.</p>
       </div>
+
+      <section class="legal-card deletion-grid" aria-labelledby="request-heading">
+        <div>
+          <h2 id="request-heading">Request deletion</h2>
+          <p>Enter only the email address used for your Adaptive Strength Coach account. We will send a secure link to that address so another person cannot delete your account.</p>
+          <form class="deletion-form" method="post" action="/api/delete-account/request" autocomplete="on">
+            <div class="form-field">
+              <label for="deletion-email">Account email</label>
+              <input id="deletion-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required aria-describedby="deletion-email-help" />
+              <p id="deletion-email-help" class="small">Your password is never requested by this page.</p>
+            </div>
+            <div class="form-trap" aria-hidden="true">
+              <label for="deletion-website">Website</label>
+              <input id="deletion-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+            <button class="button button--danger" type="submit">Send secure deletion link</button>
+          </form>
+        </div>
+        <aside class="deletion-note" aria-labelledby="verification-heading">
+          <h3 id="verification-heading">What happens next</h3>
+          <ol>
+            <li>If the email belongs to an account, Supabase sends a one-time verification link.</li>
+            <li>Open the link and deliberately confirm permanent deletion.</li>
+            <li>The service removes the RevenueCat customer profile, then the Supabase auth account and its account-linked cloud rows.</li>
+            <li>A non-sensitive completion receipt is shown only after every configured deletion step succeeds.</li>
+          </ol>
+          <p class="small">For privacy, the request result does not reveal whether an email address is registered. A request is not complete until the confirmation page says the account was deleted.</p>
+        </aside>
+      </section>
+
+      <section class="legal-card" aria-labelledby="deleted-heading">
+        <h2 id="deleted-heading">Data deleted</h2>
+        <p>After successful confirmation, deletion is immediate in the live service and includes:</p>
+        <ul>
+          <li>your Supabase authentication account, email identity, active sessions and cloud profile;</li>
+          <li>account-linked cloud rows, including any synced settings, custom training content, plans or workout records that exist for that account;</li>
+          <li>your RevenueCat customer profile and entitlement history associated with the Adaptive Strength Coach user ID.</li>
+        </ul>
+        <p>Adaptive Strength Coach currently has no Supabase file-storage buckets, so there are no account uploads or photos to delete from that service. Data stored only on your phone is not remotely accessible to Arx Algorithms; remove the app or clear its storage to erase that local copy.</p>
+      </section>
+
+      <section class="legal-card" aria-labelledby="retained-heading">
+        <h2 id="retained-heading">Data not controlled by the deleted app account</h2>
+        <ul>
+          <li><strong>Apple App Store or Google Play records:</strong> deleting the app account does not cancel a store subscription. Cancel it in the store where it was purchased. Apple and Google may retain transaction records for billing, fraud prevention, tax and legal compliance under their own published retention policies; Arx Algorithms does not control those periods.</li>
+          <li><strong>Security and infrastructure logs:</strong> the deletion form keeps the email and access token out of page URLs and application logs. The current Supabase plan retains platform logs for one day. Routine Railway service logs may be retained for the plan-specific platform period, but this application does not write the submitted email or token to them.</li>
+          <li><strong>Support correspondence:</strong> no support message is created by the automated form. If you separately email support, that correspondence is retained only as described in the Privacy Policy.</li>
+        </ul>
+        <p>The current Supabase project has no automatic database backups. If the infrastructure plan changes, this page and the Privacy Policy must be updated before different retention is claimed.</p>
+      </section>
+
+      <section class="legal-card" aria-labelledby="in-app-heading">
+        <h2 id="in-app-heading">Delete from the app</h2>
+        <p>In Adaptive Strength Coach, open <strong>Account</strong>, then choose <strong>Delete account</strong>. That action opens this same secure request flow. Logging out, uninstalling the app, pausing a workout or cancelling a subscription does not delete the account.</p>
+        <p>Need help? Contact <a href="mailto:support@adaptivestrengthcoach.com">support@adaptivestrengthcoach.com</a>. Never send your password.</p>
+        <div class="actions">
+          <a class="button button--secondary" href="/privacy/">Read the Privacy Policy</a>
+          <a class="button button--secondary" href="/support/">Support</a>
+        </div>
+      </section>
     </main>
+
+    <footer class="footer">
+      <div class="footer__inner">
+        <span>Adaptive Strength Coach · Arx Algorithms</span>
+        <div class="footer__links"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/support/">Support</a></div>
+      </div>
+    </footer>
   </body>
 </html>

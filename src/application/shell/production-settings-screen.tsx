@@ -1,6 +1,7 @@
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { openAccountDeletionRequest } from "@/application/account/account-deletion";
 import { buildDataSafetyStatus } from "@/application/account/data-safety-status";
 import { useAuth } from "@/application/auth/auth-context";
 import { useSubscription } from "@/application/billing/subscription-context";
@@ -48,7 +49,12 @@ export default function ProductionSettingsScreen() {
       <ScreenHeader eyebrow="Settings" title="Training controls" subtitle="Manage preferences, backup and your programme." />
       {accountError ? <Text accessibilityRole="alert" style={{ color: colors.danger }}>{accountError}</Text> : null}
       <SectionHeader title="Account" />
-      <PremiumCard><Text style={{ color: colors.text }}>Backup: {dataSafety.status}</Text>{user ? <SecondaryButton label="Retry sync" onPress={() => runManualSync(user.id, billing.subscription)} /> : null}</PremiumCard>
+      <PremiumCard>
+        <Text style={{ color: colors.text }}>Backup: {dataSafety.status}</Text>
+        {user ? <SecondaryButton label="Retry sync" onPress={() => runManualSync(user.id, billing.subscription)} /> : null}
+        <Text style={{ color: colors.textMuted }}>Delete your account and associated cloud data through the secure verification page. This is separate from logging out or cancelling a subscription.</Text>
+        <SecondaryButton label="Delete account" onPress={() => void openAccountDeletionRequest()} />
+      </PremiumCard>
       <SectionHeader title="Subscription" />
       <PremiumCard>
         <Text style={{ color: colors.text }}>Plan: {billing.planLabel}</Text>

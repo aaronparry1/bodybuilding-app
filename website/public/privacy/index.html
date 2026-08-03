@@ -32,7 +32,7 @@
         <p class="eyebrow">Privacy</p>
         <h1>Privacy Policy</h1>
         <p class="lede">This Privacy Policy explains how Adaptive Strength Coach collects, uses, stores, and shares information when you use the app, website, subscriptions, support, and related services.</p>
-        <p class="small">Last updated: June 18, 2026.</p>
+        <p class="small">Last updated: August 3, 2026.</p>
         <p class="small">This policy is intended to be practical and robust, but it is not a substitute for solicitor review.</p>
       </div>
 
@@ -56,7 +56,7 @@
 
       <section id="controller" class="legal-card">
         <h2>1. Controller and Contact</h2>
-        <p>Adaptive Strength Coach is responsible for deciding how personal data is used for the app and website.</p>
+        <p>Arx Algorithms, the developer of Adaptive Strength Coach, is responsible for deciding how personal data is used for the app and website.</p>
         <p>Contact: <a href="mailto:support@adaptivestrengthcoach.com">support@adaptivestrengthcoach.com</a></p>
         <p>If you contact us about privacy, account deletion, data export, correction, or access, please use the email address associated with your account where possible so we can verify the request.</p>
       </section>
@@ -161,13 +161,13 @@
 
       <section id="sync" class="legal-card">
         <h2>5. Cloud Storage and Sync</h2>
-        <p>We use Supabase to support account authentication, cloud storage, and sync of supported app data. This can include account identifiers, active plan data, completed workout history, settings, custom exercises/programmes, and other source data needed to restore progress features.</p>
-        <p>Some data may remain local-only or may sync only when you are signed in, online, and the relevant feature supports cloud sync. Derived reports may be rebuilt from stored workout history rather than stored separately.</p>
+        <p>We use Supabase for account authentication and the cloud account profile. The app also contains cloud-sync requests for supported settings, active-plan and completed-training data. Those requests run only when you are signed in and online; unsupported or unavailable cloud tables fail closed and the training data remains local to the device.</p>
+        <p>The current live production database contains the account profile table and no file-storage buckets. Some training data therefore remains local-only. Derived reports may be rebuilt from local workout history rather than stored separately.</p>
       </section>
 
       <section id="analytics" class="legal-card">
         <h2>6. Diagnostics, Analytics, and Support</h2>
-        <p>We may use diagnostics or analytics tools to understand app reliability, crashes, performance, subscription flow issues, and general product usage. If enabled, these tools should be used to improve the service, not to sell personal information.</p>
+        <p>The current production app does not include a separate advertising, behavioural analytics, or crash-reporting SDK. Supabase and RevenueCat process operational events needed for authentication, cloud requests, subscription status and purchase handling. Development-only diagnostics are excluded from the production route and payload.</p>
         <p>Support messages are used to respond to you, troubleshoot issues, verify account requests, and improve product reliability.</p>
       </section>
 
@@ -194,9 +194,10 @@
 
       <section id="retention" class="legal-card">
         <h2>9. Retention</h2>
-        <p>We keep personal data for as long as needed to provide the service, maintain your account, meet legal obligations, resolve disputes, enforce agreements, and operate backups or security systems.</p>
-        <p>Training data is generally retained while your account is active so the app can provide history, progress, reports, and restore functionality. If you delete your account, we will delete or anonymise personal data where reasonably possible, subject to legal, security, backup, and operational retention requirements.</p>
-        <p>Support emails may be retained for a reasonable period so we can manage requests and keep records of support history.</p>
+        <p>The Supabase authentication account and account-linked live database rows are retained while the account is active. After the owner confirms the automated deletion request, those live records and the linked RevenueCat customer profile are deleted immediately. The current Supabase free project has no automatic database backups.</p>
+        <p>Supabase platform logs on the current plan are retained for one day. The deletion form deliberately keeps the submitted email and one-time token out of page URLs and application logs. Routine website infrastructure logs follow Railway's plan-specific retention period; the website application does not log deletion-form email addresses, tokens, or request bodies.</p>
+        <p>Apple and Google may retain store transaction records for billing, fraud prevention, tax, and legal compliance under their own policies. Those store-controlled records are not kept in the deleted Adaptive Strength Coach account, and Arx Algorithms does not set their retention periods.</p>
+        <p>No support record is created by the automated deletion flow. If you separately contact support, correspondence is retained only as needed to answer the request, resolve a dispute, or meet a legal obligation; no fixed support-mail deletion schedule is presently configured.</p>
       </section>
 
       <section id="rights" class="legal-card">

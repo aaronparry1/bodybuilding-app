@@ -1,0 +1,122 @@
+{
+  "schema": "adaptive-strength-coach-google-play-data-safety-reconciliation",
+  "version": 1,
+  "auditedAt": "2026-08-03",
+  "app": {
+    "name": "Adaptive Strength Coach",
+    "developer": "Arx Algorithms",
+    "androidPackage": "com.aaronparry.adaptivestrengthcoach"
+  },
+  "accountDeletion": {
+    "appAllowsAccountCreation": true,
+    "inAppPath": "Account > Account controls > Delete account",
+    "publicUrl": "https://adaptivestrengthcoach.com/delete-account/",
+    "requiresAppReinstall": false,
+    "ownershipVerification": "Supabase passwordless email link with should-create disabled; server resolves user from bearer token",
+    "currentCertification": "blocked_pending_revenuecat_server_secret_and_public_e2e"
+  },
+  "dataTypes": [
+    {
+      "googlePlayType": "Personal info / Email address",
+      "collected": true,
+      "shared": false,
+      "requiredOrOptional": "required only when the user creates a cloud account; offline use is available",
+      "purposes": ["App functionality", "Account management"],
+      "encryptedInTransit": true,
+      "processors": ["Supabase"],
+      "deletion": "Supabase auth user and identity are deleted after verified confirmation"
+    },
+    {
+      "googlePlayType": "Personal info / User IDs",
+      "collected": true,
+      "shared": false,
+      "requiredOrOptional": "required for signed-in account and subscription association",
+      "purposes": ["App functionality", "Account management", "Fraud prevention, security and compliance"],
+      "encryptedInTransit": true,
+      "processors": ["Supabase", "RevenueCat"],
+      "deletion": "Supabase identity and RevenueCat customer keyed by the same UUID are deleted"
+    },
+    {
+      "googlePlayType": "Financial info / Purchase history",
+      "collected": true,
+      "shared": false,
+      "requiredOrOptional": "required when store billing is used",
+      "purposes": ["App functionality", "Analytics"],
+      "encryptedInTransit": true,
+      "processors": ["RevenueCat", "Google Play", "Apple App Store"],
+      "deletion": "RevenueCat customer history is deleted; store-controlled transaction records and subscriptions remain under store policies"
+    },
+    {
+      "googlePlayType": "Health and fitness / Fitness info",
+      "collected": true,
+      "shared": false,
+      "requiredOrOptional": "optional; entered for training functionality and usable locally",
+      "purposes": ["App functionality", "Personalization"],
+      "encryptedInTransit": true,
+      "processors": ["Supabase when signed-in cloud sync is available"],
+      "deletion": "Account-linked cloud rows are deleted; device-local data requires uninstall or clear storage"
+    },
+    {
+      "googlePlayType": "App activity / Other user-generated content",
+      "collected": true,
+      "shared": false,
+      "requiredOrOptional": "optional custom exercises, programmes, notes and settings",
+      "purposes": ["App functionality", "Personalization"],
+      "encryptedInTransit": true,
+      "processors": ["Supabase when signed-in cloud sync is available"],
+      "deletion": "Account-linked cloud rows are deleted; device-local data requires uninstall or clear storage"
+    },
+    {
+      "googlePlayType": "Device or other IDs",
+      "collected": false,
+      "shared": false,
+      "requiredOrOptional": "not applicable",
+      "purposes": [],
+      "encryptedInTransit": true,
+      "processors": [],
+      "deletion": "No advertising-ID integration or AD_ID permission found; custom app User ID is declared separately"
+    },
+    {
+      "googlePlayType": "App info and performance / Crash logs and diagnostics",
+      "collected": false,
+      "shared": false,
+      "requiredOrOptional": "not applicable",
+      "purposes": [],
+      "encryptedInTransit": true,
+      "processors": [],
+      "deletion": "No production analytics/crash SDK or remote diagnostic destination found"
+    },
+    {
+      "googlePlayType": "Location, contacts, messages, photos/videos, audio, files/docs, calendar, web browsing",
+      "collected": false,
+      "shared": false,
+      "requiredOrOptional": "not applicable",
+      "purposes": [],
+      "encryptedInTransit": true,
+      "processors": [],
+      "deletion": "No production collection path, permission, storage bucket or relevant SDK found"
+    }
+  ],
+  "evidence": [
+    "app.config.ts",
+    "app/(protected)/(tabs)/account.tsx",
+    "src/application/auth/auth-provider.ts",
+    "src/application/billing/revenuecat-gateway.ts",
+    "src/application/billing/subscription-context.tsx",
+    "src/application/sync/cloud-data-sync.ts",
+    "src/data/cloud/",
+    "src/lib/supabase/client.ts",
+    "website/account-deletion.mjs",
+    "website/public/privacy/index.html",
+    "live Supabase schema/storage/function inspection on 2026-08-03",
+    "RevenueCat Google Play Data Safety guidance inspected on 2026-08-03"
+  ],
+  "declarationDiscrepancies": [
+    "The currently submitted Play Console answers were not available in tracked repository evidence, so exact field-by-field diff against the submitted form is not yet possible.",
+    "The submitted deletion URL returned 404 and must be resubmitted only after public verification.",
+    "Purchase history must be declared because RevenueCat is mounted.",
+    "User ID must be declared because the Supabase UUID is passed to RevenueCat.",
+    "Health/fitness and user-generated training data should be declared because signed-in cloud-sync code transmits supported backup payloads even though the current live training tables are absent.",
+    "Do not declare a separate analytics/crash SDK based on current production payload evidence."
+  ]
+}

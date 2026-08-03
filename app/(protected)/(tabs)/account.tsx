@@ -1,6 +1,7 @@
 import Constants from "expo-constants";
 import { Link } from "expo-router";
 import { Text, View } from "react-native";
+import { openAccountDeletionRequest } from "@/application/account/account-deletion";
 import { buildDataSafetyStatus } from "@/application/account/data-safety-status";
 import { useAuth } from "@/application/auth/auth-context";
 import type { SubscriptionStatus } from "@/application/billing/subscription";
@@ -107,6 +108,13 @@ export default function AccountScreen() {
             <SecondaryButton label="Staging diagnostics" onPress={() => {}} />
           </Link>
         ) : null}
+      </SectionList>
+
+      <SectionList title="Account controls">
+        <Text style={{ ...type.body, color: colors.textMuted }}>
+          Permanently delete your account and associated cloud data through the secure Arx Algorithms verification page. This is separate from logging out or cancelling a store subscription.
+        </Text>
+        <SecondaryButton label="Delete account" onPress={() => void openAccountDeletionRequest()} />
       </SectionList>
 
       <SectionList title="Details">
