@@ -93,7 +93,7 @@ const config: ExpoConfig = {
           ? "com.aaronparry.adaptivestrengthcoach.staging"
           : "com.aaronparry.adaptivestrengthcoach.dev",
     ),
-    versionCode: Number.parseInt(env("APP_ANDROID_VERSION_CODE", "108"), 10),
+    versionCode: Number.parseInt(env("APP_ANDROID_VERSION_CODE", "109"), 10),
     adaptiveIcon: {
       backgroundColor: "#080A0F",
       foregroundImage: "./assets/android-icon-foreground.png",
