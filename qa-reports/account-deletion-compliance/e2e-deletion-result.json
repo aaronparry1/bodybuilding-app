@@ -1,0 +1,30 @@
+{
+  "schema": "adaptive-strength-coach-account-deletion-e2e-v1",
+  "executedAt": "2026-08-03",
+  "environment": "production-hosted workflow with synthetic-only probes",
+  "disposableAccountCreated": false,
+  "realCustomerDataAccessed": false,
+  "requestInitiation": {
+    "status": "passed",
+    "browser": "Mobile WebKit using iPhone 15 emulation",
+    "input": "synthetic unknown example.invalid address",
+    "httpStatus": 202,
+    "nonEnumerating": true,
+    "personalDataReflected": false
+  },
+  "ownershipVerification": {
+    "status": "not_executed",
+    "reason": "No disposable mailbox/account was created while the downstream deletion transaction was known to be unavailable."
+  },
+  "providerDeletion": {
+    "status": "blocked",
+    "blocker": "REVENUECAT_SECRET_API_KEY is absent from the Railway production service.",
+    "failClosedProbeStatus": 503,
+    "mutationsPerformed": 0
+  },
+  "recordsVerifiedDeleted": [],
+  "recordsAnonymised": [],
+  "recordsRetained": [],
+  "certification": "NOT_PROVEN",
+  "requiredOwnerAction": "Create an authorised RevenueCat secret API key for the Adaptive Strength Coach project and add it to the Railway production service as REVENUECAT_SECRET_API_KEY without exposing it in source or chat."
+}

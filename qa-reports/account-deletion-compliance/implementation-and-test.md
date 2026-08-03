@@ -16,15 +16,15 @@ The request accepts a bounded email address in a POST body, asks Supabase for a 
 
 | Check | Result |
 |---|---|
-| Focused account-deletion tests | PASS — 14/14 |
+| Focused account-deletion tests | PASS — 15/15, including mobile WebKit opaque-origin handling |
 | Selected production/account/cloud boundary tests | PASS — 22/22 |
 | Website static validation | PASS |
 | TypeScript | PASS |
-| Full automated suite | PASS — 390 files, 2,393 tests |
+| Full automated suite | PASS — 390 files, 2,394 tests after the browser-derived regression |
 | Production Expo public config | PASS — production route, expected package/bundle IDs, Android permissions `[]` |
 | Web export | PASS |
 | Production payload scan | PASS — 27 files, 0 findings |
 
-## Pre-deployment limitation
+## Deployed limitation
 
-The Railway service has Supabase configuration but does not yet have `REVENUECAT_SECRET_API_KEY`. The source deliberately fails closed before mutation when that credential is absent. Public deployment and request initiation can be verified, but a complete disposable-account deletion cannot be certified until an authorised RevenueCat server secret is configured. No client-public RevenueCat key is accepted for deletion.
+The Railway service has Supabase configuration but does not yet have `REVENUECAT_SECRET_API_KEY`. The source deliberately fails closed before mutation when that credential is absent. Public deployment and request initiation are verified in `deployment-verification.md`, but a complete disposable-account deletion cannot be certified until an authorised RevenueCat server secret is configured. No client-public RevenueCat key is accepted for deletion.

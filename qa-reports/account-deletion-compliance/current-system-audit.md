@@ -73,4 +73,4 @@ Cross-provider deletion is not a distributed transaction. RevenueCat is delibera
 
 ## Current truthful status
 
-The source implementation and focused tests are complete. Public deployment, public HTTP verification, disposable-account end-to-end erasure, and Play Console submission are recorded separately and cannot be claimed from this audit alone.
+The source implementation, focused/full verification, Railway deployment, public HTTP checks and mobile-WebKit request initiation are complete. The canonical slash and no-slash URLs return HTTP 200. Disposable-account end-to-end erasure remains blocked by the absent RevenueCat server secret, and Play Console submission has not occurred. These outcomes are recorded separately rather than inferred from source.
