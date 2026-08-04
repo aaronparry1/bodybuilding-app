@@ -1,6 +1,6 @@
 # Adaptive Strength Coach account-deletion audit
 
-Audit date: 2026-08-03 (Europe/London)
+Audit date: 2026-08-04 (Europe/London)
 
 ## Public failure and hosting root cause
 
@@ -64,7 +64,7 @@ Cross-provider deletion is not a distributed transaction. RevenueCat is delibera
 | Live `profiles` row | Deleted by the verified `ON DELETE CASCADE` foreign key. |
 | Other cloud training rows | None exist in the inspected live schema. Future account-linked rows are covered only if they retain a verified cascade/explicit deletion contract. |
 | Supabase Storage | No buckets or objects exist. |
-| RevenueCat customer profile and entitlement/purchase history | Must be deleted through the RevenueCat server API using the same Supabase user UUID. Production completion currently remains blocked until the secret key is configured. |
+| RevenueCat customer profile and entitlement/purchase history | Deleted through the RevenueCat server API using the same Supabase user UUID. A disposable production test verified the customer becomes absent. |
 | Apple/Google transaction records and subscription | Not deleted or cancelled by app-account deletion; controlled by the relevant store for billing, fraud, tax and legal purposes under its own retention policy. |
 | Device-local training state | Not remotely accessible; remains until the user clears app storage or uninstalls. |
 | Supabase platform logs | Current free-plan retention is one day; email/token are not written by the application logger. |
@@ -73,4 +73,6 @@ Cross-provider deletion is not a distributed transaction. RevenueCat is delibera
 
 ## Current truthful status
 
-The source implementation, focused/full verification, Railway deployment, public HTTP checks and mobile-WebKit request initiation are complete. The canonical slash and no-slash URLs return HTTP 200. Disposable-account end-to-end erasure remains blocked by the absent RevenueCat server secret, and Play Console submission has not occurred. These outcomes are recorded separately rather than inferred from source.
+The source implementation, focused/full verification, Railway deployment, public HTTP checks and mobile-WebKit request initiation are complete. The canonical slash and no-slash URLs return HTTP 200. Railway now contains the required RevenueCat server-key category (the value was never printed or stored in source), and deployment `c41c1cd8-d85a-4a54-b12d-947f84b1a29b` completed successfully.
+
+A synthetic-only production-hosted deletion test then created a disposable Supabase auth user, cascade-linked profile and RevenueCat customer, called the public confirmation endpoint with that owner's valid bearer token, and verified all three were absent afterward. The endpoint returned HTTP 200 with a valid non-sensitive deletion receipt. No real customer data was accessed and no store subscription was created or cancelled. The passwordless request UI was verified separately in mobile WebKit; actual email delivery to a disposable external mailbox was not exercised. Play Console submission has not occurred.

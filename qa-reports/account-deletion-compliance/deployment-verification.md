@@ -1,12 +1,13 @@
 # Public deployment verification
 
-Verified: 2026-08-03 (Europe/London)
+Verified: 2026-08-04 (Europe/London)
 
 ## Deployment
 
 - Hosting project: Railway `adaptive-strength-coach-site`
 - Production service: `adaptive-strength-coach-site`
 - Successful deployment: `58b9af04-73db-4061-a0d3-88c75e5a183a`
+- Credential-triggered verification deployment: `c41c1cd8-d85a-4a54-b12d-947f84b1a29b`
 - Image digest: `sha256:4f5ed61f6f9d92e08e09d6d95050cf236468898a9a43a4ba09b5f0e77321df8c`
 - Deployment status: `SUCCESS`
 - Canonical URL: `https://adaptivestrengthcoach.com/delete-account/`
@@ -38,4 +39,8 @@ The response includes CSP, HSTS, no-referrer, no-sniff and frame-denial headers.
 - Mobile WebKit form submission: the account email control and `Send secure deletion link` were operated in the public page. The final response was `Check your email`, with no console errors and no account-enumerating text.
 - Screenshot evidence is retained locally under `output/playwright/account-deletion-compliance/`.
 
-The production confirmation endpoint was also probed with a synthetic invalid bearer token. Because the RevenueCat server credential is absent, it returned HTTP 503 and the generic fail-closed response before any provider mutation. This is the intended safe state, but it prevents end-to-end completion certification.
+The production confirmation endpoint was initially probed with a synthetic invalid bearer token while the RevenueCat server credential was absent. It returned HTTP 503 and the generic fail-closed response before any provider mutation, as designed.
+
+On 2026-08-04 the owner added the required RevenueCat secret-key category directly in Railway. A name-only environment check verified that `REVENUECAT_SECRET_API_KEY`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are present; no value was printed. Railway deployment `c41c1cd8-d85a-4a54-b12d-947f84b1a29b` reached `SUCCESS`.
+
+The post-deployment synthetic production test returned HTTP 200 and a valid deletion receipt. Subsequent provider checks proved the disposable Supabase auth user absent, its profile row count zero and its RevenueCat customer absent. Read-only aggregate counts returned to their pre-test values (4 auth users and 3 profiles). No record identities or contents belonging to real users were inspected.

@@ -1,6 +1,6 @@
 # Account-deletion implementation and verification
 
-Verification date: 2026-08-03 (Europe/London)
+Verification date: 2026-08-04 (Europe/London)
 
 ## Implemented boundaries
 
@@ -25,6 +25,8 @@ The request accepts a bounded email address in a POST body, asks Supabase for a 
 | Web export | PASS |
 | Production payload scan | PASS — 27 files, 0 findings |
 
-## Deployed limitation
+## Deployed result
 
-The Railway service has Supabase configuration but does not yet have `REVENUECAT_SECRET_API_KEY`. The source deliberately fails closed before mutation when that credential is absent. Public deployment and request initiation are verified in `deployment-verification.md`, but a complete disposable-account deletion cannot be certified until an authorised RevenueCat server secret is configured. No client-public RevenueCat key is accepted for deletion.
+The Railway service now has the required RevenueCat server-key category. The value was entered by the owner directly in Railway and was never printed, copied into source or exposed to the client. Deployment `c41c1cd8-d85a-4a54-b12d-947f84b1a29b` succeeded.
+
+A synthetic-only production-hosted test verified the complete configured deletion transaction: RevenueCat customer deletion, Supabase auth deletion and profile cascade all succeeded, and postconditions proved the disposable records absent. Details and the remaining narrow email-delivery evidence limit are recorded in `e2e-deletion-result.md`.

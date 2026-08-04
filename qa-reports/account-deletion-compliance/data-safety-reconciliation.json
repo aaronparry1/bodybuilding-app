@@ -1,7 +1,7 @@
 {
   "schema": "adaptive-strength-coach-google-play-data-safety-reconciliation",
   "version": 1,
-  "auditedAt": "2026-08-03",
+  "auditedAt": "2026-08-04",
   "app": {
     "name": "Adaptive Strength Coach",
     "developer": "Arx Algorithms",
@@ -13,7 +13,7 @@
     "publicUrl": "https://adaptivestrengthcoach.com/delete-account/",
     "requiresAppReinstall": false,
     "ownershipVerification": "Supabase passwordless email link with should-create disabled; server resolves user from bearer token",
-    "currentCertification": "blocked_pending_revenuecat_server_secret_and_public_e2e"
+    "currentCertification": "production_hosted_disposable_deletion_passed_2026-08-04"
   },
   "dataTypes": [
     {
@@ -113,7 +113,7 @@
   ],
   "declarationDiscrepancies": [
     "The currently submitted Play Console answers were not available in tracked repository evidence, so exact field-by-field diff against the submitted form is not yet possible.",
-    "The submitted deletion URL returned 404 and must be resubmitted only after public verification.",
+    "The previously submitted deletion URL returned 404; the canonical URL now returns HTTP 200 and the disposable deletion transaction is verified.",
     "Purchase history must be declared because RevenueCat is mounted.",
     "User ID must be declared because the Supabase UUID is passed to RevenueCat.",
     "Health/fitness and user-generated training data should be declared because signed-in cloud-sync code transmits supported backup payloads even though the current live training tables are absent.",

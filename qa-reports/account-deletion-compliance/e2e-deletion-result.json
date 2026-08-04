@@ -1,30 +1,52 @@
 {
   "schema": "adaptive-strength-coach-account-deletion-e2e-v1",
-  "executedAt": "2026-08-03",
-  "environment": "production-hosted workflow with synthetic-only probes",
-  "disposableAccountCreated": false,
+  "executedAt": "2026-08-04",
+  "environment": "production-hosted workflow with synthetic-only disposable records",
+  "deploymentId": "c41c1cd8-d85a-4a54-b12d-947f84b1a29b",
+  "syntheticIdentityHash": "25738bca4dab",
+  "disposableAccountCreated": true,
   "realCustomerDataAccessed": false,
+  "storeSubscriptionCreatedOrCancelled": false,
   "requestInitiation": {
-    "status": "passed",
+    "status": "passed_separately",
     "browser": "Mobile WebKit using iPhone 15 emulation",
     "input": "synthetic unknown example.invalid address",
     "httpStatus": 202,
     "nonEnumerating": true,
-    "personalDataReflected": false
+    "personalDataReflected": false,
+    "scope": "Public request UI and non-enumerating response; external email delivery was not exercised."
   },
   "ownershipVerification": {
-    "status": "not_executed",
-    "reason": "No disposable mailbox/account was created while the downstream deletion transaction was known to be unavailable."
+    "status": "passed",
+    "method": "valid short-lived Supabase bearer for the disposable owner",
+    "serverOwnerResolution": true,
+    "userIdAcceptedFromBrowser": false
   },
-  "providerDeletion": {
-    "status": "blocked",
-    "blocker": "REVENUECAT_SECRET_API_KEY is absent from the Railway production service.",
-    "failClosedProbeStatus": 503,
-    "mutationsPerformed": 0
+  "created": {
+    "supabaseAuthUser": true,
+    "profileRows": 1,
+    "revenueCatCustomer": true
   },
-  "recordsVerifiedDeleted": [],
+  "publicConfirmation": {
+    "httpStatus": 200,
+    "status": "deleted",
+    "receiptFormatValid": true
+  },
+  "verifiedAfter": {
+    "supabaseAuthUserAbsent": true,
+    "profileRows": 0,
+    "revenueCatCustomerAbsent": true
+  },
+  "recordsVerifiedDeleted": [
+    "disposable Supabase auth user and identities/sessions",
+    "disposable public.profiles row via ON DELETE CASCADE",
+    "disposable RevenueCat customer"
+  ],
   "recordsAnonymised": [],
-  "recordsRetained": [],
-  "certification": "NOT_PROVEN",
-  "requiredOwnerAction": "Create an authorised RevenueCat secret API key for the Adaptive Strength Coach project and add it to the Railway production service as REVENUECAT_SECRET_API_KEY without exposing it in source or chat."
+  "recordsRetained": [
+    "provider/platform operational logs subject to provider retention",
+    "store transaction records were not created or exercised"
+  ],
+  "certification": "PROVEN",
+  "remainingEvidenceLimit": "Delivery and consumption of the passwordless message through an external disposable mailbox was not exercised; request initiation and authenticated deletion were independently verified."
 }

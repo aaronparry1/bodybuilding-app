@@ -1,19 +1,23 @@
 # Disposable-account end-to-end result
 
-Verdict: **NOT PROVEN — blocked before creating a disposable account**
+Verdict: **PROVEN for the production-hosted deletion transaction**
 
-The public request mechanism is deployed and a real mobile-WebKit submission with a synthetic unknown address returned HTTP 202 and a generic `Check your email` response. No customer data was accessed.
+On 2026-08-04 a disposable synthetic identity was created across the live configured providers without reading or changing any real customer record:
 
-The complete deletion transaction cannot yet be run because Railway does not contain `REVENUECAT_SECRET_API_KEY`. RevenueCat is a real production processor keyed by the Supabase user UUID, and its public mobile SDK keys cannot delete a customer. The server therefore checks for the secret before authenticating or mutating any provider and returns HTTP 503 when it is absent.
+- Supabase auth user: created;
+- cascade-linked `public.profiles` row: 1;
+- RevenueCat customer under the same Supabase UUID: created.
 
-No disposable Supabase account was created merely to leave it behind in this known blocked state. No production user or profile was read or deleted. A read-only aggregate check after public verification found 4 auth users and 3 profile rows; no row contents or identities were inspected.
+The public production endpoint `POST https://adaptivestrengthcoach.com/api/delete-account/confirm` was called with a valid short-lived bearer token for that disposable owner. It returned HTTP 200, status `deleted`, and a correctly shaped non-sensitive receipt. Follow-up provider checks proved:
 
-## Exact unblock action
+- Supabase auth user absent;
+- profile rows for the disposable owner: 0;
+- RevenueCat customer absent.
 
-1. In the RevenueCat project used by Adaptive Strength Coach, create or select a secret API key authorised to delete the app's customer profiles through the REST v1 subscriber endpoint.
-2. In Railway project `adaptive-strength-coach-site` → production service `adaptive-strength-coach-site` → Variables, add it as `REVENUECAT_SECRET_API_KEY`.
-3. Do not paste the value into source control, an app `EXPO_PUBLIC_*` variable, a screenshot or this report.
-4. Redeploy or allow Railway to redeploy from the variable change.
-5. Run the public flow with a dedicated disposable mailbox/account, verify the email link, confirm deletion, then prove the auth user, profile and RevenueCat customer are absent.
+The read-only live aggregates returned to 4 auth users and 3 profiles, matching their pre-test values. No real record identity or content was inspected. No Apple or Google store subscription was created or cancelled.
 
-Until that succeeds, do not submit the corrected Play Data safety declaration and do not describe account deletion as end-to-end certified.
+The server derives the owner from the bearer token; the client cannot choose a user ID. RevenueCat deletion completes before Supabase deletion, so the endpoint does not claim completion while a configured processor still retains the customer.
+
+## Request-link scope
+
+The public passwordless request form was separately exercised in mobile WebKit and returned HTTP 202 with the generic `Check your email` result, no address reflection and no enumeration. The destructive transaction used an equivalent valid Supabase owner bearer obtained for the disposable account in the isolated test harness. Delivery and consumption of a real email through an external disposable mailbox was not exercised, so that narrow mail-deliverability detail remains outside this result.
