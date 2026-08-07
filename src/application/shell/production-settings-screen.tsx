@@ -68,6 +68,7 @@ export default function ProductionSettingsScreen() {
         {user ? <SecondaryButton label="Retry sync" onPress={() => runManualSync(user.id, billing.subscription)} /> : null}
         <Text style={{ color: colors.textMuted }}>Delete your account and associated cloud data through the secure verification page. This is separate from logging out or cancelling a subscription.</Text>
         <SecondaryButton label="Delete account" onPress={() => void openAccountDeletionRequest()} />
+        <Link href="/(protected)/recovery-diagnostics" asChild><SecondaryButton label="Recovery diagnostic summary" onPress={() => {}} /></Link>
       </PremiumCard>
       <SectionHeader title="Subscription" />
       <PremiumCard>

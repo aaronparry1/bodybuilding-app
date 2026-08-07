@@ -101,6 +101,11 @@
     }
   },
   "submit": {
+    "recovery": {
+      "android": {
+        "track": "alpha"
+      }
+    },
     "preview": {
       "ios": {},
       "android": {

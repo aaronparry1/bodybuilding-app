@@ -20,6 +20,7 @@ describe("Android recovery evidence", () => {
     const after = Object.fromEntries(getLocalStorageKeys().map((key) => [key, getLocalStorage().getItem(key)]));
     expect(after).toEqual(before);
     expect(evidence.identity).toMatchObject({ authenticated: true, ownerPresent: true, ownerMatchesAuthenticatedAccount: true, planMatchesOwner: true });
+    expect(evidence).toMatchObject({ database: { initialization: "ready" }, reconciliation: { status: "consistent" }, backup: { local: "verified_readable", account: "never_verified" } });
     expect(JSON.stringify(evidence)).not.toContain("private-user-id");
     expect(JSON.stringify(evidence)).not.toContain("@example");
   });

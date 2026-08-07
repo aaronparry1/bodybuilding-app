@@ -157,6 +157,7 @@ export default function ProtectedLayout() {
         <Stack.Screen name="capacity-focus" options={{ title: "Low Back Capacity" }} />
         <Stack.Screen name="onboarding" options={{ title: "Welcome" }} />
         <Stack.Screen name="settings" options={{ title: "Settings" }} />
+        <Stack.Screen name="recovery-diagnostics" options={{ title: "Recovery Diagnostics" }} />
         <Stack.Screen name="diagnostics" options={{ title: "Diagnostics" }} />
         <Stack.Screen name="design-qa" options={{ title: "Design QA" }} />
         <Stack.Screen name="v2-benchmark-qa" options={{ title: "V2 QA" }} />
