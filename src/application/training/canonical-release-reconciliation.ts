@@ -5,6 +5,7 @@ import { canonicalActivePlanOwnerRepository } from "@/data/local/canonical-activ
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import type { CanonicalActivePlanCarrier } from "@/domain/training/canonical-active-plan-carrier";
 import { validateCanonicalLoadPrescription } from "@/domain/training/canonical-load-prescription";
+import { exerciseCustomisations, reapplyCanonicalExerciseCustomisations } from "@/domain/training/canonical-exercise-customisations";
 
 export const CANONICAL_RELEASE_RECONCILIATION_VERSION = "canonical_release_reconciliation_v1" as const;
 
@@ -156,14 +157,16 @@ export function reconcileCanonicalReleaseState(input: Readonly<{
   }
 
   const nextRevision = loaded.carrier.revision + 1;
+  const retainedCustomisations = exerciseCustomisations(loaded.carrier);
   const next: CanonicalActivePlanCarrier = {
     ...constructed.carrier,
     revision: nextRevision,
     progress: { ...constructed.carrier.progress, revision: nextRevision },
+    plannedSessions: reapplyCanonicalExerciseCustomisations(constructed.carrier.plannedSessions, retainedCustomisations, nextRevision),
     recordedSessionReferences: loaded.carrier.recordedSessionReferences ?? [],
     cycleLineage: mergeLineage(loaded.carrier, constructed.carrier, nextRevision),
     constructionInputs: facts.facts.references,
-    operational: active.status === "resumable" ? loaded.carrier.operational : constructed.carrier.operational,
+    operational: { ...(active.status === "resumable" ? loaded.carrier.operational : constructed.carrier.operational), exerciseCustomisations: retainedCustomisations },
   };
   const saved = canonicalActivePlanV2Repository.saveAtomically(next, loaded.carrier.revision);
   if (saved.status !== "saved") return result("retry_required", saved.status === "conflict" ? "stale_plan_revision" : "atomic_reconstruction_failed", false, true, active.status, 0, { ...common, priorRevision: loaded.carrier.revision, newRevision: loaded.carrier.revision, customerGuidance: "Programme recovery was interrupted before anything changed. Try again." });

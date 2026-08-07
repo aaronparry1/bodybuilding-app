@@ -1,6 +1,6 @@
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import { openAccountDeletionRequest } from "@/application/account/account-deletion";
 import { buildDataSafetyStatus } from "@/application/account/data-safety-status";
 import { useAuth } from "@/application/auth/auth-context";
@@ -32,9 +32,22 @@ export default function ProductionSettingsScreen() {
   const plan = canonicalActivePlanState.getReadModel();
   const environment = getAppEnvironment();
   const accountError = customerSafeServiceMessage(error, environment, "Account backup is unavailable right now.");
+  const backupUnavailable = Boolean(accountError) || billing.dataHydrationStatus === "error";
   const billingError = customerSafeServiceMessage(billing.error, environment, "Subscription status could not refresh right now.");
   const dataSafety = buildDataSafetyStatus({ userEmail: user?.email, isOfflineMode, subscription: billing.subscription, syncStatus, unsyncedQueueCount: syncQueueCount });
-  const restartSetup = () => { updateSettings({ onboardingCompleted: false }); router.replace("/(protected)/onboarding"); };
+  const restartSetup = () => {
+    Alert.alert(
+      "Change your training split?",
+      "This rebuilds future programme sessions only. Completed workouts, lifting history, performance records and your account identity will be preserved.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Review changes",
+          onPress: () => router.push({ pathname: "/(protected)/onboarding", params: { restart: "1" } }),
+        },
+      ],
+    );
+  };
   const changeDuration = (availableSessionMinutes: CanonicalSessionDurationMinutes) => {
     if (!plan) { updateSettings({ availableSessionMinutes }); return; }
     const result = canonicalActivePlanState.changeSessionDuration({ planId: plan.planId, expectedRevision: plan.revision, availableSessionMinutes, updatedAt: new Date().toISOString() });
@@ -47,10 +60,11 @@ export default function ProductionSettingsScreen() {
   return (
     <Screen>
       <ScreenHeader eyebrow="Settings" title="Training controls" subtitle="Manage preferences, backup and your programme." />
-      {accountError ? <Text accessibilityRole="alert" style={{ color: colors.danger }}>{accountError}</Text> : null}
       <SectionHeader title="Account" />
       <PremiumCard>
-        <Text style={{ color: colors.text }}>Backup: {dataSafety.status}</Text>
+        <Text style={{ color: colors.text, fontWeight: "900" }}>{backupUnavailable ? "Account backup unavailable" : dataSafety.title}</Text>
+        <Text style={{ color: backupUnavailable ? colors.warning : colors.text }}>Backup: {backupUnavailable ? "Local only" : dataSafety.status}</Text>
+        <Text accessibilityRole={backupUnavailable ? "alert" : undefined} style={{ color: colors.textMuted }}>{backupUnavailable ? "Your training remains saved on this device. Account backup could not connect; retrying will never replace local data." : dataSafety.body}</Text>
         {user ? <SecondaryButton label="Retry sync" onPress={() => runManualSync(user.id, billing.subscription)} /> : null}
         <Text style={{ color: colors.textMuted }}>Delete your account and associated cloud data through the secure verification page. This is separate from logging out or cancelling a subscription.</Text>
         <SecondaryButton label="Delete account" onPress={() => void openAccountDeletionRequest()} />
@@ -73,7 +87,7 @@ export default function ProductionSettingsScreen() {
         <Text style={{ color: colors.text, fontWeight: "900" }}>Workout length</Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm }}>{canonicalSessionDurationOptions.map((minutes) => <Pressable key={minutes} testID={`settings-duration-${minutes}`} accessibilityRole="button" accessibilityState={{ selected: settings.availableSessionMinutes === minutes }} accessibilityLabel={`${minutes} minute workouts`} onPress={() => changeDuration(minutes)} style={{ minHeight: 44, minWidth: 64, alignItems: "center", justifyContent: "center", borderRadius: radius.md, borderWidth: 1, borderColor: settings.availableSessionMinutes === minutes ? colors.accent : colors.line, backgroundColor: settings.availableSessionMinutes === minutes ? colors.accentSoft : colors.surfaceMuted }}><Text style={{ color: settings.availableSessionMinutes === minutes ? colors.accent : colors.textMuted, fontWeight: "900" }}>{minutes} min</Text></Pressable>)}</View>
         {durationMessage ? <Text accessibilityLiveRegion="polite" style={{ color: colors.textMuted }}>{durationMessage}</Text> : null}
-        <SecondaryButton label="Restart setup" onPress={restartSetup} />
+        <SecondaryButton label="Change training split" onPress={restartSetup} />
       </PremiumCard>
       <PrimaryButton label="Logout" onPress={signOut} />
     </Screen>

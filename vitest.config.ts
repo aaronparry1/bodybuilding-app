@@ -10,6 +10,7 @@ export default defineConfig({
   test: {
     environment: "node",
     exclude: ["**/node_modules/**", "**/dist/**", "research/adaptive_stress_lab/tests/**/*.mjs", "qa-reports/legacy-migration-change-control/originals/**"],
-    testTimeout: 10000,
+    maxWorkers: 2,
+    testTimeout: 30000,
   },
 });

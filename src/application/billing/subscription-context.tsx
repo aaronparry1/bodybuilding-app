@@ -168,6 +168,16 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      if (!user?.id && gateway.current.identifyUser && gateway.current.getProvider?.() === "revenuecat") {
+        try {
+          const anonymousSubscription = await gateway.current.identifyUser(null);
+          if (cancelled) return;
+          if (anonymousSubscription) setSubscription(cacheSubscription(anonymousSubscription));
+        } catch (nextError) {
+          if (!cancelled) setError(normalizeBillingError(nextError));
+        }
+      }
+
       await refreshSubscription();
     }
 

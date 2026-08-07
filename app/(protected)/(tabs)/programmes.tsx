@@ -5,7 +5,7 @@ import type { CanonicalPlanPresentationAction } from "@/application/training/can
 import { useAppSettings } from "@/application/settings/app-settings";
 import { PlanDashboard } from "@/ui/plan-dashboard";
 import { useCanonicalPlanPresentation } from "@/ui/canonical-training-presentation-hooks";
-import { AppScreen } from "@/ui/primitives";
+import { AppScreen, SecondaryButton } from "@/ui/primitives";
 import { TrainingSystemGuideButton } from "@/ui/training-system-guide";
 
 export default function PlanScreen() {
@@ -23,5 +23,6 @@ export default function PlanScreen() {
     router.push({ pathname: "/(protected)/(tabs)/train", params: { planId: action.planId, planRevision: String(action.planRevision), recordedSessionId: action.sessionId, lifecycle: "resume" } });
   };
 
-  return <AppScreen><PlanDashboard projection={projection} selectedSessionId={selectedSessionId} onSelectSession={setSelectedSessionId} onAction={onAction} guideAction={<TrainingSystemGuideButton />} /></AppScreen>;
+  const managedSessionId = selectedSessionId ?? canonicalActivePlanState.getReadModel()?.nextSession?.id;
+  return <AppScreen><PlanDashboard projection={projection} selectedSessionId={selectedSessionId} onSelectSession={setSelectedSessionId} onAction={onAction} guideAction={<TrainingSystemGuideButton />} />{managedSessionId ? <SecondaryButton label="Manage programme exercises" onPress={() => router.push({ pathname: "/(protected)/programmes/manage", params: { plannedSessionId: managedSessionId } })} /> : null}</AppScreen>;
 }

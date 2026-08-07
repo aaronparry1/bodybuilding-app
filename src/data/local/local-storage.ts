@@ -12,6 +12,13 @@ declare const require: ((moduleName: "expo-sqlite/kv-store") => { SQLiteStorage:
 const memoryStorage = new Map<string, string>();
 let sqliteLocalStorage: LocalStorageLike | null = null;
 
+export class PersistentStorageUnavailableError extends Error {
+  constructor(readonly causeValue: unknown) {
+    super("persistent_storage_unavailable");
+    this.name = "PersistentStorageUnavailableError";
+  }
+}
+
 const fallbackStorage: LocalStorageLike = {
   get length() {
     return memoryStorage.size;
@@ -67,8 +74,12 @@ export function getLocalStorage(): LocalStorageLike {
       return getSQLiteLocalStorage();
     } catch (error) {
       if (__DEV__) {
-        console.warn("[startup:storage] falling back to in-memory local storage", error);
+        console.warn("[startup:storage] persistent local storage unavailable", error);
       }
+      // Never present an empty in-memory store as the user's durable store on
+      // native. That makes retained data look deleted and permits defaults to
+      // be written into a temporary authority. Startup must recover or retry.
+      throw new PersistentStorageUnavailableError(error);
     }
   }
 

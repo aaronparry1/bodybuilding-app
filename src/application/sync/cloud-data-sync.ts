@@ -10,6 +10,7 @@ import { legacyTrainingYearArchive } from "@/application/training/legacy-trainin
 import { ExerciseCloudRepository } from "@/data/cloud/exercise-cloud-repository";
 import { ProgrammeCloudRepository } from "@/data/cloud/programme-cloud-repository";
 import { UserSettingsCloudRepository } from "@/data/cloud/user-settings-cloud-repository";
+import { restoreLegacyWorkoutHistoryForMigration } from "@/application/sync/legacy-workout-cloud-recovery";
 import { LocalSyncQueueStore } from "@/data/sync/local-sync-queue-store";
 import { SyncQueue } from "@/data/sync/sync-queue";
 import { WorkoutSyncService } from "@/data/sync/workout-sync-service";
@@ -71,7 +72,7 @@ export interface CloudDataSyncDependencies {
   exerciseCloudRepository?: Pick<ExerciseCloudRepository, "loadExercises"> & Partial<Pick<ExerciseCloudRepository, "saveCustomExercise">>;
   userSettingsCloudRepository?: Pick<UserSettingsCloudRepository, "loadUserSettingsBlob"> & Partial<Pick<UserSettingsCloudRepository, "saveUserSettingsBlob">>;
   workoutSyncService?: Pick<WorkoutSyncService, "flushQueue">;
-  localWorkoutRepository?: unknown;
+  localWorkoutRepository?: { list(): WorkoutSession[]; save(session: WorkoutSession): void };
   localProgrammeRepository?: typeof programmeRepository;
   localExerciseRepository?: typeof customExerciseRepository;
   localActivePlanRepository?: unknown;
@@ -104,7 +105,6 @@ async function resolveClient(dependencies: CloudDataSyncDependencies): Promise<A
 
 function resolveRepositories(dependencies: CloudDataSyncDependencies, client: AppSupabaseClient) {
   return {
-    workoutCloudRepository: dependencies.workoutCloudRepository,
     programmeCloudRepository: dependencies.programmeCloudRepository ?? new ProgrammeCloudRepository(client),
     exerciseCloudRepository: dependencies.exerciseCloudRepository ?? new ExerciseCloudRepository(client),
     userSettingsCloudRepository: dependencies.userSettingsCloudRepository ?? new UserSettingsCloudRepository(client),
@@ -188,14 +188,17 @@ export async function restoreCloudDataForUser(
   }
 
   const {
-    workoutCloudRepository,
     programmeCloudRepository,
     exerciseCloudRepository,
     userSettingsCloudRepository,
   } = resolveRepositories(dependencies, client);
 
   let settingsReadStatus: CloudDataRestoreResult["settingsReadStatus"] = "complete";
-  const [cloudProgrammes, cloudExercises, cloudSettings] = await Promise.all([
+  const [legacyWorkoutRecovery, cloudProgrammes, cloudExercises, cloudSettings] = await Promise.all([
+    restoreLegacyWorkoutHistoryForMigration(userId, client, {
+      ...(dependencies.workoutCloudRepository?.loadWorkoutHistory ? { cloud: { loadWorkoutHistory: dependencies.workoutCloudRepository.loadWorkoutHistory } } : {}),
+      ...(dependencies.localWorkoutRepository ? { local: dependencies.localWorkoutRepository } : {}),
+    }),
     programmeCloudRepository.loadProgrammes(userId).catch((error) => {
       logSyncStage("programme restore skipped", error);
       return [] as Programme[];
@@ -210,6 +213,7 @@ export async function restoreCloudDataForUser(
       return null;
     }),
   ]);
+  if (!legacyWorkoutRecovery.readable) settingsReadStatus = "failed";
 
   const localCanonicalPlan = canonicalActivePlanV2Repository.get();
   const localCanonicalOwner = canonicalActivePlanOwnerRepository.get();
@@ -231,8 +235,9 @@ export async function restoreCloudDataForUser(
 
   // Canonical recorded sessions are restored atomically from the versioned
   // backup envelope below. Legacy workout history is migration input only and
-  // is never installed or merged into live state.
-
+  // is retained in its legacy repository until an idempotent canonical
+  // migration can prove ownership. Local records win ties and are never
+  // replaced by an older cloud copy.
   const localProgrammeIds = new Set(localProgrammeRepository.listCustom().map((programme) => programme.id));
   const restorableProgrammes = cloudProgrammes.filter((programme) => programme.isCustom || programme.createdByUserId);
   for (const programme of restorableProgrammes) {
@@ -305,7 +310,7 @@ export async function restoreCloudDataForUser(
   }
 
   return {
-    restoredSessions: 0,
+    restoredSessions: legacyWorkoutRecovery.restored,
     restoredExercises: restorableExercises.filter((exercise) => !localExerciseIds.has(exercise.id)).length,
     restoredProgrammes: restorableProgrammes.filter((programme) => !localProgrammeIds.has(programme.id)).length,
     restoredSettings,

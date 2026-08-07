@@ -145,6 +145,7 @@ export default function ProtectedLayout() {
         <Stack.Screen name="programmes/[id]" options={{ title: "Programme" }} />
         <Stack.Screen name="programmes/builder" options={{ title: "Programme Builder" }} />
         <Stack.Screen name="programmes/session" options={{ title: "Session Builder" }} />
+        <Stack.Screen name="programmes/manage" options={{ title: "Manage Exercises" }} />
         <Stack.Screen name="history/index" options={{ title: "History" }} />
         <Stack.Screen name="history/[id]" options={{ title: "Workout Detail" }} />
         <Stack.Screen name="history/exercise/[id]" options={{ title: "Exercise History" }} />

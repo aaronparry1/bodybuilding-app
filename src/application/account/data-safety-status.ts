@@ -85,10 +85,21 @@ export function buildDataSafetyStatus(input: DataSafetyStatusInput): DataSafetyS
     };
   }
 
+  if (!input.syncStatus?.lastSuccessAt) {
+    return {
+      title: "Account connected",
+      status: "Backup pending",
+      body: "Your training is saved on this device. Cloud backup has not completed yet.",
+      helper: "Keep the app open and retry backup when you have a connection.",
+      retryActionLabel: "Retry Sync",
+      tone: "default",
+    };
+  }
+
   return {
     title: "Cloud Backup Active",
     status: "Signed in",
-    body: "Your training is backed up and ready to sync across devices.",
+    body: "Your training has been backed up and is ready to restore on another device.",
     meta: input.syncStatus?.lastSuccessAt ? `Last synced: ${formatLastSynced(input.syncStatus.lastSuccessAt, input.now)}` : undefined,
     primaryActionLabel: "Manage Account",
     tone: "success",

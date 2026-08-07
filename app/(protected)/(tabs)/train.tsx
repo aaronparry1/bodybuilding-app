@@ -448,6 +448,7 @@ function CanonicalTrainExperience() {
           onNext={() => activeExerciseIndex < presentation.exercises.length - 1 && selectExercise(presentation.exercises[activeExerciseIndex + 1]!.id)}
           onOpen={() => setExerciseSwitcherOpen(true)}
         />
+        <SecondaryButton label="Edit workout exercises" onPress={() => router.push({ pathname: "/(protected)/programmes/manage", params: { recordedSessionId: aggregate.session.recordedSessionId, plannedSessionId: aggregate.session.plannedSessionId } })} />
         {activeExercise ? <ActiveExerciseCard
           key={activeExercise.id}
           exercise={activeExercise}

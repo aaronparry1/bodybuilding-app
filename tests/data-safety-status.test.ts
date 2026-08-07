@@ -40,10 +40,20 @@ describe("account data safety status", () => {
     ).toMatchObject({
       title: "Cloud Backup Active",
       status: "Signed in",
-      body: "Your training is backed up and ready to sync across devices.",
+      body: "Your training has been backed up and is ready to restore on another device.",
       meta: "Last synced: Today",
       primaryActionLabel: "Manage Account",
       tone: "success",
+    });
+  });
+
+  it("does not claim account backup succeeded before the first confirmed sync", () => {
+    expect(buildDataSafetyStatus({ userEmail: "aaron@example.com", subscription: trialSubscription })).toMatchObject({
+      title: "Account connected",
+      status: "Backup pending",
+      body: "Your training is saved on this device. Cloud backup has not completed yet.",
+      retryActionLabel: "Retry Sync",
+      tone: "default",
     });
   });
 

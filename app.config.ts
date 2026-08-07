@@ -3,8 +3,6 @@ import { existsSync, readFileSync } from "node:fs";
 
 type AppEnvironment = "development" | "staging" | "production";
 
-loadLocalEnv();
-
 const profileToEnvironment: Record<string, AppEnvironment> = {
   development: "development",
   preview: "staging",
@@ -30,9 +28,10 @@ function flag(name: string, publicName: string): boolean {
   return process.env[name] === "1" || process.env[name] === "true" || process.env[publicName] === "1" || process.env[publicName] === "true";
 }
 
-function loadLocalEnv() {
+function loadLocalEnv(appEnvironment: AppEnvironment) {
   if (process.env.EXPO_NO_DOTENV === "1" || process.env.EXPO_NO_DOTENV === "true") return;
-  for (const file of [".env", ".env.local", `.env.${process.env.APP_ENV ?? ""}`].filter(Boolean)) {
+  const environmentFiles = [`.env.${appEnvironment}.local`, `.env.${appEnvironment}`, ...(appEnvironment === "production" ? [] : [".env.local"]), ".env"];
+  for (const file of environmentFiles) {
     if (!existsSync(file)) continue;
 
     for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
@@ -47,6 +46,7 @@ function loadLocalEnv() {
 }
 
 const appEnvironment = readEnvironment();
+loadLocalEnv(appEnvironment);
 const isProduction = appEnvironment === "production";
 const isStaging = appEnvironment === "staging";
 const routerRoot = isProduction ? "app-production" : "app";

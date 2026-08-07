@@ -17,6 +17,7 @@ import type { CanonicalStartingVolumeContext } from "@/domain/training/canonical
 import { resolveCanonicalConstructionFacts } from "@/application/training/canonical-construction-facts";
 import { resolveCanonicalSessionDuration } from "@/domain/training/canonical-session-duration";
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
+import { exerciseCustomisations, reapplyCanonicalExerciseCustomisations } from "@/domain/training/canonical-exercise-customisations";
 
 export type CanonicalActivePlanCreateCommand = Readonly<{
   planId: string; createdAt: string; updatedAt: string; goal: ProgrammeGoal; macrocycleGoal: CanonicalGeneratedPlanInput["macrocycleGoal"]; experienceLevel: ExperienceLevel; daysPerWeek: CanonicalTrainingDaysPerWeek; preferredSplit: CanonicalGeneratedPlanInput["preferredSplit"]; equipment: readonly Equipment[]; units: UnitSystem; targetDate?: string; recoveryCardioPreference?: RecoveryCardioPreference; availableSessionMinutes?: CanonicalSessionDurationMinutes; startingVolumeContext?: CanonicalStartingVolumeContext; exercises: readonly Exercise[]; limitations?: readonly string[]; exercisePreferences?: Readonly<Record<string, ExercisePreferenceRecord>>; history?: readonly WorkoutHistorySummary[]; establishedLoads?: Readonly<Record<string, number>>; loadEvidence?: Readonly<Record<string, CanonicalLoadEvidence>>;
@@ -86,13 +87,16 @@ export function changeCanonicalSessionDuration(command: Readonly<{
   });
   if (constructed.status !== "constructed") return { ...durationRejected(raw.carrier.revision, `session_duration_infeasible:${constructed.reason}`), customerGuidance: "That workout length cannot preserve the required training coverage for this programme. Choose a longer workout or fewer training constraints." };
   const nextRevision = raw.carrier.revision + 1;
+  const retainedCustomisations = exerciseCustomisations(raw.carrier);
   const next = {
     ...constructed.carrier,
     revision: nextRevision,
     progress: { ...constructed.carrier.progress, revision: nextRevision },
+    plannedSessions: reapplyCanonicalExerciseCustomisations(constructed.carrier.plannedSessions, retainedCustomisations, nextRevision),
     recordedSessionReferences: raw.carrier.recordedSessionReferences ?? [],
     cycleLineage: raw.carrier.cycleLineage ?? [],
     constructionInputs: facts.facts.references,
+    operational: { ...constructed.carrier.operational, exerciseCustomisations: retainedCustomisations },
   };
   const saved = canonicalActivePlanV2Repository.saveAtomically(next, raw.carrier.revision);
   if (saved.status !== "saved") return durationRejected(raw.carrier.revision, saved.status === "conflict" ? "stale_plan_revision" : "canonical_plan_save_failed");

@@ -14,6 +14,8 @@ import { legacyTrainingYearArchive } from "@/application/training/legacy-trainin
 import { SyncQueue, type SyncQueueItem, type SyncQueueStore } from "@/data/sync/sync-queue";
 import { createActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { exerciseLibrary, presetProgrammes } from "@/domain/training/presets";
+import type { WorkoutSession } from "@/domain/training/models";
+import type { WorkoutSessionRepository } from "@/data/local/workout-session-repository";
 
 class MemorySyncQueueStore implements SyncQueueStore {
   items: SyncQueueItem[] = [];
@@ -27,6 +29,14 @@ class MemorySyncQueueStore implements SyncQueueStore {
   }
 }
 
+class MemoryWorkoutRepository implements WorkoutSessionRepository {
+  sessions: WorkoutSession[] = [];
+  list() { return this.sessions; }
+  save(session: WorkoutSession) { this.sessions = [session, ...this.sessions.filter((candidate) => candidate.id !== session.id)]; }
+  remove(sessionId: string) { this.sessions = this.sessions.filter((session) => session.id !== sessionId); }
+  subscribe() { return () => undefined; }
+}
+
 describe("cloud data sync and restore", () => {
   beforeEach(() => {
     jsonStore.clearByPrefix("iron-logic.");
@@ -34,16 +44,22 @@ describe("cloud data sync and restore", () => {
     appSettingsStore.resetCache();
   });
 
-  it("does not install legacy workout history from cloud", async () => {
-    await restoreCloudDataForUser("user-1", {
+  it("restores missing cloud history without overwriting a newer local record", async () => {
+    const local = new MemoryWorkoutRepository();
+    const localSession = workout("shared", "2026-08-02T10:00:00.000Z", 100);
+    local.sessions = [localSession];
+    const result = await restoreCloudDataForUser("user-1", {
       client: {} as never,
-      workoutCloudRepository: { loadWorkoutHistory: async () => [] },
+      localWorkoutRepository: local,
+      workoutCloudRepository: { loadWorkoutHistory: async () => [workout("shared", "2026-08-01T10:00:00.000Z", 60), workout("cloud-only", "2026-08-03T10:00:00.000Z", 80)] },
       programmeCloudRepository: { loadProgrammes: async () => [] },
       exerciseCloudRepository: { loadExercises: async () => [] },
       userSettingsCloudRepository: { loadUserSettingsBlob: async () => null },
     });
 
-    expect(true).toBe(true);
+    expect(result.restoredSessions).toBe(1);
+    expect(local.list().find((session) => session.id === "shared")?.exercises[0]?.load).toBe(100);
+    expect(local.list().map((session) => session.id)).toContain("cloud-only");
   });
 
   it("restores active plan, training year, and settings from the cloud backup envelope on fresh install", async () => {
@@ -146,3 +162,7 @@ describe("cloud data sync and restore", () => {
     expect(recreatedQueue.list().some((item) => item.entityType === "workout_session")).toBe(false);
   });
 });
+
+function workout(id: string, updatedAt: string, load: number): WorkoutSession {
+  return { id, userId: "user-1", name: id, startedAt: updatedAt, completedAt: updatedAt, updatedAt, syncState: "synced", exercises: [{ id: `${id}:exercise`, exerciseId: exerciseLibrary[0]!.id, exerciseName: exerciseLibrary[0]!.name, settings: exerciseLibrary[0]!.defaultSettings, load, status: "complete", sets: [{ id: `${id}:set`, setNumber: 1, reps: 8, load, loggedAt: updatedAt }] }] };
+}

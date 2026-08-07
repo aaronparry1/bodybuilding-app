@@ -148,8 +148,9 @@ export class RevenueCatGateway implements SubscriptionGateway {
         const subscription = mapRevenueCatCustomerInfoToSubscription(mapNativeCustomerInfo(result.customerInfo, this.premiumEntitlementId), this.premiumEntitlementId);
         return this.recoverAndroidEntitlement(subscription);
       }
-
-      return null;
+      if (await purchases.isAnonymous()) return this.getSubscription();
+      const customerInfo = await purchases.logOut();
+      return mapRevenueCatCustomerInfoToSubscription(mapNativeCustomerInfo(customerInfo, this.premiumEntitlementId), this.premiumEntitlementId);
     });
   }
 

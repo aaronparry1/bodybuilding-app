@@ -1,7 +1,7 @@
 export const CANONICAL_RECORDED_SESSION_SCHEMA = "canonical_recorded_session_v1" as const;
 export type CanonicalRecordedSessionStatus = "pending" | "started" | "paused" | "completed" | "historical";
 export type CanonicalRecordedSession = Readonly<{ schemaVersion: typeof CANONICAL_RECORDED_SESSION_SCHEMA; recordedSessionId: string; plannedSessionId: string; planId: string; startRevision: number; macrocycleId: string; mesocycleId: string; microcycleId: string; role: string; prescriptionSnapshot: Readonly<Record<string, unknown>>; prescriptionHash: string; provenance: Readonly<Record<string, string>>; athleteId: string; version: number; status: CanonicalRecordedSessionStatus; createdAt: string; startedAt?: string }>;
-export type CanonicalRecordedSessionEvent = Readonly<{ eventId: string; aggregateId: string; expectedVersion: number; type: "pending_start" | "started" | "paused" | "resumed" | "performance" | "completed" | "historical" | "repair"; occurredAt: string; operationId: string; payload: Readonly<Record<string, unknown>> }>;
+export type CanonicalRecordedSessionEvent = Readonly<{ eventId: string; aggregateId: string; expectedVersion: number; type: "pending_start" | "started" | "paused" | "resumed" | "performance" | "completed" | "historical" | "repair" | "prescription_adjusted"; occurredAt: string; operationId: string; payload: Readonly<Record<string, unknown>> }>;
 
 export function validateCanonicalRecordedSession(value: unknown): { status: "valid"; session: CanonicalRecordedSession } | { status: "invalid"; reason: string } {
   if (!value || typeof value !== "object") return { status: "invalid", reason: "malformed_recorded_session" };
@@ -16,8 +16,8 @@ export function validateCanonicalRecordedSession(value: unknown): { status: "val
 
 export function allowedRecordedSessionTransition(from: CanonicalRecordedSessionStatus, event: CanonicalRecordedSessionEvent["type"]): boolean {
   if (from === "pending") return event === "started" || event === "repair";
-  if (from === "started") return ["paused", "performance", "completed", "repair"].includes(event);
-  if (from === "paused") return ["resumed", "performance", "completed", "repair"].includes(event);
+  if (from === "started") return ["paused", "performance", "completed", "repair", "prescription_adjusted"].includes(event);
+  if (from === "paused") return ["resumed", "performance", "completed", "repair", "prescription_adjusted"].includes(event);
   if (from === "completed") return event === "historical";
   return event === "repair";
 }

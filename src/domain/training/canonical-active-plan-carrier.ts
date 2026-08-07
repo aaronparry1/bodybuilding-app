@@ -62,6 +62,16 @@ export type CanonicalConstructionContext = Readonly<{
   pendingNumericDecisions?: readonly import("@/domain/training/canonical-comparable-exposure-policy").CanonicalNumericPrescriptionDecision[];
 }>;
 
+export type CanonicalExerciseCustomisation = Readonly<{
+  id: string;
+  action: "replace" | "add" | "remove";
+  sourceExerciseId?: string;
+  replacementExerciseId?: string;
+  planSessionIndex?: number;
+  slotSnapshot?: Readonly<Record<string, unknown>>;
+  occurredAt: string;
+}>;
+
 export type CanonicalActivePlanCarrier = Readonly<{
   schema: CanonicalActivePlanSchema;
   planId: string;
@@ -87,7 +97,7 @@ export type CanonicalActivePlanCarrier = Readonly<{
     startingVolumeContext?: CanonicalStartingVolumeContext;
     customSequence?: readonly string[];
   }>;
-  operational: Readonly<{ openWorkoutId?: string; migrationId?: string; recoverySourceReference?: string; syncRevision?: string }>;
+  operational: Readonly<{ openWorkoutId?: string; migrationId?: string; recoverySourceReference?: string; syncRevision?: string; exerciseCustomisations?: readonly CanonicalExerciseCustomisation[] }>;
   constructionInputs?: Readonly<{ schemaVersion: "canonical_construction_inputs_v1"; athleteId: string; exerciseCatalogueSource: string; equipmentSource: string; limitationsSource: string; preferencesSource: string; progressEvidenceScope: string; establishedLoadSource: string }>;
   constructionContext?: CanonicalConstructionContext;
   planningRationale?: CanonicalPlanningRationale;
@@ -142,7 +152,7 @@ export function assembleCanonicalActivePlan(input: CanonicalCarrierAssemblyInput
     ...(input.conditioning ? { conditioning: input.conditioning } : {}),
     constraints: input.constraints,
     operational: input.operational ?? {},
-  };
+};
   return validateCanonicalActivePlan(carrier);
 }
 

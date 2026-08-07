@@ -5,6 +5,25 @@ type Store = Record<string, { session: CanonicalRecordedSession; events: Canonic
 export const canonicalRecordedSessionLedger = {
   create(session: CanonicalRecordedSession, operationId: string) { const valid = validateCanonicalRecordedSession(session); if (valid.status !== "valid") return valid; const store = jsonStore.get<Store>(key, {}); if (store[session.recordedSessionId]) return JSON.stringify(store[session.recordedSessionId].session) === JSON.stringify(session) ? { status: "duplicate" as const, session } : { status: "conflict" as const, reason: "recorded_session_id_conflict" }; jsonStore.set(key, { ...store, [session.recordedSessionId]: { session, events: [{ eventId: `${session.recordedSessionId}:pending:${operationId}`, aggregateId: session.recordedSessionId, expectedVersion: 0, type: "pending_start", occurredAt: session.createdAt, operationId, payload: {} }] } }); return { status: "saved" as const, session }; },
   append(recordedSessionId: string, event: CanonicalRecordedSessionEvent) { const store = jsonStore.get<Store>(key, {}); const aggregate = store[recordedSessionId]; if (!aggregate) return { status: "not_found" as const }; if (event.expectedVersion !== aggregate.session.version) return { status: "stale" as const, reason: "aggregate_version_mismatch" }; if (!allowedRecordedSessionTransition(aggregate.session.status, event.type)) return { status: "rejected" as const, reason: "invalid_lifecycle_transition" }; const nextStatus = event.type === "started" || event.type === "resumed" ? "started" : event.type === "paused" ? "paused" : event.type === "completed" ? "completed" : event.type === "historical" ? "historical" : aggregate.session.status; const next = { ...aggregate.session, status: nextStatus as CanonicalRecordedSession["status"], version: aggregate.session.version + 1, ...(event.type === "started" ? { startedAt: event.occurredAt } : {}) }; const updated = { session: next, events: [...aggregate.events, event] }; jsonStore.set(key, { ...store, [recordedSessionId]: updated }); return { status: "saved" as const, session: next }; },
+  adjustActivePrescription(recordedSessionId: string, expectedVersion: number, operationId: string, occurredAt: string, prescriptionSnapshot: Readonly<Record<string, unknown>>, payload: Readonly<Record<string, unknown>>) {
+    try {
+      const store = jsonStore.get<Store>(key, {});
+      const aggregate = store[recordedSessionId];
+      if (!aggregate) return { status: "not_found" as const };
+      const prior = aggregate.events.find((event) => event.operationId === operationId);
+      if (prior) return { status: "duplicate" as const, session: aggregate.session };
+      if (aggregate.session.version !== expectedVersion) return { status: "stale" as const, reason: "aggregate_version_mismatch" };
+      if (!["started", "paused"].includes(aggregate.session.status)) return { status: "rejected" as const, reason: "active_session_required" };
+      const valid = validateCanonicalRecordedSession({ ...aggregate.session, prescriptionSnapshot, prescriptionHash: JSON.stringify(prescriptionSnapshot) });
+      if (valid.status !== "valid") return valid;
+      const event: CanonicalRecordedSessionEvent = { eventId: `${recordedSessionId}:prescription:${operationId}`, aggregateId: recordedSessionId, expectedVersion, type: "prescription_adjusted", occurredAt, operationId, payload };
+      const next = { ...aggregate.session, prescriptionSnapshot, prescriptionHash: JSON.stringify(prescriptionSnapshot), version: expectedVersion + 1 };
+      jsonStore.set(key, { ...store, [recordedSessionId]: { session: next, events: [...aggregate.events, event] } });
+      return { status: "saved" as const, session: next };
+    } catch {
+      return { status: "storage_failure" as const, reason: "recorded_session_storage_write_failed" };
+    }
+  },
   get(recordedSessionId: string) { const value = jsonStore.get<Store>(key, {})[recordedSessionId]; return value ? { status: "found" as const, session: value.session, events: [...value.events] } : { status: "not_found" as const }; },
   list(planId: string) { return Object.values(jsonStore.get<Store>(key, {})).filter((value) => value.session.planId === planId).map((value) => value.session).sort((a, b) => a.recordedSessionId.localeCompare(b.recordedSessionId)); },
   inspectActive() {

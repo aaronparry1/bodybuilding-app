@@ -1,6 +1,6 @@
 import { Redirect, useGlobalSearchParams, useSegments } from "expo-router";
 import { Stack } from "expo-router/stack";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { useAuth } from "@/application/auth/auth-context";
 import { useSubscription } from "@/application/billing/subscription-context";
@@ -15,6 +15,8 @@ import { backfillExistingUserOnboardingMetadata } from "@/application/training/c
 import { resumePendingCanonicalCoachingWork } from "@/application/training/canonical-completion-evidence-reconciliation";
 import { reconcileCanonicalReleaseState, type CanonicalReleaseReconciliationResult } from "@/application/training/canonical-release-reconciliation";
 import { resolveCanonicalStartupHydration } from "@/application/training/canonical-startup-hydration";
+import { recoverLegacyExistingUserTraining } from "@/application/training/legacy-existing-user-recovery";
+import { sameCanonicalReconciliation } from "@/application/training/stable-reconciliation";
 import { PrimaryButton } from "@/ui/primitives";
 import { colors, spacing } from "@/ui/theme";
 
@@ -51,13 +53,26 @@ export default function ProductionProtectedLayout() {
       setReconciliation(null);
       return;
     }
+    const recovery = recoverLegacyExistingUserTraining(user?.id ?? null);
+    if (recovery.status === "blocked") {
+      updateReconciliation(setReconciliation, {
+        status: "recovery_required",
+        reason: recovery.reason,
+        planVisible: false,
+        historyPreserved: true,
+        activeAttempt: "none",
+        regeneratedFutureSessions: 0,
+        customerGuidance: "We found earlier training data but could not safely reconnect it to your programme. Nothing has been overwritten. Retry account restore or contact support before creating a new plan.",
+      });
+      return;
+    }
     const result = reconcileCanonicalReleaseState({
       onboardingCompleted: settings.onboardingCompleted,
       updatedAt: new Date().toISOString(),
       authenticatedUserId: user?.id ?? null,
       accessMode: user ? "authenticated" : "offline",
     });
-    setReconciliation(result);
+    updateReconciliation(setReconciliation, result);
     if (result.onboardingMetadataBackfillRequired && result.planVisible) {
       const backfill = backfillExistingUserOnboardingMetadata();
       if (backfill.status === "rejected" && process.env.NODE_ENV !== "production") {
@@ -110,6 +125,7 @@ export default function ProductionProtectedLayout() {
       <Stack.Screen name="programmes/[id]" options={{ title: "Programme" }} />
       <Stack.Screen name="programmes/builder" options={{ title: "Programme Builder" }} />
       <Stack.Screen name="programmes/session" options={{ title: "Session Builder" }} />
+      <Stack.Screen name="programmes/manage" options={{ title: "Manage Exercises" }} />
       <Stack.Screen name="history/index" options={{ title: "History" }} />
       <Stack.Screen name="history/[id]" options={{ title: "Workout Detail" }} />
       <Stack.Screen name="history/exercise/[id]" options={{ title: "Exercise History" }} />
@@ -123,6 +139,13 @@ export default function ProductionProtectedLayout() {
       <Stack.Screen name="settings" options={{ title: "Settings" }} />
     </Stack>
   );
+}
+
+function updateReconciliation(
+  setter: Dispatch<SetStateAction<CanonicalReleaseReconciliationResult | null>>,
+  next: CanonicalReleaseReconciliationResult | null,
+): void {
+  setter((current) => sameCanonicalReconciliation(current, next) ? current : next);
 }
 
 function Loading() {
