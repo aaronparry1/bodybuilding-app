@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { projectCanonicalCompletionSummary } from "@/application/training/canonical-completion-summary-presentation";
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
@@ -12,6 +13,7 @@ import { BrandedShareCardPreviewModal } from "@/features/social-sharing/branded-
 import { AppScreen, PremiumCard, PrimaryButton, SecondaryButton } from "@/ui/primitives";
 import { spacing, type, workoutColors } from "@/ui/theme";
 import { WorkoutMetricStrip } from "@/ui/workout-visuals";
+import { useReducedMotion } from "@/ui/motion";
 
 const TRAIN = workoutColors;
 
@@ -20,6 +22,7 @@ export default function CompletionSummaryScreen() {
   const { settings } = useAppSettings();
   const [, refresh] = useState(0);
   const [sharePayload, setSharePayload] = useState<BrandedSharePayload | null>(null);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     canonicalActivePlanState.refresh();
@@ -41,40 +44,44 @@ export default function CompletionSummaryScreen() {
   const payload = buildWorkoutSummarySharePayload({ workoutName: summary.workoutName, exercisesCompleted: summary.exercisesCompleted, workSetsCompleted: summary.completedWorkingSets, prCount: 0 });
 
   return <AppScreen>
-    <View accessibilityRole="summary" style={styles.successHeader}>
+    <CompletionReveal index={0} reduceMotion={reduceMotion}><View accessibilityRole="summary" style={styles.successHeader}>
       <View style={styles.successMark}><Text style={styles.successGlyph}>✓</Text></View>
       <Text style={styles.eyebrow}>{summary.completionLabel.toUpperCase()}</Text>
       <Text style={styles.hero}>{summary.workoutName}</Text>
       <Text style={styles.muted}>{summary.completion === "complete" ? "Strong work. Every prescribed exercise was represented in the retained session." : "Your completed work is saved exactly as performed. Unfinished work was not invented."}</Text>
-    </View>
+    </View></CompletionReveal>
 
-    <WorkoutMetricStrip centered items={[
+    <CompletionReveal index={1} reduceMotion={reduceMotion}><WorkoutMetricStrip centered items={[
       { value: String(summary.completedWorkingSets), label: "work sets" },
       { value: String(summary.exercisesCompleted), label: summary.prescribedExercises ? `of ${summary.prescribedExercises} exercises` : "exercises" },
       { value: duration, label: "elapsed" },
-    ]} />
+    ]} /></CompletionReveal>
 
-    {displayedVolume !== null ? <PremiumCard tone="quiet"><Text style={styles.cardLabel}>WORK COMPLETED</Text><Text style={styles.volume}>{formatNumber(displayedVolume)} {settings.unit}</Text><Text style={styles.muted}>Evidence-backed load volume from completed weighted sets.</Text></PremiumCard> : null}
+    {displayedVolume !== null ? <CompletionReveal index={2} reduceMotion={reduceMotion}><PremiumCard tone="quiet"><Text style={styles.cardLabel}>WORK COMPLETED</Text><Text style={styles.volume}>{formatNumber(displayedVolume)} {settings.unit}</Text><Text style={styles.muted}>Evidence-backed load volume from completed weighted sets.</Text></PremiumCard></CompletionReveal> : null}
 
-    <PremiumCard tone={decision ? "success" : "quiet"}>
+    <CompletionReveal index={3} reduceMotion={reduceMotion}><PremiumCard tone={decision ? "success" : "quiet"}>
       <Text style={styles.cardLabel}>{decision ? "COACH REVIEW" : "SESSION SAVED"}</Text>
       <Text style={styles.cardTitle}>{decision ? "Your training evidence was reviewed" : "Your programme state is up to date"}</Text>
       <Text style={styles.body}>{summary.coachingOutcome}</Text>
       {summary.methodsPerformed.length ? <Text style={styles.detail}>Methods performed · {summary.methodsPerformed.join(" · ")}</Text> : null}
-    </PremiumCard>
+    </PremiumCard></CompletionReveal>
 
-    <PremiumCard tone="default">
+    <CompletionReveal index={4} reduceMotion={reduceMotion}><PremiumCard tone="default">
       <Text style={styles.cardLabel}>WHAT’S NEXT</Text>
       <Text style={styles.cardTitle}>{nextWorkout ? `${nextWorkout} is next` : "Recovery comes next"}</Text>
       <Text style={styles.body}>{nextWorkout ? "Return home to see the updated programme and start only when the next session is due." : "This block has no immediate next session. Review Progress for the latest coaching outcome."}</Text>
       <PrimaryButton label="Return home" onPress={() => router.replace("/(protected)/(tabs)")} />
       <SecondaryButton label="View progress" onPress={() => router.replace("/(protected)/(tabs)/analytics")} />
-    </PremiumCard>
+    </PremiumCard></CompletionReveal>
 
     <SecondaryButton testID="completion-share" label="Share workout summary" onPress={() => setSharePayload(payload)} />
     <Text style={styles.privacy}>The share card contains workout totals only—never your name, account, notes, bodyweight or full workout log.</Text>
     <BrandedShareCardPreviewModal payload={sharePayload} onClose={() => setSharePayload(null)} />
   </AppScreen>;
+}
+
+function CompletionReveal({ children, index, reduceMotion }: Readonly<{ children: ReactNode; index: number; reduceMotion: boolean }>) {
+  return <Animated.View entering={reduceMotion ? undefined : FadeInUp.duration(220).delay(index * 55)}>{children}</Animated.View>;
 }
 
 function formatDuration(seconds: number): string {

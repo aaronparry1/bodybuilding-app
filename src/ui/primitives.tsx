@@ -5,6 +5,7 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getTabScreenBottomPadding } from "@/ui/layout";
 import { colors, radius, shadow, shellTokens, spacing, type } from "@/ui/theme";
+import { useReducedMotion } from "@/ui/motion";
 
 export function Screen({
   children,
@@ -460,8 +461,9 @@ export function RowItem({
   children?: ReactNode;
   index?: number;
 }) {
+  const reduceMotion = useReducedMotion();
   return (
-    <Animated.View entering={FadeInUp.duration(180).delay(Math.min(index, 8) * 18)}>
+    <Animated.View entering={reduceMotion ? undefined : FadeInUp.duration(180).delay(Math.min(index, 8) * 18)}>
       <PremiumCard tone="quiet">
         <View style={{ flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
           <View style={{ flex: 1, flexShrink: 1, minWidth: 0, gap: spacing.xs }}>

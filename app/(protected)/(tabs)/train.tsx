@@ -60,6 +60,7 @@ import { hapticFeedback } from "@/application/training/haptic-feedback";
 import { AppScreen, PrimaryButton, SecondaryButton, stableUiIdentifier } from "@/ui/primitives";
 import { type, workoutColors } from "@/ui/theme";
 import { WorkoutMetricStrip, WorkoutStage } from "@/ui/workout-visuals";
+import { useReducedMotion } from "@/ui/motion";
 
 type RouteParams = Readonly<{
   planId?: string;
@@ -108,13 +109,12 @@ function CanonicalTrainExperience() {
   const [busy, setBusy] = useState(false);
   const [timerTick, setTimerTick] = useState(() => Date.now());
   const [nextInstruction, setNextInstruction] = useState<string | null>(null);
-  const [reduceMotion, setReduceMotion] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     canonicalActivePlanState.hydrate();
     return canonicalActivePlanState.subscribe(() => refresh((value) => value + 1));
   }, []);
-  useEffect(() => { void AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion); }, []);
   useEffect(() => {
     if (params.exerciseEditMessage) setMessage(String(params.exerciseEditMessage));
   }, [params.exerciseEditMessage]);
