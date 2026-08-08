@@ -20,13 +20,17 @@ describe("Adaptive Strength Coach positioning", () => {
     expect(eas).not.toContain("Iron Logic");
   });
 
-  it("shows the new onboarding goals and removes old goal labels", () => {
+  it("keeps active onboarding inside the hypertrophy, strength, and powerbuilding mission", () => {
     const source = onboardingSource();
 
-    for (const label of ["Hypertrophy", "Strength", "Powerbuilding", "Athletic Performance", "Powerlifting meet"]) {
+    for (const label of ["Hypertrophy", "Strength", "Powerbuilding", "Powerlifting meet"]) {
       expect(source).toContain(`label: "${label}"`);
     }
 
+    expect(source).toContain("Adaptive coaching built specifically for muscle, strength, or both.");
+    expect(source).not.toContain('label: "Athletic Performance"');
+    expect(source).not.toContain('label: "Getting Lean"');
+    expect(source).not.toContain('label: "Athletic event or season"');
     expect(source).not.toContain('label: "Build Strength"');
     expect(source).not.toContain('label: "Build Muscle & Strength"');
     expect(source).not.toContain('label: "Get Leaner"');

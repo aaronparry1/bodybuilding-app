@@ -45,8 +45,6 @@ const goalOptions: Array<{ value: TrainingSetupGoal; label: string; detail: stri
   { value: "build_muscle", label: "Hypertrophy", detail: "Build muscle with productive volume and steady performance." },
   { value: "build_muscle_and_strength", label: "Powerbuilding", detail: "Build muscle and strength together with heavy anchors and productive volume." },
   { value: "build_strength", label: "Strength", detail: "Build force production with enough muscle work to support it." },
-  { value: "athletic_performance", label: "Athletic Performance", detail: "Power and strength without forgetting tissue." },
-  { value: "get_leaner", label: "Getting Lean", detail: "Preserve useful strength and muscle while managing recovery and conditioning." },
 ];
 
 const commitmentOptions: Array<{ value: TrainingCommitmentType; label: string; detail: string }> = [
@@ -56,7 +54,6 @@ const commitmentOptions: Array<{ value: TrainingCommitmentType; label: string; d
 
 const eventOptions: Array<{ value: TrainingEventType; label: string; detail: string }> = [
   { value: "powerlifting_meet", label: "Powerlifting meet", detail: "For squat, bench, and deadlift performance on a fixed date." },
-  { value: "athletic_event_or_season", label: "Athletic event or season", detail: "For a season, competition, or performance date." },
   { value: "physique_event", label: "Physique event", detail: "For a stage or appearance-focused deadline." },
   { value: "holiday_or_photoshoot", label: "Holiday or photoshoot", detail: "For a visible body-composition target date." },
   { value: "custom", label: "Custom", detail: "For a target date that does not fit the standard categories." },
@@ -737,6 +734,7 @@ function titleForStep(step: StepKey): string {
 }
 
 function subtitleForStep(step: StepKey): string {
+  if (step === "goal") return "Adaptive coaching built specifically for muscle, strength, or both.";
   if (step === "schedule") {
     return "Choose the number you can consistently achieve. You can change this later and ASC will adjust your programme.";
   }
