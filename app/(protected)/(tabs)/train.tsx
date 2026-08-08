@@ -67,6 +67,7 @@ type RouteParams = Readonly<{
   recordedSessionId?: string;
   action?: string;
   lifecycle?: string;
+  exerciseEditMessage?: string;
 }>;
 type SetValues = Readonly<{ reps: string; load: string }>;
 type EditState = Readonly<{ setId: string; reps: string; load: string }>;
@@ -112,6 +113,9 @@ function CanonicalTrainExperience() {
     return canonicalActivePlanState.subscribe(() => refresh((value) => value + 1));
   }, []);
   useEffect(() => { void AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion); }, []);
+  useEffect(() => {
+    if (params.exerciseEditMessage) setMessage(String(params.exerciseEditMessage));
+  }, [params.exerciseEditMessage]);
 
   const plan = canonicalActivePlanState.getReadModel();
   const route = useMemo(() => ({
@@ -421,6 +425,7 @@ function CanonicalTrainExperience() {
   const lastInstruction = nextInstruction ?? [...aggregate.events].reverse().find((event) => event.type === "performance" && typeof event.payload.nextInstruction === "string")?.payload.nextInstruction as string | null | undefined;
   const paused = aggregate.session.status === "paused";
   const completion = resolveCanonicalTrainCompletionAffordance(presentation.completedSets, presentation.totalSets, presentation.finishAllowed);
+  const positiveFeedback = message ? isPositiveTrainFeedback(message) : false;
   const selectExercise = (exerciseId: string) => {
     setActiveExerciseId(exerciseId);
     setExerciseSwitcherOpen(false);
@@ -451,7 +456,7 @@ function CanonicalTrainExperience() {
   >
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex} keyboardVerticalOffset={0}>
       <ScrollView ref={scrollRef} automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" contentContainerStyle={[styles.content, { paddingBottom: Math.max(insets.bottom, 16) + 76 }]}>
-        {message ? <View testID="train-feedback" accessibilityLiveRegion="assertive" style={styles.feedbackBanner}><Text style={styles.feedbackText}>{message}</Text></View> : null}
+        {message ? <View testID="train-feedback" accessibilityLiveRegion={positiveFeedback ? "polite" : "assertive"} style={[styles.feedbackBanner, positiveFeedback && styles.feedbackBannerPositive]}><Text style={[styles.feedbackText, positiveFeedback && styles.feedbackTextPositive]}>{message}</Text></View> : null}
         {paused ? <PausedBanner busy={busy} onResume={resume} /> : null}
         {restTimer && restTimer.state !== "skipped" ? <RestPanel timer={restTimer} seconds={restSeconds} nextInstruction={lastInstruction ?? null} onAction={restAction} /> : null}
         {(!restTimer || restTimer.state === "skipped") && lastInstruction?.startsWith("Move directly")
@@ -464,7 +469,7 @@ function CanonicalTrainExperience() {
           onNext={() => activeExerciseIndex < presentation.exercises.length - 1 && selectExercise(presentation.exercises[activeExerciseIndex + 1]!.id)}
           onOpen={() => setExerciseSwitcherOpen(true)}
         />
-        <SecondaryButton label="Edit workout exercises" onPress={() => router.push({ pathname: "/(protected)/programmes/manage", params: { recordedSessionId: aggregate.session.recordedSessionId, plannedSessionId: aggregate.session.plannedSessionId } })} />
+        <SecondaryButton label="Swap or add exercise" onPress={() => router.push({ pathname: "/(protected)/programmes/manage", params: { recordedSessionId: aggregate.session.recordedSessionId, plannedSessionId: aggregate.session.plannedSessionId } })} />
         {activeExercise ? <ActiveExerciseCard
           key={activeExercise.id}
           exercise={activeExercise}
@@ -800,6 +805,9 @@ function friendlyReason(reason: string): string {
   };
   return labels[reason] ?? reason.replace(/_/g, " ");
 }
+function isPositiveTrainFeedback(message: string): boolean {
+  return ["Exercise replaced.", "Optional exercise", "Workout restored", "Workout started", "Workout paused", "Workout resumed", "Workout complete", "Set updated", "Starting load confirmed", "Active attempt discarded"].some((prefix) => message.startsWith(prefix));
+}
 
 export { recordCanonicalPerformedWork };
 
@@ -820,6 +828,8 @@ const styles = StyleSheet.create({
   content: { gap: 12, paddingHorizontal: 12, paddingTop: 12 },
   feedbackBanner: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, backgroundColor: TRAIN.dangerSoft, borderWidth: 1, borderColor: TRAIN.danger },
   feedbackText: { color: TRAIN.danger, fontSize: 13, lineHeight: 18, fontWeight: "800" },
+  feedbackBannerPositive: { backgroundColor: TRAIN.successSoft, borderColor: TRAIN.success },
+  feedbackTextPositive: { color: TRAIN.success },
   previewContent: { gap: 14, padding: 16, paddingBottom: 40 },
   previewSummary: { gap: 8, padding: 16, borderRadius: 18, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.line },
   eyebrow: { color: TRAIN.accent, fontSize: 11, lineHeight: 15, fontWeight: "900", letterSpacing: 1 },

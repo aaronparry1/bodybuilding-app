@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { availableExerciseCatalogue, editCanonicalExercise, rankExerciseReplacements, type ExerciseEditAction, type ExerciseEditScope } from "@/application/training/canonical-exercise-management";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
@@ -20,6 +20,7 @@ export default function ProductionProgrammeManagementScreen() {
   const [slotId, setSlotId] = useState<string | null>(null);
   const [exerciseId, setExerciseId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [reviewing, setReviewing] = useState(false);
   const [saving, setSaving] = useState(false);
   useEffect(() => { canonicalActivePlanState.hydrate(); return canonicalActivePlanState.subscribe(() => refresh((value) => value + 1)); }, []);
   const plan = canonicalActivePlanState.getReadModel();
@@ -37,14 +38,10 @@ export default function ProductionProgrammeManagementScreen() {
 
   if (!plan || !snapshot) return <View style={styles.screen}><Text style={styles.title}>Manage programme</Text><Text style={styles.muted}>Your programme is still loading. No changes can be made yet.</Text><SecondaryButton label="Go back" onPress={() => router.back()} /></View>;
 
-  const cancel = () => { setAction(null); setSlotId(null); setExerciseId(null); setMessage("No changes were saved."); };
+  const cancel = () => { setAction(null); setSlotId(null); setExerciseId(null); setReviewing(false); setMessage("No changes were saved."); };
   const confirm = () => {
     if (!action || (action !== "add" && !slotId) || (action !== "remove" && !exerciseId)) return;
-    const scopeCopy = scope === "current_session" ? "Only this active workout will change." : "Matching exercises in future planned workouts will change. Completed workouts and performance history will stay unchanged.";
-    Alert.alert(action === "remove" ? "Remove this exercise?" : action === "add" ? "Add this exercise?" : "Replace this exercise?", scopeCopy, [
-      { text: "Cancel", style: "cancel" },
-      { text: "Save change", onPress: apply },
-    ]);
+    setReviewing(true);
   };
   const apply = () => {
     setSaving(true);
@@ -59,19 +56,36 @@ export default function ProductionProgrammeManagementScreen() {
       exerciseId: exerciseId ?? undefined,
     });
     setSaving(false);
-    setMessage(friendly(result.reason));
-    if (result.status === "applied" || result.status === "idempotent") { canonicalActivePlanState.refresh(); setAction(null); setSlotId(null); setExerciseId(null); }
+    const resultMessage = friendly(result.reason);
+    setMessage(resultMessage);
+    if (result.status === "applied" || result.status === "idempotent") {
+      canonicalActivePlanState.refresh();
+      setAction(null);
+      setSlotId(null);
+      setExerciseId(null);
+      setReviewing(false);
+      if (scope === "current_session" && aggregate.status === "found") {
+        router.replace({ pathname: "/(protected)/(tabs)/train", params: { planId: plan.planId, planRevision: String(plan.revision), recordedSessionId: aggregate.session.recordedSessionId, exerciseEditMessage: resultMessage } });
+      }
+    }
   };
 
   return <ScrollView contentContainerStyle={styles.screen}>
     <Text style={styles.eyebrow}>PROGRAMME MANAGEMENT</Text><Text accessibilityRole="header" style={styles.title}>Edit exercises</Text>
     <Text style={styles.muted}>Completed workouts and recorded performance are never changed. Replacement exercises keep their own load history; when loads are not directly comparable, the app asks you to establish a safe starting load.</Text>
+    {aggregate.status === "found" ? <SecondaryButton label="Return to active workout" onPress={() => router.back()} /> : null}
     {aggregate.status === "found" ? <View style={styles.scope}><Text style={styles.section}>Apply change to</Text><Choice label="This workout only" selected={scope === "current_session"} onPress={() => setScope("current_session")} /><Choice label="Future planned workouts" selected={scope === "future_programme"} onPress={() => setScope("future_programme")} /></View> : <Text style={styles.scopeNote}>Changes here apply to future planned workouts only.</Text>}
     {!action ? <View style={styles.actions}><PrimaryButton label="Swap or replace an exercise" onPress={() => setAction("replace")} /><SecondaryButton label="Add an optional exercise" onPress={() => setAction("add")} /><SecondaryButton label="Remove an optional exercise" onPress={() => setAction("remove")} /></View> : <>
       <Text style={styles.section}>{action === "add" ? "Choose an exercise to add" : "Choose the exercise to change"}</Text>
-      {action !== "add" ? slots.map((slot) => <Choice key={String(slot.id)} label={`${exerciseDisplayName(String(slot.exerciseId))}${slot.constructionRole === "primary" ? " · required" : ""}`} selected={slotId === slot.id} onPress={() => { setSlotId(String(slot.id)); setExerciseId(null); }} />) : null}
-      {action !== "remove" && (action === "add" || selectedSlot) ? <><Text style={styles.section}>{action === "add" ? "Available optional exercises" : "Compatible replacements first"}</Text>{options.slice(0, 40).map(({ exercise, compatibility }) => <Choice key={exercise.id} label={`${exercise.name}${compatibility === "equivalent" ? " · compatible" : " · new starting load required"}`} selected={exerciseId === exercise.id} onPress={() => setExerciseId(exercise.id)} />)}</> : null}
-      <PrimaryButton label={saving ? "Saving…" : "Review change"} disabled={saving} onPress={confirm} /><SecondaryButton label="Cancel without saving" onPress={cancel} />
+      {action !== "add" ? slots.map((slot) => <Choice key={String(slot.id)} label={`${exerciseDisplayName(String(slot.exerciseId))}${slot.constructionRole === "primary" ? " · required" : ""}`} selected={slotId === slot.id} onPress={() => { setSlotId(String(slot.id)); setExerciseId(null); setReviewing(false); }} />) : null}
+      {action !== "remove" && (action === "add" || selectedSlot) ? <><Text style={styles.section}>{action === "add" ? "Available optional exercises" : "Compatible replacements first"}</Text>{options.slice(0, 40).map(({ exercise, compatibility }) => <Choice key={exercise.id} label={`${exercise.name}${compatibility === "equivalent" ? " · compatible" : " · new starting load required"}`} selected={exerciseId === exercise.id} onPress={() => { setExerciseId(exercise.id); setReviewing(false); }} />)}</> : null}
+      {!reviewing ? <PrimaryButton label="Review change" disabled={saving || (action !== "add" && !slotId) || (action !== "remove" && !exerciseId)} onPress={confirm} /> : <View testID="exercise-change-review" style={styles.review}>
+        <Text accessibilityRole="header" style={styles.section}>{action === "remove" ? "Remove this exercise?" : action === "add" ? "Add this exercise?" : "Replace this exercise?"}</Text>
+        <Text style={styles.muted}>{scope === "current_session" ? "Only this active workout will change." : "Matching exercises in future planned workouts will change. Completed workouts and performance history will stay unchanged."}</Text>
+        <PrimaryButton label={saving ? "Saving…" : "Save change"} disabled={saving} onPress={apply} />
+        <SecondaryButton label="Back to choices" onPress={() => setReviewing(false)} />
+      </View>}
+      <SecondaryButton label="Cancel without saving" onPress={cancel} />
     </>}
     {message ? <Text accessibilityLiveRegion="polite" style={styles.message}>{message}</Text> : null}
   </ScrollView>;
@@ -90,5 +104,6 @@ const styles = {
   choice: { minHeight: 48, justifyContent: "center", paddingHorizontal: spacing.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surfaceMuted } as const,
   choiceSelected: { borderColor: colors.accent, backgroundColor: colors.accentSoft } as const,
   choiceText: { color: colors.textMuted, fontWeight: "700" } as const, choiceTextSelected: { color: colors.accent } as const,
+  review: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.accent, backgroundColor: colors.accentSoft } as const,
   message: { color: colors.textMuted } as const,
 };

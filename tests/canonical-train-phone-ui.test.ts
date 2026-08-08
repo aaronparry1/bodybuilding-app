@@ -83,6 +83,9 @@ describe("phone-first canonical Train UI", () => {
     expect(resolveCanonicalTrainCompletionAffordance(1, 22, true)).toEqual({ normalFinishAvailable: false, earlyFinishAvailable: true, completedSets: 1, remainingSets: 21 });
     expect(resolveCanonicalTrainCompletionAffordance(22, 22, true)).toEqual({ normalFinishAvailable: true, earlyFinishAvailable: false, completedSets: 22, remainingSets: 0 });
     expect(trainSource).not.toContain("Your recorded working sets are ready to complete.");
+    expect(trainSource).toContain("isPositiveTrainFeedback");
+    expect(trainSource).toContain("feedbackBannerPositive");
+    expect(trainSource).toContain('positiveFeedback ? "polite" : "assertive"');
   });
 
   it("keeps the current exercise focused and opens the full list only on demand", () => {
