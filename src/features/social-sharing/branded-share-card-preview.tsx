@@ -158,9 +158,9 @@ const shareCardOuterStyle = {
 
 const shareCardGradientStyle = {
   flex: 1,
-  paddingTop: 26,
-  paddingHorizontal: 26,
-  paddingBottom: 30,
+  paddingTop: 20,
+  paddingHorizontal: 22,
+  paddingBottom: 20,
   justifyContent: "space-between" as const,
 };
 
@@ -177,21 +177,21 @@ const shareCardGlowStyle = {
 const shareCardTopRowStyle = {
   flexDirection: "row" as const,
   alignItems: "center" as const,
-  gap: 14,
+  gap: 10,
 };
 
 const shareLogoStyle = {
-  width: 72,
-  height: 72,
-  borderRadius: 20,
+  width: 54,
+  height: 54,
+  borderRadius: 16,
   borderWidth: 1,
   borderColor: "rgba(247,211,122,0.55)",
 };
 
 const shareBrandStyle = {
   color: "#F8F3E8",
-  fontSize: 19,
-  lineHeight: 23,
+  fontSize: 17,
+  lineHeight: 20,
   fontWeight: "900" as const,
 };
 
@@ -204,8 +204,8 @@ const shareSubtitleStyle = {
 };
 
 const shareCardBodyStyle = {
-  gap: 14,
-  paddingVertical: 20,
+  gap: 8,
+  paddingVertical: 12,
 };
 
 const shareEyebrowStyle = {
@@ -218,15 +218,15 @@ const shareEyebrowStyle = {
 
 const shareTitleStyle = {
   color: "#FFFFFF",
-  fontSize: 34,
-  lineHeight: 39,
+  fontSize: 28,
+  lineHeight: 32,
   fontWeight: "900" as const,
 };
 
 const shareMetricStyle = {
   color: "#F7D37A",
-  fontSize: 44,
-  lineHeight: 51,
+  fontSize: 34,
+  lineHeight: 40,
   fontWeight: "900" as const,
 };
 
@@ -239,8 +239,8 @@ const shareDividerStyle = {
 
 const shareDetailStyle = {
   color: "rgba(248,243,232,0.84)",
-  fontSize: 20,
-  lineHeight: 26,
+  fontSize: 14,
+  lineHeight: 19,
   fontWeight: "900" as const,
 };
 

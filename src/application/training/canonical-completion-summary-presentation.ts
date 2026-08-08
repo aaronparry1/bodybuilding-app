@@ -1,9 +1,11 @@
 import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/domain/training/canonical-recorded-session-ledger";
 import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
+import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
 import { methodDisplayName, sessionRoleDisplayName } from "@/application/training/display-labels";
-export type CanonicalCompletionSummaryPresentation = Readonly<{ title: "Workout complete"; workoutName: string; elapsedSeconds: number; completedWorkingSets: number; exercisesCompleted: number; totalVolume: number | null; methodsPerformed: readonly string[]; progressionWins: readonly string[]; coachingOutcome: string; nextWorkoutId: string | null }>;
+export type CanonicalCompletionSummaryPresentation = Readonly<{ title: "Workout complete"; workoutName: string; completion: "complete" | "partial" | "missed"; completionLabel: string; elapsedSeconds: number; completedWorkingSets: number; exercisesCompleted: number; prescribedExercises: number; totalVolume: number | null; methodsPerformed: readonly string[]; progressionWins: readonly string[]; coachingOutcome: string; nextWorkoutId: string | null }>;
 export function projectCanonicalCompletionSummary(input: Readonly<{ session: CanonicalRecordedSession; events: readonly CanonicalRecordedSessionEvent[]; nextWorkoutId?: string | null; coachingExplanation?: string; now?: number }>): CanonicalCompletionSummaryPresentation {
   const performance = effectiveCanonicalPerformedWork(input.events);
+  const completionSummary = deriveCanonicalCompletionSummary(input.session, input.events);
   const exercises = new Set(performance.map((event) => String(event.payload.exerciseId)));
   const performedSlots = new Set(performance.map((event) => String(event.payload.slotId)));
   const snapshot = (input.session.prescriptionSnapshot ?? {}) as Record<string, unknown>;
@@ -14,5 +16,10 @@ export function projectCanonicalCompletionSummary(input: Readonly<{ session: Can
   const startedAt = input.session.startedAt ? Date.parse(input.session.startedAt) : Date.parse(input.session.createdAt);
   const completedAt = input.events.find((event) => event.type === "completed")?.occurredAt;
   const end = completedAt ? Date.parse(completedAt) : (input.now ?? Date.now());
-  return { title: "Workout complete", workoutName: sessionRoleDisplayName(input.session.role), elapsedSeconds: Number.isFinite(startedAt) ? Math.max(0, Math.floor((end - startedAt) / 1000)) : 0, completedWorkingSets: performance.length, exercisesCompleted: exercises.size, totalVolume, methodsPerformed, progressionWins: [], coachingOutcome: input.coachingExplanation ?? "Training recorded. Your next session is ready when you are.", nextWorkoutId: input.nextWorkoutId ?? null };
+  const completionLabel = completionSummary.completion === "complete"
+    ? "Full session completed"
+    : completionSummary.completion === "partial"
+      ? "Partial session saved"
+      : "Session closed without working sets";
+  return { title: "Workout complete", workoutName: sessionRoleDisplayName(input.session.role), completion: completionSummary.completion, completionLabel, elapsedSeconds: Number.isFinite(startedAt) ? Math.max(0, Math.floor((end - startedAt) / 1000)) : 0, completedWorkingSets: performance.length, exercisesCompleted: exercises.size, prescribedExercises: slots.length, totalVolume, methodsPerformed, progressionWins: [], coachingOutcome: input.coachingExplanation ?? "Training recorded. Your next session is ready when you are.", nextWorkoutId: input.nextWorkoutId ?? null };
 }
