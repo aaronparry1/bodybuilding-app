@@ -160,6 +160,7 @@ describe("cloud data sync and restore", () => {
 
     expect(recreatedQueue.count()).toBeGreaterThan(0);
     expect(recreatedQueue.list().some((item) => item.entityType === "workout_session")).toBe(false);
+    expect(recreatedQueue.list().map((item) => item.entityType)).toEqual(["user_settings"]);
   });
 });
 

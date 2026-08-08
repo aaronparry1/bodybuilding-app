@@ -1,6 +1,6 @@
 import type { WorkoutSession } from "@/domain/training/models";
 
-export type SyncEntityType = "workout_session" | "canonical_recorded_session" | "custom_exercise" | "programme" | "user_settings";
+export type SyncEntityType = "workout_session" | "custom_exercise" | "programme" | "user_settings";
 
 export interface SyncQueueItem<TPayload = unknown> {
   id: string;

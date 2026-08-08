@@ -329,14 +329,10 @@ export function enqueueLocalDataForAutomaticSync(
   const localProgrammeRepository = dependencies.localProgrammeRepository ?? programmeRepository;
   const localExerciseRepository = dependencies.localExerciseRepository ?? customExerciseRepository;
 
-  // Canonical recorded-session envelopes are included in the backup payload
-  // and queued as canonical state; legacy workout records are not re-enqueued.
-  const canonical = canonicalActivePlanV2Repository.get();
-  if (canonical.status === "saved") {
-    for (const record of canonicalRecordedSessionLedger.exportPlan(canonical.carrier.planId)) {
-      queue.enqueue("canonical_recorded_session", record.session.recordedSessionId, record, userId);
-    }
-  }
+  // Canonical recorded sessions and progress evidence live inside the
+  // versioned user-settings backup envelope below. Queueing them as a second,
+  // unsupported entity type previously left permanent skipped work while the
+  // UI could still report a successful account backup.
 
   localExerciseRepository.listCustom().forEach((exercise) => {
     queue.enqueue("custom_exercise", exercise.id, { ...exercise, createdByUserId: exercise.createdByUserId ?? userId }, userId);

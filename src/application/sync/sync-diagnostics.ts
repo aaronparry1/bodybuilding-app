@@ -56,13 +56,14 @@ export async function runManualSync(userId: string, subscription: SubscriptionSt
 
   try {
     const result = await new WorkoutSyncService(userId, client, queue, undefined, undefined, undefined, undefined, subscription, true).flushQueue();
+    const backupVerified = result.failed === 0 && result.skipped === 0 && queue.count() === 0;
     syncDiagnosticsStore.set({
       lastAttemptAt: attemptedAt,
-      lastSuccessAt: result.failed === 0 ? new Date().toISOString() : syncDiagnosticsStore.get().lastSuccessAt,
+      lastSuccessAt: backupVerified ? new Date().toISOString() : syncDiagnosticsStore.get().lastSuccessAt,
       lastSyncedCount: result.synced,
       lastSkippedCount: result.skipped,
       lastFailedCount: result.failed,
-      lastError: result.failed > 0 ? "Some queued items failed to sync." : undefined,
+      lastError: backupVerified ? undefined : "Account backup is incomplete. Your local data is safe and retryable.",
     });
     return result;
   } catch (nextError) {

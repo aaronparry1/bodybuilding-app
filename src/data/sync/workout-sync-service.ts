@@ -7,6 +7,29 @@ import { SyncQueue } from "@/data/sync/sync-queue";
 import type { AppSupabaseClient } from "@/lib/supabase/client";
 import { canAccess, type SubscriptionState } from "@/application/billing/subscription";
 import type { Exercise, Programme } from "@/domain/training/models";
+import type { WorkoutSession } from "@/domain/training/models";
+
+function stableJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .filter(([, entry]) => entry !== undefined)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, entry]) => `${JSON.stringify(key)}:${stableJson(entry)}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function workoutIsComplete(remote: WorkoutSession, local: WorkoutSession): boolean {
+  const remoteExercises = new Map(remote.exercises.map((exercise) => [exercise.id, exercise]));
+  return local.exercises.every((exercise) => {
+    const saved = remoteExercises.get(exercise.id);
+    if (!saved) return false;
+    const savedSetIds = new Set(saved.sets.map((set) => set.id));
+    return exercise.sets.every((set) => savedSetIds.has(set.id));
+  });
+}
 
 export class WorkoutSyncService {
   constructor(
@@ -37,15 +60,29 @@ export class WorkoutSyncService {
 
       try {
         if (item.entityType === "workout_session") {
-          await this.workoutRepository.saveWorkoutSession(this.userId, item.payload as never);
+          const payload = item.payload as WorkoutSession;
+          await this.workoutRepository.saveWorkoutSession(this.userId, payload);
+          const saved = (await this.workoutRepository.loadWorkoutHistory(this.userId)).find((session) => session.id === payload.id);
+          if (!saved || !workoutIsComplete(saved, payload)) throw new Error("Workout backup verification failed.");
         } else if (item.entityType === "programme") {
-          await this.programmeRepository.saveProgramme(this.userId, item.payload as Programme);
+          const payload = item.payload as Programme;
+          await this.programmeRepository.saveProgramme(this.userId, payload);
+          if (!(await this.programmeRepository.loadProgrammes(this.userId)).some((programme) => programme.id === payload.id)) {
+            throw new Error("Programme backup verification failed.");
+          }
         } else if (item.entityType === "custom_exercise") {
-          await this.exerciseRepository.saveCustomExercise(this.userId, item.payload as Exercise);
+          const payload = item.payload as Exercise;
+          await this.exerciseRepository.saveCustomExercise(this.userId, payload);
+          if (!(await this.exerciseRepository.loadExercises(this.userId)).some((exercise) => exercise.id === payload.id)) {
+            throw new Error("Exercise backup verification failed.");
+          }
         } else if (item.entityType === "user_settings") {
           await this.userSettingsRepository.saveUserSettings(this.userId, item.payload);
+          const saved = await this.userSettingsRepository.loadUserSettingsBlob(this.userId);
+          if (stableJson(saved) !== stableJson(item.payload)) throw new Error("Account backup envelope verification failed.");
         } else {
-          skipped += 1;
+          this.queue.markFailed(item.id, "Unsupported backup entity type.");
+          failed += 1;
           continue;
         }
         this.queue.markSynced(item.id);
