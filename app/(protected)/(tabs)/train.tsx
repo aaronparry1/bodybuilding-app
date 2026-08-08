@@ -426,6 +426,22 @@ function CanonicalTrainExperience() {
     setExerciseSwitcherOpen(false);
     requestAnimationFrame(() => scrollRef.current?.scrollTo({ y: 0, animated: !reduceMotion }));
   };
+  const keyboardAction = (() => {
+    if (!activeExercise || paused) return { label: "Done", run: Keyboard.dismiss };
+    if (editState) {
+      const editedSet = activeExercise.sets.find((set) => set.id === editState.setId);
+      return editedSet
+        ? { label: "Save set", run: () => { saveEdit(activeExercise, editedSet); Keyboard.dismiss(); } }
+        : { label: "Done", run: Keyboard.dismiss };
+    }
+    if (activeExercise.calibration?.required && calibrationLoads[activeExercise.id] === undefined) {
+      return { label: "Confirm load", run: () => { confirmCalibration(activeExercise); Keyboard.dismiss(); } };
+    }
+    const currentSet = activeExercise.sets.find((set) => set.state === "current");
+    return currentSet
+      ? { label: "Log set", run: () => { recordSet(activeExercise, currentSet); Keyboard.dismiss(); } }
+      : { label: "Done", run: Keyboard.dismiss };
+  })();
 
   return <TrainShell
     insets={insets}
@@ -472,7 +488,7 @@ function CanonicalTrainExperience() {
         {completion.normalFinishAvailable ? <FinishPanel presentation={presentation} busy={busy} onFinish={() => setModal("finish_complete")} /> : null}
       </ScrollView>
     </KeyboardAvoidingView>
-    {Platform.OS === "ios" ? <InputAccessoryView nativeID={TRAIN_NUMERIC_KEYBOARD_ACCESSORY_ID}><View style={styles.keyboardAccessory}><Pressable testID="train-keyboard-done" accessibilityRole="button" accessibilityLabel="Done" onPress={Keyboard.dismiss} style={({ pressed }) => [styles.keyboardDone, pressed && styles.pressed]}><Text maxFontSizeMultiplier={1.4} style={styles.keyboardDoneText}>Done</Text></Pressable></View></InputAccessoryView> : null}
+    {Platform.OS === "ios" ? <InputAccessoryView nativeID={TRAIN_NUMERIC_KEYBOARD_ACCESSORY_ID}><View style={styles.keyboardAccessory}><Pressable testID="train-keyboard-action" accessibilityRole="button" accessibilityLabel={keyboardAction.label} onPress={keyboardAction.run} style={({ pressed }) => [styles.keyboardDone, pressed && styles.pressed]}><Text maxFontSizeMultiplier={1.4} style={styles.keyboardDoneText}>{keyboardAction.label}</Text></Pressable></View></InputAccessoryView> : null}
     <TrainActionModal
       modal={modal}
       reduceMotion={reduceMotion}
@@ -635,7 +651,7 @@ function ActiveExerciseCard(props: Readonly<{
       <Text style={styles.smallMuted}>{calibration.rampInstruction}</Text>
       <View style={styles.calibrationInputs}>
         <Field testID="train-calibration-reps" label="Successful reps" value={draft.reps} unit="reps" keyboardType="number-pad" error={props.fieldError === "reps"} onChange={(reps) => props.setCalibrationDraft({ ...draft, reps })} />
-        <Field testID="train-calibration-load" label="Successful load" value={draft.load} unit={props.displayUnit} keyboardType="decimal-pad" error={props.fieldError === "load"} onChange={(load) => props.setCalibrationDraft({ ...draft, load })} />
+        <Field testID="train-calibration-load" label="Successful load" value={draft.load} unit={props.displayUnit} keyboardType="decimal-pad" error={props.fieldError === "load"} onChange={(load) => props.setCalibrationDraft({ ...draft, load })} onSubmit={props.onConfirmCalibration} />
       </View>
       <Pressable testID="train-confirm-calibration" accessibilityRole="button" accessibilityLabel={`Confirm starting load for ${exercise.name}`} onPress={props.onConfirmCalibration} style={({ pressed }) => [styles.calibrationAction, pressed && styles.primaryActionPressed]}><Text numberOfLines={1} style={styles.calibrationActionText}>Confirm starting load</Text></Pressable>
       <Text style={styles.tinyMuted}>Ramp attempts are not counted as working sets.</Text>
@@ -655,7 +671,7 @@ function ActiveExerciseCard(props: Readonly<{
         <View style={styles.setRow}>
           <View style={[styles.setIdentity, { width: props.layout.setWidth }]}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={styles.setNumber}>{set.number}</Text><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.setStateText, current && styles.accentText, completed && styles.successText]}>{completed ? "Done" : current ? "Now" : "Next"}</Text></View>
           {completed && !editing ? <Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75} style={[styles.completedValue, styles.flex]}>{set.actualReps} reps</Text> : <NumericTextInput testID={`train-reps-${exercise.order}-${set.number}`} accessibilityLabel={`Actual reps for set ${set.number} of ${exercise.name}`} keyboardType="number-pad" returnKeyType="next" editable={!props.paused && (!completed || editing)} selectTextOnFocus value={editing ? props.editState!.reps : values.reps} onChangeText={(reps) => editing ? props.setEditState({ ...props.editState!, reps }) : props.setSetValues((currentValues) => ({ ...currentValues, [set.id]: { ...values, reps } }))} style={[styles.compactInput, styles.flex, props.fieldError === "reps" && current && styles.inputError, (completed && !editing) && styles.lockedInput]} />}
-          {set.loadSemantic === "bodyweight" ? <View style={styles.bodyweightCell}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={styles.bodyweightText}>Bodyweight</Text></View> : completed && !editing ? <Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={[styles.completedValue, styles.loadColumn]}>{set.actualLoad} {set.unit}</Text> : set.loadSemantic === "unavailable" ? <View style={styles.loadColumn}><Text maxFontSizeMultiplier={1.35} numberOfLines={2} style={styles.unavailableText}>Unavailable</Text></View> : <View style={styles.loadInputWrap}><NumericTextInput testID={`train-load-${exercise.order}-${set.number}`} accessibilityLabel={`${set.loadInputLabel} for set ${set.number} of ${exercise.name}, ${props.displayUnit}`} keyboardType="decimal-pad" returnKeyType="done" editable={!props.paused && (!completed || editing)} selectTextOnFocus value={editing ? props.editState!.load : values.load} onChangeText={(load) => editing ? props.setEditState({ ...props.editState!, load }) : props.setSetValues((currentValues) => ({ ...currentValues, [set.id]: { ...values, load } }))} style={[styles.compactInput, styles.loadInput, props.fieldError === "load" && current && styles.inputError]} /><Text maxFontSizeMultiplier={1.35} style={styles.unitLabel}>{props.displayUnit}</Text></View>}
+          {set.loadSemantic === "bodyweight" ? <View style={styles.bodyweightCell}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={styles.bodyweightText}>Bodyweight</Text></View> : completed && !editing ? <Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={[styles.completedValue, styles.loadColumn]}>{set.actualLoad} {set.unit}</Text> : set.loadSemantic === "unavailable" ? <View style={styles.loadColumn}><Text maxFontSizeMultiplier={1.35} numberOfLines={2} style={styles.unavailableText}>Unavailable</Text></View> : <View style={styles.loadInputWrap}><NumericTextInput testID={`train-load-${exercise.order}-${set.number}`} accessibilityLabel={`${set.loadInputLabel} for set ${set.number} of ${exercise.name}, ${props.displayUnit}`} keyboardType="decimal-pad" returnKeyType="done" editable={!props.paused && (!completed || editing)} selectTextOnFocus value={editing ? props.editState!.load : values.load} onChangeText={(load) => editing ? props.setEditState({ ...props.editState!, load }) : props.setSetValues((currentValues) => ({ ...currentValues, [set.id]: { ...values, load } }))} onSubmitEditing={() => editing ? props.onSaveEdit(set) : current ? props.onComplete(set) : undefined} style={[styles.compactInput, styles.loadInput, props.fieldError === "load" && current && styles.inputError]} /><Text maxFontSizeMultiplier={1.35} style={styles.unitLabel}>{props.displayUnit}</Text></View>}
           <Pressable testID={`train-complete-${exercise.order}-${set.number}`} accessibilityRole="button" accessibilityLabel={completed ? `Set ${set.number} completed; edit available below` : `Complete set ${set.number} of ${exercise.name}`} accessibilityState={{ disabled: completed || !current || props.paused }} disabled={completed || !current || props.paused || (calibration?.required && !props.calibrationConfirmed) || set.loadSemantic === "unavailable"} onPress={() => props.onComplete(set)} style={({ pressed }) => [styles.doneControl, completed && styles.doneControlComplete, (!current || props.paused) && styles.doneControlUpcoming, pressed && styles.doneControlPressed]}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.doneGlyph, completed && styles.doneGlyphComplete]}>{completed ? "✓" : "✓"}</Text></Pressable>
         </View>
         <View style={styles.setDetailRow}>
@@ -731,7 +747,7 @@ function TrainActionModal({ modal, reduceMotion, busy, message, completion, onCo
   </Modal>;
 }
 
-function Field({ testID, label, value, unit, keyboardType, error, onChange }: Readonly<{ testID: string; label: string; value: string; unit: string; keyboardType: "number-pad" | "decimal-pad"; error: boolean; onChange(value: string): void }>) { return <View style={styles.field}><Text maxFontSizeMultiplier={1.35} style={styles.columnLabel}>{label}</Text><View style={[styles.fieldInputWrap, error && styles.inputError]}><NumericTextInput testID={testID} accessibilityLabel={`${label}, ${unit}`} keyboardType={keyboardType} value={value} onChangeText={onChange} style={styles.fieldInput} /><Text maxFontSizeMultiplier={1.35} style={styles.unitLabel}>{unit}</Text></View></View>; }
+function Field({ testID, label, value, unit, keyboardType, error, onChange, onSubmit }: Readonly<{ testID: string; label: string; value: string; unit: string; keyboardType: "number-pad" | "decimal-pad"; error: boolean; onChange(value: string): void; onSubmit?(): void }>) { return <View style={styles.field}><Text maxFontSizeMultiplier={1.35} style={styles.columnLabel}>{label}</Text><View style={[styles.fieldInputWrap, error && styles.inputError]}><NumericTextInput testID={testID} accessibilityLabel={`${label}, ${unit}`} keyboardType={keyboardType} returnKeyType={onSubmit ? "done" : undefined} value={value} onChangeText={onChange} onSubmitEditing={onSubmit} style={styles.fieldInput} /><Text maxFontSizeMultiplier={1.35} style={styles.unitLabel}>{unit}</Text></View></View>; }
 
 function NumericTextInput(props: React.ComponentProps<typeof TextInput> & Readonly<{ testID: string }>) {
   return <TextInput maxFontSizeMultiplier={1.35} {...props} inputAccessoryViewID={Platform.OS === "ios" ? TRAIN_NUMERIC_KEYBOARD_ACCESSORY_ID : undefined} />;

@@ -49,6 +49,16 @@ describe("phone-first canonical Train UI", () => {
     expect(trainSource).toContain("inFlightSets.current.has(set.id)");
   });
 
+  it("turns numeric keyboard completion into the current validated workout action", () => {
+    expect(trainSource).toContain('label: "Confirm load"');
+    expect(trainSource).toContain('label: "Log set"');
+    expect(trainSource).toContain('label: "Save set"');
+    expect(trainSource).toContain('testID="train-keyboard-action"');
+    expect(trainSource).toContain("onSubmit={props.onConfirmCalibration}");
+    expect(trainSource).toContain("onSubmitEditing={() => editing ? props.onSaveEdit(set) : current ? props.onComplete(set) : undefined}");
+    expect(trainSource).not.toContain('testID="train-keyboard-done"');
+  });
+
   it("requires exact calibration reps and exposes bodyweight, added-load, and assistance semantics", () => {
     expect(validateCanonicalCalibrationEntry({ repsText: "5", loadText: "60", exactTargetReps: 6, displayUnit: "kg" })).toMatchObject({ status: "invalid", field: "reps" });
     expect(validateCanonicalCalibrationEntry({ repsText: "6", loadText: "60", exactTargetReps: 6, displayUnit: "kg" })).toMatchObject({ status: "valid", reps: 6, baseLoadKg: 60 });
