@@ -13,7 +13,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     enterOfflineModeIfNeeded()
     completeOnboarding()
 
-    XCTAssertTrue(element("action-start-workout").waitForExistence(timeout: 20), "Home must expose the next canonical session")
+    XCTAssertTrue(element("action-review-workout").waitForExistence(timeout: 20), "Home must expose the next canonical session for review")
     attachScreenshot("01-planned-home")
     app.swipeUp()
     attachScreenshot("01a-cardio-home")
@@ -28,7 +28,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     attachScreenshot("02-plan-preview")
     tap("tab-home")
 
-    tap("action-start-workout")
+    openNextWorkoutFromHome()
     unlockMockSubscriptionIfPresented()
     tap("train-start")
     XCTAssertTrue(element("train-confirm-calibration").waitForExistence(timeout: 15))
@@ -40,28 +40,28 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     attachScreenshot("04-active-logger")
 
     // Continue is intentionally a no-op.
-    tap("train-close")
-    tap("train-close-continue")
-    XCTAssertTrue(element("train-close").waitForExistence(timeout: 5))
+    tap("train-actions")
+    tap("train-actions-cancel")
+    XCTAssertTrue(element("train-actions").waitForExistence(timeout: 5))
 
     // Pause and leave preserves the performed set and restores the tab shell.
-    tap("train-close")
+    tap("train-actions")
     tap("train-pause-leave")
     XCTAssertTrue(element("tab-home").waitForExistence(timeout: 10))
     XCTAssertTrue(element("action-resume-workout").waitForExistence(timeout: 10))
     attachScreenshot("05-paused-home")
     tap("action-resume-workout")
-    XCTAssertTrue(element("train-resume").waitForExistence(timeout: 10))
-    tap("train-resume")
+    XCTAssertTrue(element("train-actions").waitForExistence(timeout: 10), "A valid persisted attempt must resume directly into the active logger")
+    XCTAssertFalse(element("train-resume").exists, "A valid persisted attempt must not add a redundant resume confirmation")
     attachScreenshot("05a-resumed-train")
 
     // Discard requires confirmation; cancelling preserves the attempt.
-    tap("train-close")
+    tap("train-actions")
     tap("train-request-discard")
     XCTAssertTrue(app.staticTexts["Discard active attempt?"].waitForExistence(timeout: 5))
     attachScreenshot("06-discard-confirmation")
     tap("train-discard-cancel")
-    XCTAssertTrue(element("train-close").waitForExistence(timeout: 5))
+    XCTAssertTrue(element("train-actions").waitForExistence(timeout: 5))
 
     // Physical failure reproduction: confirmation must still work while a
     // numeric set field owns the keyboard.
@@ -69,20 +69,21 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     XCTAssertTrue(nextReps.waitForExistence(timeout: 5))
     replaceText("8", in: nextReps)
     XCTAssertTrue(app.keyboards.firstMatch.exists)
-    tap("train-close")
+    tap("train-actions")
     tap("train-request-discard")
     tap("train-discard-confirm")
-    XCTAssertTrue(element("action-start-workout").waitForExistence(timeout: 15), "Discard must make the immutable planned session available again")
+    XCTAssertTrue(element("action-review-workout").waitForExistence(timeout: 15), "Discard must make the immutable planned session available again")
     XCTAssertFalse(app.keyboards.firstMatch.exists, "Discard must dismiss the numeric keyboard and restore normal navigation")
 
     // Start a fresh attempt, record valid work, and complete exactly once.
-    tap("action-start-workout")
+    openNextWorkoutFromHome()
     tap("train-start")
     calibrateCurrentExerciseIfRequired(load: "40")
     completeCurrentSet(exercise: 1, set: 1)
     skipRestIfPresent()
-    tap("train-finish")
-    tap("train-finish-confirm")
+    tap("train-actions")
+    tap("train-request-finish-early")
+    tap("train-finish-early-confirm")
     XCTAssertTrue(app.staticTexts["Workout complete"].waitForExistence(timeout: 15))
     attachScreenshot("07-completion-summary")
     tap("action-view-progress")
@@ -153,8 +154,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     expectedNextInstruction: String
   ) throws {
     enterOfflineModeIfNeeded()
-    XCTAssertTrue(element("action-start-workout").waitForExistence(timeout: 20))
-    tap("action-start-workout")
+    openNextWorkoutFromHome()
     unlockMockSubscriptionIfPresented()
     tap("train-start")
     XCTAssertTrue(element("train-exercise-1").waitForExistence(timeout: 15), "Train must finish starting before method execution advances")
@@ -205,6 +205,15 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     if offline.waitForExistence(timeout: 10) { tap("action-continue-offline") }
   }
 
+  private func openNextWorkoutFromHome() {
+    XCTAssertTrue(element("action-review-workout").waitForExistence(timeout: 20), "Home must expose the next canonical session for review")
+    tap("action-review-workout")
+    if element("action-start-14-day-free-trial").waitForExistence(timeout: 5) {
+      unlockMockSubscriptionIfPresented()
+    }
+    XCTAssertTrue(element("train-start").waitForExistence(timeout: 10), "The prescription preview must expose the explicit start action")
+  }
+
   private func completeOnboarding() {
     XCTAssertTrue(element("option-build-muscle").waitForExistence(timeout: 15))
     tap("option-build-muscle")
@@ -212,7 +221,6 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     tap("option-continuous-development")
     tap("action-continue")
     tap("option-5")
-    tap("action-continue")
     tap("option-60")
     tap("action-continue")
     tap("option-push-pull-legs")
@@ -220,7 +228,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     tap("option-intermediate")
     tap("action-continue")
     tap("option-currently-training")
-    tap("option-5")
+    tap("recent-routine-5")
     tap("option-moderate")
     tap("option-ordinary")
     tap("option-none")
@@ -229,10 +237,10 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     XCTAssertTrue(recommendedRecovery.waitForExistence(timeout: 5))
     XCTAssertTrue(recommendedRecovery.isSelected, "Recommended recovery and cardio must remain the selected canonical default")
     tap("action-continue")
-    XCTAssertTrue(element("action-create-programme").waitForExistence(timeout: 5))
-    XCTAssertTrue(app.staticTexts["60 minutes"].exists)
+    XCTAssertTrue(element("onboarding-create-programme").waitForExistence(timeout: 5))
+    XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] %@", "60 minutes")).firstMatch.waitForExistence(timeout: 5))
     attachScreenshot("00-onboarding-review")
-    tap("action-create-programme")
+    tap("onboarding-create-programme")
   }
 
   private func unlockMockSubscriptionIfPresented() {
@@ -284,6 +292,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
   }
 
   private func editFirstCompletedSet() {
+    tap("train-all-sets-toggle")
     let edit = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Edit completed set 1")).firstMatch
     XCTAssertTrue(edit.waitForExistence(timeout: 5))
     edit.tap()
