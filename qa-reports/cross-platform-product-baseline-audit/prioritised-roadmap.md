@@ -10,10 +10,12 @@
 | P1 product-authority clarity | custom builders are separate from canonical plan | decide archive vs canonical future-edit integration | deep-link/navigation tests; rollback via flag; large |
 | P1 coaching consolidation | preserve one mounted adaptation boundary and document all policy delegates | authority contract + static architecture tests | count remains 1/0/0; medium |
 | P2 athlete model | facts lack provenance/confidence/decay/correction | schema/migration/privacy review | anomaly/contradiction/expiry tests; programme-level |
-| P2 evidence registry | literature/manual claims not governed | source pack + scientific review owners | citation/conflict/rule-version gates; large |
+| P2 evidence registry | 15 sources inspected and 26 candidates catalogued, but claims remain ungoverned; source 16 corrupt | scientific/product/rights owners + clean source 16 replacement | page/citation/conflict/rights/rule-version gates; large |
 | P2 programme expansion | >7-day rotations, missed-session/morph explanations incomplete | athlete model + policy registry | invariant and longitudinal simulations; programme-level |
 | P2 premium UI | density/semantic color/accessibility inconsistencies | parity baseline/design tokens | WCAG/platform gates, feature-flag rollback; large |
 | P3 method library | mounted breadth narrower than domain ideas | registry + fatigue model | per-method purpose/stop/exit/golden fixtures; programme-level |
 | P3 experiments | optimize adherence/results without authority drift | analytics privacy/causal design | preregistered metrics, no unsafe auto-rollout; large |
 
 No wholesale rewrite is justified: core identity, migration protection, canonical snapshots, ledger, evidence, CAS and tests are valuable and incrementally repairable.
+
+The supplement closes “locate and appraise supplied source pack” for 15 files. It does not pull method-library work forward: first ingest candidates as non-executable drafts, complete rights and scientific review, then promote only narrow neutral policies with tests. Replacing source 16 is a documentation/evidence gate, not a runtime blocker.

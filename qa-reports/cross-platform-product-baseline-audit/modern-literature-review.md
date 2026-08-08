@@ -30,3 +30,7 @@ This is a baseline claim map, not a clinical guideline or proof that the app is 
 | Adherence/missed/extra sessions | sustainable completion often dominates theoretical optimization; exact rescheduling rules under-studied | moderate principle, low rule specificity | preserve plan identity, bounded reflow, ask preferences |
 
 Major gaps requiring formal searches/extraction: dose-response at high trained volumes; deload RCTs; taper by strength goal; objective readiness interventions; validated RIR by exercise/training age; women/older adults; missed-session algorithms; pain-boundary consensus; rest-pause chronic outcomes; extra-session risk. Every future claim needs population, intervention/comparison, effect magnitude, bias/limitations, conflicts and review date.
+
+## Supplied-source supplement
+
+Fifteen supplied sources were subsequently inspected and produced 26 page-attributable candidates. They add method vocabulary and historical/architectural context, not a new scientific evidence tier. Modern reconciliation particularly rejects universal all-set failure, rigid exclusive rep zones, inevitable concurrent-training interference and anecdotal transformation claims. Periodisation/tier/conjugate structures, conservative training maxima, quality-preserving recovery and optional density/advanced methods remain bounded heuristics or definitions. See `supplied-source-modern-evidence-crosswalk.md` for claim-level links and `supplied-source-claim-candidates.md` for exact PDF pages.

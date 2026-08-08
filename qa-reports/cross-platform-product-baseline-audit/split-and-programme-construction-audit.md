@@ -17,3 +17,9 @@ Supported user-facing frameworks include Full Body, Upper/Lower and Push/Pull/Le
 | Preference preservation | split retained as constraint; automatic resolution can choose compatible form but explanations are not always explicit |
 
 Recommendation: preserve the athlete's named split as a preference, not an invariant physical template. Any morph must show “kept,” “temporarily changed,” duration, rationale and return condition. Support rotating microcycles independently of calendar weeks before claiming intelligent split morphing.
+
+## Supplied-source programme architecture
+
+The Tier System's movement-priority rotation and major/minor effort tiers (08 pp.66–96), 5/3/1's conservative training-max convention (01 pp.21, 67), and the conjugate thesis' rotating emphases/restoration sequencing (15 pp.20–27) are useful architecture candidates. They support representing `priority`, `emphasis`, `effort`, `phase` and `restoration rationale` explicitly. They do not establish a universally best split, mandatory fourth-week deload, fixed percentage band or branded programme.
+
+Source-derived templates should therefore compile into the same canonical session roles and constraints as user-created plans. A source template may suggest a starting arrangement; availability, equipment, experience, sport demand, recovery and current evidence determine whether it is eligible. The receipt must distinguish “template provenance” from “scientific rationale.”

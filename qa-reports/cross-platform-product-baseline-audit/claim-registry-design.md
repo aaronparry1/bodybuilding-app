@@ -15,3 +15,9 @@ type EvidenceClaim = {
 ```
 
 Governance: two-person scientific/product approval for material rules; DOI/source-location deduplication; conflict record mandatory; expiry/review cadence; rule version pinned into prescription rationale; withdrawn/updated claims do not rewrite historical decisions; implementation requires deterministic counterfactual and boundary tests.
+
+## Source-supplement ingestion contract
+
+Import the 26 candidates only as `draft`. Add source-level fields for `exactFilename`, file hash, edition/provenance confidence, stable logical PDF page, extraction mode (`native`, `ocr`, `mixed`), OCR verification status, rights status and source availability. Add a candidate disposition covering `method_definition`, `soft_heuristic`, `explanation_only`, `historical_only`, `insufficient` and `rejected`; only an independently approved claim can receive a rule strength.
+
+The registry must link a manual claim to its modern crosswalk rather than merging them into one citation. Source 16 is an unavailable/corrupt source record with no claims. Rights status defaults to `research_reference_only`; evidence approval does not imply permission to reproduce source expression.

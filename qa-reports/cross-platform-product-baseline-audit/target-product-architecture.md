@@ -29,3 +29,7 @@ flowchart TB
 - **Rules:** registry claim→approved policy→rule version→fingerprinted decision→receipt; deterministic fallback and rollback to last valid carrier.
 - **Adapters:** shared domain/application core; iOS/Android adapters for keyboard, back, haptics, billing, secure storage, accessibility and lifecycle.
 - **Operations:** feature flags cannot create competing authorities; migrations are recoverable/idempotent; diagnostics are privacy-minimised and read-only; analytics never become prescription truth.
+
+## Source-content boundary
+
+Add no PDF/OCR corpus to the product runtime. Source records and claim candidates belong in an offline governed evidence workflow; approved policies export only original, rights-cleared neutral wording, evidence IDs and deterministic parameters. A template has separate `provenance`, `evidenceBasis`, `rightsStatus` and `policyVersion` fields so historical inspiration cannot masquerade as scientific validation or redistribution permission. The supplied-source pass justifies this boundary but does not authorize a schema or runtime change in the current slice.

@@ -4,7 +4,7 @@
 
 - Current Play state beyond the supplied Candidate 111 report; do not call it approved/installable/public.
 - Current TestFlight/App Store live state.
-- All 16 exact source PDFs, metadata, OCR and page claims.
+- Source 16 (`16-Applied-Strongman-Training-for-Sport-POLIQUIN-and-McDERMOTT.pdf`) remains unreadable/corrupt; its exact contents, edition and page claims are unknown.
 - Android rendering, TalkBack, keyboard/back/haptics, billing and lifecycle.
 - Current iOS rendering outside retained captures; iPad behavior.
 - Native cold/warm/navigation/set/timer/memory/ANR metrics.
@@ -20,4 +20,4 @@
 5. Store: sandbox purchase/restore/cancel/paywall/account deletion with test identities.
 6. Scale: 100/1,000 sessions and repeated navigation/memory/render counts.
 
-Evidence needed for PDF unblock: place the 16 exact, unchanged files at `project_sources/` or provide authoritative paths and hashes plus permission to inspect them.
+The other 15 exact filenames were inspected outside the repository at the authoritative supplied path, with extraction status and page candidates documented. Source 16 unblocks only when a clean copy of the exact intended edition, provenance/permission and hash are supplied. A similarly titled internet copy is not an acceptable silent substitute.
