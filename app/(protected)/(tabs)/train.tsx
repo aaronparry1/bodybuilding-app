@@ -92,6 +92,7 @@ function CanonicalTrainExperience() {
   const { settings } = useAppSettings();
   const scrollRef = useRef<ScrollView>(null);
   const inFlightSets = useRef(new Set<string>());
+  const routeResumeAttempt = useRef<string | null>(null);
   const [renderVersion, refresh] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<"reps" | "load" | null>(null);
@@ -245,6 +246,14 @@ function CanonicalTrainExperience() {
     canonicalActivePlanState.refresh();
     setBusy(false);
   };
+
+  useEffect(() => {
+    if (route.lifecycle !== "resume" || !plan || !recordedId || aggregate.status !== "found" || aggregate.session.status !== "paused") return;
+    const attempt = `${recordedId}:${aggregate.session.version}`;
+    if (routeResumeAttempt.current === attempt) return;
+    routeResumeAttempt.current = attempt;
+    resume();
+  }, [aggregate.status === "found" ? aggregate.session.status : "missing", aggregate.status === "found" ? aggregate.session.version : -1, plan?.planId, plan?.revision, recordedId, route.lifecycle]);
 
   const discard = () => {
     if (!plan || aggregate.status !== "found") return;

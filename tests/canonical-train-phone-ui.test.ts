@@ -29,6 +29,15 @@ describe("phone-first canonical Train UI", () => {
     expect(tabsSource).not.toContain("focusedWorkoutActive ? null");
   });
 
+  it("fulfils explicit resume navigation with one guarded canonical command", () => {
+    expect(trainSource).toContain('route.lifecycle !== "resume"');
+    expect(trainSource).toContain('aggregate.session.status !== "paused"');
+    expect(trainSource).toContain("routeResumeAttempt.current === attempt");
+    expect(trainSource).toContain("routeResumeAttempt.current = attempt");
+    expect(trainSource).toContain("resume();");
+    expect(trainSource).toContain('testID="train-resume"');
+  });
+
   it("uses a bounded four-column set row with a non-wrapping accessible completion control", () => {
     const layout = canonicalTrainNarrowLayout(320, 1.4);
     expect(layout).toEqual({ rowGap: 6, setWidth: 36, doneWidth: 48, minimumHitSize: 44, horizontalOverflow: false, completionCanWrap: false });
