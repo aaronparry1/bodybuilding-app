@@ -8,6 +8,8 @@ const completionSummaryPath = "app/(protected)/completion-summary.tsx";
 const source = readFileSync(trainPath, "utf8");
 const productionSource = readFileSync(productionTrainPath, "utf8");
 const completionSummarySource = readFileSync(completionSummaryPath, "utf8");
+const homeSource = readFileSync("src/ui/home-dashboard.tsx", "utf8");
+const workoutVisualsSource = readFileSync("src/ui/workout-visuals.tsx", "utf8");
 
 describe("canonical Train brand boundary", () => {
   it("uses the shared semantic workout palette without raw colour literals or a duplicate local theme", () => {
@@ -64,6 +66,18 @@ describe("canonical Train brand boundary", () => {
     for (const [foreground, background] of pairs) {
       expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
     }
+  });
+
+  it("carries one workout identity and metric hierarchy through Home, preview and completion", () => {
+    expect(workoutVisualsSource).toContain("export function WorkoutStage");
+    expect(workoutVisualsSource).toContain("export function WorkoutMetricStrip");
+    expect(homeSource).toContain("<WorkoutStage");
+    expect(homeSource).toContain("<WorkoutMetricStrip");
+    expect(source).toContain("<WorkoutStage");
+    expect(source).toContain("<WorkoutMetricStrip");
+    expect(completionSummarySource).toContain("<WorkoutMetricStrip centered");
+    expect(source).toContain("styles.exerciseEditAction");
+    expect(source).not.toContain('<SecondaryButton label="Swap or add exercise"');
   });
 });
 

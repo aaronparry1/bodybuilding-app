@@ -2,6 +2,7 @@ import { Pressable, Text, View } from "react-native";
 import type { CanonicalHomeAction, CanonicalHomePrimary, CanonicalHomeProjection } from "@/application/training/canonical-home-projection";
 import { colors, radius, shellTokens, spacing, type } from "@/ui/theme";
 import { stableUiIdentifier } from "@/ui/primitives";
+import { WorkoutMetricStrip, WorkoutStage } from "@/ui/workout-visuals";
 
 export function HomeDashboard({ projection, onAction }: Readonly<{ projection: CanonicalHomeProjection; onAction(action: CanonicalHomeAction): void }>) {
   return <View style={{ gap: shellTokens.sectionGap }}>
@@ -26,18 +27,10 @@ export function HomeGreeting({ projection }: Readonly<{ projection: CanonicalHom
 export function HomeNextAction({ primary, onAction }: Readonly<{ primary: CanonicalHomePrimary; onAction(action: CanonicalHomeAction): void }>) {
   const active = primary.kind === "active";
   const completed = primary.kind === "completed_today";
-  return <View style={{ overflow: "hidden", borderRadius: radius.xl, borderCurve: "continuous", borderWidth: 1, borderColor: completed ? colors.success : active ? colors.accent : colors.line, backgroundColor: completed ? colors.successSoft : active ? colors.accentSoft : colors.surface }}>
-    <View style={{ height: 3, backgroundColor: completed ? colors.success : colors.accent }} />
-    <View style={{ paddingHorizontal: shellTokens.cardPadding, paddingTop: spacing.md, paddingBottom: shellTokens.cardPadding, gap: spacing.md }}>
-      <View style={{ gap: spacing.xs }}>
-        <Text style={{ ...type.label, color: completed ? colors.success : colors.accent, textTransform: "uppercase", letterSpacing: 0.8 }}>{primary.eyebrow}</Text>
-        <Text style={{ ...type.section, fontSize: 22, lineHeight: 27, color: colors.text }}>{primary.title}</Text>
-        <Text style={{ ...type.body, color: colors.textMuted }}>{primary.detail}</Text>
-      </View>
+  return <WorkoutStage eyebrow={primary.eyebrow} title={primary.title} detail={primary.detail} tone={completed ? "success" : active || primary.kind === "planned" ? "accent" : "neutral"}>
       {primary.workout ? <WorkoutAtAGlance primary={primary} /> : null}
       {primary.action && primary.ctaLabel ? <DashboardAction label={primary.ctaLabel} onPress={() => onAction(primary.action!)} emphasized={active || primary.kind === "planned"} /> : null}
-    </View>
-  </View>;
+  </WorkoutStage>;
 }
 
 function WorkoutAtAGlance({ primary }: Readonly<{ primary: CanonicalHomePrimary }>) {
@@ -45,11 +38,11 @@ function WorkoutAtAGlance({ primary }: Readonly<{ primary: CanonicalHomePrimary 
   const remainingExercises = Math.max(0, workout.exerciseCount - workout.exercisePreview.length);
   return <View style={{ gap: spacing.md }}>
     {workout.lifecycle === "active" || workout.lifecycle === "paused" ? <View accessibilityRole="progressbar" accessibilityLabel={`${workout.progressPercent}% of working sets complete`} style={{ height: 4, borderRadius: radius.pill, overflow: "hidden", backgroundColor: colors.backgroundElevated }}><View style={{ width: `${workout.progressPercent}%`, height: "100%", backgroundColor: colors.accent }} /></View> : null}
-    <View style={{ flexDirection: "row", gap: spacing.sm }}>
-      <Metric label="Exercises" value={String(workout.exerciseCount)} />
-      <Metric label="Sets" value={workout.completedSetCount ? `${workout.completedSetCount}/${workout.workingSetCount}` : String(workout.workingSetCount)} />
-      <Metric label="Estimate" value={workout.estimatedDurationMinutes ? `${workout.estimatedDurationMinutes}m` : "—"} />
-    </View>
+    <WorkoutMetricStrip items={[
+      { label: "Exercises", value: String(workout.exerciseCount) },
+      { label: "Sets", value: workout.completedSetCount ? `${workout.completedSetCount}/${workout.workingSetCount}` : String(workout.workingSetCount) },
+      { label: "Estimate", value: workout.estimatedDurationMinutes ? `${workout.estimatedDurationMinutes}m` : "—" },
+    ]} />
     {workout.exercisePreview.length ? <Text numberOfLines={2} style={{ color: colors.textMuted, fontSize: 13, lineHeight: 19 }}>{workout.exercisePreview.join(" · ")}{remainingExercises ? ` · +${remainingExercises} more` : ""}</Text> : null}
     {workout.methodPreview.length ? <Text numberOfLines={2} style={{ color: colors.textSubtle, fontSize: 12, lineHeight: 18 }}>Methods: {workout.methodPreview.join(" · ")}</Text> : null}
   </View>;
@@ -110,10 +103,6 @@ function DashboardAction({ label, onPress, emphasized = false }: Readonly<{ labe
   return <Pressable testID={stableUiIdentifier("action", label)} accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => ({ minHeight: shellTokens.controlMinHeight, alignItems: "center", justifyContent: "center", borderRadius: radius.md, borderCurve: "continuous", borderWidth: 1, borderColor: emphasized || pressed ? colors.accent : colors.line, backgroundColor: emphasized ? pressed ? colors.accentPressed : colors.accent : pressed ? colors.accentSoft : colors.surfaceMuted, paddingHorizontal: spacing.lg, opacity: pressed ? 0.86 : 1 })}>
     <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.82} style={{ color: emphasized ? colors.background : colors.text, fontSize: 14, lineHeight: 18, fontWeight: "900" }}>{label}</Text>
   </Pressable>;
-}
-
-function Metric({ label, value }: Readonly<{ label: string; value: string }>) {
-  return <View style={{ flex: 1, minWidth: 0, paddingHorizontal: spacing.sm, paddingVertical: 8, gap: 2, borderRadius: radius.md, backgroundColor: colors.backgroundElevated }}><Text numberOfLines={1} style={{ color: colors.text, fontSize: 18, lineHeight: 22, fontWeight: "900", fontVariant: ["tabular-nums"] }}>{value}</Text><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.84} style={{ color: colors.textSubtle, fontSize: 12, lineHeight: 15, fontWeight: "800", textTransform: "uppercase" }}>{label}</Text></View>;
 }
 
 function Pill({ text }: Readonly<{ text: string }>) {

@@ -11,6 +11,7 @@ import { buildWorkoutSummarySharePayload, type BrandedSharePayload } from "@/dom
 import { BrandedShareCardPreviewModal } from "@/features/social-sharing/branded-share-card-preview";
 import { AppScreen, PremiumCard, PrimaryButton, SecondaryButton } from "@/ui/primitives";
 import { spacing, type, workoutColors } from "@/ui/theme";
+import { WorkoutMetricStrip } from "@/ui/workout-visuals";
 
 const TRAIN = workoutColors;
 
@@ -47,11 +48,11 @@ export default function CompletionSummaryScreen() {
       <Text style={styles.muted}>{summary.completion === "complete" ? "Strong work. Every prescribed exercise was represented in the retained session." : "Your completed work is saved exactly as performed. Unfinished work was not invented."}</Text>
     </View>
 
-    <View style={styles.metrics}>
-      <Metric value={String(summary.completedWorkingSets)} label="work sets" />
-      <Metric value={String(summary.exercisesCompleted)} label={summary.prescribedExercises ? `of ${summary.prescribedExercises} exercises` : "exercises"} />
-      <Metric value={duration} label="elapsed" />
-    </View>
+    <WorkoutMetricStrip centered items={[
+      { value: String(summary.completedWorkingSets), label: "work sets" },
+      { value: String(summary.exercisesCompleted), label: summary.prescribedExercises ? `of ${summary.prescribedExercises} exercises` : "exercises" },
+      { value: duration, label: "elapsed" },
+    ]} />
 
     {displayedVolume !== null ? <PremiumCard tone="quiet"><Text style={styles.cardLabel}>WORK COMPLETED</Text><Text style={styles.volume}>{formatNumber(displayedVolume)} {settings.unit}</Text><Text style={styles.muted}>Evidence-backed load volume from completed weighted sets.</Text></PremiumCard> : null}
 
@@ -76,10 +77,6 @@ export default function CompletionSummaryScreen() {
   </AppScreen>;
 }
 
-function Metric({ value, label }: Readonly<{ value: string; label: string }>) {
-  return <View style={styles.metric}><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={styles.metricValue}>{value}</Text><Text numberOfLines={2} style={styles.metricLabel}>{label}</Text></View>;
-}
-
 function formatDuration(seconds: number): string {
   const minutes = Math.max(0, Math.floor(seconds / 60));
   if (minutes < 60) return `${minutes}m`;
@@ -98,10 +95,6 @@ const styles = StyleSheet.create({
   hero: { color: TRAIN.text, ...type.hero, textAlign: "center" },
   muted: { color: TRAIN.muted, ...type.body, textAlign: "center" },
   body: { color: TRAIN.text, ...type.body },
-  metrics: { flexDirection: "row", gap: spacing.sm },
-  metric: { flex: 1, minWidth: 0, minHeight: 92, alignItems: "center", justifyContent: "center", gap: spacing.xs, padding: spacing.sm, borderRadius: 14, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.line },
-  metricValue: { color: TRAIN.text, ...type.metric, fontVariant: ["tabular-nums"] },
-  metricLabel: { color: TRAIN.muted, fontSize: 11, lineHeight: 14, fontWeight: "700", textAlign: "center" },
   cardLabel: { color: TRAIN.accent, ...type.label, letterSpacing: 0.7 },
   cardTitle: { color: TRAIN.text, ...type.section },
   volume: { color: TRAIN.text, fontSize: 32, lineHeight: 36, fontWeight: "900", fontVariant: ["tabular-nums"] },

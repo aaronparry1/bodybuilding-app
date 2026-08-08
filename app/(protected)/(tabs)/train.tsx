@@ -59,6 +59,7 @@ import { useAppSettings } from "@/application/settings/app-settings";
 import { hapticFeedback } from "@/application/training/haptic-feedback";
 import { AppScreen, PrimaryButton, SecondaryButton, stableUiIdentifier } from "@/ui/primitives";
 import { type, workoutColors } from "@/ui/theme";
+import { WorkoutMetricStrip, WorkoutStage } from "@/ui/workout-visuals";
 
 type RouteParams = Readonly<{
   planId?: string;
@@ -478,7 +479,7 @@ function CanonicalTrainExperience() {
           onNext={() => activeExerciseIndex < presentation.exercises.length - 1 && selectExercise(presentation.exercises[activeExerciseIndex + 1]!.id)}
           onOpen={() => setExerciseSwitcherOpen(true)}
         />
-        <SecondaryButton label="Swap or add exercise" onPress={() => router.push({ pathname: "/(protected)/programmes/manage", params: { recordedSessionId: aggregate.session.recordedSessionId, plannedSessionId: aggregate.session.plannedSessionId } })} />
+        <Pressable testID={stableUiIdentifier("action", "Swap or add exercise")} accessibilityRole="button" accessibilityLabel="Swap or add exercise" onPress={() => router.push({ pathname: "/(protected)/programmes/manage", params: { recordedSessionId: aggregate.session.recordedSessionId, plannedSessionId: aggregate.session.plannedSessionId } })} style={({ pressed }) => [styles.exerciseEditAction, pressed && styles.pressed]}><Text style={styles.exerciseEditActionText}>Swap or add exercise</Text><Text accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.exerciseEditGlyph}>›</Text></Pressable>
         {activeExercise ? <ActiveExerciseCard
           key={activeExercise.id}
           exercise={activeExercise}
@@ -545,16 +546,13 @@ function TrainShell({ insets, presentation, onMinimise, onActions, children }: R
 function WorkoutPreview({ presentation, busy, onStart, message }: Readonly<{ presentation: WorkoutPresentation; busy: boolean; onStart(): void; message: string | null }>) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   return <ScrollView contentContainerStyle={styles.previewContent}>
-    <View style={styles.previewSummary}>
-      <Text style={styles.eyebrow}>WORKOUT PREVIEW</Text>
-      <Text style={styles.previewTitle}>{presentation.title}</Text>
-      <Text style={styles.body}>{presentation.purpose}</Text>
-      <View style={styles.previewStats}>
-        <Stat label="Exercises" value={String(presentation.exercises.length)} />
-        <Stat label="Working sets" value={String(presentation.totalSets)} />
-        <Stat label="Estimate" value={`${presentation.estimatedDurationMinutes ?? "—"} min`} />
-      </View>
-    </View>
+    <WorkoutStage eyebrow="Workout preview" title={presentation.title} detail={presentation.purpose}>
+      <WorkoutMetricStrip items={[
+        { label: "Exercises", value: String(presentation.exercises.length) },
+        { label: "Working sets", value: String(presentation.totalSets) },
+        { label: "Estimate", value: `${presentation.estimatedDurationMinutes ?? "—"} min` },
+      ]} />
+    </WorkoutStage>
     <Pressable testID="train-start" accessibilityRole="button" accessibilityLabel="Start workout" disabled={busy} onPress={onStart} style={({ pressed }) => [styles.primaryAction, pressed && styles.primaryActionPressed, busy && styles.disabled]}><Text numberOfLines={1} style={styles.primaryActionText}>{busy ? "Starting…" : "Start workout"}</Text></Pressable>
     <Text style={styles.startReassurance}>Your workout is not recorded until you start. You can still review every exercise below.</Text>
     <Pressable testID="train-preview-details-toggle" accessibilityRole="button" accessibilityState={{ expanded: detailsOpen }} accessibilityLabel={`${detailsOpen ? "Hide" : "Review"} full workout prescription`} onPress={() => setDetailsOpen((open) => !open)} style={({ pressed }) => [styles.disclosureRow, pressed && styles.pressed]}><Text style={styles.disclosureText}>{detailsOpen ? "Hide workout details" : `Review ${presentation.exercises.length} exercises`}</Text><Text style={styles.disclosureGlyph}>{detailsOpen ? "⌃" : "⌄"}</Text></Pressable>
@@ -766,8 +764,6 @@ function Field({ testID, label, value, unit, keyboardType, error, onChange, onSu
 function NumericTextInput(props: React.ComponentProps<typeof TextInput> & Readonly<{ testID: string }>) {
   return <TextInput maxFontSizeMultiplier={1.35} {...props} inputAccessoryViewID={Platform.OS === "ios" ? TRAIN_NUMERIC_KEYBOARD_ACCESSORY_ID : undefined} />;
 }
-function Stat({ label, value }: Readonly<{ label: string; value: string }>) { return <View style={styles.stat}><Text style={styles.statValue}>{value}</Text><Text style={styles.tinyMuted}>{label}</Text></View>; }
-
 function UnavailableState({ message, detail, onReturn, onRestore }: Readonly<{ message: string; detail?: string | null; onReturn(): void; onRestore?: () => void }>) { return <AppScreen><Text style={{ color: TRAIN.text, fontSize: 28, fontWeight: "900" }}>Train safely</Text><Text style={{ color: TRAIN.muted }}>{message}</Text>{detail ? <Text style={{ color: TRAIN.muted }}>{detail}</Text> : null}{onRestore ? <SecondaryButton label="Restore workout" onPress={onRestore} /> : null}<SecondaryButton label="Return to Home" onPress={onReturn} /></AppScreen>; }
 
 function TrainPaywall({ onRestore }: Readonly<{ onRestore(): void }>) {
@@ -840,13 +836,8 @@ const styles = StyleSheet.create({
   feedbackBannerPositive: { backgroundColor: TRAIN.successSoft, borderColor: TRAIN.success },
   feedbackTextPositive: { color: TRAIN.success },
   previewContent: { gap: 14, padding: 16, paddingBottom: 40 },
-  previewSummary: { gap: 8, padding: 16, borderRadius: 18, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.line },
   eyebrow: { color: TRAIN.accent, fontSize: 11, lineHeight: 15, fontWeight: "900", letterSpacing: 1 },
-  previewTitle: { color: TRAIN.text, fontSize: 28, lineHeight: 33, fontWeight: "900" },
   body: { color: TRAIN.muted, fontSize: 15, lineHeight: 21, fontWeight: "500" },
-  previewStats: { flexDirection: "row", gap: 8, marginTop: 8 },
-  stat: { flex: 1, minWidth: 0, padding: 10, borderRadius: 12, backgroundColor: TRAIN.surfaceRaised, borderWidth: 1, borderColor: TRAIN.line },
-  statValue: { color: TRAIN.text, fontSize: 19, lineHeight: 23, fontWeight: "900" },
   tinyMuted: { color: TRAIN.subtle, fontSize: 11, lineHeight: 15, fontWeight: "600", flexShrink: 1 },
   previewList: { gap: 8 },
   previewExercise: { flexDirection: "row", gap: 12, alignItems: "flex-start", padding: 12, borderRadius: 14, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.line },
@@ -865,6 +856,9 @@ const styles = StyleSheet.create({
   exerciseNavigatorName: { maxWidth: "100%", color: TRAIN.text, fontSize: 17, lineHeight: 21, fontWeight: "900", textAlign: "center" },
   exerciseNavArrow: { width: 44, minHeight: 56, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: TRAIN.surfaceRaised, borderWidth: 1, borderColor: TRAIN.lineStrong },
   exerciseNavArrowText: { color: TRAIN.text, fontSize: 34, lineHeight: 36, fontWeight: "600" },
+  exerciseEditAction: { alignSelf: "flex-end", minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingHorizontal: 4 },
+  exerciseEditActionText: { color: TRAIN.muted, fontSize: 12, lineHeight: 17, fontWeight: "800" },
+  exerciseEditGlyph: { color: TRAIN.accent, fontSize: 20, lineHeight: 21, fontWeight: "800" },
   switcherHeading: { flexDirection: "row", alignItems: "flex-start", gap: 12 },
   switcherClose: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: TRAIN.surfaceRaised },
   switcherCloseText: { color: TRAIN.text, fontSize: 28, lineHeight: 30 },

@@ -281,7 +281,8 @@ describe("onboarding programme integrity", () => {
     expect(onboarding).not.toContain('"first dose"');
     expect(onboarding).not.toContain('"recovery budget"');
     expect(onboarding).not.toContain('"provisional starting point"');
-    expect(home).toContain('<Metric label="Sets"');
+    expect(home).toContain('<WorkoutMetricStrip items={[');
+    expect(home).toContain('{ label: "Sets", value: workout.completedSetCount');
     expect(home).not.toContain("CURRENT SESSION WORKING SETS");
   });
 });
