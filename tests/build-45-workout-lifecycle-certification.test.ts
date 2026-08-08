@@ -161,7 +161,7 @@ describe("Build 45 workout lifecycle certification", () => {
       status: "ready",
       primary: {
         kind: "planned",
-        ctaLabel: "Start workout",
+        ctaLabel: "Review workout",
         action: { type: "open_planned_session", sessionId: started.plannedSessionId },
       },
     });

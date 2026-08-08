@@ -142,7 +142,7 @@ describe("onboarding programme integrity", () => {
     const home = readCanonicalHomeProjection();
     expect(home.primary).toMatchObject({
       kind: "planned",
-      ctaLabel: "Start workout",
+      ctaLabel: "Review workout",
       workout: { lifecycle: "planned", completedSetCount: 0 },
     });
     expect(home.programme).toMatchObject({

@@ -151,7 +151,7 @@ export function projectCanonicalHome(input: Readonly<{
   } else if (plannedSession && plannedWorkout) {
     const action = plannedAction(model, plannedSession.id);
     actions.push(action);
-    primary = { kind: "planned", eyebrow: "Up next", title: plannedWorkout.title, detail: sessionPurposeCopy(plannedSession.role, plannedWorkout.title), ctaLabel: "Start workout", action, workout: summarizeWorkout(plannedWorkout, plannedSession.role) };
+    primary = { kind: "planned", eyebrow: "Up next", title: plannedWorkout.title, detail: sessionPurposeCopy(plannedSession.role, plannedWorkout.title), ctaLabel: "Review workout", action, workout: summarizeWorkout(plannedWorkout, plannedSession.role) };
   } else {
     primary = { kind: "rest_day", eyebrow: "Recovery day", title: "No workout due", detail: "Recover well today and be ready for your next session." };
   }

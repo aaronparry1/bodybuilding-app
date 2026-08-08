@@ -10,6 +10,9 @@ describe("phone-first canonical Train UI", () => {
   it("keeps preview read-only until its explicit Start action", () => {
     const preview = trainSource.slice(trainSource.indexOf("function WorkoutPreview"), trainSource.indexOf("function ExerciseNavigator"));
     expect(preview).toContain("Start workout");
+    expect(preview.indexOf('testID="train-start"')).toBeLessThan(preview.indexOf("presentation.exercises.map"));
+    expect(preview).toContain('testID="train-preview-details-toggle"');
+    expect(preview).toContain("Review ${presentation.exercises.length} exercises");
     expect(preview).not.toContain("startCanonicalSession");
     expect(preview).not.toContain("recordCanonicalPerformedWork");
   });

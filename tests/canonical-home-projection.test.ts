@@ -8,7 +8,7 @@ describe("canonical Home projection", () => {
     const before = JSON.stringify(model);
     const result = projectCanonicalHome({ status: "ready", model, now: Date.parse("2026-01-02T10:00:00.000Z") });
     expect(result.contractVersion).toBe(CANONICAL_HOME_PROJECTION_VERSION);
-    expect(result.primary).toMatchObject({ kind: "planned", title: "Upper", ctaLabel: "Start workout" });
+    expect(result.primary).toMatchObject({ kind: "planned", title: "Upper", ctaLabel: "Review workout" });
     expect(result.actions[0]).toEqual({ type: "open_planned_session", planId: "p", planRevision: 2, sessionId: "s" });
     expect(result.programme).toMatchObject({ sessionPosition: "Session 1 of 2", completionLabel: "0 of 2 sessions completed" });
     expect(JSON.stringify(model)).toBe(before);

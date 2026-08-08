@@ -513,6 +513,7 @@ function TrainShell({ insets, presentation, onMinimise, onActions, children }: R
 }
 
 function WorkoutPreview({ presentation, busy, onStart, message }: Readonly<{ presentation: WorkoutPresentation; busy: boolean; onStart(): void; message: string | null }>) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
   return <ScrollView contentContainerStyle={styles.previewContent}>
     <View style={styles.previewSummary}>
       <Text style={styles.eyebrow}>WORKOUT PREVIEW</Text>
@@ -524,7 +525,10 @@ function WorkoutPreview({ presentation, busy, onStart, message }: Readonly<{ pre
         <Stat label="Estimate" value={`${presentation.estimatedDurationMinutes ?? "—"} min`} />
       </View>
     </View>
-    <View style={styles.previewList}>{presentation.exercises.map((exercise) => <View key={exercise.id} style={styles.previewExercise}>
+    <Pressable testID="train-start" accessibilityRole="button" accessibilityLabel="Start workout" disabled={busy} onPress={onStart} style={({ pressed }) => [styles.primaryAction, pressed && styles.primaryActionPressed, busy && styles.disabled]}><Text numberOfLines={1} style={styles.primaryActionText}>{busy ? "Starting…" : "Start workout"}</Text></Pressable>
+    <Text style={styles.startReassurance}>Your workout is not recorded until you start. You can still review every exercise below.</Text>
+    <Pressable testID="train-preview-details-toggle" accessibilityRole="button" accessibilityState={{ expanded: detailsOpen }} accessibilityLabel={`${detailsOpen ? "Hide" : "Review"} full workout prescription`} onPress={() => setDetailsOpen((open) => !open)} style={({ pressed }) => [styles.disclosureRow, pressed && styles.pressed]}><Text style={styles.disclosureText}>{detailsOpen ? "Hide workout details" : `Review ${presentation.exercises.length} exercises`}</Text><Text style={styles.disclosureGlyph}>{detailsOpen ? "⌃" : "⌄"}</Text></Pressable>
+    {detailsOpen ? <View style={styles.previewList}>{presentation.exercises.map((exercise) => <View key={exercise.id} style={styles.previewExercise}>
       <View style={styles.exerciseNumber}><Text style={styles.exerciseNumberText}>{exercise.order}</Text></View>
       <View style={styles.previewExerciseText}>
         <Text style={styles.exerciseName}>{exercise.name}</Text>
@@ -532,8 +536,7 @@ function WorkoutPreview({ presentation, busy, onStart, message }: Readonly<{ pre
         <Text style={styles.smallMuted}>{exercise.sets[0]?.loadLabel} · {exercise.method}</Text>
         <Text style={styles.methodSummary}>{exercise.methodExecution.instruction}</Text>
       </View>
-    </View>)}</View>
-    <Pressable testID="train-start" accessibilityRole="button" accessibilityLabel="Start workout" disabled={busy} onPress={onStart} style={({ pressed }) => [styles.primaryAction, pressed && styles.primaryActionPressed, busy && styles.disabled]}><Text numberOfLines={1} style={styles.primaryActionText}>{busy ? "Starting…" : "Start workout"}</Text></Pressable>
+    </View>)}</View> : null}
     {message ? <Text style={styles.message}>{message}</Text> : null}
   </ScrollView>;
 }
@@ -820,6 +823,7 @@ const styles = StyleSheet.create({
   primaryAction: { minHeight: 58, borderRadius: 16, alignItems: "center", justifyContent: "center", backgroundColor: TRAIN.accent, paddingHorizontal: 16 },
   primaryActionPressed: { backgroundColor: TRAIN.accentPressed },
   primaryActionText: { color: TRAIN.background, fontSize: 17, fontWeight: "900" },
+  startReassurance: { color: TRAIN.subtle, fontSize: 11, lineHeight: 16, fontWeight: "600", textAlign: "center", paddingHorizontal: 8 },
   message: { color: TRAIN.muted, fontSize: 13, lineHeight: 19, paddingHorizontal: 4 },
   exerciseNavigator: { minHeight: 76, flexDirection: "row", alignItems: "stretch", gap: 8, padding: 8, borderRadius: 16, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.line },
   exerciseNavigatorMain: { flex: 1, minWidth: 0, justifyContent: "center", alignItems: "center", gap: 1, paddingHorizontal: 4 },
