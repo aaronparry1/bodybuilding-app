@@ -33,7 +33,7 @@ These are candidate statements extracted for appraisal, not approved product rul
 | SSC-25 | 14 p.11, pp.88–91 | Dynamic-tension and partner/wrestling drills are historical exercise systems. | historical only | product/history inspiration; partner drills raise supervision and injury concerns |
 | SSC-26 | 15 p.20, p.25, p.27 | Conjugate sequencing rotates emphases and may follow high loading with lower-volume restoration. | soft heuristic | secondary thesis synthesis; useful architecture hypothesis, not primary proof |
 
-Disposition totals: 8 soft heuristics, 8 method definitions, 3 explanations, 3 historical/context-only, 1 insufficient-evidence candidate and 2 rejections, plus SSC-25 as historical only. **No supplied-source candidate is approved as a hard product rule.**
+Disposition totals: 8 soft heuristics, 8 method definitions, 3 explanations, 3 historical/context-only, 1 insufficient-evidence candidate and 2 rejections, plus SSC-25 as historical only. **No supplied-source candidate is approved as a hard product rule.** Source 16 contributes zero candidates because no usable replacement was inspected; that low-priority omission does not change the 26-candidate register.
 
 ## Product conversion gate
 

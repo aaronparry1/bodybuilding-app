@@ -7,7 +7,7 @@ Supported user-facing frameworks include Full Body, Upper/Lower and Push/Pull/Le
 | 3/4/5/6 days | supported by typed scheduler/tests; physical UX unverified |
 | Symmetric/asymmetric microcycles | supported through role arrays/offsets |
 | >7-day rotations | not established as user-facing; gap |
-| Hypertrophy/strength/powerbuilding/athletic | goal-specific policies exist |
+| Hypertrophy/strength/powerbuilding/athletic | historical repository finding: goal-specific policies exist; athletic lane made inactive by later owner decision |
 | Accumulation/intensification/realisation/taper/deload | mesocycle/event policies exist; breadth varies |
 | SBD-led strength | primary lift/strength lanes exist |
 | Specialisation/weak point | capacity/focus/selection modules exist; athlete-facing control limited |
@@ -23,3 +23,9 @@ Recommendation: preserve the athlete's named split as a preference, not an invar
 The Tier System's movement-priority rotation and major/minor effort tiers (08 pp.66–96), 5/3/1's conservative training-max convention (01 pp.21, 67), and the conjugate thesis' rotating emphases/restoration sequencing (15 pp.20–27) are useful architecture candidates. They support representing `priority`, `emphasis`, `effort`, `phase` and `restoration rationale` explicitly. They do not establish a universally best split, mandatory fourth-week deload, fixed percentage band or branded programme.
 
 Source-derived templates should therefore compile into the same canonical session roles and constraints as user-created plans. A source template may suggest a starting arrangement; availability, equipment, experience, sport demand, recovery and current evidence determine whether it is eligible. The receipt must distinguish “template provenance” from “scientific rationale.”
+
+## Mission-locked construction supplement
+
+Replace “sport demand” in future active policy with the demands of the selected hypertrophy, strength or powerbuilding lane and, where applicable, a named target lift. Full Body, Upper/Lower, PPL, asymmetric rotations, SBD-led phases and bodybuilding specialisation are eligible research/construction families. Sport practices, conditioning blocks, strongman-event preparation and Olympic-lift performance plans are not.
+
+Construction must expose muscle/lift frequency, recoverable dose, priority, exercise intent, fatigue distribution, duration feasibility, user preference and phase transition. Energy deficit may conservatively modify these only as a time-decaying context. The registered schedule/phase gaps remain non-executable and do not displace reliability work.

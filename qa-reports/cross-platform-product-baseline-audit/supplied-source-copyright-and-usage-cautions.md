@@ -15,7 +15,7 @@ Allowed audit behaviour was deliberately narrow: inspect locally, record bibliog
 - Do not use the corpus for model training, retrieval-augmented generation, bulk ingestion or user-visible quotation unless rights and privacy/provenance are documented for that exact use.
 - Historical material can contain obsolete safety, medical, nutrition, body-image or gender assumptions. It must never bypass current safety policy or qualified medical guidance.
 - Source 9 is a compilation/database and sources 2 and 13 are compilations with uncertain upstream permissions; downstream reuse is especially risky.
-- Source 16 is corrupt. An internet-hosted similarly titled copy must not be substituted without identity and rights checks.
+- The earlier Source 16 binary was corrupt and no usable repository replacement was inspected. A similarly titled copy must not be substituted without identity and rights checks; the item is optional and low priority under the current mission.
 
 ## Required rights record
 

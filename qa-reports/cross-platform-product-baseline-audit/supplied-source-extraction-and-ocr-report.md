@@ -25,9 +25,9 @@ For every parseable file the pass recorded byte size, metadata, logical page cou
 | 13 | 820,441 | 33 | 86,436 | 30 | 0 | native text, readable |
 | 14 | 4,183,385 | 91 | 215,812 | 88 | 0 | native text, readable |
 | 15 | 558,036 | 40 | 72,563 | 40 | 0 | native text, readable |
-| 16 | 15,159,296 | — | — | — | — | corrupt/unreadable |
+| 16 | 15,159,296 (earlier external binary) | — | — | — | — | earlier binary corrupt; no usable repository replacement inspected |
 
-Usable total: **1,910 logical pages across 15 files**. Counts use the PDF page number, beginning at 1, rather than printed folio numbers. Sources 10 and 11 contain broken cross-reference/page-tree structures: Poppler reports 139 and 134 pages respectively, while stable logical traversal yields 66 and 65. Claims cite the stable logical PDF page. Source 16 produces invalid cross-reference, missing `endstream` and null top-level pages errors; independent attempts with `pypdf`, Poppler and Apple PDFKit all failed.
+Usable total: **1,910 logical pages across 15 files**. Counts use the PDF page number, beginning at 1, rather than printed folio numbers. Sources 10 and 11 contain broken cross-reference/page-tree structures: Poppler reports 139 and 134 pages respectively, while stable logical traversal yields 66 and 65. Claims cite the stable logical PDF page. The earlier external Source 16 binary produced invalid cross-reference, missing `endstream` and null top-level pages errors; independent attempts with `pypdf`, Poppler and Apple PDFKit all failed. No usable replacement was available in this repository workspace, so no later page, render or OCR claim is made.
 
 ## OCR quality and limits
 
@@ -37,7 +37,7 @@ Representative text-bearing samples usually produced high recognition confidence
 - Page candidates were confirmed visually before inclusion.
 - Tables, formulae, load prescriptions and unusual proper nouns require a second human transcription check before quotation or data entry.
 - This was a targeted claim-extraction pass, not an assertion that every line on every image-only page was exhaustively OCR'd.
-- Source 16 cannot be repaired or inferred from similarly titled internet copies; an exact clean replacement remains required.
+- Source 16 cannot be inferred from similarly titled copies. It remains an optional low-priority future supplement, not a current completion gate.
 
 ## Reproducibility boundary
 

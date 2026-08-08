@@ -24,3 +24,9 @@ Sources: [STNDRD official](https://www.stndrd.app/), [JuggernautAI official](htt
 | Sheiko learning period/responsiveness | calibrated low-confidence period, session-level adjustment and objective signals | generating an unseen future can reduce plan trust; PCr/AI claims need validation |
 
 ASC should combine visible future structure with bounded execution adaptation: show the stable plan, show exactly what changed today, and never copy competitor wording, artwork or proprietary programmes.
+
+## Mission-locked benchmark supplement
+
+The table remains an attributable snapshot from the original audit. The active benchmark set is now bodybuilding, strength, powerlifting and powerbuilding coaching products, evaluated on coherent long-term programming, adaptation transparency, weak-point handling, workout execution, persistence truth, cross-platform quality and accessibility. STNDRD, JuggernautAI and Sheiko Gold remain relevant from different points in that space; their marketing is not evidence of private mechanics.
+
+Sport-performance, endurance/conditioning and calorie-tracking products are not product-mission comparators. Competitor material requested in Queue 3 must be public or lawfully accessed and can reveal workflow/system choices, not scientifically validate them or justify copying proprietary programmes.

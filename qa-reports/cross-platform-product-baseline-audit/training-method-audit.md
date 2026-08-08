@@ -20,3 +20,9 @@ Each future method definition must specify purpose, goal/phase/exercise eligibil
 The source pass improves definitions for 5/3/1/BBB (01 pp.21–46), max/dynamic/repetition methods and accommodating resistance (07 pp.3–16), tier organisation (08 pp.66–96), extended-set parameters (10 pp.10–12) and 10×3 density work (13 pp.1–7). This does **not** change production reachability. It also supplies reasons not to mount several prescriptions unchanged: source 9's generic all-set failure routine is unsupported; source 10's exclusive rep zones are overly rigid; source 11's hypertrophy threshold/failure wording is context-dependent; and source 12's universal Heavy Duty claims are rejected.
 
 The safest eventual library order remains: certify existing straight sets/grouped methods; register neutral method definitions; add one method at a time behind eligibility, fatigue, stop and fallback contracts; then test longitudinal interaction with the canonical programme. Do not ship branded routines or source-derived prose.
+
+## Mission filter
+
+A method is eligible only when its purpose materially serves hypertrophy, strength or powerbuilding. Sprint/agility drills, conditioning-for-expenditure, sport-event strongman work and Olympic-weightlifting performance methods are inactive even if historical modules or supplied sources describe them. Loaded carries, grip or trunk exercises may be considered only as neutral accessories with evidence for a current-lane purpose—not as a hidden strongman programme.
+
+No advanced method enters the roadmap until purpose, population/exercise eligibility, dose, progression, stop, exit, fatigue cost, fallback, rights-safe naming and golden tests can all be specified. The evidence register separates this method gate from foundational coaching-policy research.

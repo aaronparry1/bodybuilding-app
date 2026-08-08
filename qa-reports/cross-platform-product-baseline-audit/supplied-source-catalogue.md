@@ -4,7 +4,7 @@
 
 At repository baseline commit `411d9f6`, `project_sources/` did not exist and none of the requested files was available in the repository. That remains the historical truth recorded by the original audit. The later supplemental pass found the exact 16 filenames, outside the repository, at `/Users/aaronparry/Downloads/canonical-policy-source-corpus/`. The files were inspected in place and were not copied into version control. [directly verified]
 
-Result: **15/16 files were inspectable; 1/16 is corrupt and remains blocked.** Across the inspectable set there are 1,910 usable logical PDF pages. Five files require OCR, two have mixed text/image coverage, and two have damaged page trees for which Poppler's nominal page count is inflated; the catalogue uses the stable logical page count returned by `pypdf`. Extraction details and the sampling method are in `supplied-source-extraction-and-ocr-report.md`.
+Result: **15/16 historical sources were inspected; Source 16 remains unresolved but is not a product or audit-completion blocker.** Across the inspected set there are 1,910 usable logical PDF pages. Five files require OCR, two have mixed text/image coverage, and two have damaged page trees for which Poppler's nominal page count is inflated; the catalogue uses the stable logical page count returned by `pypdf`. Extraction details and the sampling method are in `supplied-source-extraction-and-ocr-report.md`.
 
 | # | Exact filename | Usable pages | Extraction class | Evidence/use class | Inspection result |
 |---:|---|---:|---|---|---|
@@ -23,10 +23,10 @@ Result: **15/16 files were inspectable; 1/16 is corrupt and remains blocked.** A
 | 13 | `13-Chad-Waterbury-s-Programs.pdf` | 33 | native text | coach-authored programme compilation | inspected; routine examples only |
 | 14 | `14-Charles-Atlas-Bodybuilding-Course.pdf` | 91 | native text | historical commercial course | inspected; historical/product inspiration only |
 | 15 | `15-Development-of-the-Russian-Conjugate-SS.pdf` | 40 | native text | historical secondary thesis/coach-science synthesis | inspected; explanation and architecture only |
-| 16 | `16-Applied-Strongman-Training-for-Sport-POLIQUIN-and-McDERMOTT.pdf` | — | corrupt/unreadable | coach-authored commercial system; exact contents unverified | blocked: invalid cross-reference/page tree and unreadable by `pypdf`, Poppler and Apple PDFKit |
+| 16 | `16-Applied-Strongman-Training-for-Sport-POLIQUIN-and-McDERMOTT.pdf` | — | unresolved; earlier binary corrupt | coach-authored commercial sport system; exact contents unverified; current mission relevance low | not reviewed: the earlier external binary was unreadable and the described usable replacement was not available in this repository workspace |
 
 These are deliberately multi-label classifications. The set contains no contemporary systematic review, meta-analysis, consensus statement or clinical guideline. A manual's specificity and practical utility do not elevate it above peer-reviewed evidence, and title/author reputation is not a substitute for claim-level appraisal.
 
-## Remaining source gate
+## Unresolved low-priority supplement
 
-Source 16 requires a clean replacement of the exact intended edition, with identity/permission confirmed. Search results suggesting a similarly titled 121-page copy were used only to diagnose that the supplied binary is incomplete or damaged; they were not treated as the supplied source and did not generate claims. Until replacement, the source pass is **complete with one explicitly bounded source blocker**, not 16/16 complete.
+Source 16 may be reviewed later only if a clean exact edition, identity and permission are available. Search results suggesting a similarly titled 121-page copy and preliminary owner observations were not treated as inspected evidence and generated no claims. Because strongman-sport preparation is outside the locked product mission, this is a **low-priority unresolved supplementary-source item, not a gate** for product scope, evidence planning or reliability work. The truthful completion state is 15 historical sources reviewed and Source 16 unresolved.

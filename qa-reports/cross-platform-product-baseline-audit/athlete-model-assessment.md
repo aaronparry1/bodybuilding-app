@@ -31,3 +31,9 @@ type AthleteModel = {
 ```
 
 Rules: one anomaly cannot create a high-confidence inference; confidence needs minimum comparable observations; contradictory evidence lowers confidence; time-sensitive facts decay; user correction is appended, not history-rewritten; every material consumer records input IDs and rule version. Explanations must say “You told us…”, “We observed…”, “We infer…”, confidence/insufficiency, and the exact prescription delta.
+
+## Mission-locked athlete model supplement
+
+The model serves only hypertrophy, strength and powerbuilding. Stable facts/preferences should cover training age, goal lane and priority, available days/time/equipment, target-lift history where relevant, exercise preferences, limitations, units and load increments. Observations cover performed sets, comparable lift performance, adherence, substitutions, duration and explicit pain/stop events. Optional time-decaying context may include deficit status, sleep, soreness, motivation and stress only when a reviewed consumer justifies collection burden.
+
+Sport, speed, agility, conditioning and endurance prescriptions are not consumers. Bodyweight is contextual evidence and must never become a complete muscle-growth or programme-effectiveness score. The 43-gap register makes minimum observations, confidence decay, contradiction handling, e1RM error and readiness validity explicit prerequisites; no “responder” label is presently justified.

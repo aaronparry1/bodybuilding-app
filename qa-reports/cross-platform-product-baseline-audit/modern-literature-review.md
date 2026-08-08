@@ -23,7 +23,7 @@ This is a baseline claim map, not a clinical guideline or proof that the app is 
 | e1RM | useful trend estimate; equation/exercise/fatigue introduce error | moderate | confidence-tagged derived fact, never exact max |
 | Readiness questionnaires | practical but noisy; associations do not prove the correct prescription | low-moderate | advisory input with decay/contradiction handling |
 | Variation/weak points | specificity matters; variation can manage exposure/adherence but “weak point” inference is uncertain | low-moderate | explicit preference + evidence thresholds |
-| Concurrent training | interference depends on modality, dose, proximity and goal | moderate | scheduling/recovery heuristic |
+| Concurrent training | interference depends on modality, dose, proximity and goal | moderate | historical/contextual evidence only after later mission decision; no endurance-programming consumer |
 | Power | ballistic intent, specificity and fatigue management matter | moderate | lower velocity loss/quality emphasis |
 | Sex/age/training age | relative principles overlap, but baseline capacity, recovery and evidence representation differ | moderate but underrepresented groups | stratify confidence; do not assume young male trained samples generalize |
 | Pain/injury | training evidence cannot diagnose or prescribe rehabilitation | high boundary | stop/seek-qualified-help safety rule only |
@@ -34,3 +34,7 @@ Major gaps requiring formal searches/extraction: dose-response at high trained v
 ## Supplied-source supplement
 
 Fifteen supplied sources were subsequently inspected and produced 26 page-attributable candidates. They add method vocabulary and historical/architectural context, not a new scientific evidence tier. Modern reconciliation particularly rejects universal all-set failure, rigid exclusive rep zones, inevitable concurrent-training interference and anecdotal transformation claims. Periodisation/tier/conjugate structures, conservative training maxima, quality-preserving recovery and optional density/advanced methods remain bounded heuristics or definitions. See `supplied-source-modern-evidence-crosswalk.md` for claim-level links and `supplied-source-claim-candidates.md` for exact PDF pages.
+
+## Mission relevance supplement
+
+Future review depth is concentrated on hypertrophy dose/effort/exercise selection; general and lift-specific strength; powerbuilding sequencing; autoregulation; programme construction; population modifiers; and adherence. Concurrent-training evidence remains historical/contextual and is not an active conditioning-programme workstream. Energy-deficit evidence is relevant only to training recovery, progression expectations and size/strength retention. The decision-linked scope and acceptance criteria now live in `evidence-gap-register.md`; the existing narrative table should not be mistaken for a completed policy review.

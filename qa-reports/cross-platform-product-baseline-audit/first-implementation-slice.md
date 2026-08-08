@@ -9,3 +9,5 @@ Scope: cold/warm startup, usable local state, open workout, set write/haptic, ti
 Completion: budgets pass on one current iPhone and representative compact Android; same fixture and protocol; no network required for training; retained history hashes unchanged; diagnostic contains IDs/counts/status only; automated failure-injection plus manual VoiceOver/TalkBack/keyboard/back gates; rollback is removal/disablement of profiling diagnostics. Relative effort: medium.
 
 The source supplement does not alter this slice. Do not add OCR, PDFs, new methods, branded templates, registry schema or coaching-rule changes to cross-platform certification. Evidence-registry ingestion is a later documentation/governance slice and all 26 candidates remain non-executable.
+
+The 2026-08-08 mission decision also leaves this slice unchanged. Hypertrophy/strength/powerbuilding quality, athlete-model work and the new evidence register begin only after reliability priorities 1–5. No sport-specific or fat-loss feature belongs in this or any active coaching slice.

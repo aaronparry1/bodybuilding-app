@@ -27,3 +27,16 @@
 | e1RM/strength history | derived from performed work | metrics/evidence | trends/load evidence | used in reporting/load policies with confidence bounds |
 
 Decorative/overpromised inputs: equipment is silently broad rather than athlete-specific; limitation collection is missing; rest/session-duration and missed-session observations do not clearly learn longitudinally; bodyweight is absent; preferences lack an inspectable confidence/expiry model. No input currently has a user-facing “told/observed/inferred/confidence/changed this decision” record.
+
+## Mission decision and target input authority
+
+The table above is a historical repository assessment, not an instruction to preserve every consumer. Under the 2026-08-08 owner decision:
+
+- `Goal` must resolve only to hypertrophy, strength or powerbuilding; any cardio consumer is removed from future coaching authority.
+- `Target/competition date` means an appropriate strength-expression/test date, not a sport-event planner.
+- `Recovery/cardio preference` must not generate conditioning; at most, declared outside activity may contextualise recovery without programming it.
+- `Bodyweight` may be an optional corrected trend/context fact. A recorded energy deficit may lower expectations or support conservative training only after evidence review; neither creates nutrition coaching.
+- Required missing inputs are athlete-specific equipment, limitations, relevant lift/training history and explicit weak-point/preference priorities.
+- Readiness inputs stay optional until predictive utility, privacy cost and decision consumer are justified.
+
+No new input is authorised by this documentation decision; schema and collection changes belong after reliability and athlete-model governance.

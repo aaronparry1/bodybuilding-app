@@ -33,3 +33,7 @@ flowchart TB
 ## Source-content boundary
 
 Add no PDF/OCR corpus to the product runtime. Source records and claim candidates belong in an offline governed evidence workflow; approved policies export only original, rights-cleared neutral wording, evidence IDs and deterministic parameters. A template has separate `provenance`, `evidenceBasis`, `rightsStatus` and `policyVersion` fields so historical inspiration cannot masquerade as scientific validation or redistribution permission. The supplied-source pass justifies this boundary but does not authorize a schema or runtime change in the current slice.
+
+## Mission isolation
+
+The shared infrastructure layer may support future products, but this engine loads only hypertrophy, strength and powerbuilding policies. Sport-specific athlete facts, conditioning generators and event policies must not remain dormant delegates behind flags. A future sport product owns a separate policy registry/engine boundary while reusing non-coaching authentication, persistence, workout execution and evidence-governance contracts. Energy-deficit context is an input to bounded recovery/expectation policy, not a nutrition subsystem.
