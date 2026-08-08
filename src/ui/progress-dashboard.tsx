@@ -2,6 +2,7 @@ import { Pressable, Text, View } from "react-native";
 import type { CanonicalProgressPresentation, CanonicalProgressPresentationAction } from "@/application/training/canonical-progress-presentation";
 import { DetailToggle, EmptyActionState, Pill, PrimaryButton } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
+import { WorkoutStage } from "@/ui/workout-visuals";
 
 export function ProgressDashboard({ projection, onAction }: Readonly<{ projection: CanonicalProgressPresentation; onAction(action: CanonicalProgressPresentationAction): void }>) {
   if (["empty", "recoverable_error", "storage_error"].includes(projection.status)) return <ProgressUnavailable projection={projection} onAction={onAction} />;
@@ -29,13 +30,12 @@ function ZeroProgress({ projection, onAction }: Readonly<{ projection: Canonical
 
 function ProgressOverview({ projection }: Readonly<{ projection: CanonicalProgressPresentation }>) {
   const overview = projection.overview!;
-  return <View style={{ gap: spacing.md, paddingBottom: spacing.lg, borderBottomWidth: 1, borderBottomColor: colors.lineSoft }}>
-    <View style={{ gap: spacing.xs }}><Text selectable style={{ color: colors.text, fontSize: 17, fontWeight: "900" }}>{overview.completedSummary}</Text><Text selectable style={{ color: colors.textMuted, fontSize: 13 }}>{overview.recentConsistency}</Text></View>
-    <View style={{ gap: spacing.xs }}><Text style={{ ...type.label, color: colors.accent, textTransform: "uppercase" }}>{overview.phase}</Text><Text selectable style={{ color: colors.text, fontWeight: "900" }}>{overview.phaseProgress}</Text></View>
+  return <WorkoutStage eyebrow="Training record" title={overview.completedSummary} detail={overview.recentConsistency} tone="neutral">
+    <View style={{ gap: spacing.xs, paddingTop: spacing.sm, borderTopWidth: 1, borderTopColor: colors.lineSoft }}><Text style={{ ...type.label, color: colors.accent, textTransform: "uppercase" }}>{overview.phase}</Text><Text selectable style={{ color: colors.text, fontSize: 16, fontWeight: "900" }}>{overview.phaseProgress}</Text></View>
     {overview.statusLabel ? <Pill label={overview.statusLabel} tone="success" /> : null}
     {overview.guidance ? <Text selectable style={{ color: colors.textMuted, fontSize: 13, lineHeight: 18 }}>{overview.guidance}</Text> : null}
     <DetailToggle label="How this is calculated" compact><Text selectable style={{ ...type.body, color: colors.textMuted }}>{overview.calculationDisclosure}</Text></DetailToggle>
-  </View>;
+  </WorkoutStage>;
 }
 
 function ProgressionHighlight({ projection, onAction }: Readonly<{ projection: CanonicalProgressPresentation; onAction(action: CanonicalProgressPresentationAction): void }>) {

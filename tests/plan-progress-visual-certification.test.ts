@@ -84,4 +84,19 @@ describe("canonical Plan and Progress visual certification", () => {
       expect(progressScreen, forbidden).not.toContain(forbidden);
     }
   });
+
+  it("uses the shared premium stage hierarchy without changing presentation authority", () => {
+    const planDashboard = readFileSync(path.join(repositoryRoot, "src/ui/plan-dashboard.tsx"), "utf8");
+    const progressDashboard = readFileSync(path.join(repositoryRoot, "src/ui/progress-dashboard.tsx"), "utf8");
+    const workoutVisuals = readFileSync(path.join(repositoryRoot, "src/ui/workout-visuals.tsx"), "utf8");
+    expect(workoutVisuals).toContain("compact?: boolean");
+    expect(planDashboard).toContain("<WorkoutStage");
+    expect(planDashboard).toContain("<WorkoutMetricStrip compact");
+    expect(progressDashboard).toContain('eyebrow="Training record"');
+    expect(progressDashboard).toContain("<WorkoutStage");
+    for (const source of [planDashboard, progressDashboard]) {
+      expect(source).not.toContain("canonicalRecordedSessionLedger");
+      expect(source).not.toContain("applyProgressDecision");
+    }
+  });
 });

@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import type { CanonicalPlanPresentation, CanonicalPlanPresentationAction, CanonicalPlanSessionPresentation, CanonicalPlanSessionStatus } from "@/application/training/canonical-plan-presentation";
 import { DetailToggle, EmptyActionState, Pill, PrimaryButton, stableUiIdentifier } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
+import { WorkoutMetricStrip, WorkoutStage } from "@/ui/workout-visuals";
 
 export function PlanDashboard({ projection, selectedSessionId, onSelectSession, onAction, guideAction }: Readonly<{
   projection: CanonicalPlanPresentation;
@@ -35,12 +36,7 @@ export function PlanDashboard({ projection, selectedSessionId, onSelectSession, 
 
 function ProgrammeContext({ projection }: Readonly<{ projection: CanonicalPlanPresentation }>) {
   const programme = projection.programme!;
-  return <View style={{ padding: spacing.lg, gap: spacing.md, borderRadius: radius.lg, backgroundColor: colors.surfaceMuted, borderWidth: 1, borderColor: colors.lineSoft }}>
-    <View style={{ gap: spacing.xs }}>
-      <Text maxFontSizeMultiplier={2} style={{ ...type.label, color: colors.accent, textTransform: "uppercase", letterSpacing: 0.7 }}>{programme.focus}</Text>
-      <Text selectable maxFontSizeMultiplier={2} style={{ ...type.display, color: colors.text }}>{programme.phase}</Text>
-      <Text selectable maxFontSizeMultiplier={2} style={{ ...type.body, color: colors.textMuted }}>{programme.phasePurpose}</Text>
-    </View>
+  return <WorkoutStage eyebrow={programme.focus} title={programme.phase} detail={programme.phasePurpose} tone="neutral">
     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: spacing.md }}>
       <Pill label={programme.week} tone="accent" />
       <Text selectable maxFontSizeMultiplier={2} style={{ color: colors.textMuted, fontSize: 13, fontWeight: "700", textAlign: "right", flex: 1 }}>{programme.progressLabel}</Text>
@@ -48,7 +44,7 @@ function ProgrammeContext({ projection }: Readonly<{ projection: CanonicalPlanPr
     <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: programme.progressPercent }} style={{ height: 4, borderRadius: radius.pill, backgroundColor: colors.lineSoft, overflow: "hidden" }}>
       <View style={{ height: "100%", width: `${programme.progressPercent}%`, borderRadius: radius.pill, backgroundColor: colors.accent }} />
     </View>
-  </View>;
+  </WorkoutStage>;
 }
 
 function SessionRow({ session, selected, onPress }: Readonly<{ session: CanonicalPlanSessionPresentation; selected: boolean; onPress(): void }>) {
@@ -66,11 +62,11 @@ function SessionRow({ session, selected, onPress }: Readonly<{ session: Canonica
       </View>
     </View>
     <Text selectable maxFontSizeMultiplier={2} style={{ color: colors.textSubtle, fontSize: 12, lineHeight: 17 }}>{session.emphasis}</Text>
-    <View style={{ flexDirection: "row", gap: spacing.md }}>
-      <SessionMeta value={`${session.exerciseCount}`} label="exercises" />
-      <SessionMeta value={`${session.workingSetCount}`} label="work sets" />
-      <SessionMeta value={session.estimatedDurationMinutes ? `${session.estimatedDurationMinutes}m` : "—"} label="estimate" />
-    </View>
+    <WorkoutMetricStrip compact items={[
+      { value: `${session.exerciseCount}`, label: "exercises" },
+      { value: `${session.workingSetCount}`, label: "work sets" },
+      { value: session.estimatedDurationMinutes ? `${session.estimatedDurationMinutes}m` : "—", label: "estimate" },
+    ]} />
   </Pressable>;
 }
 
@@ -112,5 +108,4 @@ function StatusIcon({ status, color }: Readonly<{ status: CanonicalPlanSessionSt
   return <SymbolView name={names[status]} size={18} tintColor={color} weight="semibold" />;
 }
 
-function SessionMeta({ value, label }: Readonly<{ value: string; label: string }>) { return <View style={{ flex: 1, gap: 1 }}><Text maxFontSizeMultiplier={2} style={{ color: colors.text, fontSize: 14, fontWeight: "900" }}>{value}</Text><Text maxFontSizeMultiplier={2} style={{ color: colors.textSubtle, fontSize: 10, fontWeight: "700", textTransform: "uppercase" }}>{label}</Text></View>; }
 function SectionHeading({ title, detail }: Readonly<{ title: string; detail: string }>) { return <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", gap: spacing.md }}><Text maxFontSizeMultiplier={2} style={{ ...type.section, color: colors.text }}>{title}</Text><Text maxFontSizeMultiplier={2} style={{ color: colors.textSubtle, fontSize: 11, textAlign: "right" }}>{detail}</Text></View>; }
