@@ -160,14 +160,12 @@ create or replace function public.handle_new_user_profile()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = ''
 as $$
 begin
   insert into public.profiles (id, email, display_name)
   values (new.id, new.email, coalesce(new.raw_user_meta_data->>'display_name', split_part(new.email, '@', 1)))
-  on conflict (id) do update
-    set email = excluded.email,
-        updated_at = now();
+  on conflict (id) do nothing;
   return new;
 end;
 $$;
@@ -367,3 +365,7 @@ create index if not exists performed_exercises_session_idx on public.performed_e
 create index if not exists performed_exercises_origin_idx on public.performed_exercises(user_id, exercise_origin);
 create index if not exists performed_sets_exercise_idx on public.performed_sets(performed_exercise_id);
 create index if not exists performed_sets_type_idx on public.performed_sets(performed_exercise_id, set_type);
+
+-- The baseline is completed by the idempotent production backup-contract
+-- hardening used by the repository's established psql schema workflow.
+\ir migrations/20260808110239_harden_production_backup_contract.sql

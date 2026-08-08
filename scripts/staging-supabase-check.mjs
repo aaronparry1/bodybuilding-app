@@ -68,10 +68,12 @@ if (authProbe.error) {
 
 for (const table of requiredTables) {
   const { error } = await supabase.from(table).select("*", { count: "exact", head: true });
-  if (error) {
-    fail(`Table check failed for ${table}: ${error.message}`);
+  if (table === "exercises" && error) {
+    fail(`Public exercise read failed: ${error.message}`);
+  } else if (table !== "exercises" && !error) {
+    fail(`Anonymous access was unexpectedly granted for ${table}.`);
   } else {
-    ok(`Table reachable through REST: ${table}`);
+    ok(table === "exercises" ? "Public exercise read is reachable." : `Anonymous access is denied for ${table}.`);
   }
 }
 
@@ -80,18 +82,14 @@ const testPassword = process.env.STAGING_TEST_PASSWORD;
 if (testEmail && testPassword) {
   const signIn = await supabase.auth.signInWithPassword({ email: testEmail, password: testPassword });
   if (signIn.error) {
-    const signUp = await supabase.auth.signUp({ email: testEmail, password: testPassword });
-    if (signUp.error) {
-      if (signUp.error.message.toLowerCase().includes("rate limit")) {
-        console.log(`SKIP Auth sign-up retry is rate limited by Supabase: ${signUp.error.message}`);
-      } else {
-        fail(`Auth sign-in/sign-up failed for staging test user: ${signUp.error.message}`);
-      }
-    } else {
-      ok("Staging test user sign-up endpoint accepted credentials.");
-    }
+    fail(`Auth sign-in failed for configured test user: ${signIn.error.message}`);
   } else {
-    ok("Staging test user login succeeded.");
+    ok("Configured test user login succeeded.");
+    for (const table of requiredTables) {
+      const { error } = await supabase.from(table).select("*", { count: "exact", head: true });
+      if (error) fail(`Authenticated owner reachability failed for ${table}: ${error.message}`);
+      else ok(`Authenticated table reachable: ${table}`);
+    }
   }
 
   await supabase.auth.signOut();
