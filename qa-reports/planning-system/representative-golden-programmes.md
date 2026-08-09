@@ -6163,7 +6163,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "microcycle_role:Full body strength A",
                 "mesocycle_purpose:Build work capacity and movement tolerance",
                 "slot:0:full-body knee-dominant anchor",
-                "slot:1:full-body press",
+                "slot:1:full-body bench-strength exposure",
                 "slot:2:full-body pull",
                 "slot:3:complementary lower pattern",
                 "slot:4:trunk support"
@@ -6176,7 +6176,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "microcycle_role:Full body strength B",
                 "mesocycle_purpose:Build work capacity and movement tolerance",
                 "slot:0:full-body hinge anchor",
-                "slot:1:full-body press",
+                "slot:1:full-body bench-strength exposure",
                 "slot:2:full-body pull",
                 "slot:3:complementary lower pattern",
                 "slot:4:trunk support"
@@ -6189,7 +6189,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "microcycle_role:Full body strength C",
                 "mesocycle_purpose:Build work capacity and movement tolerance",
                 "slot:0:full-body knee-dominant anchor",
-                "slot:1:full-body press",
+                "slot:1:full-body bench-strength exposure",
                 "slot:2:full-body pull",
                 "slot:3:complementary lower pattern",
                 "slot:4:trunk support"
@@ -6271,21 +6271,22 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-decline-plate-loaded-press",
-              "exercise": "Decline Plate Loaded Press",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "full-body press",
+              "slotPurpose": "full-body bench-strength exposure",
               "directStimuli": [
                 "chest"
               ],
               "meaningfulSecondaryMuscles": [
-                "triceps"
+                "triceps",
+                "shoulders"
               ],
-              "exerciseFatigue": "moderate",
+              "exerciseFatigue": "high",
               "workingSets": 2,
               "exactReps": [
-                10,
-                10
+                5,
+                5
               ],
               "exactTargetKinds": [
                 "reps",
@@ -6293,19 +6294,20 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 180,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_strength",
                 "mesocycle:strength_general",
-                "slot:full-body press",
-                "fatigue:moderate",
+                "slot:full-body bench-strength exposure",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
+                "stability:moderate",
                 "repeat:not_repeated",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "bench_pec_and_position_strength"
             },
             {
               "exerciseId": "ex-chest-supported-row",
@@ -6473,22 +6475,22 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-incline-plate-loaded-press",
-              "exercise": "Incline Plate Loaded Press",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "full-body press",
+              "slotPurpose": "full-body bench-strength exposure",
               "directStimuli": [
                 "chest"
               ],
               "meaningfulSecondaryMuscles": [
-                "shoulders",
-                "triceps"
+                "triceps",
+                "shoulders"
               ],
-              "exerciseFatigue": "moderate",
+              "exerciseFatigue": "high",
               "workingSets": 2,
               "exactReps": [
-                10,
-                10
+                5,
+                5
               ],
               "exactTargetKinds": [
                 "reps",
@@ -6496,19 +6498,20 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 180,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_strength",
                 "mesocycle:strength_general",
-                "slot:full-body press",
-                "fatigue:moderate",
+                "slot:full-body bench-strength exposure",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
-                "repeat:not_repeated",
+                "stability:moderate",
+                "repeat:stable_primary_practice",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "bench_pec_and_position_strength"
             },
             {
               "exerciseId": "ex-lat-pulldown",
@@ -6675,10 +6678,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-machine-chest-press",
-              "exercise": "Machine Chest Press",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "full-body press",
+              "slotPurpose": "full-body bench-strength exposure",
               "directStimuli": [
                 "chest"
               ],
@@ -6686,11 +6689,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps",
                 "shoulders"
               ],
-              "exerciseFatigue": "moderate",
+              "exerciseFatigue": "high",
               "workingSets": 2,
               "exactReps": [
-                10,
-                10
+                5,
+                5
               ],
               "exactTargetKinds": [
                 "reps",
@@ -6698,19 +6701,20 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 180,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_strength",
                 "mesocycle:strength_general",
-                "slot:full-body press",
-                "fatigue:moderate",
+                "slot:full-body bench-strength exposure",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
-                "repeat:not_repeated",
+                "stability:moderate",
+                "repeat:stable_primary_practice",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "bench_pec_and_position_strength"
             },
             {
               "exerciseId": "ex-dorian-yates-row-machine",
@@ -6837,11 +6841,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "meaningfulSecondarySets": {
           "hip_extension": 8,
           "triceps": 6,
+          "anterior_delts": 6,
           "biceps": 6,
           "rear_delts": 4,
           "upper_back": 2,
-          "quadriceps": 2,
-          "anterior_delts": 4
+          "quadriceps": 2
         },
         "muscleFrequency": {
           "chest": 3,
@@ -6864,7 +6868,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "primaryLiftExposures": {
           "bench": {
-            "primary": 0,
+            "primary": 3,
             "secondaryVariation": 0
           },
           "squat": {
@@ -6900,6 +6904,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           {
             "exerciseId": "ex-barbell-back-squat",
             "count": 2,
+            "reason": "stable_primary_practice"
+          },
+          {
+            "exerciseId": "ex-bench-press",
+            "count": 3,
             "reason": "stable_primary_practice"
           },
           {
@@ -6998,6 +7007,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_stimulus_reported_separately",
             "no_unauthorised_specialist_selection",
             "repeat_authorised:ex-barbell-back-squat",
+            "repeat_authorised:ex-bench-press",
             "repeat_authorised:ex-cable-crunch",
             "session_systemic_fatigue_reported_for_comparison",
             "high_fatigue_reps_and_rest_appropriate"
@@ -8259,7 +8269,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "microcycle_role:Full body powerbuilding A",
                 "mesocycle_purpose:Establish repeatable squat, bench and deadlift",
                 "slot:0:full-body knee-dominant anchor",
-                "slot:1:full-body press",
+                "slot:1:full-body bench-strength exposure",
                 "slot:2:full-body pull",
                 "slot:3:complementary lower pattern",
                 "slot:4:trunk support"
@@ -8272,7 +8282,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "microcycle_role:Full body powerbuilding B",
                 "mesocycle_purpose:Establish repeatable squat, bench and deadlift",
                 "slot:0:full-body hinge anchor",
-                "slot:1:full-body press",
+                "slot:1:full-body bench-strength exposure",
                 "slot:2:full-body pull",
                 "slot:3:complementary lower pattern",
                 "slot:4:trunk support"
@@ -8285,7 +8295,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "microcycle_role:Full body powerbuilding C",
                 "mesocycle_purpose:Establish repeatable squat, bench and deadlift",
                 "slot:0:full-body knee-dominant anchor",
-                "slot:1:full-body press",
+                "slot:1:full-body bench-strength exposure",
                 "slot:2:full-body pull",
                 "slot:3:complementary lower pattern",
                 "slot:4:trunk support"
@@ -8371,22 +8381,23 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-decline-plate-loaded-press",
-              "exercise": "Decline Plate Loaded Press",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "full-body press",
+              "slotPurpose": "full-body bench-strength exposure",
               "directStimuli": [
                 "chest"
               ],
               "meaningfulSecondaryMuscles": [
-                "triceps"
+                "triceps",
+                "shoulders"
               ],
-              "exerciseFatigue": "moderate",
+              "exerciseFatigue": "high",
               "workingSets": 3,
               "exactReps": [
-                10,
-                10,
-                10
+                5,
+                5,
+                5
               ],
               "exactTargetKinds": [
                 "reps",
@@ -8395,19 +8406,20 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 180,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle_and_strength",
                 "mesocycle:powerbuilding_foundation",
-                "slot:full-body press",
-                "fatigue:moderate",
+                "slot:full-body bench-strength exposure",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
+                "stability:moderate",
                 "repeat:not_repeated",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "bench_pec_and_position_strength"
             },
             {
               "exerciseId": "ex-chest-supported-row",
@@ -8583,23 +8595,23 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-incline-plate-loaded-press",
-              "exercise": "Incline Plate Loaded Press",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "full-body press",
+              "slotPurpose": "full-body bench-strength exposure",
               "directStimuli": [
                 "chest"
               ],
               "meaningfulSecondaryMuscles": [
-                "shoulders",
-                "triceps"
+                "triceps",
+                "shoulders"
               ],
-              "exerciseFatigue": "moderate",
+              "exerciseFatigue": "high",
               "workingSets": 3,
               "exactReps": [
-                10,
-                10,
-                10
+                5,
+                5,
+                5
               ],
               "exactTargetKinds": [
                 "reps",
@@ -8608,19 +8620,20 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 180,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle_and_strength",
                 "mesocycle:powerbuilding_foundation",
-                "slot:full-body press",
-                "fatigue:moderate",
+                "slot:full-body bench-strength exposure",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
-                "repeat:not_repeated",
+                "stability:moderate",
+                "repeat:stable_primary_practice",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "bench_pec_and_position_strength"
             },
             {
               "exerciseId": "ex-lat-pulldown",
@@ -8795,10 +8808,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-machine-chest-press",
-              "exercise": "Machine Chest Press",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "full-body press",
+              "slotPurpose": "full-body bench-strength exposure",
               "directStimuli": [
                 "chest"
               ],
@@ -8806,12 +8819,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps",
                 "shoulders"
               ],
-              "exerciseFatigue": "moderate",
+              "exerciseFatigue": "high",
               "workingSets": 3,
               "exactReps": [
-                10,
-                10,
-                10
+                5,
+                5,
+                5
               ],
               "exactTargetKinds": [
                 "reps",
@@ -8820,19 +8833,20 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 180,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_muscle_and_strength",
                 "mesocycle:powerbuilding_foundation",
-                "slot:full-body press",
-                "fatigue:moderate",
+                "slot:full-body bench-strength exposure",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
-                "repeat:not_repeated",
+                "stability:moderate",
+                "repeat:stable_primary_practice",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "bench_pec_and_position_strength"
             },
             {
               "exerciseId": "ex-dorian-yates-row-machine",
@@ -8963,11 +8977,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "meaningfulSecondarySets": {
           "hip_extension": 14,
           "triceps": 9,
+          "anterior_delts": 9,
           "biceps": 9,
           "rear_delts": 6,
           "upper_back": 4,
-          "quadriceps": 4,
-          "anterior_delts": 6
+          "quadriceps": 4
         },
         "muscleFrequency": {
           "chest": 3,
@@ -8990,7 +9004,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "primaryLiftExposures": {
           "bench": {
-            "primary": 0,
+            "primary": 3,
             "secondaryVariation": 0
           },
           "squat": {
@@ -9026,6 +9040,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           {
             "exerciseId": "ex-barbell-back-squat",
             "count": 2,
+            "reason": "stable_primary_practice"
+          },
+          {
+            "exerciseId": "ex-bench-press",
+            "count": 3,
             "reason": "stable_primary_practice"
           },
           {
@@ -9125,6 +9144,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_stimulus_reported_separately",
             "no_unauthorised_specialist_selection",
             "repeat_authorised:ex-barbell-back-squat",
+            "repeat_authorised:ex-bench-press",
             "repeat_authorised:ex-cable-crunch",
             "session_systemic_fatigue_reported_for_comparison",
             "high_fatigue_reps_and_rest_appropriate"
@@ -10565,7 +10585,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "microcycle_role:Full body strength and power A",
                 "mesocycle_purpose:General athletic preparation",
                 "slot:0:full-body knee-dominant anchor",
-                "slot:1:full-body press",
+                "slot:1:full-body bench-strength exposure",
                 "slot:2:full-body pull",
                 "slot:3:complementary lower pattern",
                 "slot:4:trunk support"
@@ -10578,7 +10598,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "microcycle_role:Full body strength and power B",
                 "mesocycle_purpose:General athletic preparation",
                 "slot:0:full-body hinge anchor",
-                "slot:1:full-body press",
+                "slot:1:full-body bench-strength exposure",
                 "slot:2:full-body pull",
                 "slot:3:complementary lower pattern",
                 "slot:4:trunk support"
@@ -10591,7 +10611,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "microcycle_role:Full body strength and power C",
                 "mesocycle_purpose:General athletic preparation",
                 "slot:0:full-body knee-dominant anchor",
-                "slot:1:full-body press",
+                "slot:1:full-body bench-strength exposure",
                 "slot:2:full-body pull",
                 "slot:3:complementary lower pattern",
                 "slot:4:trunk support"
@@ -10675,41 +10695,43 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-decline-plate-loaded-press",
-              "exercise": "Decline Plate Loaded Press",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "full-body press",
+              "slotPurpose": "full-body bench-strength exposure",
               "directStimuli": [
                 "chest"
               ],
               "meaningfulSecondaryMuscles": [
-                "triceps"
+                "triceps",
+                "shoulders"
               ],
-              "exerciseFatigue": "moderate",
+              "exerciseFatigue": "high",
               "workingSets": 2,
               "exactReps": [
-                10,
-                10
+                5,
+                5
               ],
               "exactTargetKinds": [
                 "reps",
                 "reps"
               ],
-              "method": "antagonist_superset",
+              "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 0,
+              "restSeconds": 180,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:athletic_performance",
                 "mesocycle:athletic_general",
-                "slot:full-body press",
-                "fatigue:moderate",
+                "slot:full-body bench-strength exposure",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
+                "stability:moderate",
                 "repeat:not_repeated",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "bench_pec_and_position_strength"
             },
             {
               "exerciseId": "ex-chest-supported-row",
@@ -10732,9 +10754,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "reps",
                 "reps"
               ],
-              "method": "antagonist_superset",
+              "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 60,
+              "restSeconds": 120,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
@@ -10877,22 +10899,22 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-incline-plate-loaded-press",
-              "exercise": "Incline Plate Loaded Press",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "full-body press",
+              "slotPurpose": "full-body bench-strength exposure",
               "directStimuli": [
                 "chest"
               ],
               "meaningfulSecondaryMuscles": [
-                "shoulders",
-                "triceps"
+                "triceps",
+                "shoulders"
               ],
-              "exerciseFatigue": "moderate",
+              "exerciseFatigue": "high",
               "workingSets": 2,
               "exactReps": [
-                10,
-                10
+                5,
+                5
               ],
               "exactTargetKinds": [
                 "reps",
@@ -10900,19 +10922,20 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ],
               "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 120,
+              "restSeconds": 180,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:athletic_performance",
                 "mesocycle:athletic_general",
-                "slot:full-body press",
-                "fatigue:moderate",
+                "slot:full-body bench-strength exposure",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
-                "repeat:not_repeated",
+                "stability:moderate",
+                "repeat:stable_primary_practice",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "bench_pec_and_position_strength"
             },
             {
               "exerciseId": "ex-lat-pulldown",
@@ -11079,10 +11102,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-machine-chest-press",
-              "exercise": "Machine Chest Press",
+              "exerciseId": "ex-bench-press",
+              "exercise": "Bench Press",
               "movement": "horizontal_push",
-              "slotPurpose": "full-body press",
+              "slotPurpose": "full-body bench-strength exposure",
               "directStimuli": [
                 "chest"
               ],
@@ -11090,31 +11113,32 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "triceps",
                 "shoulders"
               ],
-              "exerciseFatigue": "moderate",
+              "exerciseFatigue": "high",
               "workingSets": 2,
               "exactReps": [
-                10,
-                10
+                5,
+                5
               ],
               "exactTargetKinds": [
                 "reps",
                 "reps"
               ],
-              "method": "antagonist_superset",
+              "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 0,
+              "restSeconds": 180,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:athletic_performance",
                 "mesocycle:athletic_general",
-                "slot:full-body press",
-                "fatigue:moderate",
+                "slot:full-body bench-strength exposure",
+                "fatigue:high",
                 "recovery:normal",
-                "stability:high",
-                "repeat:not_repeated",
+                "stability:moderate",
+                "repeat:stable_primary_practice",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "bench_pec_and_position_strength"
             },
             {
               "exerciseId": "ex-dorian-yates-row-machine",
@@ -11138,9 +11162,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "reps",
                 "reps"
               ],
-              "method": "antagonist_superset",
+              "method": "straight_sets",
               "loadState": "calibration_required",
-              "restSeconds": 60,
+              "restSeconds": 120,
               "progression": "rep_progression",
               "stopRule": "change_target",
               "reasonCodes": [
@@ -11239,11 +11263,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "meaningfulSecondarySets": {
           "hip_extension": 10,
           "triceps": 6,
+          "anterior_delts": 6,
           "biceps": 6,
           "rear_delts": 4,
           "upper_back": 3,
-          "quadriceps": 3,
-          "anterior_delts": 4
+          "quadriceps": 3
         },
         "muscleFrequency": {
           "chest": 3,
@@ -11266,7 +11290,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "primaryLiftExposures": {
           "bench": {
-            "primary": 0,
+            "primary": 3,
             "secondaryVariation": 0
           },
           "squat": {
@@ -11302,6 +11326,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           {
             "exerciseId": "ex-barbell-back-squat",
             "count": 2,
+            "reason": "stable_primary_practice"
+          },
+          {
+            "exerciseId": "ex-bench-press",
+            "count": 3,
             "reason": "stable_primary_practice"
           },
           {
@@ -11418,6 +11447,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_stimulus_reported_separately",
             "no_unauthorised_specialist_selection",
             "repeat_authorised:ex-barbell-back-squat",
+            "repeat_authorised:ex-bench-press",
             "repeat_authorised:ex-cable-crunch",
             "session_systemic_fatigue_reported_for_comparison",
             "high_fatigue_reps_and_rest_appropriate"

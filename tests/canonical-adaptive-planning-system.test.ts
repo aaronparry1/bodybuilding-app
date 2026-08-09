@@ -85,6 +85,18 @@ describe("complete canonical adaptive planning system", () => {
     expect(lowerSnapshot.slots.slice(0, 2).map((slot) => slot.exerciseId)).toEqual(["ex-barbell-back-squat", "ex-romanian-deadlift"]);
   });
 
+  it("preserves all three primary-lift exposures in three-day full-body strength programmes", () => {
+    for (const id of ["beginner-strength-3", "intermediate-powerbuilding-3"] as const) {
+      const result = constructGoldenProgramme(canonicalRepresentativeGoldenCases.find((item) => item.id === id)!);
+      expect(result.status).toBe("constructed");
+      if (result.status !== "constructed") continue;
+      expect(result.accounting.primaryLiftExposures.bench.primary).toBe(3);
+      expect(result.accounting.primaryLiftExposures.squat.primary).toBe(2);
+      expect(result.accounting.primaryLiftExposures.deadlift.primary).toBe(1);
+      expect(result.sessions.map((session) => session.exercises[1]?.exerciseId)).toEqual(["ex-bench-press", "ex-bench-press", "ex-bench-press"]);
+    }
+  });
+
   it("certifies every representative golden case or records its explicit unsupported contract", () => {
     const results = canonicalRepresentativeGoldenCases.map(constructGoldenProgramme);
     for (const result of results) {

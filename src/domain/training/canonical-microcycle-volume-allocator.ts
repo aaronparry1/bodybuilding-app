@@ -775,7 +775,9 @@ function fullBodyContract(index: number, strength: boolean, primaryOnlyEquipment
   const squatDay = index % 2 === 0;
   return [
     slot("primary_compound", "primary", [squatDay ? "quads" : "hamstrings", "glutes"], [squatDay ? "quadriceps" : "hip_extension"], squatDay ? "full-body knee-dominant anchor" : "full-body hinge anchor", squatDay ? ["squat", "lunge"] : ["hinge"], strength ? { primaryLift: squatDay ? "squat" : "deadlift", liftExposure: "primary", repeatPolicy: "stable_primary_practice" } : { repeatPolicy: "variation_preferred" }),
-    slot(primaryOnlyEquipment ? "primary_compound" : "secondary_compound", "secondary", ["chest"], ["chest"], "full-body press", ["horizontal_push"], { repeatPolicy: "variation_preferred" }),
+    slot(strength || primaryOnlyEquipment ? "primary_compound" : "secondary_compound", "secondary", ["chest"], ["chest"], strength ? "full-body bench-strength exposure" : "full-body press", ["horizontal_push"], strength
+      ? { primaryLift: "bench", liftExposure: "primary", repeatPolicy: "stable_primary_practice", transferRationale: "bench_pec_and_position_strength" }
+      : { repeatPolicy: "variation_preferred" }),
     slot("secondary_compound", "secondary", ["back"], [index % 2 === 0 ? "upper_back" : "lats"], "full-body pull", index % 2 === 0 ? ["horizontal_pull"] : ["vertical_pull"], { repeatPolicy: "variation_preferred" }),
     slot("secondary_compound", "secondary", [squatDay ? "hamstrings" : "quads"], [squatDay ? "hip_extension" : "quadriceps"], "complementary lower pattern", squatDay ? ["hinge", "hip_thrust"] : ["squat", "lunge"], { repeatPolicy: "variation_preferred" }),
     slot("accessory", "accessory", ["abs"], ["core"], "trunk support", ["core", "carry"], { repeatPolicy: "repeat_if_no_equivalent" }),

@@ -342,7 +342,6 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     }
   ],
   "observedMethods": [
-    "antagonist_superset",
     "back_off_sets",
     "straight_sets"
   ]

@@ -337,7 +337,6 @@
     }
   ],
   "observedMethods": [
-    "antagonist_superset",
     "back_off_sets",
     "straight_sets"
   ]
