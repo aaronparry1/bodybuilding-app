@@ -7091,10 +7091,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasons": [
                 "microcycle_role:Lower strength",
                 "mesocycle_purpose:Build work capacity and movement tolerance",
-                "slot:0:squat-specific anchor",
-                "slot:1:quad drive assistance",
-                "slot:2:posterior-chain assistance",
-                "slot:3:knee-flexion hamstring support",
+                "slot:0:deadlift-family strength anchor",
+                "slot:1:knee-dominant lower-body support",
+                "slot:2:hamstring strength assistance",
+                "slot:3:lower-fatigue hip-extension support",
                 "slot:4:calf retention"
               ]
             }
@@ -7816,55 +7816,54 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 4,
           "role": "Lower strength",
           "purpose": "Build work capacity and movement tolerance",
-          "workingSets": 14,
-          "estimatedMinutes": 51,
+          "workingSets": 13,
+          "estimatedMinutes": 44,
           "dosageAssessment": {
             "exerciseCount": 5,
-            "workingSets": 14,
+            "workingSets": 13,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "5 owned movement/muscle slots supply 14 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "5 owned movement/muscle slots supply 13 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
-              "exerciseId": "ex-barbell-back-squat",
-              "exercise": "Barbell Back Squat",
-              "movement": "squat",
-              "slotPurpose": "squat-specific anchor",
+              "exerciseId": "ex-deadlift",
+              "exercise": "Deadlift",
+              "movement": "hinge",
+              "slotPurpose": "deadlift-family strength anchor",
               "directStimuli": [
-                "quadriceps"
+                "hip_extension"
               ],
               "meaningfulSecondaryMuscles": [
-                "hamstrings",
-                "adductors"
+                "quads",
+                "traps",
+                "forearms"
               ],
               "exerciseFatigue": "high",
-              "workingSets": 4,
+              "workingSets": 3,
               "exactReps": [
                 3,
-                7,
                 7,
                 7
               ],
               "exactTargetKinds": [
                 "reps",
                 "reps",
-                "reps",
                 "reps"
               ],
               "method": "back_off_sets",
               "loadState": "calibration_required",
-              "restSeconds": 210,
+              "restSeconds": 240,
               "progression": "load_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_strength",
                 "mesocycle:strength_general",
-                "slot:squat-specific anchor",
+                "slot:deadlift-family strength anchor",
                 "fatigue:high",
                 "recovery:normal",
                 "stability:moderate",
-                "repeat:stable_primary_practice",
+                "repeat:not_repeated",
                 "preference_score:0"
               ]
             },
@@ -7872,7 +7871,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exerciseId": "ex-hack-squat-machine",
               "exercise": "Hack Squat Machine",
               "movement": "squat",
-              "slotPurpose": "quad drive assistance",
+              "slotPurpose": "knee-dominant lower-body support",
               "directStimuli": [
                 "quadriceps"
               ],
@@ -7899,71 +7898,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasonCodes": [
                 "goal:build_strength",
                 "mesocycle:strength_general",
-                "slot:quad drive assistance",
+                "slot:knee-dominant lower-body support",
                 "fatigue:moderate",
                 "recovery:normal",
                 "stability:high",
                 "repeat:not_repeated",
                 "preference_score:0"
               ],
-              "transferRationale": "squat_quad_drive"
-            },
-            {
-              "exerciseId": "ex-machine-glute-drive",
-              "exercise": "Machine Glute Drive",
-              "movement": "hip_thrust",
-              "slotPurpose": "posterior-chain assistance",
-              "directStimuli": [
-                "hip_extension"
-              ],
-              "meaningfulSecondaryMuscles": [
-                "hamstrings"
-              ],
-              "exerciseFatigue": "moderate",
-              "workingSets": 3,
-              "exactReps": [
-                10,
-                10,
-                10
-              ],
-              "exactTargetKinds": [
-                "reps",
-                "reps",
-                "reps"
-              ],
-              "method": "straight_sets",
-              "loadState": "calibration_required",
-              "restSeconds": 120,
-              "progression": "rep_progression",
-              "stopRule": "change_target",
-              "reasonCodes": [
-                "goal:build_strength",
-                "mesocycle:strength_general",
-                "slot:posterior-chain assistance",
-                "fatigue:moderate",
-                "recovery:normal",
-                "stability:high",
-                "repeat:not_repeated",
-                "preference_score:0"
-              ],
-              "transferRationale": "squat_posterior_support"
+              "transferRationale": "deadlift_quad_support"
             },
             {
               "exerciseId": "ex-lying-leg-curl",
               "exercise": "Lying Leg Curl",
               "movement": "isolation",
-              "slotPurpose": "knee-flexion hamstring support",
+              "slotPurpose": "hamstring strength assistance",
               "directStimuli": [
                 "hamstrings_knee_flexion"
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 2,
+              "workingSets": 3,
               "exactReps": [
+                12,
                 12,
                 12
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps"
               ],
@@ -7975,13 +7936,52 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasonCodes": [
                 "goal:build_strength",
                 "mesocycle:strength_general",
-                "slot:knee-flexion hamstring support",
+                "slot:hamstring strength assistance",
                 "fatigue:low",
                 "recovery:normal",
                 "stability:high",
                 "repeat:not_repeated",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "deadlift_hamstring_strength"
+            },
+            {
+              "exerciseId": "ex-machine-glute-drive",
+              "exercise": "Machine Glute Drive",
+              "movement": "hip_thrust",
+              "slotPurpose": "lower-fatigue hip-extension support",
+              "directStimuli": [
+                "hip_extension"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "hamstrings"
+              ],
+              "exerciseFatigue": "moderate",
+              "workingSets": 2,
+              "exactReps": [
+                10,
+                10
+              ],
+              "exactTargetKinds": [
+                "reps",
+                "reps"
+              ],
+              "method": "straight_sets",
+              "loadState": "calibration_required",
+              "restSeconds": 120,
+              "progression": "rep_progression",
+              "stopRule": "change_target",
+              "reasonCodes": [
+                "goal:build_strength",
+                "mesocycle:strength_general",
+                "slot:lower-fatigue hip-extension support",
+                "fatigue:moderate",
+                "recovery:normal",
+                "stability:high",
+                "repeat:not_repeated",
+                "preference_score:0"
+              ],
+              "transferRationale": "deadlift_hip_extension_support"
             },
             {
               "exerciseId": "ex-machine-calf-raise",
@@ -8029,9 +8029,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "lateral_delts": 4,
           "triceps": 4,
           "biceps": 4,
-          "quadriceps": 14,
-          "hip_extension": 6,
-          "hamstrings_knee_flexion": 4,
+          "quadriceps": 10,
+          "hip_extension": 8,
+          "hamstrings_knee_flexion": 5,
           "calves": 4
         },
         "meaningfulSecondarySets": {
@@ -8039,7 +8039,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "anterior_delts": 8,
           "biceps": 8,
           "rear_delts": 4,
-          "hip_extension": 14
+          "hip_extension": 9,
+          "upper_back": 3,
+          "quadriceps": 3
         },
         "muscleFrequency": {
           "biceps": 2,
@@ -8058,8 +8060,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "horizontal_pull": 2,
           "vertical_pull": 2,
           "isolation": 10,
-          "squat": 4,
-          "lunge": 4,
+          "squat": 3,
+          "lunge": 3,
           "hinge": 2,
           "hip_thrust": 2
         },
@@ -8069,45 +8071,40 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondaryVariation": 0
           },
           "squat": {
-            "primary": 2,
+            "primary": 1,
             "secondaryVariation": 0
           },
           "deadlift": {
-            "primary": 0,
+            "primary": 1,
             "secondaryVariation": 0
           }
         },
-        "totalWorkingSets": 56,
+        "totalWorkingSets": 55,
         "perSessionWorkingSets": [
           14,
           14,
           14,
-          14
+          13
         ],
         "perSessionEstimatedMinutes": [
           45,
           51,
           45,
-          51
+          44
         ],
         "fatigueUnits": {
           "perSession": [
             26,
             28,
             26,
-            28
+            24
           ],
-          "weeklyUnits": 108,
+          "weeklyUnits": 104,
           "overlapFlags": [
             "more_than_three_primary_sessions"
           ]
         },
         "repeatedExercises": [
-          {
-            "exerciseId": "ex-barbell-back-squat",
-            "count": 2,
-            "reason": "stable_primary_practice"
-          },
           {
             "exerciseId": "ex-bench-press",
             "count": 2,
@@ -8207,7 +8204,6 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "calves_direct_coverage",
             "secondary_stimulus_reported_separately",
             "no_unauthorised_specialist_selection",
-            "repeat_authorised:ex-barbell-back-squat",
             "repeat_authorised:ex-bench-press",
             "session_systemic_fatigue_reported_for_comparison",
             "same_role_sessions_complementary:upper",
@@ -15272,10 +15268,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasons": [
                 "microcycle_role:Lower strength",
                 "mesocycle_purpose:Build work capacity and movement tolerance",
-                "slot:0:squat-specific anchor",
-                "slot:1:quad drive assistance",
-                "slot:2:posterior-chain assistance",
-                "slot:3:knee-flexion hamstring support",
+                "slot:0:deadlift-family strength anchor",
+                "slot:1:knee-dominant lower-body support",
+                "slot:2:hamstring strength assistance",
+                "slot:3:lower-fatigue hip-extension support",
                 "slot:4:calf retention"
               ]
             }
@@ -15997,55 +15993,54 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "dayOffset": 4,
           "role": "Lower strength",
           "purpose": "Build work capacity and movement tolerance",
-          "workingSets": 14,
-          "estimatedMinutes": 51,
+          "workingSets": 13,
+          "estimatedMinutes": 44,
           "dosageAssessment": {
             "exerciseCount": 5,
-            "workingSets": 14,
+            "workingSets": 13,
             "fourExercisesAndElevenSets": false,
             "outcome": "role_specific_allocation",
-            "reason": "5 owned movement/muscle slots supply 14 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
+            "reason": "5 owned movement/muscle slots supply 13 exact working sets for this session role; appropriateness is certified from full-rotation direct stimulus, secondary stimulus, duration and fatigue rather than a universal exercise count."
           },
           "exercises": [
             {
-              "exerciseId": "ex-barbell-back-squat",
-              "exercise": "Barbell Back Squat",
-              "movement": "squat",
-              "slotPurpose": "squat-specific anchor",
+              "exerciseId": "ex-deadlift",
+              "exercise": "Deadlift",
+              "movement": "hinge",
+              "slotPurpose": "deadlift-family strength anchor",
               "directStimuli": [
-                "quadriceps"
+                "hip_extension"
               ],
               "meaningfulSecondaryMuscles": [
-                "hamstrings",
-                "adductors"
+                "quads",
+                "traps",
+                "forearms"
               ],
               "exerciseFatigue": "high",
-              "workingSets": 4,
+              "workingSets": 3,
               "exactReps": [
                 3,
-                7,
                 7,
                 7
               ],
               "exactTargetKinds": [
                 "reps",
                 "reps",
-                "reps",
                 "reps"
               ],
               "method": "back_off_sets",
               "loadState": "calibration_required",
-              "restSeconds": 210,
+              "restSeconds": 240,
               "progression": "load_progression",
               "stopRule": "change_target",
               "reasonCodes": [
                 "goal:build_strength",
                 "mesocycle:strength_general",
-                "slot:squat-specific anchor",
+                "slot:deadlift-family strength anchor",
                 "fatigue:high",
                 "recovery:normal",
                 "stability:moderate",
-                "repeat:stable_primary_practice",
+                "repeat:not_repeated",
                 "preference_score:0"
               ]
             },
@@ -16053,7 +16048,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "exerciseId": "ex-hack-squat-machine",
               "exercise": "Hack Squat Machine",
               "movement": "squat",
-              "slotPurpose": "quad drive assistance",
+              "slotPurpose": "knee-dominant lower-body support",
               "directStimuli": [
                 "quadriceps"
               ],
@@ -16080,71 +16075,33 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasonCodes": [
                 "goal:build_strength",
                 "mesocycle:strength_general",
-                "slot:quad drive assistance",
+                "slot:knee-dominant lower-body support",
                 "fatigue:moderate",
                 "recovery:normal",
                 "stability:high",
                 "repeat:not_repeated",
                 "preference_score:0"
               ],
-              "transferRationale": "squat_quad_drive"
-            },
-            {
-              "exerciseId": "ex-machine-glute-drive",
-              "exercise": "Machine Glute Drive",
-              "movement": "hip_thrust",
-              "slotPurpose": "posterior-chain assistance",
-              "directStimuli": [
-                "hip_extension"
-              ],
-              "meaningfulSecondaryMuscles": [
-                "hamstrings"
-              ],
-              "exerciseFatigue": "moderate",
-              "workingSets": 3,
-              "exactReps": [
-                10,
-                10,
-                10
-              ],
-              "exactTargetKinds": [
-                "reps",
-                "reps",
-                "reps"
-              ],
-              "method": "straight_sets",
-              "loadState": "calibration_required",
-              "restSeconds": 120,
-              "progression": "rep_progression",
-              "stopRule": "change_target",
-              "reasonCodes": [
-                "goal:build_strength",
-                "mesocycle:strength_general",
-                "slot:posterior-chain assistance",
-                "fatigue:moderate",
-                "recovery:normal",
-                "stability:high",
-                "repeat:not_repeated",
-                "preference_score:0"
-              ],
-              "transferRationale": "squat_posterior_support"
+              "transferRationale": "deadlift_quad_support"
             },
             {
               "exerciseId": "ex-lying-leg-curl",
               "exercise": "Lying Leg Curl",
               "movement": "isolation",
-              "slotPurpose": "knee-flexion hamstring support",
+              "slotPurpose": "hamstring strength assistance",
               "directStimuli": [
                 "hamstrings_knee_flexion"
               ],
               "meaningfulSecondaryMuscles": [],
               "exerciseFatigue": "low",
-              "workingSets": 2,
+              "workingSets": 3,
               "exactReps": [
+                12,
                 12,
                 12
               ],
               "exactTargetKinds": [
+                "reps",
                 "reps",
                 "reps"
               ],
@@ -16156,13 +16113,52 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "reasonCodes": [
                 "goal:build_strength",
                 "mesocycle:strength_general",
-                "slot:knee-flexion hamstring support",
+                "slot:hamstring strength assistance",
                 "fatigue:low",
                 "recovery:normal",
                 "stability:high",
                 "repeat:not_repeated",
                 "preference_score:0"
-              ]
+              ],
+              "transferRationale": "deadlift_hamstring_strength"
+            },
+            {
+              "exerciseId": "ex-machine-glute-drive",
+              "exercise": "Machine Glute Drive",
+              "movement": "hip_thrust",
+              "slotPurpose": "lower-fatigue hip-extension support",
+              "directStimuli": [
+                "hip_extension"
+              ],
+              "meaningfulSecondaryMuscles": [
+                "hamstrings"
+              ],
+              "exerciseFatigue": "moderate",
+              "workingSets": 2,
+              "exactReps": [
+                10,
+                10
+              ],
+              "exactTargetKinds": [
+                "reps",
+                "reps"
+              ],
+              "method": "straight_sets",
+              "loadState": "calibration_required",
+              "restSeconds": 120,
+              "progression": "rep_progression",
+              "stopRule": "change_target",
+              "reasonCodes": [
+                "goal:build_strength",
+                "mesocycle:strength_general",
+                "slot:lower-fatigue hip-extension support",
+                "fatigue:moderate",
+                "recovery:normal",
+                "stability:high",
+                "repeat:not_repeated",
+                "preference_score:0"
+              ],
+              "transferRationale": "deadlift_hip_extension_support"
             },
             {
               "exerciseId": "ex-machine-calf-raise",
@@ -16210,9 +16206,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "lateral_delts": 4,
           "triceps": 4,
           "biceps": 4,
-          "quadriceps": 14,
-          "hip_extension": 6,
-          "hamstrings_knee_flexion": 4,
+          "quadriceps": 10,
+          "hip_extension": 8,
+          "hamstrings_knee_flexion": 5,
           "calves": 4
         },
         "meaningfulSecondarySets": {
@@ -16220,7 +16216,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "anterior_delts": 8,
           "biceps": 8,
           "rear_delts": 4,
-          "hip_extension": 14
+          "hip_extension": 9,
+          "upper_back": 3,
+          "quadriceps": 3
         },
         "muscleFrequency": {
           "biceps": 2,
@@ -16239,8 +16237,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "horizontal_pull": 2,
           "vertical_pull": 2,
           "isolation": 10,
-          "squat": 4,
-          "lunge": 4,
+          "squat": 3,
+          "lunge": 3,
           "hinge": 2,
           "hip_thrust": 2
         },
@@ -16250,45 +16248,40 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondaryVariation": 0
           },
           "squat": {
-            "primary": 2,
+            "primary": 1,
             "secondaryVariation": 0
           },
           "deadlift": {
-            "primary": 0,
+            "primary": 1,
             "secondaryVariation": 0
           }
         },
-        "totalWorkingSets": 56,
+        "totalWorkingSets": 55,
         "perSessionWorkingSets": [
           14,
           14,
           14,
-          14
+          13
         ],
         "perSessionEstimatedMinutes": [
           45,
           51,
           45,
-          51
+          44
         ],
         "fatigueUnits": {
           "perSession": [
             26,
             28,
             26,
-            28
+            24
           ],
-          "weeklyUnits": 108,
+          "weeklyUnits": 104,
           "overlapFlags": [
             "more_than_three_primary_sessions"
           ]
         },
         "repeatedExercises": [
-          {
-            "exerciseId": "ex-barbell-back-squat",
-            "count": 2,
-            "reason": "stable_primary_practice"
-          },
           {
             "exerciseId": "ex-bench-press",
             "count": 2,
@@ -16388,7 +16381,6 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "calves_direct_coverage",
             "secondary_stimulus_reported_separately",
             "no_unauthorised_specialist_selection",
-            "repeat_authorised:ex-barbell-back-squat",
             "repeat_authorised:ex-bench-press",
             "session_systemic_fatigue_reported_for_comparison",
             "same_role_sessions_complementary:upper",

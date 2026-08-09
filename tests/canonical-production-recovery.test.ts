@@ -6,7 +6,7 @@ import { exerciseLibrary } from "@/domain/training/presets";
 function movementPatternsForTest(role: string): readonly string[] {
   const value = role.toLowerCase();
   if (value.includes("bench") || value.includes("upper")) return ["horizontal_push", "vertical_push"];
-  if (value.includes("squat") || value.includes("lower") || value.includes("leg")) return ["squat", "lunge", "hip_thrust"];
+  if (value.includes("squat") || value.includes("lower") || value.includes("leg")) return ["squat", "lunge", "hinge", "hip_thrust"];
   if (value.includes("deadlift") || value.includes("back")) return ["hinge", "horizontal_pull", "vertical_pull"];
   return [];
 }

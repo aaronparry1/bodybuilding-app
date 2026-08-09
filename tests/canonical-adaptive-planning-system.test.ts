@@ -70,6 +70,21 @@ describe("complete canonical adaptive planning system", () => {
     expect(resolveCanonicalProgrammeFramework({ goal: "athletic_performance", sessionsPerWeek: 4, requested: "upper_lower", phase: "athletic_power" })).toMatchObject({ status: "resolved", framework: "upper_lower", morphPolicy: { deliveryStrategy: "athletic_asymmetric_rotation" } });
   });
 
+  it("preserves squat and deadlift strength exposure in general-phase upper/lower programmes", () => {
+    const fourDay = constructGoldenProgramme(canonicalRepresentativeGoldenCases.find((item) => item.id === "intermediate-strength-4")!);
+    expect(fourDay.status).toBe("constructed");
+    if (fourDay.status !== "constructed") return;
+    expect(fourDay.accounting.primaryLiftExposures.squat.primary).toBeGreaterThan(0);
+    expect(fourDay.accounting.primaryLiftExposures.deadlift.primary).toBeGreaterThan(0);
+    expect(fourDay.sessions.filter((session) => session.role.startsWith("Lower")).map((session) => session.exercises[0]?.exerciseId)).toEqual(["ex-barbell-back-squat", "ex-deadlift"]);
+
+    const twoDay = construct("build_strength", "strength_hypertrophy", "intermediate", 2, "upper_lower", fullEquipment, "strength-two-day");
+    expect(twoDay.status).toBe("constructed");
+    if (twoDay.status !== "constructed") return;
+    const lowerSnapshot = twoDay.carrier.plannedSessions[1]!.prescriptionSnapshot as CanonicalSessionSnapshotV3;
+    expect(lowerSnapshot.slots.slice(0, 2).map((slot) => slot.exerciseId)).toEqual(["ex-barbell-back-squat", "ex-romanian-deadlift"]);
+  });
+
   it("certifies every representative golden case or records its explicit unsupported contract", () => {
     const results = canonicalRepresentativeGoldenCases.map(constructGoldenProgramme);
     for (const result of results) {

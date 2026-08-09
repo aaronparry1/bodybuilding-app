@@ -48,7 +48,7 @@ export type AllocatedSlot = Readonly<{
   specialistsPermitted?: boolean;
   repeatPolicy: "stable_primary_practice" | "variation_preferred" | "repeat_if_no_equivalent";
   preferredHypertrophyBias?: "lengthened" | "neutral" | "shortened";
-  transferRationale?: "bench_pec_and_position_strength" | "bench_scapular_platform" | "bench_lat_stability" | "bench_lockout" | "squat_quad_drive" | "squat_posterior_support" | "deadlift_lat_position" | "deadlift_hamstring_strength";
+  transferRationale?: "bench_pec_and_position_strength" | "bench_scapular_platform" | "bench_lat_stability" | "bench_lockout" | "squat_quad_drive" | "squat_posterior_support" | "deadlift_lat_position" | "deadlift_hamstring_strength" | "deadlift_quad_support" | "deadlift_hip_extension_support";
   baseWorkingSets?: number;
   workingSets: number;
 }>;
@@ -627,7 +627,7 @@ function canonicalContract(input: CanonicalMicrocycleVolumeAllocationInput, type
   const contract = type === "push" ? strengthOrPowerbuilding ? strengthPushContract() : pushContract(barbellDominant)
     : type === "pull" ? strengthOrPowerbuilding ? strengthPullContract() : pullContract(input.experience === "beginner")
     : type === "legs" ? strengthOrPowerbuilding ? lowerContract(true, input.experience === "beginner", false) : lowerContract(false, input.experience === "beginner", true, input.sessionRoles[index]?.endsWith(" F") === true)
-    : type === "lower" || type === "lower_strength" ? strengthOrPowerbuilding ? lowerContract(true, input.experience === "beginner", false) : dumbbellBodyweightOnly ? limitedLowerContract("dumbbell") : machineCableOnly ? limitedLowerContract("machine") : lowerContract(false, input.experience === "beginner", denseHypertrophy)
+    : type === "lower" || type === "lower_strength" ? strengthOrPowerbuilding ? strengthLowerContract(input, index) : dumbbellBodyweightOnly ? limitedLowerContract("dumbbell") : machineCableOnly ? limitedLowerContract("machine") : lowerContract(false, input.experience === "beginner", denseHypertrophy)
     : type === "squat" ? lowerContract(true)
     : type === "bench" ? benchContract()
     : type === "deadlift" ? deadliftContract()
@@ -642,6 +642,32 @@ function canonicalContract(input: CanonicalMicrocycleVolumeAllocationInput, type
     : fullBodyContract(index, false);
   return adaptOptionalStimulusToEquipment(contract, input.equipment);
 }
+
+function strengthLowerContract(input: CanonicalMicrocycleVolumeAllocationInput, index: number): readonly SlotContract[] {
+  const sessionTypes = input.sessionTypes ?? input.sessionRoles.map(inferSessionType);
+  const lowerSessionIndexes = sessionTypes.flatMap((sessionType, sessionIndex) => sessionType === "lower" || sessionType === "lower_strength" ? [sessionIndex] : []);
+  const lowerOccurrence = lowerSessionIndexes.indexOf(index);
+  if (lowerSessionIndexes.length === 1) return combinedStrengthLowerContract();
+  return lowerOccurrence % 2 === 0
+    ? lowerContract(true, input.experience === "beginner", false)
+    : deadliftLowerContract();
+}
+
+function combinedStrengthLowerContract(): readonly SlotContract[] { return [
+  slot("primary_compound", "primary", ["quads"], ["quadriceps"], "squat-specific strength anchor", ["squat"], { primaryLift: "squat", liftExposure: "primary", repeatPolicy: "stable_primary_practice", baseWorkingSets: 4 }),
+  slot("primary_compound", "secondary", ["hamstrings", "glutes"], ["hip_extension"], "deadlift-family strength exposure", ["hinge"], { primaryLift: "deadlift", liftExposure: "secondary_variation", repeatPolicy: "stable_primary_practice", baseWorkingSets: 3 }),
+  slot("secondary_compound", "secondary", ["quads", "glutes"], ["quadriceps"], "quad drive assistance", ["squat", "lunge"], { repeatPolicy: "variation_preferred", transferRationale: "squat_quad_drive", baseWorkingSets: 2 }),
+  slot("isolation", "accessory", ["hamstrings"], ["hamstrings_knee_flexion"], "knee-flexion hamstring support", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 2 }),
+  slot("isolation", "accessory", ["calves"], ["calves"], "calf retention", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 2 }),
+]; }
+
+function deadliftLowerContract(): readonly SlotContract[] { return [
+  slot("primary_compound", "primary", ["hamstrings", "glutes"], ["hip_extension"], "deadlift-family strength anchor", ["hinge"], { primaryLift: "deadlift", liftExposure: "primary", repeatPolicy: "stable_primary_practice", baseWorkingSets: 3 }),
+  slot("secondary_compound", "secondary", ["quads", "glutes"], ["quadriceps"], "knee-dominant lower-body support", ["squat", "lunge"], { repeatPolicy: "variation_preferred", transferRationale: "deadlift_quad_support", baseWorkingSets: 3 }),
+  slot("isolation", "accessory", ["hamstrings"], ["hamstrings_knee_flexion"], "hamstring strength assistance", ["isolation"], { repeatPolicy: "variation_preferred", transferRationale: "deadlift_hamstring_strength", baseWorkingSets: 3 }),
+  slot("secondary_compound", "secondary", ["glutes"], ["hip_extension"], "lower-fatigue hip-extension support", ["hip_thrust"], { repeatPolicy: "variation_preferred", transferRationale: "deadlift_hip_extension_support", baseWorkingSets: 2 }),
+  slot("isolation", "accessory", ["calves"], ["calves"], "calf retention", ["isolation"], { repeatPolicy: "variation_preferred", baseWorkingSets: 2 }),
+]; }
 
 function limitedLowerContract(mode: "dumbbell" | "machine"): readonly SlotContract[] {
   return mode === "dumbbell" ? [

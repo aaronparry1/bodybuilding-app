@@ -71,7 +71,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     {
       "id": "intermediate-strength-4",
       "experience": "intermediate",
-      "totalWorkingSets": 56
+      "totalWorkingSets": 55
     },
     {
       "id": "intermediate-powerbuilding-3",
@@ -106,7 +106,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     {
       "id": "event-strength",
       "experience": "intermediate",
-      "totalWorkingSets": 56
+      "totalWorkingSets": 55
     },
     {
       "id": "established-loads",
