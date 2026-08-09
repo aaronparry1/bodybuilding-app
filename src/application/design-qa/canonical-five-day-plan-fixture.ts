@@ -8,11 +8,13 @@ import {
   startCanonicalSession,
 } from "@/application/training/canonical-recorded-session-application";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
+import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
 import { exerciseLibrary } from "@/domain/training/presets";
 import type { CanonicalLoadEvidence } from "@/domain/training/canonical-load-prescription";
+import type { CanonicalProgressDecision } from "@/domain/training/canonical-progress-decision";
 
 export const CANONICAL_FIVE_DAY_FIXTURE_CREATED_AT = "2026-01-01T00:00:00.000Z";
 export const canonicalFiveDayFixtureProfile = {
@@ -149,6 +151,51 @@ export function applyCanonicalProgressVisualState(
   return applyComparableProgressHistory(planId, exposures, state === "established" ? 0 : 2.5);
 }
 
+export function applyCanonicalAdaptationVisualState(options: Readonly<{ planId?: string }> = {}) {
+  const planId = options.planId ?? "design-qa:progress-adaptation-applied";
+  const model = applyCanonicalProgressVisualState("established", { planId });
+  const sourceSessionId = `${planId}:comparison:3`;
+  const decision: CanonicalProgressDecision = {
+    schemaVersion: "canonical_progress_decision_v1",
+    decisionId: `${planId}:adaptation-decision`,
+    planId,
+    expectedPlanRevision: model.revision,
+    macrocycleId: `${planId}:macrocycle`,
+    mesocycleId: model.mesocycle.id,
+    microcycleId: model.microcycle.id,
+    evaluationId: `${planId}:adaptation-evaluation`,
+    evidenceIds: [`${sourceSessionId}:evidence:1`, `${sourceSessionId}:evidence:2`, `${sourceSessionId}:evidence:3`],
+    outcome: "continue",
+    owner: "mesocycle",
+    reason: "comparable_training_progressed",
+    explanation: "Your completed Bench Press work supported a small load increase for future sessions.",
+    status: "consumed",
+    phaseOne: {
+      schemaVersion: "canonical_coaching_decision_details_v1",
+      decisionType: "advance_microcycle",
+      sourceRecordedSessionId: sourceSessionId,
+      sourcePrescriptionHash: "design-qa-prescription-hash",
+      reasonCodes: ["comparable_success_threshold_met"],
+      evidenceSummary: { targetCompletion: "successful", comparableExposureCount: 3, repDropOff: false, recoveryEvidence: "stable", transitionEligible: false, deloadEligible: false },
+      priorFutureSessionIds: model.plannedSessions.map((session) => session.id),
+      result: "future_prescription_change",
+      boundedAdjustment: {
+        kind: "construct_next_microcycle",
+        exerciseIds: ["ex-bench-press"],
+        numericLoadAdjustmentAuthorised: true,
+        numericDecisions: [{ schemaVersion: "canonical_numeric_prescription_decision_v1", policyId: "canonical_numeric_progression_policy_v1", outcome: "progress_load", comparableExposureKey: "design-qa-bench-comparable", exerciseId: "ex-bench-press", planSessionIndex: 0, sessionRole: "Upper strength", constructionRole: "primary", exerciseRole: "primary_compound", lane: "strength", method: "straight_sets", progressionRule: "load_progression", evidenceIds: [`${sourceSessionId}:evidence:1`, `${sourceSessionId}:evidence:2`, `${sourceSessionId}:evidence:3`], exposureCount: 3, successfulExposureCount: 3, failedExposureCount: 0, reasonCode: "comparable_success_threshold_met", before: { prescribedBaseLoad: 65, exactTargets: [5, 5, 5] }, after: { prescribedBaseLoad: 67.5, exactTargets: [5, 5, 5] }, exactNumericDelta: { loadKg: 2.5, repetitions: [0, 0, 0] } }],
+      },
+      contextIdentity: { macrocycleId: `${planId}:macrocycle`, mesocycleId: model.mesocycle.id, microcycleId: model.microcycle.id },
+      decidedAt: "2026-07-18T11:00:00.000Z",
+      idempotencyKey: `${planId}:adaptation-idempotency`,
+    },
+    phaseOneApplication: { schemaVersion: "canonical_coaching_application_receipt_v2", status: "applied", actualResult: "future_prescription_change", reasonCode: "numeric_progression_applied", explanation: "Your completed Bench Press work supported a small load increase for future sessions.", priorRevision: Math.max(0, model.revision - 1), newRevision: model.revision, resultingFutureSessionIds: model.plannedSessions.map((session) => session.id), materialDeltas: [{ schemaVersion: "canonical_material_prescription_delta_v1", sessionKey: "0:Upper strength:planned", slotKey: "0:ex-bench-press", field: "loadPrescription.prescribedBaseLoad", before: 65, after: 67.5 }], appliedAt: "2026-07-18T11:00:01.000Z" },
+  };
+  const saved = canonicalProgressDecisionRepository.save(decision);
+  if (saved.status !== "saved") throw new Error(`canonical_adaptation_visual_decision_failed:${saved.status}`);
+  return model;
+}
+
 function applyComparableProgressHistory(planId: string, exposures: number, loadStepKg: number) {
   resetCanonicalHomeVisualState();
   const created = canonicalActivePlanState.create(canonicalProgressFixtureInput(planId));
@@ -238,6 +285,7 @@ function resetCanonicalHomeVisualState(): void {
   canonicalActivePlanState.clear();
   canonicalRecordedSessionLedger.clear();
   canonicalProgressEvidenceRepository.clear();
+  canonicalProgressDecisionRepository.clear();
   canonicalRestTimerRepository.clear();
 }
 

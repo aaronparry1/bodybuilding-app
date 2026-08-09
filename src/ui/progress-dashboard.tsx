@@ -12,9 +12,20 @@ export function ProgressDashboard({ projection, onAction }: Readonly<{ projectio
     {projection.overview ? <ProgressOverview projection={projection} /> : null}
     {projection.progressionHighlight ? <ProgressionHighlight projection={projection} onAction={onAction} /> : projection.status === "early" ? <EarlyHistoryNote /> : null}
     {projection.trend ? <TrendPanel projection={projection} /> : null}
-    {projection.review ? <View style={{ padding: spacing.lg, gap: spacing.xs, borderRadius: radius.lg, backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: colors.accent }}><Text style={{ ...type.section, color: colors.text }}>{projection.review.title}</Text><Text style={{ ...type.body, color: colors.textMuted }}>{projection.review.detail}</Text><Pill label="Review only" tone="accent" /></View> : null}
+    {projection.review ? <AdaptationReview projection={projection} /> : null}
     <RecentTraining projection={projection} onAction={onAction} />
   </>;
+}
+
+function AdaptationReview({ projection }: Readonly<{ projection: CanonicalProgressPresentation }>) {
+  const review = projection.review!;
+  const tone = review.applicationStatus === "applied" ? "success" as const : "accent" as const;
+  return <View style={{ padding: spacing.lg, gap: spacing.md, borderRadius: radius.lg, backgroundColor: review.applicationStatus === "applied" ? colors.successSoft : colors.accentSoft, borderWidth: 1, borderColor: review.applicationStatus === "applied" ? colors.success : colors.accent }}>
+    <View style={{ gap: spacing.xs }}><Text style={{ ...type.label, color: review.applicationStatus === "applied" ? colors.success : colors.accent, textTransform: "uppercase" }}>{review.sourceLabel}</Text><Text selectable style={{ ...type.section, color: colors.text }}>{review.title}</Text><Text selectable style={{ ...type.body, color: colors.textMuted }}>{review.detail}</Text></View>
+    <Pill label={review.statusLabel} tone={tone} />
+    {review.changes.map((change) => <View key={`${change.exerciseName}:${change.before}:${change.after}`} style={{ gap: spacing.sm, paddingTop: spacing.sm, borderTopWidth: 1, borderTopColor: colors.lineSoft }}><Text selectable style={{ color: colors.text, fontSize: 15, fontWeight: "900" }}>{change.exerciseName}</Text><View style={{ gap: spacing.xs }}><ReceiptComparison label="Before" value={change.before} /><Text accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ color: colors.success, fontWeight: "900" }}>↓</Text><ReceiptComparison label="Next" value={change.after} /></View><Text selectable style={{ color: colors.textMuted, fontSize: 13 }}>{change.reason}</Text></View>)}
+    <DetailToggle label="Why this review?" compact><View style={{ gap: spacing.sm }}><Text selectable style={{ ...type.body, color: colors.textMuted }}>{review.evidenceSummary}</Text><Text selectable style={{ ...type.body, color: colors.textMuted }}>{review.sourceDetail}</Text></View></DetailToggle>
+  </View>;
 }
 
 function ZeroProgress({ projection, onAction }: Readonly<{ projection: CanonicalProgressPresentation; onAction(action: CanonicalProgressPresentationAction): void }>) {
@@ -70,4 +81,5 @@ function EarlyHistoryNote() { return <View style={{ padding: spacing.lg, gap: sp
 
 function ProgressUnavailable({ projection, onAction }: Readonly<{ projection: CanonicalProgressPresentation; onAction(action: CanonicalProgressPresentationAction): void }>) { return <><Text style={{ ...type.title, color: colors.text }}>{projection.title}</Text><EmptyActionState title={projection.attention?.title ?? (projection.status === "empty" ? "No training plan yet" : "Progress unavailable")} message={projection.attention?.detail ?? projection.subtitle} actionLabel={projection.primaryAction?.label ?? "Try again"} onPress={() => projection.primaryAction && onAction(projection.primaryAction)} /></>; }
 function Comparison({ label, value }: Readonly<{ label: string; value: string }>) { return <View style={{ flex: 1, gap: 2 }}><Text style={{ color: colors.textSubtle, fontSize: 10, fontWeight: "800", textTransform: "uppercase" }}>{label}</Text><Text adjustsFontSizeToFit minimumFontScale={0.7} numberOfLines={1} style={{ color: colors.text, fontSize: 16, fontWeight: "900" }}>{value}</Text></View>; }
+function ReceiptComparison({ label, value }: Readonly<{ label: string; value: string }>) { return <View style={{ gap: 2 }}><Text style={{ color: colors.textSubtle, fontSize: 10, fontWeight: "800", textTransform: "uppercase" }}>{label}</Text><Text selectable style={{ color: colors.text, fontSize: 16, fontWeight: "900" }}>{value}</Text></View>; }
 function formatValue(value: number): string { return Number.isInteger(value) ? String(value) : value.toFixed(1); }

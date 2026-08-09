@@ -15,7 +15,7 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import { startCanonicalSession, prescriptionHash } from "@/application/training/canonical-recorded-session-application";
 import { applyCanonicalActiveSessionFixture } from "@/application/design-qa/canonical-session-fixtures";
 import { createCanonicalTrainProjection } from "@/application/design-qa/canonical-train-projection";
-import { applyCanonicalHomeVisualState, applyCanonicalPlanVisualState, applyCanonicalProgressVisualState, canonicalFiveDayFixtureInput, type CanonicalHomeVisualState, type CanonicalPlanVisualState, type CanonicalProgressVisualState } from "@/application/design-qa/canonical-five-day-plan-fixture";
+import { applyCanonicalAdaptationVisualState, applyCanonicalHomeVisualState, applyCanonicalPlanVisualState, applyCanonicalProgressVisualState, canonicalFiveDayFixtureInput, type CanonicalHomeVisualState, type CanonicalPlanVisualState, type CanonicalProgressVisualState } from "@/application/design-qa/canonical-five-day-plan-fixture";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
@@ -27,6 +27,7 @@ export type DesignQaFixtureId =
   | "progress_fatigue"
   | "progress_slowing"
   | "progress_recent_clean"
+  | "progress_adaptation_applied"
   | "home_no_plan"
   | "home_active_plan"
   | "home_active_workout"
@@ -127,6 +128,7 @@ export const designQaFixtures: DesignQaFixtureDefinition[] = [
   { id: "progress_fatigue", area: "Progress", label: "Fatigue high", description: "Deload/reduce workload should lead over load jumps.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_slowing", area: "Progress", label: "Progress slowing", description: "Enough history with stalls and monitor-style coaching.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_recent_clean", area: "Progress", label: "Clean recent list", description: "Recent workout cards with no AI names or zero-set junk.", targetHref: "/(protected)/(tabs)/analytics" },
+  { id: "progress_adaptation_applied", area: "Progress", label: "Applied adaptation", description: "A completed-training decision with an applied before/next prescription change.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_volume_large_low", area: "Progress", label: "Volume: large low", description: "Large muscle below starting productive zone with low fatigue.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_volume_ladder_apply", area: "Progress", label: "Volume: apply ladder", description: "Personalised volume ladder recommendation with Apply / Ignore actions.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_volume_large_high_fatigue", area: "Progress", label: "Volume: high fatigue", description: "Large muscle high volume with shutdowns and falling output.", targetHref: "/(protected)/(tabs)/analytics" },
@@ -344,11 +346,18 @@ function applyProgressDecisionFixture(id: DesignQaFixtureId, environment: AppEnv
     jsonStore.set(activeFixtureKey, activeFixture);
     return activeFixture;
   }
-  if (["progress_volume_large_low", "progress_volume_ladder_apply", "progress_volume_large_high_fatigue", "progress_volume_small_progressing", "progress_rotation_stalled_tier_a", "progress_rotation_action", "progress_rotation_progressing_tier_a", "progress_rotation_tier_c", "progress_low", "progress_healthy", "progress_strength_dashboard", "progress_fatigue", "progress_slowing", "progress_recent_clean", "phase1_load_one_bad_session", "phase1_low_history_no_deload", "phase1_deload_mild", "phase1_deload_clear", "phase1_deload_severe", "home_recovery_capacity", "phase1_goal_strength", "phase1_goal_muscle", "phase1_goal_muscle_strength", "phase1_goal_athletic", "phase1_goal_event", "phase1_goal_general", "progress_deload_action"].includes(id)) {
+  if (["progress_volume_large_low", "progress_volume_ladder_apply", "progress_volume_large_high_fatigue", "progress_volume_small_progressing", "progress_rotation_stalled_tier_a", "progress_rotation_action", "progress_rotation_progressing_tier_a", "progress_rotation_tier_c", "progress_low", "progress_healthy", "progress_strength_dashboard", "progress_fatigue", "progress_slowing", "progress_recent_clean", "progress_adaptation_applied", "phase1_load_one_bad_session", "phase1_low_history_no_deload", "phase1_deload_mild", "phase1_deload_clear", "phase1_deload_severe", "home_recovery_capacity", "phase1_goal_strength", "phase1_goal_muscle", "phase1_goal_muscle_strength", "phase1_goal_athletic", "phase1_goal_event", "phase1_goal_general", "progress_deload_action"].includes(id)) {
     if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
     clearFixtureViewStateOnly();
     appSettingsStore.patch({ onboardingCompleted: true });
     canonicalActivePlanState.clear();
+    if (id === "progress_adaptation_applied") {
+      applyCanonicalAdaptationVisualState({ planId: `design-qa:${id}` });
+      const definition = getFixtureDefinition(id);
+      const activeFixture = { id, label: definition.label, appliedAt: "2026-01-01T00:00:00.000Z" };
+      jsonStore.set(activeFixtureKey, activeFixture);
+      return activeFixture;
+    }
     const result = id === "home_recovery_capacity"
       ? canonicalActivePlanState.create(canonicalFiveDayFixtureInput(`design-qa:${id}`))
       : canonicalActivePlanState.create({ planId: `design-qa:${id}`, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z", goal: "hypertrophy", macrocycleGoal: "build_muscle", experienceLevel: "intermediate", daysPerWeek: 4, preferredSplit: "upper_lower", equipment: ["barbell", "dumbbell"], units: "kg", exercises: exerciseLibrary, history: [] });

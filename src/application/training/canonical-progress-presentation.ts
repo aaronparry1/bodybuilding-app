@@ -52,7 +52,16 @@ export type CanonicalProgressPresentation = Readonly<{
     summary: string;
   }>;
   recentTraining: readonly Readonly<{ id: string; title: string; detail: string; methods: readonly string[]; completedAt: string; action: CanonicalProgressPresentationAction }>[];
-  review?: Readonly<{ title: string; detail: string; applicationStatus: "review_only" }>;
+  review?: Readonly<{
+    title: string;
+    detail: string;
+    statusLabel: string;
+    sourceLabel: "Adaptive coaching";
+    sourceDetail: string;
+    evidenceSummary: string;
+    changes: readonly Readonly<{ exerciseName: string; before: string; after: string; reason: string }>[];
+    applicationStatus: "applied" | "unchanged" | "review_only" | "blocked";
+  }>;
   attention?: Readonly<{ title: string; detail: string; action?: CanonicalProgressPresentationAction }>;
   primaryAction?: CanonicalProgressPresentationAction;
 }>;
@@ -92,12 +101,16 @@ export function readCanonicalProgressPresentation(input: Readonly<{
     if (aggregate.status !== "found") return projectCanonicalProgressPresentation({ status: "recoverable_error", plan: state.model, displayUnit: input.displayUnit, now: input.now });
     aggregates.push(aggregate);
   }
+  const decisions = canonicalProgressDecisionRepository.list(state.model.planId).filter((decision) => decision.mesocycleId === state.model!.mesocycle.id);
+  const decision = canonicalProgressDecisionRepository.current(state.model.planId, state.model.mesocycle.id)[0]
+    ?? decisions.slice().reverse().find((candidate) => candidate.phaseOneApplication !== undefined)
+    ?? null;
   return projectCanonicalProgressPresentation({
     status: "ready",
     plan: state.model,
     completedAggregates: aggregates,
     evidence: canonicalProgressEvidenceRepository.list(state.model.planId),
-    decision: canonicalProgressDecisionRepository.current(state.model.planId, state.model.mesocycle.id)[0] ?? null,
+    decision,
     displayUnit: input.displayUnit,
     now: input.now,
   });
@@ -184,8 +197,71 @@ export function projectCanonicalProgressPresentation(input: Readonly<{
     ...(highlight ? { progressionHighlight: highlight } : {}),
     ...(established && trend ? { trend } : {}),
     recentTraining,
-    ...(input.decision ? { review: { title: "Training review available", detail: "Review the recommendation before making any programme change.", applicationStatus: "review_only" as const } } : {}),
+    ...(input.decision ? { review: adaptationReview(input.decision, displayUnit) } : {}),
   };
+}
+
+function adaptationReview(decision: CanonicalProgressDecision, displayUnit: "kg" | "lb"): NonNullable<CanonicalProgressPresentation["review"]> {
+  const receipt = decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2" ? decision.phaseOneApplication : undefined;
+  const applicationStatus = receipt?.status === "applied" ? "applied" as const
+    : receipt?.status === "unchanged" ? "unchanged" as const
+      : receipt?.status === "blocked" ? "blocked" as const
+        : "review_only" as const;
+  const changes = (decision.phaseOne?.boundedAdjustment.numericDecisions ?? [])
+    .filter((item) => item.after)
+    .slice(0, 3)
+    .map((item) => ({
+      exerciseName: exerciseDisplayName(item.exerciseId),
+      before: numericPrescriptionLabel(item.before.prescribedBaseLoad, item.before.exactTargets, displayUnit),
+      after: numericPrescriptionLabel(item.after!.prescribedBaseLoad, item.after!.exactTargets, displayUnit),
+      reason: numericDecisionReason(item.outcome, item.exposureCount),
+    }));
+  const evidence = decision.phaseOne?.evidenceSummary;
+  const evidenceSummary = evidence
+    ? `${evidence.comparableExposureCount} ${plural(evidence.comparableExposureCount, "comparable exposure")} · ${targetCompletionLabel(evidence.targetCompletion)} · ${recoveryEvidenceLabel(evidence.recoveryEvidence)}`
+    : `${decision.evidenceIds.length} ${plural(decision.evidenceIds.length, "completed-training record")} reviewed`;
+  const title = applicationStatus === "applied" ? "Your programme adapted"
+    : applicationStatus === "unchanged" ? "Your programme held steady"
+      : applicationStatus === "blocked" ? "Coaching review needed"
+        : "Training review ready";
+  const statusLabel = applicationStatus === "applied" ? "Applied to future workouts"
+    : applicationStatus === "unchanged" ? "No programme change"
+      : applicationStatus === "blocked" ? "No change made"
+        : "Review only";
+  const detail = receipt?.explanation ?? decision.explanation;
+  return {
+    title,
+    detail,
+    statusLabel,
+    sourceLabel: "Adaptive coaching",
+    sourceDetail: "This review came from completed training evidence. It was not a manual programme edit.",
+    evidenceSummary,
+    changes,
+    applicationStatus,
+  };
+}
+
+function numericPrescriptionLabel(loadKg: number, targets: readonly number[], displayUnit: "kg" | "lb"): string {
+  const target = targets.length && targets.every((value) => value === targets[0]) ? `${targets.length} × ${targets[0]}` : targets.join(" / ");
+  return `${formatLoad(loadKg, displayUnit)} · ${target} reps`;
+}
+
+function numericDecisionReason(outcome: string, exposureCount: number): string {
+  const basis = `${exposureCount} ${plural(exposureCount, "comparable workout")}`;
+  if (outcome === "progress_load") return `Load progressed after ${basis}.`;
+  if (outcome === "progress_repetitions") return `Repetition target progressed after ${basis}.`;
+  if (outcome === "regress_load") return `Load reduced after repeated comparable difficulty across ${basis}.`;
+  if (outcome === "regress_repetitions") return `Repetition target reduced after repeated comparable difficulty across ${basis}.`;
+  if (outcome === "calibrate") return `Starting prescription calibrated from ${basis}.`;
+  return `Prescription reviewed against ${basis}.`;
+}
+
+function targetCompletionLabel(value: "successful" | "partial" | "failed"): string {
+  return value === "successful" ? "targets completed" : value === "partial" ? "some targets completed" : "targets not completed";
+}
+
+function recoveryEvidenceLabel(value: "not_collected" | "stable" | "constrained" | "conflicting"): string {
+  return value === "stable" ? "recovery stable" : value === "constrained" ? "recovery constrained" : value === "conflicting" ? "recovery evidence mixed" : "recovery not yet recorded";
 }
 
 function exerciseObservations(aggregate: Aggregate): ExerciseObservation[] {

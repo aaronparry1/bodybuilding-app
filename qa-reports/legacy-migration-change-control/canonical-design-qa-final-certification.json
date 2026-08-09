@@ -1,10 +1,10 @@
 {
   "schemaVersion": "canonical_design_qa_final_certification_v1",
-  "fixtureCount": 78,
+  "fixtureCount": 79,
   "familyCounts": {
     "plan_state": 13,
     "session_lifecycle": 30,
-    "progress_decision": 35
+    "progress_decision": 36
   },
   "uniqueIds": true,
   "allCanonicalSetup": true,
