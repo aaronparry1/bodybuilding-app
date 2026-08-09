@@ -1,5 +1,6 @@
 import type { PersonalRecordItem } from "@/domain/training/personal-records";
 import type { StrengthLiftDashboardItem, StrengthPrItem, StrengthTotalDashboard } from "@/domain/training/strength-dashboard";
+import type { CanonicalWorkoutAchievement } from "@/domain/training/canonical-workout-achievements";
 
 export type BrandedShareCardType = "pr" | "strength_progress" | "powerlifting_total" | "workout_summary";
 
@@ -124,6 +125,29 @@ export function buildWorkoutSummarySharePayload({
   });
 }
 
+export function buildWorkoutAchievementSharePayload(achievement: CanonicalWorkoutAchievement, displayUnit: "kg" | "lb" = "kg"): BrandedSharePayload {
+  const loadValue = achievement.value == null ? null : displayUnit === "lb" && achievement.unit === "kg" ? achievement.value * 2.2046226218 : achievement.value;
+  const load = loadValue == null ? "" : `${formatNumber(loadValue)}${displayUnit}`;
+  const metric = achievement.kind === "load" ? load
+    : achievement.kind === "comparable_reps" ? `${achievement.load == null || achievement.load <= 0 ? "Bodyweight" : `${formatNumber(displayUnit === "lb" && achievement.unit === "kg" ? achievement.load * 2.2046226218 : achievement.load)}${displayUnit}`} × ${achievement.reps ?? achievement.value}`
+      : achievement.kind === "estimated_strength" ? `${load} estimated 1RM`
+        : achievement.kind === "meaningful_volume" ? `${load} completed volume`
+          : `${achievement.value ?? ""}`;
+  const detail = achievement.kind === "load" ? "Heaviest completed work set for this exercise."
+    : achievement.kind === "comparable_reps" ? "Most completed reps at this exact load."
+      : achievement.kind === "estimated_strength" ? "Best estimated strength from comparable completed work."
+        : achievement.kind === "meaningful_volume" ? "Highest meaningful completed volume for this exercise."
+          : achievement.detail;
+  return basePayload({
+    type: achievement.kind === "programme_milestone" || achievement.kind === "consistency_milestone" || achievement.kind === "exercise_milestone" ? "workout_summary" : "pr",
+    eyebrow: achievement.kind.includes("milestone") ? "MILESTONE" : "NEW BEST",
+    title: achievement.title,
+    cardTitle: achievement.exerciseName ?? achievement.title,
+    metric,
+    detail,
+  });
+}
+
 export function fallbackShareMessage(payload: BrandedSharePayload): string {
   return [
     payload.cardTitle,
@@ -169,6 +193,8 @@ function basePayload(input: {
     },
   };
 }
+
+function formatNumber(value: number): string { const rounded = Math.round(value * 10) / 10; return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1); }
 
 function formatPrMetric(record: PersonalRecordItem | StrengthPrItem): string {
   if (record.type === "load") return `${formatLoad(record.value, record.unit ?? "kg")}`;

@@ -30,6 +30,7 @@ export const canonicalFiveDayFixtureProfile = {
 export type CanonicalHomeVisualState = "planned" | "active" | "paused" | "completed" | "rest_day";
 export type CanonicalPlanVisualState = "planned" | "active" | "partial_week" | "phase_completed";
 export type CanonicalProgressVisualState = "zero" | "one_completed" | "insufficient_trend" | "established" | "genuine_pr";
+export type CanonicalCompletionVisualState = "ordinary" | "pr" | "multiple" | "missing_history" | "partial" | "long_accessibility" | "sharing";
 
 export function canonicalFiveDayFixtureInput(planId: string) {
   return {
@@ -151,6 +152,18 @@ export function applyCanonicalProgressVisualState(
   return applyComparableProgressHistory(planId, exposures, state === "established" ? 0 : 2.5);
 }
 
+/** Executable finish-screen states built from canonical immutable session history. */
+export function applyCanonicalCompletionVisualState(
+  state: CanonicalCompletionVisualState,
+  options: Readonly<{ planId?: string }> = {},
+): Readonly<{ model: ReturnType<typeof requireModel>; recordedSessionId: string }> {
+  const planId = options.planId ?? `design-qa:completion-${state}`;
+  const exposures = state === "ordinary" || state === "missing_history" ? 1 : state === "partial" ? 2 : 3;
+  const loadStepKg = state === "ordinary" || state === "missing_history" ? 0 : 2.5;
+  const model = applyComparableProgressHistory(planId, exposures, loadStepKg, state === "multiple" || state === "long_accessibility", state === "partial");
+  return { model, recordedSessionId: `${planId}:comparison:${exposures}` };
+}
+
 export function applyCanonicalAdaptationVisualState(options: Readonly<{ planId?: string }> = {}) {
   const planId = options.planId ?? "design-qa:progress-adaptation-applied";
   const model = applyCanonicalProgressVisualState("established", { planId });
@@ -196,7 +209,7 @@ export function applyCanonicalAdaptationVisualState(options: Readonly<{ planId?:
   return model;
 }
 
-function applyComparableProgressHistory(planId: string, exposures: number, loadStepKg: number) {
+function applyComparableProgressHistory(planId: string, exposures: number, loadStepKg: number, progressEveryExercise = false, partialFinalExposure = false) {
   resetCanonicalHomeVisualState();
   const created = canonicalActivePlanState.create(canonicalProgressFixtureInput(planId));
   if (created.hydration !== "hydrated" || !created.model) throw new Error(`canonical_progress_visual_plan_failed:${created.error ?? created.hydration}`);
@@ -246,9 +259,10 @@ function applyComparableProgressHistory(planId: string, exposures: number, loadS
     for (let setIndex = 0; setIndex < prescribed.length; setIndex += 1) {
       const performed = prescribed[setIndex]!;
       const slot = performed.slot;
+      if (partialFinalExposure && index === exposures - 1 && setIndex >= Math.max(1, Math.floor(prescribed.length / 2))) continue;
       const loadPrescription = (slot.loadPrescription ?? {}) as Record<string, unknown>;
       const isComparisonExercise = String(slot.id) === String(firstSlot.id);
-      const load = loadPrescription.state === "bodyweight" ? 0 : Number(loadPrescription.prescribedBaseLoad ?? 60) + (isComparisonExercise ? index * loadStepKg : 0);
+      const load = loadPrescription.state === "bodyweight" ? 0 : Number(loadPrescription.prescribedBaseLoad ?? 60) + (isComparisonExercise || progressEveryExercise ? index * loadStepKg : 0);
       const work = recordCanonicalPerformedWork({
         planId,
         expectedPlanRevision: repositoryPlan.carrier.revision,

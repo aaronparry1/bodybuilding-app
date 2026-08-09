@@ -4,6 +4,7 @@ import {
   buildPowerliftingTotalSharePayload,
   buildPrSharePayload,
   buildStrengthProgressSharePayload,
+  buildWorkoutAchievementSharePayload,
   buildWorkoutSummarySharePayload,
   fallbackShareMessage,
 } from "@/domain/training/share-cards";
@@ -128,6 +129,13 @@ describe("branded share cards", () => {
     expect(text).not.toContain("injury");
     expect(text).not.toContain("@");
     expect(text).not.toContain("bodyweight");
+  });
+
+  it("previews one canonical achievement with unit-safe public content", () => {
+    const payload = buildWorkoutAchievementSharePayload({ id: "session:bench:load", kind: "load", title: "New load best", detail: "105 kg is your heaviest completed work set for this exercise.", exerciseId: "ex-bench-press", exerciseName: "Bench Press", value: 105, previousValue: 100, unit: "kg" }, "lb");
+    expect(payload).toMatchObject({ eyebrow: "NEW BEST", cardTitle: "Bench Press", metric: "231.5lb" });
+    expect(payload.message).not.toMatch(/account|email|bodyweight|notes|athlete/i);
+    expect(payload.privacy.includesPrivateData).toBe(false);
   });
 
   it("has a text fallback when richer image sharing is unavailable", () => {

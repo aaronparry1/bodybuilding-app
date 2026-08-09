@@ -18,7 +18,8 @@ describe("premium motion accessibility boundary", () => {
     expect(primitives).toContain("entering={reduceMotion ? undefined : FadeInUp");
     expect(completion).toContain("const reduceMotion = useReducedMotion()");
     expect(completion).toContain("function CompletionReveal");
-    expect(completion).toContain("entering={reduceMotion ? undefined : FadeInUp");
+    expect(completion).toContain('if (reduceMotion || Platform.OS === "web") return <View>{children}</View>');
+    expect(completion).toContain("entering={FadeInUp");
   });
 
   it("keeps Train motion, modals and scroll transitions on the same preference", () => {

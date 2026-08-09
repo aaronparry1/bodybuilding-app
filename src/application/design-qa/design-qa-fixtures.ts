@@ -15,12 +15,19 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import { startCanonicalSession, prescriptionHash } from "@/application/training/canonical-recorded-session-application";
 import { applyCanonicalActiveSessionFixture } from "@/application/design-qa/canonical-session-fixtures";
 import { createCanonicalTrainProjection } from "@/application/design-qa/canonical-train-projection";
-import { applyCanonicalAdaptationVisualState, applyCanonicalHomeVisualState, applyCanonicalPlanVisualState, applyCanonicalProgressVisualState, canonicalFiveDayFixtureInput, type CanonicalHomeVisualState, type CanonicalPlanVisualState, type CanonicalProgressVisualState } from "@/application/design-qa/canonical-five-day-plan-fixture";
+import { applyCanonicalAdaptationVisualState, applyCanonicalCompletionVisualState, applyCanonicalHomeVisualState, applyCanonicalPlanVisualState, applyCanonicalProgressVisualState, canonicalFiveDayFixtureInput, type CanonicalHomeVisualState, type CanonicalPlanVisualState, type CanonicalProgressVisualState } from "@/application/design-qa/canonical-five-day-plan-fixture";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
 
 export type DesignQaFixtureId =
+  | "completion_ordinary"
+  | "completion_pr"
+  | "completion_multiple"
+  | "completion_missing_history"
+  | "completion_partial"
+  | "completion_long_accessibility"
+  | "completion_share"
   | "progress_low"
   | "progress_healthy"
   | "progress_strength_dashboard"
@@ -103,7 +110,7 @@ export type DesignQaFixtureId =
 
 export interface DesignQaFixtureDefinition {
   id: DesignQaFixtureId;
-  area: "Progress" | "Home" | "Train" | "Plan";
+  area: "Progress" | "Home" | "Train" | "Plan" | "Finish";
   label: string;
   description: string;
   targetHref: string;
@@ -122,6 +129,13 @@ const workoutSessionsKey = "iron-logic.workout-sessions";
 const sessionPrepRecordsKey = "iron-logic.session-prep-records";
 
 export const designQaFixtures: DesignQaFixtureDefinition[] = [
+  { id: "completion_ordinary", area: "Finish", label: "Ordinary completion", description: "Truthful retained totals without a fabricated achievement.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_ordinary:comparison:1" },
+  { id: "completion_pr", area: "Finish", label: "Genuine PR", description: "A comparable exact-exercise load best with prior history.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_pr:comparison:3" },
+  { id: "completion_multiple", area: "Finish", label: "Multiple achievements", description: "Several defensible exercise achievements remain calm and bounded.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_multiple:comparison:3" },
+  { id: "completion_missing_history", area: "Finish", label: "Missing history", description: "First exposure stays useful without claiming a record.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_missing_history:comparison:1" },
+  { id: "completion_partial", area: "Finish", label: "Partial completion", description: "Saved work is explicit while unfinished work is not invented.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_partial:comparison:2" },
+  { id: "completion_long_accessibility", area: "Finish", label: "Long and accessible", description: "Bounded multi-achievement content at large text and narrow widths.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_long_accessibility:comparison:3" },
+  { id: "completion_share", area: "Finish", label: "Sharing preview", description: "A privacy-safe single-achievement share-card entry point.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_share:comparison:3" },
   { id: "progress_low", area: "Progress", label: "Low history", description: "One completed workout, no strategic verdict yet.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_healthy", area: "Progress", label: "Healthy/adapting", description: "Progression moving, fatigue low, clean recent cards.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_strength_dashboard", area: "Progress", label: "Strength dashboard", description: "Powerlifting Meet history with SBD total and recent PRs.", targetHref: "/(protected)/(tabs)/analytics" },
@@ -232,6 +246,7 @@ export function ensureDesignQaLocalWorkoutReadyState(environment: AppEnvironment
 export type DesignQaFixtureFamily = "plan_state" | "session_lifecycle" | "progress_decision" | "failure_recovery";
 
 export function designQaFixtureFamily(id: DesignQaFixtureId): DesignQaFixtureFamily {
+  if (id.startsWith("completion_")) return "session_lifecycle";
   if (id === "home_active_workout") return "session_lifecycle";
   if (id === "home_recovery_capacity") return "progress_decision";
   if (["train_load_regression_reduce", "train_load_escalation", "train_load_escalation_modal", "train_load_average_next", "train_productive_below_min", "train_productive_target_zone", "train_productive_soft_cap", "train_productive_over_soft_cap"].includes(id)) return "progress_decision";
@@ -306,6 +321,16 @@ function applyPlanStateFixture(id: DesignQaFixtureId, environment: AppEnvironmen
 }
 
 function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
+  if (id.startsWith("completion_")) {
+    if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
+    clearFixtureViewStateOnly();
+    appSettingsStore.patch({ onboardingCompleted: true });
+    applyCanonicalCompletionVisualState(id.replace("completion_", "") as Parameters<typeof applyCanonicalCompletionVisualState>[0], { planId: `design-qa:${id}` });
+    const definition = getFixtureDefinition(id);
+    const activeFixture = { id, label: definition.label, appliedAt: "2026-07-18T10:00:00.000Z" };
+    jsonStore.set(activeFixtureKey, activeFixture);
+    return activeFixture;
+  }
   if (id === "home_active_workout") {
     if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
     clearFixtureViewStateOnly();

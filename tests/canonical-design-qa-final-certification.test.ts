@@ -6,8 +6,8 @@ import { certifyCanonicalDesignQaMatrix } from "@/application/design-qa/canonica
 describe("final canonical Design-QA certification", () => {
   it("certifies the complete declared matrix and publishes deterministic evidence", () => {
     const result = certifyCanonicalDesignQaMatrix();
-    expect(result.fixtureCount).toBe(79);
-    expect(result.familyCounts).toEqual({ plan_state: 13, session_lifecycle: 30, progress_decision: 36 });
+    expect(result.fixtureCount).toBe(86);
+    expect(result.familyCounts).toEqual({ plan_state: 13, session_lifecycle: 37, progress_decision: 36 });
     expect(result.uniqueIds).toBe(true);
     expect(result.allCanonicalSetup).toBe(true);
     expect(result.designQaCanonicalMatrixComplete).toBe(true);

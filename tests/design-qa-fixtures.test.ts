@@ -324,6 +324,15 @@ function assertFixtureShape(fixtureId: DesignQaFixtureId) {
 
   expect(activeFixture?.id).toBe(fixtureId);
 
+  if (fixtureId.startsWith("completion_")) {
+    const expectedCount = fixtureId === "completion_ordinary" || fixtureId === "completion_missing_history" ? 1 : fixtureId === "completion_partial" ? 2 : 3;
+    const sessionId = `design-qa:${fixtureId}:comparison:${expectedCount}`;
+    const aggregate = canonicalRecordedSessionLedger.get(sessionId);
+    expect(aggregate.status).toBe("found");
+    if (aggregate.status === "found") expect(aggregate.session.status).toBe("completed");
+    return;
+  }
+
   if (fixtureId === "home_active_workout") {
     expect(canonicalActivePlanState.getReadModel()?.activeRecordedSession).not.toBeNull();
     return;
