@@ -97,6 +97,32 @@ describe("complete canonical adaptive planning system", () => {
     }
   });
 
+  it("constructs every active Strength and Powerbuilding phase without a successor dead end", () => {
+    const activePhases = mesocycleLibrary.filter((mesocycle) => mesocycle.engine === "strength" || mesocycle.engine === "powerbuilding");
+    for (const mesocycle of activePhases) {
+      const powerbuilding = mesocycle.engine === "powerbuilding";
+      const result = constructCanonicalActivePlanFromCanonicalInputs({
+        planId: `phase-${mesocycle.id}`,
+        createdAt: "2026-07-19T08:00:00.000Z",
+        updatedAt: "2026-07-19T08:00:00.000Z",
+        goal: "strength_hypertrophy",
+        macrocycleGoal: powerbuilding ? "build_muscle_and_strength" : "build_strength",
+        experienceLevel: "intermediate",
+        daysPerWeek: powerbuilding ? 5 : 4,
+        preferredSplit: powerbuilding ? "push_pull_legs" : "upper_lower",
+        equipment: fullEquipment,
+        units: "kg",
+        selectedMesocycleId: mesocycle.id,
+        exercises: exerciseLibrary,
+      });
+      expect(result.status, mesocycle.id).toBe("constructed");
+      if (result.status !== "constructed") continue;
+      const sessionSets = result.carrier.plannedSessions.map((session) => (session.prescriptionSnapshot as CanonicalSessionSnapshotV3).slots.reduce((sum, slot) => sum + (slot.settings.requiredSets ?? slot.settings.requiredWorkSets), 0));
+      expect(sessionSets.every((sets) => sets >= 2), mesocycle.id).toBe(true);
+      if (/(?:realisation|taper|transition)$/.test(mesocycle.id)) expect(sessionSets.every((sets) => sets <= 6), mesocycle.id).toBe(true);
+    }
+  });
+
   it("certifies every representative golden case or records its explicit unsupported contract", () => {
     const results = canonicalRepresentativeGoldenCases.map(constructGoldenProgramme);
     for (const result of results) {

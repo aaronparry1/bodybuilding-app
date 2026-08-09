@@ -86,8 +86,8 @@ describe("P1A policy-quality certification", () => {
     expect(stateCounts).toEqual({
       deload: 5,
       peak: 1,
-      speed_power: 4,
-      standard: 11,
+      speed_power: 1,
+      standard: 14,
       taper: 1,
     });
     expect(macrocycleEngineForGoal("get_leaner")).toBe("hypertrophy");

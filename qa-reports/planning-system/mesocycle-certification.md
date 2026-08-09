@@ -321,6 +321,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -701,6 +702,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -1083,6 +1085,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -1461,6 +1464,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -1749,12 +1753,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
           "technicalComplexity": "moderate",
           "specificity": "mixed",
-          "fatigueCost": "low"
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "deload",
@@ -2032,12 +2037,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
           "technicalComplexity": "moderate",
           "specificity": "mixed",
-          "fatigueCost": "low"
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "deload",
@@ -2406,6 +2412,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -2788,6 +2795,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -3169,6 +3177,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -3274,22 +3283,22 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "lane": {
           "allowed": [
-            "power",
+            "hypertrophy",
             "strength"
           ],
           "prohibited": [],
-          "preferred": "power",
+          "preferred": "strength",
           "readinessRestriction": "none"
         },
         "concreteLanes": {
           "allowed": [
-            "power",
+            "strength",
             "strength_support",
             "maintenance"
           ],
           "prohibited": [],
           "preferredByRole": {
-            "primary": "power",
+            "primary": "strength",
             "secondary": "strength_support",
             "accessory": "maintenance"
           },
@@ -3307,14 +3316,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "maintenance"
             ]
           },
-          "calibrationRequired": [
-            "power"
-          ],
-          "establishedLoadRequired": []
+          "calibrationRequired": [],
+          "establishedLoadRequired": [
+            "strength"
+          ]
         },
         "targets": {
           "modes": [
-            "velocity_intent",
+            "rep_region",
             "established_load"
           ],
           "minimumRepTarget": 1,
@@ -3325,12 +3334,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "targetEnvelopes": {
           "primary": {
-            "power": {
+            "strength": {
               "minReps": 1,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -3338,7 +3347,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "provenance": [
                 "mesocycle:powerbuilding_intensification",
                 "role:primary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -3375,12 +3384,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             }
           },
           "secondary": {
-            "power": {
+            "strength": {
               "minReps": 4,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -3388,7 +3397,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "provenance": [
                 "mesocycle:powerbuilding_intensification",
                 "role:secondary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -3425,12 +3434,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             }
           },
           "accessory": {
-            "power": {
+            "strength": {
               "minReps": 8,
               "maxReps": 20,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -3438,7 +3447,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "provenance": [
                 "mesocycle:powerbuilding_intensification",
                 "role:accessory",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -3484,8 +3493,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "permitted": [
             "straight_sets",
             "back_off_sets",
-            "pyramid",
-            "dynamic_effort"
+            "pyramid"
           ],
           "prohibited": [],
           "conditional": []
@@ -3494,7 +3502,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "roles": [
             "primary_compound",
             "secondary_compound",
-            "power"
+            "accessory",
+            "isolation",
+            "power",
+            "recovery"
           ],
           "stability": "high",
           "technicalComplexity": "high",
@@ -3502,10 +3513,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "fatigueCost": "high"
         },
         "specialStateScoring": {
-          "state": "speed_power",
-          "fatiguePenalty": "none",
+          "state": "standard",
+          "fatiguePenalty": "moderate",
           "specificityBonus": "moderate",
-          "velocityRequired": true
+          "velocityRequired": false
         },
         "strengthAnchor": {
           "required": true,
@@ -3515,25 +3526,25 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           ],
           "specificity": "specific",
           "loadability": "required",
-          "calibrationRequired": true
+          "calibrationRequired": false
         },
         "dropOff": {
-          "monitoring": "velocity",
-          "status": "permitted",
+          "monitoring": "rep",
+          "status": "required",
           "thresholdPolicyId": "mesocycle:powerbuilding_intensification:dropoff:v1",
-          "response": "continue",
+          "response": "stop",
           "evidenceRequired": true
         },
         "fatigue": {
           "boundary": "tight",
-          "monitoring": "velocity",
+          "monitoring": "rep",
           "stopPolicy": "continue"
         },
-        "specialState": "speed_power",
+        "specialState": "standard",
         "progression": {
           "permitted": [
-            "velocity_intent",
-            "expression"
+            "double_progression",
+            "load_progression"
           ],
           "evidenceRequired": true,
           "exitEvidence": [
@@ -3817,8 +3828,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "exerciseSuitability": {
           "roles": [
             "primary_compound",
-            "secondary_compound",
-            "power"
+            "secondary_compound"
           ],
           "stability": "high",
           "technicalComplexity": "high",
@@ -3856,8 +3866,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "specialState": "peak",
         "progression": {
           "permitted": [
-            "double_progression",
-            "load_progression"
+            "expression"
           ],
           "evidenceRequired": true,
           "exitEvidence": [
@@ -4101,12 +4110,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
           "technicalComplexity": "moderate",
           "specificity": "mixed",
-          "fatigueCost": "low"
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "deload",
@@ -4478,6 +4488,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -4861,6 +4872,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -4965,22 +4977,22 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "lane": {
           "allowed": [
-            "power",
+            "hypertrophy",
             "strength"
           ],
           "prohibited": [],
-          "preferred": "power",
+          "preferred": "strength",
           "readinessRestriction": "none"
         },
         "concreteLanes": {
           "allowed": [
-            "power",
+            "strength",
             "strength_support",
             "maintenance"
           ],
           "prohibited": [],
           "preferredByRole": {
-            "primary": "power",
+            "primary": "strength",
             "secondary": "strength_support",
             "accessory": "maintenance"
           },
@@ -4998,14 +5010,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "maintenance"
             ]
           },
-          "calibrationRequired": [
-            "power"
-          ],
-          "establishedLoadRequired": []
+          "calibrationRequired": [],
+          "establishedLoadRequired": [
+            "strength"
+          ]
         },
         "targets": {
           "modes": [
-            "velocity_intent",
+            "rep_region",
             "established_load"
           ],
           "minimumRepTarget": 1,
@@ -5016,12 +5028,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "targetEnvelopes": {
           "primary": {
-            "power": {
+            "strength": {
               "minReps": 1,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5029,7 +5041,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "provenance": [
                 "mesocycle:strength_specific",
                 "role:primary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5066,12 +5078,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             }
           },
           "secondary": {
-            "power": {
+            "strength": {
               "minReps": 4,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5079,7 +5091,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "provenance": [
                 "mesocycle:strength_specific",
                 "role:secondary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5116,12 +5128,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             }
           },
           "accessory": {
-            "power": {
+            "strength": {
               "minReps": 8,
               "maxReps": 20,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5129,7 +5141,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "provenance": [
                 "mesocycle:strength_specific",
                 "role:accessory",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5177,7 +5189,6 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "back_off_sets",
             "pyramid",
             "heavy_single_triple_five_backoffs",
-            "dynamic_effort",
             "cluster"
           ],
           "prohibited": [],
@@ -5190,7 +5201,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "roles": [
             "primary_compound",
             "secondary_compound",
-            "power"
+            "accessory",
+            "isolation",
+            "power",
+            "recovery"
           ],
           "stability": "high",
           "technicalComplexity": "high",
@@ -5198,10 +5212,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "fatigueCost": "high"
         },
         "specialStateScoring": {
-          "state": "speed_power",
-          "fatiguePenalty": "none",
+          "state": "standard",
+          "fatiguePenalty": "moderate",
           "specificityBonus": "moderate",
-          "velocityRequired": true
+          "velocityRequired": false
         },
         "strengthAnchor": {
           "required": true,
@@ -5211,25 +5225,25 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           ],
           "specificity": "specific",
           "loadability": "required",
-          "calibrationRequired": true
+          "calibrationRequired": false
         },
         "dropOff": {
-          "monitoring": "velocity",
-          "status": "permitted",
+          "monitoring": "rep",
+          "status": "required",
           "thresholdPolicyId": "mesocycle:strength_specific:dropoff:v1",
-          "response": "continue",
+          "response": "stop",
           "evidenceRequired": true
         },
         "fatigue": {
           "boundary": "tight",
-          "monitoring": "velocity",
+          "monitoring": "rep",
           "stopPolicy": "continue"
         },
-        "specialState": "speed_power",
+        "specialState": "standard",
         "progression": {
           "permitted": [
-            "velocity_intent",
-            "expression"
+            "double_progression",
+            "load_progression"
           ],
           "evidenceRequired": true,
           "exitEvidence": [
@@ -5294,22 +5308,22 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "lane": {
           "allowed": [
-            "power",
+            "hypertrophy",
             "strength"
           ],
           "prohibited": [],
-          "preferred": "power",
+          "preferred": "strength",
           "readinessRestriction": "none"
         },
         "concreteLanes": {
           "allowed": [
-            "power",
+            "strength",
             "strength_support",
             "maintenance"
           ],
           "prohibited": [],
           "preferredByRole": {
-            "primary": "power",
+            "primary": "strength",
             "secondary": "strength_support",
             "accessory": "maintenance"
           },
@@ -5327,14 +5341,14 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "maintenance"
             ]
           },
-          "calibrationRequired": [
-            "power"
-          ],
-          "establishedLoadRequired": []
+          "calibrationRequired": [],
+          "establishedLoadRequired": [
+            "strength"
+          ]
         },
         "targets": {
           "modes": [
-            "velocity_intent",
+            "rep_region",
             "established_load"
           ],
           "minimumRepTarget": 1,
@@ -5345,12 +5359,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "targetEnvelopes": {
           "primary": {
-            "power": {
+            "strength": {
               "minReps": 1,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5358,7 +5372,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "provenance": [
                 "mesocycle:strength_intensification",
                 "role:primary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5395,12 +5409,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             }
           },
           "secondary": {
-            "power": {
+            "strength": {
               "minReps": 4,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5408,7 +5422,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "provenance": [
                 "mesocycle:strength_intensification",
                 "role:secondary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5445,12 +5459,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             }
           },
           "accessory": {
-            "power": {
+            "strength": {
               "minReps": 8,
               "maxReps": 20,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5458,7 +5472,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               "provenance": [
                 "mesocycle:strength_intensification",
                 "role:accessory",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5506,7 +5520,6 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "back_off_sets",
             "pyramid",
             "heavy_single_triple_five_backoffs",
-            "dynamic_effort",
             "max_effort"
           ],
           "prohibited": [],
@@ -5516,7 +5529,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "roles": [
             "primary_compound",
             "secondary_compound",
-            "power"
+            "accessory",
+            "isolation",
+            "power",
+            "recovery"
           ],
           "stability": "high",
           "technicalComplexity": "high",
@@ -5524,10 +5540,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "fatigueCost": "high"
         },
         "specialStateScoring": {
-          "state": "speed_power",
-          "fatiguePenalty": "none",
+          "state": "standard",
+          "fatiguePenalty": "moderate",
           "specificityBonus": "moderate",
-          "velocityRequired": true
+          "velocityRequired": false
         },
         "strengthAnchor": {
           "required": true,
@@ -5537,25 +5553,25 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           ],
           "specificity": "specific",
           "loadability": "required",
-          "calibrationRequired": true
+          "calibrationRequired": false
         },
         "dropOff": {
-          "monitoring": "velocity",
-          "status": "permitted",
+          "monitoring": "rep",
+          "status": "required",
           "thresholdPolicyId": "mesocycle:strength_intensification:dropoff:v1",
-          "response": "continue",
+          "response": "stop",
           "evidenceRequired": true
         },
         "fatigue": {
           "boundary": "tight",
-          "monitoring": "velocity",
+          "monitoring": "rep",
           "stopPolicy": "continue"
         },
-        "specialState": "speed_power",
+        "specialState": "standard",
         "progression": {
           "permitted": [
-            "velocity_intent",
-            "expression"
+            "double_progression",
+            "load_progression"
           ],
           "evidenceRequired": true,
           "exitEvidence": [
@@ -5666,8 +5682,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "rep_region",
             "established_load"
           ],
-          "minimumRepTarget": 4,
-          "maximumRepTarget": 20,
+          "minimumRepTarget": 1,
+          "maximumRepTarget": 12,
           "establishedLoadRequired": false,
           "backOffPermitted": true,
           "failureOrAmrapPermitted": false
@@ -5896,12 +5912,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
-          "stability": "moderate",
-          "technicalComplexity": "moderate",
-          "specificity": "mixed",
-          "fatigueCost": "moderate"
+          "stability": "high",
+          "technicalComplexity": "high",
+          "specificity": "specific",
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "taper",
@@ -5915,8 +5932,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "primary_compound",
             "secondary_compound"
           ],
-          "specificity": "mixed",
-          "loadability": "preferred",
+          "specificity": "specific",
+          "loadability": "required",
           "calibrationRequired": false
         },
         "dropOff": {
@@ -6179,12 +6196,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
           "technicalComplexity": "moderate",
           "specificity": "mixed",
-          "fatigueCost": "low"
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "deload",
@@ -6555,6 +6573,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -6932,6 +6951,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -7257,7 +7277,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "roles": [
             "primary_compound",
             "secondary_compound",
-            "power"
+            "accessory",
+            "isolation",
+            "power",
+            "recovery"
           ],
           "stability": "high",
           "technicalComplexity": "high",
@@ -7266,7 +7289,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "specialStateScoring": {
           "state": "speed_power",
-          "fatiguePenalty": "none",
+          "fatiguePenalty": "moderate",
           "specificityBonus": "moderate",
           "velocityRequired": true
         },
@@ -7282,9 +7305,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         },
         "dropOff": {
           "monitoring": "velocity",
-          "status": "permitted",
+          "status": "required",
           "thresholdPolicyId": "mesocycle:athletic_power:dropoff:v1",
-          "response": "continue",
+          "response": "stop",
           "evidenceRequired": true
         },
         "fatigue": {
@@ -7541,12 +7564,13 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
           "technicalComplexity": "moderate",
           "specificity": "mixed",
-          "fatigueCost": "low"
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "deload",

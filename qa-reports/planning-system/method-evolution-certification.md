@@ -111,9 +111,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       },
       "exactTargets": [
         3,
-        5,
-        5,
-        5
+        7,
+        7,
+        7
       ],
       "targetKinds": [
         "reps",

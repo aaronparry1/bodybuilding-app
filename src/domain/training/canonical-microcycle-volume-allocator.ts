@@ -127,20 +127,20 @@ const requiredFiveDayRoles = ["Bench and hypertrophy", "Squat and hypertrophy", 
 const fiveDayPurpose: Readonly<Record<(typeof requiredFiveDayRoles)[number], readonly SlotContract[]>> = {
   "Bench and hypertrophy": [
     slot("primary_compound", "primary", ["chest"], ["chest"], "bench competition-pattern practice", ["horizontal_push"], { primaryLift: "bench", liftExposure: "primary", repeatPolicy: "stable_primary_practice", baseWorkingSets: 4 }),
-    slot("secondary_compound", "secondary", ["chest"], ["chest"], "complementary chest hypertrophy", ["horizontal_push"], { repeatPolicy: "variation_preferred", preferredHypertrophyBias: "lengthened" }),
-    slot("isolation", "accessory", ["shoulders"], ["lateral_delts"], "lateral-delt work not supplied by pressing", ["isolation"], { repeatPolicy: "variation_preferred" }),
+    slot("secondary_compound", "secondary", ["chest"], ["chest"], "complementary chest hypertrophy", ["horizontal_push"], { repeatPolicy: "variation_preferred", preferredHypertrophyBias: "lengthened", transferRationale: "bench_pec_and_position_strength" }),
+    slot("isolation", "accessory", ["shoulders"], ["lateral_delts"], "lateral-delt work not supplied by pressing", ["isolation"], { repeatPolicy: "variation_preferred", transferRationale: "bench_scapular_platform" }),
     slot("isolation", "accessory", ["triceps"], ["triceps"], "triceps support", ["isolation"], { repeatPolicy: "variation_preferred" }),
   ],
   "Squat and hypertrophy": [
     slot("primary_compound", "primary", ["quads"], ["quadriceps"], "squat competition-pattern practice", ["squat"], { primaryLift: "squat", liftExposure: "primary", repeatPolicy: "stable_primary_practice", baseWorkingSets: 4 }),
-    slot("secondary_compound", "secondary", ["quads"], ["quadriceps"], "stable low-complexity quadriceps hypertrophy", ["squat", "lunge"], { repeatPolicy: "variation_preferred" }),
-    slot("isolation", "accessory", ["hamstrings"], ["hamstrings_knee_flexion"], "knee-flexion hamstring work", ["isolation"], { repeatPolicy: "variation_preferred" }),
+    slot("secondary_compound", "secondary", ["quads"], ["quadriceps"], "stable low-complexity quadriceps hypertrophy", ["squat", "lunge"], { repeatPolicy: "variation_preferred", transferRationale: "squat_quad_drive" }),
+    slot("isolation", "accessory", ["hamstrings"], ["hamstrings_knee_flexion"], "knee-flexion hamstring work", ["isolation"], { repeatPolicy: "variation_preferred", transferRationale: "squat_posterior_support" }),
     slot("isolation", "accessory", ["calves"], ["calves"], "calf work", ["isolation"], { repeatPolicy: "variation_preferred" }),
   ],
   "Deadlift and back": [
     slot("primary_compound", "primary", ["hamstrings", "glutes"], ["hip_extension"], "deadlift competition-pattern practice", ["hinge"], { primaryLift: "deadlift", liftExposure: "primary", repeatPolicy: "stable_primary_practice", baseWorkingSets: 3 }),
-    slot("secondary_compound", "secondary", ["back"], ["upper_back"], "horizontal-pull upper-back work", ["horizontal_pull"], { repeatPolicy: "variation_preferred" }),
-    slot("secondary_compound", "secondary", ["back"], ["lats"], "true vertical-pull lat work", ["vertical_pull"], { minimumSets: 3, repeatPolicy: "variation_preferred" }),
+    slot("secondary_compound", "secondary", ["back"], ["upper_back"], "horizontal-pull upper-back work", ["horizontal_pull"], { repeatPolicy: "variation_preferred", transferRationale: "deadlift_lat_position" }),
+    slot("secondary_compound", "secondary", ["back"], ["lats"], "true vertical-pull lat work", ["vertical_pull"], { minimumSets: 3, repeatPolicy: "variation_preferred", transferRationale: "deadlift_lat_position" }),
     slot("isolation", "accessory", ["biceps"], ["biceps"], "elbow-flexor support", ["isolation"], { repeatPolicy: "variation_preferred" }),
   ],
   "Upper support": [
@@ -161,16 +161,18 @@ const fiveDayPurpose: Readonly<Record<(typeof requiredFiveDayRoles)[number], rea
 };
 
 export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolumeAllocationInput): CanonicalMicrocycleVolumeAllocation {
-  const profile = isExactFiveDayProfile(input.sessionRoles) ? "powerbuilding_five_day_v1" : "goal_phase_frequency_v1";
+  const exactFiveDayProfile = isExactFiveDayProfile(input.sessionRoles);
+  const profile = exactFiveDayProfile && !isReducedStrengthPhase(input.mesocycleId) ? "powerbuilding_five_day_v1" : "goal_phase_frequency_v1";
   let slots: AllocatedSlot[] = [];
   for (const [sessionIndex, sessionRole] of input.sessionRoles.entries()) {
-    const contract = profile === "powerbuilding_five_day_v1" ? fiveDayPurpose[sessionRole as (typeof requiredFiveDayRoles)[number]] : canonicalContract(input, input.sessionTypes?.[sessionIndex] ?? inferSessionType(sessionRole), sessionIndex);
+    const baseContract = exactFiveDayProfile ? fiveDayPurpose[sessionRole as (typeof requiredFiveDayRoles)[number]] : canonicalContract(input, input.sessionTypes?.[sessionIndex] ?? inferSessionType(sessionRole), sessionIndex);
+    const contract = contractForMesocyclePhase(input.mesocycleId, baseContract);
     contract.forEach((entry, order) => slots.push({
       ...entry,
       sessionIndex,
       sessionRole,
       order,
-      workingSets: Math.max(entry.minimumSets ?? 1, setsFor(input.experience, entry.constructionRole, input.mesocycleId, input.recoveryRestricted, input.frequency, entry.baseWorkingSets, profile === "powerbuilding_five_day_v1", input.establishedLoadExerciseIds.length > 0)),
+      workingSets: setsForMesocyclePhase(input.mesocycleId, entry, Math.max(entry.minimumSets ?? 1, setsFor(input.experience, entry.constructionRole, input.mesocycleId, input.recoveryRestricted, input.frequency, entry.baseWorkingSets, exactFiveDayProfile, input.establishedLoadExerciseIds.length > 0))),
     }));
   }
 
@@ -211,7 +213,8 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
     primary: slots.filter((entry) => entry.primaryLift === lift && entry.liftExposure === "primary").length,
     secondaryVariation: slots.filter((entry) => entry.primaryLift === lift && entry.liftExposure === "secondary_variation").length,
   }])) as CanonicalMicrocycleVolumeAllocation["primaryLiftExposures"];
-  const directSetTargets = profile === "powerbuilding_five_day_v1"
+  const phaseVolumeReduced = isReducedStrengthPhase(input.mesocycleId);
+  const directSetTargets = profile === "powerbuilding_five_day_v1" && !phaseVolumeReduced
     ? Object.fromEntries((["chest", "lats", "upper_back", "lateral_delts", "rear_delts", "triceps", "biceps", "quadriceps", "hamstrings_knee_flexion", "hip_extension", "calves", "core"] as CanonicalStimulusRegion[]).map((region) => [region, weeklyBounds(input.experience, region)]))
     : hypertrophy
       ? Object.fromEntries(Object.keys(directSets).map((region) => {
@@ -628,11 +631,12 @@ function canonicalContract(input: CanonicalMicrocycleVolumeAllocationInput, type
     : type === "pull" ? strengthOrPowerbuilding ? strengthPullContract() : pullContract(input.experience === "beginner")
     : type === "legs" ? strengthOrPowerbuilding ? lowerContract(true, input.experience === "beginner", false) : lowerContract(false, input.experience === "beginner", true, input.sessionRoles[index]?.endsWith(" F") === true)
     : type === "lower" || type === "lower_strength" ? strengthOrPowerbuilding ? strengthLowerContract(input, index) : dumbbellBodyweightOnly ? limitedLowerContract("dumbbell") : machineCableOnly ? limitedLowerContract("machine") : lowerContract(false, input.experience === "beginner", denseHypertrophy)
-    : type === "squat" ? lowerContract(true)
+    : type === "squat" ? squatContract()
     : type === "bench" ? benchContract()
     : type === "deadlift" ? deadliftContract()
     : type === "upper" || type === "upper_strength" ? upperContract(strengthOrPowerbuilding, barbellDominant)
-    : type === "full_body" || type === "full_body_strength" ? fullBodyContract(index, type === "full_body_strength" || input.mesocycleId.startsWith("strength_") || input.mesocycleId.startsWith("powerbuilding_"), barbellDominant)
+    : type === "full_body_strength" ? strengthTechnicalSupportContract()
+    : type === "full_body" ? fullBodyContract(index, input.mesocycleId.startsWith("strength_") || input.mesocycleId.startsWith("powerbuilding_"), barbellDominant)
     : type === "chest_back" ? chestBackContract(input.experience === "beginner")
     : type === "shoulders_arms" ? shouldersArmsContract()
     : type === "chest" ? chestContract()
@@ -641,6 +645,20 @@ function canonicalContract(input: CanonicalMicrocycleVolumeAllocationInput, type
     : type === "arms" ? armsContract()
     : fullBodyContract(index, false);
   return adaptOptionalStimulusToEquipment(contract, input.equipment);
+}
+
+function isReducedStrengthPhase(mesocycleId: string): boolean {
+  return /(?:realisation|taper|transition)$/.test(mesocycleId) && /^(?:strength|powerbuilding)_/.test(mesocycleId);
+}
+
+function contractForMesocyclePhase(mesocycleId: string, contract: readonly SlotContract[]): readonly SlotContract[] {
+  if (!isReducedStrengthPhase(mesocycleId)) return contract;
+  return contract.filter((entry) => entry.primaryLift !== undefined || entry.exerciseRole === "secondary_compound");
+}
+
+function setsForMesocyclePhase(mesocycleId: string, entry: SlotContract, plannedSets: number): number {
+  if (!isReducedStrengthPhase(mesocycleId)) return plannedSets;
+  return Math.min(plannedSets, entry.liftExposure === "primary" ? 2 : 1);
 }
 
 function strengthLowerContract(input: CanonicalMicrocycleVolumeAllocationInput, index: number): readonly SlotContract[] {
@@ -792,6 +810,19 @@ function benchContract(): readonly SlotContract[] { return [
   slot("isolation", "accessory", ["rear_delts"], ["rear_delts"], "shoulder-balance hypertrophy", ["isolation"], { repeatPolicy: "variation_preferred" }),
 ]; }
 
+function squatContract(): readonly SlotContract[] { return [
+  slot("primary_compound", "primary", ["quads", "glutes"], ["quadriceps"], "squat-specific anchor", ["squat"], { primaryLift: "squat", liftExposure: "primary", repeatPolicy: "stable_primary_practice", baseWorkingSets: 4 }),
+  slot("secondary_compound", "secondary", ["quads", "glutes"], ["quadriceps"], "quad drive assistance", ["squat", "lunge"], { repeatPolicy: "variation_preferred", transferRationale: "squat_quad_drive", baseWorkingSets: 3 }),
+  slot("secondary_compound", "secondary", ["hamstrings", "glutes"], ["hip_extension"], "posterior-chain assistance", ["hinge", "hip_thrust"], { repeatPolicy: "variation_preferred", transferRationale: "squat_posterior_support", baseWorkingSets: 3 }),
+  slot("accessory", "accessory", ["abs"], ["core"], "bracing support", ["core", "carry"], { repeatPolicy: "repeat_if_no_equivalent", baseWorkingSets: 2 }),
+]; }
+
+function strengthTechnicalSupportContract(): readonly SlotContract[] { return [
+  slot("secondary_compound", "secondary", ["chest"], ["chest"], "bench technical variation", ["horizontal_push"], { primaryLift: "bench", liftExposure: "secondary_variation", repeatPolicy: "variation_preferred", transferRationale: "bench_pec_and_position_strength", baseWorkingSets: 2 }),
+  slot("secondary_compound", "secondary", ["quads", "glutes"], ["quadriceps"], "squat technical variation", ["squat", "lunge"], { primaryLift: "squat", liftExposure: "secondary_variation", repeatPolicy: "variation_preferred", transferRationale: "squat_quad_drive", baseWorkingSets: 2 }),
+  slot("primary_compound", "secondary", ["hamstrings", "glutes"], ["hip_extension"], "deadlift technical variation", ["hinge"], { primaryLift: "deadlift", liftExposure: "secondary_variation", repeatPolicy: "variation_preferred", transferRationale: "deadlift_hamstring_strength", baseWorkingSets: 2 }),
+]; }
+
 function deadliftContract(): readonly SlotContract[] { return [
   slot("primary_compound", "primary", ["hamstrings", "glutes"], ["hip_extension"], "deadlift-specific anchor", ["hinge"], { primaryLift: "deadlift", liftExposure: "primary", repeatPolicy: "stable_primary_practice" }),
   slot("secondary_compound", "secondary", ["back"], ["lats"], "lat work for deadlift bar position", ["vertical_pull"], { repeatPolicy: "variation_preferred", transferRationale: "deadlift_lat_position" }),
@@ -866,7 +897,7 @@ function certify(input: CanonicalMicrocycleVolumeAllocationInput, profile: Canon
   // The component-duration model is the owned upper bound. Retaining the old
   // unexplained universal 20/28-set ceiling would create a second authority
   // that conflicts with frequency, experience and the selected duration.
-  check(sessionSets.every((sets) => sets >= 3), "session_volume_has_meaningful_work", "session_volume_below_minimum", passed, failures);
+  check(sessionSets.every((sets) => sets >= (isReducedStrengthPhase(input.mesocycleId) ? 2 : 3)), "session_volume_has_meaningful_work", "session_volume_below_minimum", passed, failures);
   check(durations.every((minutes) => minutes > 0 && minutes <= availableMinutes), "available_session_duration_respected", "available_session_duration_exceeded", passed, failures);
   check(slots.every((entry) => entry.muscles.length > 0 && entry.movementPatterns.length > 0), "slot_targets_resolved", "unresolved_slot_target", passed, failures);
   if (hypertrophyPpl && !input.recoveryRestricted && !durationConstrained) {
@@ -892,9 +923,13 @@ function certify(input: CanonicalMicrocycleVolumeAllocationInput, profile: Canon
     check(lifts.squat.primary === 1, "squat_primary_exposure_present", "squat_exposure_missing", passed, failures);
     check(lifts.deadlift.primary === 1 && lifts.deadlift.secondaryVariation === 0, "deadlift_fatigue_bounded_to_primary_exposure", "deadlift_exposure_invalid", passed, failures);
     check(detectCanonicalMicrocycleOverlap(slots).length === 0, "weekly_overlap_bounded", "excessive_primary_overlap", passed, failures);
-    for (const region of ["chest", "lats", "upper_back", "lateral_delts", "rear_delts", "triceps", "biceps", "quadriceps", "hamstrings_knee_flexion", "hip_extension", "calves", "core"] as const) {
-      const bounds = weeklyBounds(input.experience, region);
-      check((direct[region] ?? 0) >= bounds.min && (direct[region] ?? 0) <= bounds.max, `${region}_volume_authorised`, `${region}_volume_out_of_bounds`, passed, failures);
+    if (isReducedStrengthPhase(input.mesocycleId)) {
+      check(sessionSets.every((sets) => sets >= 1 && sets <= 6), "expression_phase_volume_reduced", "expression_phase_volume_not_reduced", passed, failures);
+    } else {
+      for (const region of ["chest", "lats", "upper_back", "lateral_delts", "rear_delts", "triceps", "biceps", "quadriceps", "hamstrings_knee_flexion", "hip_extension", "calves", "core"] as const) {
+        const bounds = weeklyBounds(input.experience, region);
+        check((direct[region] ?? 0) >= bounds.min && (direct[region] ?? 0) <= bounds.max, `${region}_volume_authorised`, `${region}_volume_out_of_bounds`, passed, failures);
+      }
     }
     check(input.frequency === 5, "frequency_matches_profile", "profile_frequency_mismatch", passed, failures);
   }

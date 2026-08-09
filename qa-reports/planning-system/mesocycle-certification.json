@@ -316,6 +316,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -696,6 +697,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -1078,6 +1080,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -1456,6 +1459,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -1744,12 +1748,13 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
           "technicalComplexity": "moderate",
           "specificity": "mixed",
-          "fatigueCost": "low"
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "deload",
@@ -2027,12 +2032,13 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
           "technicalComplexity": "moderate",
           "specificity": "mixed",
-          "fatigueCost": "low"
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "deload",
@@ -2401,6 +2407,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -2783,6 +2790,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -3164,6 +3172,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -3269,22 +3278,22 @@
         },
         "lane": {
           "allowed": [
-            "power",
+            "hypertrophy",
             "strength"
           ],
           "prohibited": [],
-          "preferred": "power",
+          "preferred": "strength",
           "readinessRestriction": "none"
         },
         "concreteLanes": {
           "allowed": [
-            "power",
+            "strength",
             "strength_support",
             "maintenance"
           ],
           "prohibited": [],
           "preferredByRole": {
-            "primary": "power",
+            "primary": "strength",
             "secondary": "strength_support",
             "accessory": "maintenance"
           },
@@ -3302,14 +3311,14 @@
               "maintenance"
             ]
           },
-          "calibrationRequired": [
-            "power"
-          ],
-          "establishedLoadRequired": []
+          "calibrationRequired": [],
+          "establishedLoadRequired": [
+            "strength"
+          ]
         },
         "targets": {
           "modes": [
-            "velocity_intent",
+            "rep_region",
             "established_load"
           ],
           "minimumRepTarget": 1,
@@ -3320,12 +3329,12 @@
         },
         "targetEnvelopes": {
           "primary": {
-            "power": {
+            "strength": {
               "minReps": 1,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -3333,7 +3342,7 @@
               "provenance": [
                 "mesocycle:powerbuilding_intensification",
                 "role:primary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -3370,12 +3379,12 @@
             }
           },
           "secondary": {
-            "power": {
+            "strength": {
               "minReps": 4,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -3383,7 +3392,7 @@
               "provenance": [
                 "mesocycle:powerbuilding_intensification",
                 "role:secondary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -3420,12 +3429,12 @@
             }
           },
           "accessory": {
-            "power": {
+            "strength": {
               "minReps": 8,
               "maxReps": 20,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -3433,7 +3442,7 @@
               "provenance": [
                 "mesocycle:powerbuilding_intensification",
                 "role:accessory",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -3479,8 +3488,7 @@
           "permitted": [
             "straight_sets",
             "back_off_sets",
-            "pyramid",
-            "dynamic_effort"
+            "pyramid"
           ],
           "prohibited": [],
           "conditional": []
@@ -3489,7 +3497,10 @@
           "roles": [
             "primary_compound",
             "secondary_compound",
-            "power"
+            "accessory",
+            "isolation",
+            "power",
+            "recovery"
           ],
           "stability": "high",
           "technicalComplexity": "high",
@@ -3497,10 +3508,10 @@
           "fatigueCost": "high"
         },
         "specialStateScoring": {
-          "state": "speed_power",
-          "fatiguePenalty": "none",
+          "state": "standard",
+          "fatiguePenalty": "moderate",
           "specificityBonus": "moderate",
-          "velocityRequired": true
+          "velocityRequired": false
         },
         "strengthAnchor": {
           "required": true,
@@ -3510,25 +3521,25 @@
           ],
           "specificity": "specific",
           "loadability": "required",
-          "calibrationRequired": true
+          "calibrationRequired": false
         },
         "dropOff": {
-          "monitoring": "velocity",
-          "status": "permitted",
+          "monitoring": "rep",
+          "status": "required",
           "thresholdPolicyId": "mesocycle:powerbuilding_intensification:dropoff:v1",
-          "response": "continue",
+          "response": "stop",
           "evidenceRequired": true
         },
         "fatigue": {
           "boundary": "tight",
-          "monitoring": "velocity",
+          "monitoring": "rep",
           "stopPolicy": "continue"
         },
-        "specialState": "speed_power",
+        "specialState": "standard",
         "progression": {
           "permitted": [
-            "velocity_intent",
-            "expression"
+            "double_progression",
+            "load_progression"
           ],
           "evidenceRequired": true,
           "exitEvidence": [
@@ -3812,8 +3823,7 @@
         "exerciseSuitability": {
           "roles": [
             "primary_compound",
-            "secondary_compound",
-            "power"
+            "secondary_compound"
           ],
           "stability": "high",
           "technicalComplexity": "high",
@@ -3851,8 +3861,7 @@
         "specialState": "peak",
         "progression": {
           "permitted": [
-            "double_progression",
-            "load_progression"
+            "expression"
           ],
           "evidenceRequired": true,
           "exitEvidence": [
@@ -4096,12 +4105,13 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
           "technicalComplexity": "moderate",
           "specificity": "mixed",
-          "fatigueCost": "low"
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "deload",
@@ -4473,6 +4483,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -4856,6 +4867,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -4960,22 +4972,22 @@
         },
         "lane": {
           "allowed": [
-            "power",
+            "hypertrophy",
             "strength"
           ],
           "prohibited": [],
-          "preferred": "power",
+          "preferred": "strength",
           "readinessRestriction": "none"
         },
         "concreteLanes": {
           "allowed": [
-            "power",
+            "strength",
             "strength_support",
             "maintenance"
           ],
           "prohibited": [],
           "preferredByRole": {
-            "primary": "power",
+            "primary": "strength",
             "secondary": "strength_support",
             "accessory": "maintenance"
           },
@@ -4993,14 +5005,14 @@
               "maintenance"
             ]
           },
-          "calibrationRequired": [
-            "power"
-          ],
-          "establishedLoadRequired": []
+          "calibrationRequired": [],
+          "establishedLoadRequired": [
+            "strength"
+          ]
         },
         "targets": {
           "modes": [
-            "velocity_intent",
+            "rep_region",
             "established_load"
           ],
           "minimumRepTarget": 1,
@@ -5011,12 +5023,12 @@
         },
         "targetEnvelopes": {
           "primary": {
-            "power": {
+            "strength": {
               "minReps": 1,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5024,7 +5036,7 @@
               "provenance": [
                 "mesocycle:strength_specific",
                 "role:primary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5061,12 +5073,12 @@
             }
           },
           "secondary": {
-            "power": {
+            "strength": {
               "minReps": 4,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5074,7 +5086,7 @@
               "provenance": [
                 "mesocycle:strength_specific",
                 "role:secondary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5111,12 +5123,12 @@
             }
           },
           "accessory": {
-            "power": {
+            "strength": {
               "minReps": 8,
               "maxReps": 20,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5124,7 +5136,7 @@
               "provenance": [
                 "mesocycle:strength_specific",
                 "role:accessory",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5172,7 +5184,6 @@
             "back_off_sets",
             "pyramid",
             "heavy_single_triple_five_backoffs",
-            "dynamic_effort",
             "cluster"
           ],
           "prohibited": [],
@@ -5185,7 +5196,10 @@
           "roles": [
             "primary_compound",
             "secondary_compound",
-            "power"
+            "accessory",
+            "isolation",
+            "power",
+            "recovery"
           ],
           "stability": "high",
           "technicalComplexity": "high",
@@ -5193,10 +5207,10 @@
           "fatigueCost": "high"
         },
         "specialStateScoring": {
-          "state": "speed_power",
-          "fatiguePenalty": "none",
+          "state": "standard",
+          "fatiguePenalty": "moderate",
           "specificityBonus": "moderate",
-          "velocityRequired": true
+          "velocityRequired": false
         },
         "strengthAnchor": {
           "required": true,
@@ -5206,25 +5220,25 @@
           ],
           "specificity": "specific",
           "loadability": "required",
-          "calibrationRequired": true
+          "calibrationRequired": false
         },
         "dropOff": {
-          "monitoring": "velocity",
-          "status": "permitted",
+          "monitoring": "rep",
+          "status": "required",
           "thresholdPolicyId": "mesocycle:strength_specific:dropoff:v1",
-          "response": "continue",
+          "response": "stop",
           "evidenceRequired": true
         },
         "fatigue": {
           "boundary": "tight",
-          "monitoring": "velocity",
+          "monitoring": "rep",
           "stopPolicy": "continue"
         },
-        "specialState": "speed_power",
+        "specialState": "standard",
         "progression": {
           "permitted": [
-            "velocity_intent",
-            "expression"
+            "double_progression",
+            "load_progression"
           ],
           "evidenceRequired": true,
           "exitEvidence": [
@@ -5289,22 +5303,22 @@
         },
         "lane": {
           "allowed": [
-            "power",
+            "hypertrophy",
             "strength"
           ],
           "prohibited": [],
-          "preferred": "power",
+          "preferred": "strength",
           "readinessRestriction": "none"
         },
         "concreteLanes": {
           "allowed": [
-            "power",
+            "strength",
             "strength_support",
             "maintenance"
           ],
           "prohibited": [],
           "preferredByRole": {
-            "primary": "power",
+            "primary": "strength",
             "secondary": "strength_support",
             "accessory": "maintenance"
           },
@@ -5322,14 +5336,14 @@
               "maintenance"
             ]
           },
-          "calibrationRequired": [
-            "power"
-          ],
-          "establishedLoadRequired": []
+          "calibrationRequired": [],
+          "establishedLoadRequired": [
+            "strength"
+          ]
         },
         "targets": {
           "modes": [
-            "velocity_intent",
+            "rep_region",
             "established_load"
           ],
           "minimumRepTarget": 1,
@@ -5340,12 +5354,12 @@
         },
         "targetEnvelopes": {
           "primary": {
-            "power": {
+            "strength": {
               "minReps": 1,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5353,7 +5367,7 @@
               "provenance": [
                 "mesocycle:strength_intensification",
                 "role:primary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5390,12 +5404,12 @@
             }
           },
           "secondary": {
-            "power": {
+            "strength": {
               "minReps": 4,
-              "maxReps": 5,
+              "maxReps": 15,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5403,7 +5417,7 @@
               "provenance": [
                 "mesocycle:strength_intensification",
                 "role:secondary",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5440,12 +5454,12 @@
             }
           },
           "accessory": {
-            "power": {
+            "strength": {
               "minReps": 8,
               "maxReps": 20,
               "preferredBias": "lower",
-              "loadingMode": "velocity_intent",
-              "establishedLoad": "not_required",
+              "loadingMode": "rep_progression",
+              "establishedLoad": "preferred",
               "backOffPermitted": true,
               "amrapPermitted": false,
               "failurePermitted": false,
@@ -5453,7 +5467,7 @@
               "provenance": [
                 "mesocycle:strength_intensification",
                 "role:accessory",
-                "lane:power"
+                "lane:strength"
               ]
             },
             "strength_support": {
@@ -5501,7 +5515,6 @@
             "back_off_sets",
             "pyramid",
             "heavy_single_triple_five_backoffs",
-            "dynamic_effort",
             "max_effort"
           ],
           "prohibited": [],
@@ -5511,7 +5524,10 @@
           "roles": [
             "primary_compound",
             "secondary_compound",
-            "power"
+            "accessory",
+            "isolation",
+            "power",
+            "recovery"
           ],
           "stability": "high",
           "technicalComplexity": "high",
@@ -5519,10 +5535,10 @@
           "fatigueCost": "high"
         },
         "specialStateScoring": {
-          "state": "speed_power",
-          "fatiguePenalty": "none",
+          "state": "standard",
+          "fatiguePenalty": "moderate",
           "specificityBonus": "moderate",
-          "velocityRequired": true
+          "velocityRequired": false
         },
         "strengthAnchor": {
           "required": true,
@@ -5532,25 +5548,25 @@
           ],
           "specificity": "specific",
           "loadability": "required",
-          "calibrationRequired": true
+          "calibrationRequired": false
         },
         "dropOff": {
-          "monitoring": "velocity",
-          "status": "permitted",
+          "monitoring": "rep",
+          "status": "required",
           "thresholdPolicyId": "mesocycle:strength_intensification:dropoff:v1",
-          "response": "continue",
+          "response": "stop",
           "evidenceRequired": true
         },
         "fatigue": {
           "boundary": "tight",
-          "monitoring": "velocity",
+          "monitoring": "rep",
           "stopPolicy": "continue"
         },
-        "specialState": "speed_power",
+        "specialState": "standard",
         "progression": {
           "permitted": [
-            "velocity_intent",
-            "expression"
+            "double_progression",
+            "load_progression"
           ],
           "evidenceRequired": true,
           "exitEvidence": [
@@ -5661,8 +5677,8 @@
             "rep_region",
             "established_load"
           ],
-          "minimumRepTarget": 4,
-          "maximumRepTarget": 20,
+          "minimumRepTarget": 1,
+          "maximumRepTarget": 12,
           "establishedLoadRequired": false,
           "backOffPermitted": true,
           "failureOrAmrapPermitted": false
@@ -5891,12 +5907,13 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
-          "stability": "moderate",
-          "technicalComplexity": "moderate",
-          "specificity": "mixed",
-          "fatigueCost": "moderate"
+          "stability": "high",
+          "technicalComplexity": "high",
+          "specificity": "specific",
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "taper",
@@ -5910,8 +5927,8 @@
             "primary_compound",
             "secondary_compound"
           ],
-          "specificity": "mixed",
-          "loadability": "preferred",
+          "specificity": "specific",
+          "loadability": "required",
           "calibrationRequired": false
         },
         "dropOff": {
@@ -6174,12 +6191,13 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
           "technicalComplexity": "moderate",
           "specificity": "mixed",
-          "fatigueCost": "low"
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "deload",
@@ -6550,6 +6568,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -6927,6 +6946,7 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
@@ -7252,7 +7272,10 @@
           "roles": [
             "primary_compound",
             "secondary_compound",
-            "power"
+            "accessory",
+            "isolation",
+            "power",
+            "recovery"
           ],
           "stability": "high",
           "technicalComplexity": "high",
@@ -7261,7 +7284,7 @@
         },
         "specialStateScoring": {
           "state": "speed_power",
-          "fatiguePenalty": "none",
+          "fatiguePenalty": "moderate",
           "specificityBonus": "moderate",
           "velocityRequired": true
         },
@@ -7277,9 +7300,9 @@
         },
         "dropOff": {
           "monitoring": "velocity",
-          "status": "permitted",
+          "status": "required",
           "thresholdPolicyId": "mesocycle:athletic_power:dropoff:v1",
-          "response": "continue",
+          "response": "stop",
           "evidenceRequired": true
         },
         "fatigue": {
@@ -7536,12 +7559,13 @@
             "secondary_compound",
             "accessory",
             "isolation",
+            "power",
             "recovery"
           ],
           "stability": "moderate",
           "technicalComplexity": "moderate",
           "specificity": "mixed",
-          "fatigueCost": "low"
+          "fatigueCost": "high"
         },
         "specialStateScoring": {
           "state": "deload",

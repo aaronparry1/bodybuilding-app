@@ -145,8 +145,7 @@
         "permitted": [
           "straight_sets",
           "back_off_sets",
-          "pyramid",
-          "dynamic_effort"
+          "pyramid"
         ],
         "prohibited": [],
         "conditional": []
@@ -221,7 +220,6 @@
           "back_off_sets",
           "pyramid",
           "heavy_single_triple_five_backoffs",
-          "dynamic_effort",
           "cluster"
         ],
         "prohibited": [],
@@ -239,7 +237,6 @@
           "back_off_sets",
           "pyramid",
           "heavy_single_triple_five_backoffs",
-          "dynamic_effort",
           "max_effort"
         ],
         "prohibited": [],

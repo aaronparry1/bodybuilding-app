@@ -36,6 +36,21 @@ describe("canonical mesocycle prescription policy", () => {
     }
   });
 
+  it("reserves velocity-required power policy for the actual athletic power phase", () => {
+    const specificStrength = resolveMesocyclePrescriptionPolicy("strength_specific");
+    const strengthIntensification = resolveMesocyclePrescriptionPolicy("strength_intensification");
+    const athleticPower = resolveMesocyclePrescriptionPolicy("athletic_power");
+    expect(specificStrength.status).toBe("resolved");
+    expect(strengthIntensification.status).toBe("resolved");
+    expect(athleticPower.status).toBe("resolved");
+    if (specificStrength.status !== "resolved" || strengthIntensification.status !== "resolved" || athleticPower.status !== "resolved") return;
+    expect(specificStrength.policy.concreteLanes.preferredByRole.primary).toBe("strength");
+    expect(strengthIntensification.policy.specialStateScoring.velocityRequired).toBe(false);
+    expect(strengthIntensification.policy.methods.permitted).not.toContain("dynamic_effort");
+    expect(athleticPower.policy.concreteLanes.preferredByRole.primary).toBe("power");
+    expect(athleticPower.policy.specialStateScoring.velocityRequired).toBe(true);
+  });
+
   it("rejects incompatible macrocycle engines", () => {
     expect(resolveMesocyclePrescriptionPolicy("strength_general", { goal: "build_muscle", engine: "hypertrophy" }).status).toBe("incompatible");
   });

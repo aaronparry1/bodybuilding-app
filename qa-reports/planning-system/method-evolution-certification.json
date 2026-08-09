@@ -106,9 +106,9 @@
       },
       "exactTargets": [
         3,
-        5,
-        5,
-        5
+        7,
+        7,
+        7
       ],
       "targetKinds": [
         "reps",
