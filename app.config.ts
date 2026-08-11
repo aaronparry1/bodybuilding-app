@@ -67,6 +67,7 @@ const config: ExpoConfig = {
   scheme: env("APP_SCHEME", isProduction ? "ironlogic" : isStaging ? "ironlogic-staging" : "ironlogic-dev"),
   userInterfaceStyle: "dark",
   ios: {
+    version: env("APP_IOS_VERSION", "1.0.19"),
     icon: "./assets/icon.png",
     supportsTablet: true,
     bundleIdentifier: env(
