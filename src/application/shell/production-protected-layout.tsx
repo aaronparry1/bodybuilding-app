@@ -19,6 +19,7 @@ import { recoverLegacyExistingUserTraining } from "@/application/training/legacy
 import { sameCanonicalReconciliation } from "@/application/training/stable-reconciliation";
 import { PrimaryButton } from "@/ui/primitives";
 import { colors, spacing } from "@/ui/theme";
+import { elapsedSince, recordStartupTelemetry } from "@/application/startup/startup-observability";
 
 /** Production-only protected route boundary. QA and preview routes deliberately
  * live in the separate development Router root and are not imported here. */
@@ -53,6 +54,8 @@ export default function ProductionProtectedLayout() {
       setReconciliation(null);
       return;
     }
+    const reconciliationStartedAt = Date.now();
+    recordStartupTelemetry({ stage: "reconciliation", outcome: "started" });
     const recovery = recoverLegacyExistingUserTraining(user?.id ?? null);
     if (recovery.status === "blocked") {
       updateReconciliation(setReconciliation, {
@@ -64,6 +67,7 @@ export default function ProductionProtectedLayout() {
         regeneratedFutureSessions: 0,
         customerGuidance: "We found earlier training data but could not safely reconnect it to your programme. Nothing has been overwritten. Retry account restore or contact support before creating a new plan.",
       });
+      recordStartupTelemetry({ stage: "reconciliation", outcome: "failed", durationMs: elapsedSince(reconciliationStartedAt), reason: "unknown" });
       return;
     }
     const result = reconcileCanonicalReleaseState({
@@ -73,6 +77,7 @@ export default function ProductionProtectedLayout() {
       accessMode: user ? "authenticated" : "offline",
     });
     updateReconciliation(setReconciliation, result);
+    recordStartupTelemetry({ stage: "reconciliation", outcome: result.status === "ready" || result.status === "reconstructed" ? "ready" : "failed", durationMs: elapsedSince(reconciliationStartedAt), reason: result.status === "ready" || result.status === "reconstructed" ? undefined : "unknown" });
     if (result.onboardingMetadataBackfillRequired && result.planVisible) {
       const backfill = backfillExistingUserOnboardingMetadata();
       if (backfill.status === "rejected" && process.env.NODE_ENV !== "production") {
@@ -91,9 +96,9 @@ export default function ProductionProtectedLayout() {
     user?.id,
   ]);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <StartupState title="Checking your saved session" detail="This check has a deadline. Your training will not be changed." />;
   if (!user && !isOfflineMode) return <Redirect href="/(auth)" />;
-  if (routeDecision.status === "waiting") return <Loading />;
+  if (routeDecision.status === "waiting") return <StartupState title={routeDecision.reason === "canonical_reconciliation_pending" ? "Checking your local programme" : "Restoring your account in the background"} detail={routeDecision.reason === "canonical_reconciliation_pending" ? "Your saved programme and workout are being verified on this device." : "No safe local programme is available yet. You can retry if this check is delayed."} showSpinner />;
   if (routeDecision.status === "recovery") {
     const retry = () => {
       setReconciliation(null);
@@ -102,9 +107,10 @@ export default function ProductionProtectedLayout() {
     };
     return (
       <View style={{ flex: 1, justifyContent: "center", backgroundColor: colors.background, padding: spacing.xl, gap: spacing.md }}>
-        <Text accessibilityRole="header" style={{ color: colors.text, fontSize: 24, fontWeight: "900" }}>We found training that needs restoring</Text>
+        <Text style={{ color: colors.accent, fontSize: 12, fontWeight: "900", letterSpacing: 1.2 }}>SAFE RECOVERY</Text>
+        <Text accessibilityRole="header" style={{ color: colors.text, fontSize: 28, lineHeight: 33, fontWeight: "900" }}>{dataHydrationStatus === "conflict" ? "This training belongs to another account" : dataHydrationStatus === "delayed" ? "Account restore is taking longer than expected" : "We found training that needs restoring"}</Text>
         <Text style={{ color: colors.textMuted, fontSize: 16, lineHeight: 23 }}>
-          {reconciliation?.customerGuidance ?? "Your programme and workout have not been changed. Try restoring them again before setting up anything new."}
+          {dataHydrationStatus === "conflict" ? "This device contains account-scoped training that cannot be shown for the signed-in account. Nothing has been overwritten." : dataHydrationStatus === "delayed" ? "The remote check reached its deadline. Nothing has been overwritten. Retry when your connection is stable." : reconciliation?.customerGuidance ?? "Your programme and workout have not been changed. Try restoring them again before setting up anything new."}
         </Text>
         {dataHydrationError && process.env.NODE_ENV !== "production" ? <Text style={{ color: colors.textSubtle }}>{dataHydrationError}</Text> : null}
         <PrimaryButton label="Try restoring training" onPress={retry} />
@@ -149,6 +155,11 @@ function updateReconciliation(
   setter((current) => sameCanonicalReconciliation(current, next) ? current : next);
 }
 
-function Loading() {
-  return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.background }}><ActivityIndicator color={colors.accent} /></View>;
+function StartupState({ title, detail, showSpinner = false }: Readonly<{ title: string; detail: string; showSpinner?: boolean }>) {
+  return <View style={{ flex: 1, justifyContent: "center", backgroundColor: colors.background, padding: spacing.xl, gap: spacing.md }}>
+    {showSpinner ? <ActivityIndicator accessibilityLabel="Startup check in progress" color={colors.accent} /> : null}
+    <Text style={{ color: colors.accent, fontSize: 12, fontWeight: "900", letterSpacing: 1.2 }}>SAFE STARTUP</Text>
+    <Text accessibilityRole="header" style={{ color: colors.text, fontSize: 28, lineHeight: 33, fontWeight: "900" }}>{title}</Text>
+    <Text style={{ color: colors.textMuted, fontSize: 16, lineHeight: 23 }}>{detail}</Text>
+  </View>;
 }

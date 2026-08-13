@@ -11,6 +11,7 @@ import { ExerciseCloudRepository } from "@/data/cloud/exercise-cloud-repository"
 import { ProgrammeCloudRepository } from "@/data/cloud/programme-cloud-repository";
 import { UserSettingsCloudRepository } from "@/data/cloud/user-settings-cloud-repository";
 import { restoreLegacyWorkoutHistoryForMigration } from "@/application/sync/legacy-workout-cloud-recovery";
+import { WorkoutSessionCloudRepository } from "@/data/cloud/workout-session-cloud-repository";
 import { LocalSyncQueueStore } from "@/data/sync/local-sync-queue-store";
 import { SyncQueue } from "@/data/sync/sync-queue";
 import { WorkoutSyncService } from "@/data/sync/workout-sync-service";
@@ -20,6 +21,7 @@ import type { ActiveTrainingPlan } from "@/domain/training/plan-setup";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalActivePlanOwnerRepository } from "@/data/local/canonical-active-plan-owner-repository";
+import { STARTUP_BRANCH_DEADLINE_MS, withStartupDeadline } from "@/application/startup/startup-observability";
 
 const cloudBackupSchema = "adaptive-strength-coach-cloud-backup";
 const cloudBackupVersion = 1;
@@ -192,22 +194,25 @@ export async function restoreCloudDataForUser(
     exerciseCloudRepository,
     userSettingsCloudRepository,
   } = resolveRepositories(dependencies, client);
+  const legacyWorkoutCloud = dependencies.workoutCloudRepository?.loadWorkoutHistory
+    ? { loadWorkoutHistory: dependencies.workoutCloudRepository.loadWorkoutHistory }
+    : new WorkoutSessionCloudRepository(client);
 
   let settingsReadStatus: CloudDataRestoreResult["settingsReadStatus"] = "complete";
   const [legacyWorkoutRecovery, cloudProgrammes, cloudExercises, cloudSettings] = await Promise.all([
     restoreLegacyWorkoutHistoryForMigration(userId, client, {
-      ...(dependencies.workoutCloudRepository?.loadWorkoutHistory ? { cloud: { loadWorkoutHistory: dependencies.workoutCloudRepository.loadWorkoutHistory } } : {}),
+      cloud: { loadWorkoutHistory: (nextUserId: string) => withStartupDeadline(legacyWorkoutCloud.loadWorkoutHistory(nextUserId), STARTUP_BRANCH_DEADLINE_MS, "restore_branch") },
       ...(dependencies.localWorkoutRepository ? { local: dependencies.localWorkoutRepository } : {}),
     }),
-    programmeCloudRepository.loadProgrammes(userId).catch((error) => {
+    withStartupDeadline(programmeCloudRepository.loadProgrammes(userId), STARTUP_BRANCH_DEADLINE_MS, "restore_branch").catch((error) => {
       logSyncStage("programme restore skipped", error);
       return [] as Programme[];
     }),
-    exerciseCloudRepository.loadExercises(userId).catch((error) => {
+    withStartupDeadline(exerciseCloudRepository.loadExercises(userId), STARTUP_BRANCH_DEADLINE_MS, "restore_branch").catch((error) => {
       logSyncStage("exercise restore skipped", error);
       return [] as Exercise[];
     }),
-    userSettingsCloudRepository.loadUserSettingsBlob(userId).catch((error) => {
+    withStartupDeadline(userSettingsCloudRepository.loadUserSettingsBlob(userId), STARTUP_BRANCH_DEADLINE_MS, "restore_branch").catch((error) => {
       logSyncStage("settings restore skipped", error);
       settingsReadStatus = "failed";
       return null;

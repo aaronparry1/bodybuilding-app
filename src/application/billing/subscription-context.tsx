@@ -5,6 +5,7 @@ import { createSubscriptionGateway } from "@/application/billing/billing-gateway
 import { MockRevenueCatGateway } from "@/application/billing/mock-revenuecat";
 import { restoreCloudDataForUser, syncLocalDataForUser } from "@/application/sync/cloud-data-sync";
 import { cacheSubscription, getCachedSubscription, getOfflineEntitlementFallback } from "@/application/billing/subscription-cache";
+import { elapsedSince, recordStartupTelemetry, STARTUP_RESTORE_DEADLINE_MS, StartupDeadlineError, withStartupDeadline } from "@/application/startup/startup-observability";
 import {
   canAccess,
   buildRestorePurchasesFailureResult,
@@ -47,7 +48,7 @@ interface SubscriptionContextValue {
   restorePurchases(): Promise<RestorePurchasesResult>;
   restoreStatus: RestorePurchasesStatus;
   restoreMessage: string | null;
-  dataHydrationStatus: "idle" | "restoring" | "ready" | "error";
+  dataHydrationStatus: "idle" | "restoring" | "ready" | "delayed" | "error" | "conflict";
   dataHydrationError: string | null;
   retryDataHydration(): void;
   presentPaywall(): Promise<void>;
@@ -207,24 +208,35 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     lastRestoredUserId.current = restorationIdentity;
     setDataHydrationStatus("restoring");
     setDataHydrationError(null);
-    restoreCloudDataForUser(user.id)
+    const restoreStartedAt = Date.now();
+    recordStartupTelemetry({ stage: "account_restore", outcome: "started" });
+    withStartupDeadline(restoreCloudDataForUser(user.id), STARTUP_RESTORE_DEADLINE_MS, "account_restore")
       .then((restore) => {
         if (cancelled) return;
+        if (restore.accountScopeBlocked) {
+          setDataHydrationStatus("conflict");
+          setDataHydrationError("account_scope_conflict");
+          recordStartupTelemetry({ stage: "account_restore", outcome: "conflict", durationMs: elapsedSince(restoreStartedAt), reason: "ownership_mismatch" });
+          return;
+        }
         if (restore.settingsReadStatus === "failed") {
           setDataHydrationStatus("error");
           setDataHydrationError("account_data_restore_failed");
+          recordStartupTelemetry({ stage: "account_restore", outcome: "failed", durationMs: elapsedSince(restoreStartedAt), reason: "partial_failure" });
           return;
         }
         setDataHydrationStatus("ready");
-        if (restore.accountScopeBlocked) return;
+        recordStartupTelemetry({ stage: "account_restore", outcome: "ready", durationMs: elapsedSince(restoreStartedAt) });
         syncLocalDataForUser(user.id, subscriptionRef.current).catch((nextError) => {
           if (process.env.NODE_ENV !== "production") console.info("[sync] startup sync failed", nextError);
         });
       })
       .catch((nextError) => {
         if (cancelled) return;
-        setDataHydrationStatus("error");
-        setDataHydrationError(nextError instanceof Error ? nextError.message : "account_data_restore_failed");
+        const timedOut = nextError instanceof StartupDeadlineError;
+        setDataHydrationStatus(timedOut ? "delayed" : "error");
+        setDataHydrationError(timedOut ? "account_data_restore_delayed" : "account_data_restore_failed");
+        recordStartupTelemetry({ stage: "account_restore", outcome: timedOut ? "timeout" : "failed", durationMs: elapsedSince(restoreStartedAt), reason: timedOut ? "deadline" : "unknown" });
         if (process.env.NODE_ENV !== "production") console.info("[sync] startup restore failed", nextError);
       });
     return () => {

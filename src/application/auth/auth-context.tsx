@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { createOptionalAuthService, type AuthService, type AuthState } from "@/application/auth/auth-provider";
+import { elapsedSince, recordStartupTelemetry, STARTUP_AUTH_DEADLINE_MS, StartupDeadlineError, withStartupDeadline } from "@/application/startup/startup-observability";
 
 interface AuthContextValue extends AuthState {
   isOfflineMode: boolean;
@@ -36,14 +37,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     let mounted = true;
-    service
-      .getSession()
+    const startedAt = Date.now();
+    recordStartupTelemetry({ stage: "auth", outcome: "started" });
+    withStartupDeadline(service.getSession(), STARTUP_AUTH_DEADLINE_MS, "auth")
       .then((nextSession) => {
         if (mounted) setSession(nextSession);
+        recordStartupTelemetry({ stage: "auth", outcome: "ready", durationMs: elapsedSince(startedAt) });
         logAuthStage(nextSession ? "session restored" : "no session");
       })
       .catch((nextError: unknown) => {
-        if (mounted) setError(nextError instanceof Error ? nextError.message : "Unable to load session.");
+        if (mounted) {
+          setError(nextError instanceof StartupDeadlineError ? "Session check timed out. Sign in again or continue offline." : "Unable to load session.");
+          setIsOfflineMode(nextError instanceof StartupDeadlineError);
+        }
+        recordStartupTelemetry({ stage: "auth", outcome: nextError instanceof StartupDeadlineError ? "timeout" : "failed", durationMs: elapsedSince(startedAt), reason: nextError instanceof StartupDeadlineError ? "deadline" : "unknown" });
       })
       .finally(() => {
         if (mounted) setIsLoading(false);
