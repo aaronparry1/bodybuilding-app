@@ -89,6 +89,23 @@ export const shellTokens = {
   focus: colors.focus,
 };
 
+/** Living Programme semantic roles. Kept separate while Stage 1 is introduced so
+ * untouched production surfaces do not change by accident. */
+export const livingProgrammeColors = {
+  action: "#c9f35c",
+  actionPressed: "#b7df50",
+  actionSoft: "#1b2418",
+  complete: "#70e0ad",
+  attention: "#f0b35a",
+  risk: "#ff766d",
+  canvas: colors.background,
+  surface: "#111513",
+  surfaceRaised: "#171c19",
+  line: "#2a302d",
+  text: colors.text,
+  muted: colors.textMuted,
+} as const;
+
 export const shadow = {
   soft: "0 10px 28px rgba(0, 0, 0, 0.22)",
   lift: "0 18px 44px rgba(0, 0, 0, 0.32)",

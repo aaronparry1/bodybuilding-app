@@ -6,6 +6,9 @@ import { projectCanonicalHome, readCanonicalHomeProjection, type CanonicalHomeAc
 import { useAppSettings } from "@/application/settings/app-settings";
 import { HomeDashboard } from "@/ui/home-dashboard";
 import { AppScreen } from "@/ui/primitives";
+import { useSubscription } from "@/application/billing/subscription-context";
+import { useAuth } from "@/application/auth/auth-context";
+import { elapsedSince, recordStartupTelemetry } from "@/application/startup/startup-observability";
 
 function readHome(state: CanonicalActivePlanState, displayUnit: "kg" | "lb"): CanonicalHomeProjection {
   if (state.hydration === "empty") return projectCanonicalHome({ status: "empty", model: null });
@@ -16,10 +19,14 @@ function readHome(state: CanonicalActivePlanState, displayUnit: "kg" | "lb"): Ca
 
 export default function HomeScreen() {
   const { settings } = useAppSettings();
+  const { dataHydrationStatus, retryDataHydration } = useSubscription();
+  const { isOfflineMode } = useAuth();
   const scrollRef = useRef<ScrollView>(null);
   const [state, setState] = useState<CanonicalActivePlanState>(canonicalActivePlanState.getState());
   useEffect(() => {
+    const startedAt = Date.now();
     setState(canonicalActivePlanState.hydrate());
+    recordStartupTelemetry({ stage: "local_today", outcome: "local_ready", durationMs: elapsedSince(startedAt) });
     return canonicalActivePlanState.subscribe(() => setState(canonicalActivePlanState.getState()));
   }, []);
   useFocusEffect(useCallback(() => {
@@ -31,6 +38,10 @@ export default function HomeScreen() {
     if (action.type === "retry_storage") { canonicalActivePlanState.refresh(); return; }
     if (action.type === "setup_plan") { router.push("/(protected)/onboarding"); return; }
     if (action.type === "open_progress") { router.push("/(protected)/(tabs)/analytics"); return; }
+    if (action.type === "open_session_prep") {
+      router.push({ pathname: "/(protected)/session-prep", params: { workoutName: action.workoutName, workoutType: action.workoutType, firstExerciseName: action.firstExerciseName } });
+      return;
+    }
     if (action.type === "open_planned_session") {
       router.push({ pathname: "/(protected)/(tabs)/train", params: { planId: action.planId, planRevision: String(action.planRevision), plannedSessionId: action.sessionId, lifecycle: "start" } });
       return;
@@ -40,5 +51,5 @@ export default function HomeScreen() {
     }
   };
 
-  return <AppScreen scrollRef={scrollRef}><HomeDashboard projection={home} onAction={onAction} /></AppScreen>;
+  return <AppScreen scrollRef={scrollRef}><HomeDashboard projection={home} onAction={onAction} startup={{ status: isOfflineMode ? "offline" : dataHydrationStatus, onRetry: retryDataHydration }} /></AppScreen>;
 }

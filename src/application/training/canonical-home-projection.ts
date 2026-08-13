@@ -11,10 +11,13 @@ export const CANONICAL_HOME_PROJECTION_VERSION = "canonical_home_projection_v3" 
 
 export type CanonicalHomeStatus = "hydrating" | "ready" | "empty" | "recorded_history_recovery_required" | "storage_error";
 export type CanonicalHomeAction = Readonly<{
-  type: "open_planned_session" | "resume_recorded_session" | "open_progress" | "setup_plan" | "retry_storage";
+  type: "open_planned_session" | "resume_recorded_session" | "open_progress" | "open_session_prep" | "setup_plan" | "retry_storage";
   planId?: string;
   planRevision?: number;
   sessionId?: string;
+  workoutName?: string;
+  workoutType?: string;
+  firstExerciseName?: string;
 }>;
 
 export type CanonicalHomeWorkoutSummary = Readonly<{
@@ -156,6 +159,7 @@ export function projectCanonicalHome(input: Readonly<{
     primary = { kind: "rest_day", eyebrow: "Recovery day", title: "No workout due", detail: "Recover well today and be ready for your next session." };
   }
   if (reviewAvailable) actions.push(progressAction);
+  if (primary.kind === "planned" && plannedWorkout) actions.push({ type: "open_session_prep", workoutName: plannedWorkout.title, workoutType: plannedSession?.role, firstExerciseName: plannedWorkout.exercises[0]?.name });
 
   const activeSnapshot = input.activeAggregate?.session.prescriptionSnapshot;
   const activeIndex = activeSnapshot && typeof activeSnapshot.planSessionIndex === "number" ? activeSnapshot.planSessionIndex : null;
