@@ -58,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const unsubscribe = service.onAuthStateChange((nextSession) => {
       setSession(nextSession);
+      if (nextSession) setIsOfflineMode(false);
       setIsLoading(false);
       logAuthStage(nextSession ? "auth state: signed in" : "auth state: signed out");
     });

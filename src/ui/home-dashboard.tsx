@@ -16,7 +16,7 @@ export function HomeDashboard({ projection, onAction, startup }: Readonly<{
     {startup && startup.status !== "ready" && startup.status !== "idle" ? <StartupNotice status={startup.status} onRetry={startup.onRetry} /> : null}
     {projection.primary ? <Objective primary={projection.primary} projection={projection} onAction={onAction} prep={prep} /> : null}
     {projection.programme ? <ProgrammePosition projection={projection} /> : null}
-    {projection.attention ? <EvidenceNotice projection={projection} onAction={onAction} /> : null}
+    {projection.attention && !projection.primary ? <EvidenceNotice projection={projection} onAction={onAction} /> : null}
     {projection.conditioning ? <FlatSection eyebrow="Next support work" title={projection.conditioning.title} detail={`${projection.conditioning.detail} · ${projection.conditioning.placement}`} /> : null}
     {projection.recent ? <FlatSection eyebrow="Recent work" title={projection.recent.title} detail={projection.recent.detail} /> : null}
     {projection.status === "ready" && projection.progress.reviewAvailable ? <ProgressLink projection={projection} onAction={onAction} /> : null}
