@@ -479,7 +479,6 @@ function CanonicalTrainExperience() {
           onNext={() => activeExerciseIndex < presentation.exercises.length - 1 && selectExercise(presentation.exercises[activeExerciseIndex + 1]!.id)}
           onOpen={() => setExerciseSwitcherOpen(true)}
         />
-        <Pressable testID={stableUiIdentifier("action", "Swap or add exercise")} accessibilityRole="button" accessibilityLabel="Swap or add exercise" onPress={() => router.push({ pathname: "/(protected)/programmes/manage", params: { recordedSessionId: aggregate.session.recordedSessionId, plannedSessionId: aggregate.session.plannedSessionId } })} style={({ pressed }) => [styles.exerciseEditAction, pressed && styles.pressed]}><Text style={styles.exerciseEditActionText}>Swap or add exercise</Text><Text accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.exerciseEditGlyph}>›</Text></Pressable>
         {activeExercise ? <ActiveExerciseCard
           key={activeExercise.id}
           exercise={activeExercise}
@@ -500,6 +499,7 @@ function CanonicalTrainExperience() {
           onSaveEdit={(set) => saveEdit(activeExercise, set)}
           onComplete={(set) => recordSet(activeExercise, set)}
         /> : null}
+        <Pressable testID={stableUiIdentifier("action", "Swap or add exercise")} accessibilityRole="button" accessibilityLabel="Swap or add exercise" onPress={() => router.push({ pathname: "/(protected)/programmes/manage", params: { recordedSessionId: aggregate.session.recordedSessionId, plannedSessionId: aggregate.session.plannedSessionId } })} style={({ pressed }) => [styles.exerciseEditAction, pressed && styles.pressed]}><Text style={styles.exerciseEditActionText}>Swap or add exercise</Text><Text accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.exerciseEditGlyph}>›</Text></Pressable>
         {completion.normalFinishAvailable ? <FinishPanel presentation={presentation} busy={busy} onFinish={() => setModal("finish_complete")} /> : null}
       </ScrollView>
     </KeyboardAvoidingView>

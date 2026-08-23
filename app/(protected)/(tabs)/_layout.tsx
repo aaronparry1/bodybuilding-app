@@ -1,4 +1,5 @@
 import { Tabs, useSegments } from "expo-router";
+import { useEffect, useState } from "react";
 import { AccessibilityInfo, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
@@ -66,7 +67,12 @@ export default function MainTabsLayout() {
 
 function CompactTabBar({ state, descriptors, navigation, onBeforeNavigate }: TabBarProps) {
   const insets = useSafeAreaInsets();
+  const [, refresh] = useState(0);
+  useEffect(() => canonicalActivePlanState.subscribe(() => refresh((value) => value + 1)), []);
   const routes = state.routes.filter((route) => route.name !== "account" && descriptors[route.key]?.options.href !== null);
+  const focusedRoute = state.routes[state.index]?.name;
+  const activeAttempt = canonicalActivePlanState.getReadModel()?.activeRecordedSession;
+  if (focusedRoute === "train" && activeAttempt && ["pending", "started", "paused"].includes(activeAttempt.status)) return null;
   return <View accessibilityRole="tablist" style={{ height: getTabBarHeight(insets.bottom), flexDirection: "row", alignItems: "flex-start", paddingHorizontal: spacing.xs, paddingTop: 4, paddingBottom: Math.max(insets.bottom, 6), backgroundColor: colors.backgroundElevated, borderTopWidth: 1, borderTopColor: colors.line }}>
     {routes.map((route) => {
       const routeIndex = state.routes.findIndex((candidate) => candidate.key === route.key);
