@@ -6198,7 +6198,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "availableSessionMinutes": 75
       },
       "ownedDifferences": {
-        "totalWorkingSets": 110,
+        "totalWorkingSets": 109,
         "directSets": {
           "chest": 12,
           "anterior_delts": 10,
@@ -6211,7 +6211,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "quadriceps": 7,
           "hip_extension": 6,
           "hamstrings_knee_flexion": 6,
-          "calves": 5
+          "calves": 4
         },
         "policyTargets": {
           "chest": 10,
@@ -6519,9 +6519,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "exercises": [
               {
                 "exerciseId": "ex-donkey-calf-raise",
-                "sets": 5,
+                "sets": 4,
                 "exactReps": [
-                  15,
                   15,
                   15,
                   15,

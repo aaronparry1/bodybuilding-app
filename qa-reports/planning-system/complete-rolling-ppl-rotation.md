@@ -436,12 +436,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           }
         ],
         "workingSets": 18,
-        "estimatedMinutes": 54,
+        "estimatedMinutes": 57,
         "durationBreakdown": {
           "generalWarmup": 240,
           "liftSpecificRamp": 390,
           "workingSetExecution": 720,
-          "prescribedInterSetRest": 1500,
+          "prescribedInterSetRest": 1680,
           "equipmentSetup": 180,
           "exerciseTransitions": 150,
           "unilateralOverhead": 0,
@@ -811,12 +811,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           }
         ],
         "workingSets": 18,
-        "estimatedMinutes": 55,
+        "estimatedMinutes": 58,
         "durationBreakdown": {
           "generalWarmup": 240,
           "liftSpecificRamp": 420,
           "workingSetExecution": 720,
-          "prescribedInterSetRest": 1500,
+          "prescribedInterSetRest": 1680,
           "equipmentSetup": 180,
           "exerciseTransitions": 150,
           "unilateralOverhead": 0,
@@ -1183,12 +1183,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           }
         ],
         "workingSets": 20,
-        "estimatedMinutes": 65,
+        "estimatedMinutes": 68,
         "durationBreakdown": {
           "generalWarmup": 240,
           "liftSpecificRamp": 420,
           "workingSetExecution": 800,
-          "prescribedInterSetRest": 1830,
+          "prescribedInterSetRest": 2010,
           "equipmentSetup": 180,
           "exerciseTransitions": 150,
           "unilateralOverhead": 210,
@@ -1495,12 +1495,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           }
         ],
         "workingSets": 13,
-        "estimatedMinutes": 42,
+        "estimatedMinutes": 44,
         "durationBreakdown": {
           "generalWarmup": 240,
           "liftSpecificRamp": 360,
           "workingSetExecution": 520,
-          "prescribedInterSetRest": 1080,
+          "prescribedInterSetRest": 1170,
           "equipmentSetup": 150,
           "exerciseTransitions": 120,
           "unilateralOverhead": 0,
@@ -1865,12 +1865,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           }
         ],
         "workingSets": 16,
-        "estimatedMinutes": 51,
+        "estimatedMinutes": 53,
         "durationBreakdown": {
           "generalWarmup": 240,
           "liftSpecificRamp": 420,
           "workingSetExecution": 640,
-          "prescribedInterSetRest": 1320,
+          "prescribedInterSetRest": 1440,
           "equipmentSetup": 180,
           "exerciseTransitions": 150,
           "unilateralOverhead": 0,
@@ -2277,12 +2277,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           }
         ],
         "workingSets": 16,
-        "estimatedMinutes": 48,
+        "estimatedMinutes": 51,
         "durationBreakdown": {
           "generalWarmup": 240,
           "liftSpecificRamp": 420,
           "workingSetExecution": 640,
-          "prescribedInterSetRest": 1020,
+          "prescribedInterSetRest": 1200,
           "equipmentSetup": 210,
           "exerciseTransitions": 180,
           "unilateralOverhead": 70,
@@ -2312,7 +2312,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
       }
     ],
     "totalWorkingSets": 101,
-    "estimatedMinutes": 315,
+    "estimatedMinutes": 331,
     "directSets": {
       "chest": 10,
       "anterior_delts": 7,

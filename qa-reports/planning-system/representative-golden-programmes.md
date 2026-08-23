@@ -41,7 +41,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:beginner",
             "frequency:2",
             "mesocycle:hypertrophy_calibration",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -96,7 +97,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Full Body hypertrophy A",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 15,
-          "estimatedMinutes": 53,
+          "estimatedMinutes": 54,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 15,
@@ -535,7 +536,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           12
         ],
         "perSessionEstimatedMinutes": [
-          53,
+          54,
           45
         ],
         "fatigueUnits": {
@@ -682,7 +683,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:3",
             "mesocycle:hypertrophy_calibration",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -1522,7 +1524,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:4",
             "mesocycle:hypertrophy_calibration",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -1610,7 +1613,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 21,
-          "estimatedMinutes": 64,
+          "estimatedMinutes": 67,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 21,
@@ -1862,7 +1865,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 46,
+          "estimatedMinutes": 48,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -2101,7 +2104,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 21,
-          "estimatedMinutes": 64,
+          "estimatedMinutes": 67,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 21,
@@ -2354,7 +2357,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 46,
+          "estimatedMinutes": 48,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -2654,10 +2657,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           14
         ],
         "perSessionEstimatedMinutes": [
-          64,
-          46,
-          64,
-          46
+          67,
+          48,
+          67,
+          48
         ],
         "fatigueUnits": {
           "perSession": [
@@ -2824,7 +2827,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:5",
             "mesocycle:hypertrophy_calibration",
-            "schedule:asymmetric_rotation"
+            "schedule:asymmetric_rotation",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -2926,7 +2930,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy A",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 18,
-          "estimatedMinutes": 54,
+          "estimatedMinutes": 57,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 18,
@@ -3173,7 +3177,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy B",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 18,
-          "estimatedMinutes": 55,
+          "estimatedMinutes": 58,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 18,
@@ -3424,7 +3428,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Legs hypertrophy C",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 20,
-          "estimatedMinutes": 65,
+          "estimatedMinutes": 68,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 20,
@@ -3675,7 +3679,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy D",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 13,
-          "estimatedMinutes": 42,
+          "estimatedMinutes": 44,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 13,
@@ -3880,7 +3884,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy E",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 16,
-          "estimatedMinutes": 51,
+          "estimatedMinutes": 53,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 16,
@@ -4192,11 +4196,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           16
         ],
         "perSessionEstimatedMinutes": [
-          54,
-          55,
-          65,
-          42,
-          51
+          57,
+          58,
+          68,
+          44,
+          53
         ],
         "fatigueUnits": {
           "perSession": [
@@ -4356,7 +4360,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:6",
             "mesocycle:hypertrophy_calibration",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -4474,7 +4479,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy A",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 43,
+          "estimatedMinutes": 45,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -4713,7 +4718,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy B",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 44,
+          "estimatedMinutes": 46,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -4956,7 +4961,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Legs hypertrophy C",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 15,
-          "estimatedMinutes": 48,
+          "estimatedMinutes": 51,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 15,
@@ -5197,7 +5202,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy D",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 12,
-          "estimatedMinutes": 39,
+          "estimatedMinutes": 40,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 12,
@@ -5400,7 +5405,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy E",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 44,
+          "estimatedMinutes": 46,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -5642,7 +5647,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Legs hypertrophy F",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 15,
-          "estimatedMinutes": 46,
+          "estimatedMinutes": 48,
           "dosageAssessment": {
             "exerciseCount": 7,
             "workingSets": 15,
@@ -5984,12 +5989,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           15
         ],
         "perSessionEstimatedMinutes": [
-          43,
-          44,
-          48,
-          39,
-          44,
-          46
+          45,
+          46,
+          51,
+          40,
+          46,
+          48
         ],
         "fatigueUnits": {
           "perSession": [
@@ -6153,7 +6158,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:beginner",
             "frequency:3",
             "mesocycle:strength_general",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -6223,7 +6229,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Full body strength A",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 10,
-          "estimatedMinutes": 36,
+          "estimatedMinutes": 38,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 10,
@@ -6426,7 +6432,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Full body strength B",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 10,
-          "estimatedMinutes": 36,
+          "estimatedMinutes": 38,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 10,
@@ -6630,7 +6636,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Full body strength C",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 10,
-          "estimatedMinutes": 36,
+          "estimatedMinutes": 38,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 10,
@@ -6887,9 +6893,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           10
         ],
         "perSessionEstimatedMinutes": [
-          36,
-          36,
-          36
+          38,
+          38,
+          38
         ],
         "fatigueUnits": {
           "perSession": [
@@ -7051,7 +7057,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:4",
             "mesocycle:strength_general",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -7137,7 +7144,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper strength",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 14,
-          "estimatedMinutes": 45,
+          "estimatedMinutes": 47,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -7377,7 +7384,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower strength",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 14,
-          "estimatedMinutes": 51,
+          "estimatedMinutes": 54,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 14,
@@ -7586,7 +7593,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper strength",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 14,
-          "estimatedMinutes": 45,
+          "estimatedMinutes": 47,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -7827,7 +7834,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower strength",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 13,
-          "estimatedMinutes": 44,
+          "estimatedMinutes": 48,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 13,
@@ -8097,10 +8104,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           13
         ],
         "perSessionEstimatedMinutes": [
-          45,
-          51,
-          45,
-          44
+          47,
+          54,
+          47,
+          48
         ],
         "fatigueUnits": {
           "perSession": [
@@ -8259,7 +8266,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:3",
             "mesocycle:powerbuilding_foundation",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -8329,7 +8337,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Full body powerbuilding A",
           "purpose": "Establish repeatable squat, bench and deadlift",
           "workingSets": 15,
-          "estimatedMinutes": 54,
+          "estimatedMinutes": 57,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 15,
@@ -8542,7 +8550,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Full body powerbuilding B",
           "purpose": "Establish repeatable squat, bench and deadlift",
           "workingSets": 15,
-          "estimatedMinutes": 54,
+          "estimatedMinutes": 58,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 15,
@@ -8756,7 +8764,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Full body powerbuilding C",
           "purpose": "Establish repeatable squat, bench and deadlift",
           "workingSets": 15,
-          "estimatedMinutes": 54,
+          "estimatedMinutes": 57,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 15,
@@ -9023,9 +9031,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           15
         ],
         "perSessionEstimatedMinutes": [
-          54,
-          54,
-          54
+          57,
+          58,
+          57
         ],
         "fatigueUnits": {
           "perSession": [
@@ -9188,7 +9196,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:5",
             "mesocycle:powerbuilding_foundation",
-            "schedule:asymmetric_rotation"
+            "schedule:asymmetric_rotation",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -9286,7 +9295,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push strength and hypertrophy",
           "purpose": "Establish repeatable squat, bench and deadlift",
           "workingSets": 15,
-          "estimatedMinutes": 49,
+          "estimatedMinutes": 51,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 15,
@@ -9498,7 +9507,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull strength and hypertrophy",
           "purpose": "Establish repeatable squat, bench and deadlift",
           "workingSets": 14,
-          "estimatedMinutes": 46,
+          "estimatedMinutes": 49,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 14,
@@ -9709,7 +9718,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Legs strength and hypertrophy",
           "purpose": "Establish repeatable squat, bench and deadlift",
           "workingSets": 14,
-          "estimatedMinutes": 51,
+          "estimatedMinutes": 54,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 14,
@@ -9918,7 +9927,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push strength and hypertrophy",
           "purpose": "Establish repeatable squat, bench and deadlift",
           "workingSets": 15,
-          "estimatedMinutes": 49,
+          "estimatedMinutes": 51,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 15,
@@ -10132,7 +10141,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull strength and hypertrophy",
           "purpose": "Establish repeatable squat, bench and deadlift",
           "workingSets": 14,
-          "estimatedMinutes": 46,
+          "estimatedMinutes": 49,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 14,
@@ -10404,11 +10413,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           14
         ],
         "perSessionEstimatedMinutes": [
-          49,
-          46,
           51,
           49,
-          46
+          54,
+          51,
+          49
         ],
         "fatigueUnits": {
           "perSession": [
@@ -10575,7 +10584,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:3",
             "mesocycle:athletic_general",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -10645,7 +10655,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Full body strength and power A",
           "purpose": "General athletic preparation",
           "workingSets": 10,
-          "estimatedMinutes": 38,
+          "estimatedMinutes": 40,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 10,
@@ -10848,7 +10858,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Full body strength and power B",
           "purpose": "General athletic preparation",
           "workingSets": 10,
-          "estimatedMinutes": 38,
+          "estimatedMinutes": 40,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 10,
@@ -11052,7 +11062,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Full body strength and power C",
           "purpose": "General athletic preparation",
           "workingSets": 10,
-          "estimatedMinutes": 38,
+          "estimatedMinutes": 40,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 10,
@@ -11309,9 +11319,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           10
         ],
         "perSessionEstimatedMinutes": [
-          38,
-          38,
-          38
+          40,
+          40,
+          40
         ],
         "fatigueUnits": {
           "perSession": [
@@ -11492,7 +11502,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:4",
             "mesocycle:hypertrophy_calibration",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -11580,7 +11591,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 21,
-          "estimatedMinutes": 64,
+          "estimatedMinutes": 67,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 21,
@@ -11832,7 +11843,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 46,
+          "estimatedMinutes": 48,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -12071,7 +12082,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 21,
-          "estimatedMinutes": 64,
+          "estimatedMinutes": 67,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 21,
@@ -12324,7 +12335,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 46,
+          "estimatedMinutes": 48,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -12624,10 +12635,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           14
         ],
         "perSessionEstimatedMinutes": [
-          64,
-          46,
-          64,
-          46
+          67,
+          48,
+          67,
+          48
         ],
         "fatigueUnits": {
           "perSession": [
@@ -12803,7 +12814,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:4",
             "mesocycle:hypertrophy_calibration",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -12887,7 +12899,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 21,
-          "estimatedMinutes": 64,
+          "estimatedMinutes": 67,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 21,
@@ -13139,7 +13151,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 48,
+          "estimatedMinutes": 50,
           "dosageAssessment": {
             "exerciseCount": 4,
             "workingSets": 14,
@@ -13190,8 +13202,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
               ]
             },
             {
-              "exerciseId": "ex-dumbbell-romanian-deadlift",
-              "exercise": "Dumbbell Romanian Deadlift",
+              "exerciseId": "ex-romanian-deadlift",
+              "exercise": "Romanian Deadlift",
               "movement": "hinge",
               "slotPurpose": "dumbbell hinge anchor",
               "directStimuli": [
@@ -13313,7 +13325,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 21,
-          "estimatedMinutes": 64,
+          "estimatedMinutes": 67,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 21,
@@ -13569,7 +13581,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 48,
+          "estimatedMinutes": 50,
           "dosageAssessment": {
             "exerciseCount": 4,
             "workingSets": 14,
@@ -13657,8 +13669,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
                 "fatigue:high",
                 "recovery:normal",
                 "stability:moderate",
-                "repeat:not_repeated",
-                "preference_score:0"
+                "repeat:variation_preferred",
+                "preference_score:0",
+                "repeat:no_unused_equivalent_available"
               ]
             },
             {
@@ -13804,10 +13817,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           14
         ],
         "perSessionEstimatedMinutes": [
-          64,
-          48,
-          64,
-          48
+          67,
+          50,
+          67,
+          50
         ],
         "fatigueUnits": {
           "perSession": [
@@ -13832,6 +13845,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           },
           {
             "exerciseId": "ex-pull-up",
+            "count": 2,
+            "reason": "only_equivalent_available"
+          },
+          {
+            "exerciseId": "ex-romanian-deadlift",
             "count": 2,
             "reason": "only_equivalent_available"
           }
@@ -13936,6 +13954,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "repeat_authorised:ex-bulgarian-split-squat",
             "repeat_authorised:ex-dumbbell-bench-press",
             "repeat_authorised:ex-pull-up",
+            "repeat_authorised:ex-romanian-deadlift",
             "session_systemic_fatigue_reported_for_comparison",
             "same_role_sessions_complementary:upper",
             "same_role_sessions_complementary:lower",
@@ -13977,7 +13996,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:4",
             "mesocycle:hypertrophy_calibration",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -14064,7 +14084,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 21,
-          "estimatedMinutes": 64,
+          "estimatedMinutes": 67,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 21,
@@ -14315,7 +14335,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 16,
-          "estimatedMinutes": 49,
+          "estimatedMinutes": 51,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 16,
@@ -14554,7 +14574,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 21,
-          "estimatedMinutes": 64,
+          "estimatedMinutes": 67,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 21,
@@ -14806,7 +14826,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 44,
+          "estimatedMinutes": 46,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 14,
@@ -15070,10 +15090,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           14
         ],
         "perSessionEstimatedMinutes": [
-          64,
-          49,
-          64,
-          44
+          67,
+          51,
+          67,
+          46
         ],
         "fatigueUnits": {
           "perSession": [
@@ -15248,7 +15268,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:4",
             "mesocycle:strength_general",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -15334,7 +15355,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper strength",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 14,
-          "estimatedMinutes": 45,
+          "estimatedMinutes": 47,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -15574,7 +15595,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower strength",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 14,
-          "estimatedMinutes": 51,
+          "estimatedMinutes": 54,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 14,
@@ -15783,7 +15804,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper strength",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 14,
-          "estimatedMinutes": 45,
+          "estimatedMinutes": 47,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -16024,7 +16045,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower strength",
           "purpose": "Build work capacity and movement tolerance",
           "workingSets": 13,
-          "estimatedMinutes": 44,
+          "estimatedMinutes": 48,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 13,
@@ -16294,10 +16315,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           13
         ],
         "perSessionEstimatedMinutes": [
-          45,
-          51,
-          45,
-          44
+          47,
+          54,
+          47,
+          48
         ],
         "fatigueUnits": {
           "perSession": [
@@ -16456,7 +16477,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:5",
             "mesocycle:hypertrophy_calibration",
-            "schedule:asymmetric_rotation"
+            "schedule:asymmetric_rotation",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -16559,7 +16581,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy A",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 18,
-          "estimatedMinutes": 52,
+          "estimatedMinutes": 55,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 18,
@@ -16812,7 +16834,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy B",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 20,
-          "estimatedMinutes": 59,
+          "estimatedMinutes": 62,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 20,
@@ -17073,7 +17095,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Legs hypertrophy C",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 22,
-          "estimatedMinutes": 68,
+          "estimatedMinutes": 72,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 22,
@@ -17334,7 +17356,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy D",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 17,
-          "estimatedMinutes": 49,
+          "estimatedMinutes": 51,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 17,
@@ -17584,7 +17606,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy E",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 18,
-          "estimatedMinutes": 52,
+          "estimatedMinutes": 55,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 18,
@@ -17906,11 +17928,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           18
         ],
         "perSessionEstimatedMinutes": [
-          52,
-          59,
-          68,
-          49,
-          52
+          55,
+          62,
+          72,
+          51,
+          55
         ],
         "fatigueUnits": {
           "perSession": [
@@ -18070,7 +18092,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:5",
             "mesocycle:hypertrophy_calibration",
-            "schedule:asymmetric_rotation"
+            "schedule:asymmetric_rotation",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -18172,7 +18195,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy A",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 18,
-          "estimatedMinutes": 54,
+          "estimatedMinutes": 57,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 18,
@@ -18419,7 +18442,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy B",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 18,
-          "estimatedMinutes": 55,
+          "estimatedMinutes": 58,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 18,
@@ -18670,7 +18693,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Legs hypertrophy C",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 20,
-          "estimatedMinutes": 65,
+          "estimatedMinutes": 68,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 20,
@@ -18921,7 +18944,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy D",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 13,
-          "estimatedMinutes": 42,
+          "estimatedMinutes": 44,
           "dosageAssessment": {
             "exerciseCount": 5,
             "workingSets": 13,
@@ -19126,7 +19149,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy E",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 16,
-          "estimatedMinutes": 51,
+          "estimatedMinutes": 53,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 16,
@@ -19438,11 +19461,11 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           16
         ],
         "perSessionEstimatedMinutes": [
-          54,
-          55,
-          65,
-          42,
-          51
+          57,
+          58,
+          68,
+          44,
+          53
         ],
         "fatigueUnits": {
           "perSession": [
@@ -19603,7 +19626,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:4",
             "mesocycle:hypertrophy_calibration",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {
@@ -19691,7 +19715,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 21,
-          "estimatedMinutes": 64,
+          "estimatedMinutes": 67,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 21,
@@ -19943,7 +19967,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 46,
+          "estimatedMinutes": 48,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -20182,7 +20206,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Upper hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 21,
-          "estimatedMinutes": 64,
+          "estimatedMinutes": 67,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 21,
@@ -20435,7 +20459,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Lower hypertrophy",
           "purpose": "Establish reproducible exercise, load and recovery baselines",
           "workingSets": 14,
-          "estimatedMinutes": 46,
+          "estimatedMinutes": 48,
           "dosageAssessment": {
             "exerciseCount": 6,
             "workingSets": 14,
@@ -20735,10 +20759,10 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           14
         ],
         "perSessionEstimatedMinutes": [
-          64,
-          46,
-          64,
-          46
+          67,
+          48,
+          67,
+          48
         ],
         "fatigueUnits": {
           "perSession": [
@@ -20905,7 +20929,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
             "experience:intermediate",
             "frequency:3",
             "mesocycle:hypertrophy_calibration",
-            "schedule:calendar_week"
+            "schedule:calendar_week",
+            "training_priority:balanced"
           ],
           "sessionReasons": [
             {

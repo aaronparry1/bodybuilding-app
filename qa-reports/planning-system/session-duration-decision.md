@@ -9,8 +9,8 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
   "commitmentMeaning": "days_per_week_only",
   "currentAcceptanceOwner": "canonical_session_duration_policy_v2 validated by canonical active-plan application and enforced by canonical_microcycle_volume_policy_v4",
   "currentEstimatedRangeMinutes": [
-    42,
-    65
+    44,
+    68
   ],
   "currentMaximumMinutes": 90,
   "supportedMinutes": [
@@ -39,12 +39,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy A",
           "exercises": 6,
           "workingSets": 18,
-          "estimatedMinutes": 54,
+          "estimatedMinutes": 57,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 390,
             "workingSetExecution": 720,
-            "prescribedInterSetRest": 1500,
+            "prescribedInterSetRest": 1680,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 0,
@@ -57,12 +57,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy B",
           "exercises": 6,
           "workingSets": 18,
-          "estimatedMinutes": 55,
+          "estimatedMinutes": 58,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 420,
             "workingSetExecution": 720,
-            "prescribedInterSetRest": 1500,
+            "prescribedInterSetRest": 1680,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 0,
@@ -75,12 +75,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Legs hypertrophy C",
           "exercises": 5,
           "workingSets": 16,
-          "estimatedMinutes": 56,
+          "estimatedMinutes": 58,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 390,
             "workingSetExecution": 640,
-            "prescribedInterSetRest": 1560,
+            "prescribedInterSetRest": 1650,
             "equipmentSetup": 150,
             "exerciseTransitions": 120,
             "unilateralOverhead": 210,
@@ -93,12 +93,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy D",
           "exercises": 6,
           "workingSets": 17,
-          "estimatedMinutes": 51,
+          "estimatedMinutes": 54,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 390,
             "workingSetExecution": 680,
-            "prescribedInterSetRest": 1350,
+            "prescribedInterSetRest": 1530,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 0,
@@ -111,12 +111,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy E",
           "exercises": 6,
           "workingSets": 16,
-          "estimatedMinutes": 51,
+          "estimatedMinutes": 53,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 420,
             "workingSetExecution": 640,
-            "prescribedInterSetRest": 1320,
+            "prescribedInterSetRest": 1440,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 0,
@@ -126,7 +126,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "allRetainedExercisesUseful": true
         }
       ],
-      "maximumObservedMinutes": 56
+      "maximumObservedMinutes": 58
     },
     {
       "availableSessionMinutes": 75,
@@ -136,12 +136,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy A",
           "exercises": 6,
           "workingSets": 18,
-          "estimatedMinutes": 54,
+          "estimatedMinutes": 57,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 390,
             "workingSetExecution": 720,
-            "prescribedInterSetRest": 1500,
+            "prescribedInterSetRest": 1680,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 0,
@@ -154,12 +154,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy B",
           "exercises": 6,
           "workingSets": 18,
-          "estimatedMinutes": 55,
+          "estimatedMinutes": 58,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 420,
             "workingSetExecution": 720,
-            "prescribedInterSetRest": 1500,
+            "prescribedInterSetRest": 1680,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 0,
@@ -172,12 +172,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Legs hypertrophy C",
           "exercises": 6,
           "workingSets": 20,
-          "estimatedMinutes": 65,
+          "estimatedMinutes": 68,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 420,
             "workingSetExecution": 800,
-            "prescribedInterSetRest": 1830,
+            "prescribedInterSetRest": 2010,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 210,
@@ -190,12 +190,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy D",
           "exercises": 5,
           "workingSets": 13,
-          "estimatedMinutes": 42,
+          "estimatedMinutes": 44,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 360,
             "workingSetExecution": 520,
-            "prescribedInterSetRest": 1080,
+            "prescribedInterSetRest": 1170,
             "equipmentSetup": 150,
             "exerciseTransitions": 120,
             "unilateralOverhead": 0,
@@ -208,12 +208,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy E",
           "exercises": 6,
           "workingSets": 16,
-          "estimatedMinutes": 51,
+          "estimatedMinutes": 53,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 420,
             "workingSetExecution": 640,
-            "prescribedInterSetRest": 1320,
+            "prescribedInterSetRest": 1440,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 0,
@@ -223,7 +223,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "allRetainedExercisesUseful": true
         }
       ],
-      "maximumObservedMinutes": 65
+      "maximumObservedMinutes": 68
     },
     {
       "availableSessionMinutes": 90,
@@ -233,12 +233,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy A",
           "exercises": 6,
           "workingSets": 18,
-          "estimatedMinutes": 54,
+          "estimatedMinutes": 57,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 390,
             "workingSetExecution": 720,
-            "prescribedInterSetRest": 1500,
+            "prescribedInterSetRest": 1680,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 0,
@@ -251,12 +251,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy B",
           "exercises": 6,
           "workingSets": 18,
-          "estimatedMinutes": 55,
+          "estimatedMinutes": 58,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 420,
             "workingSetExecution": 720,
-            "prescribedInterSetRest": 1500,
+            "prescribedInterSetRest": 1680,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 0,
@@ -269,12 +269,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Legs hypertrophy C",
           "exercises": 6,
           "workingSets": 20,
-          "estimatedMinutes": 65,
+          "estimatedMinutes": 68,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 420,
             "workingSetExecution": 800,
-            "prescribedInterSetRest": 1830,
+            "prescribedInterSetRest": 2010,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 210,
@@ -287,12 +287,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Push hypertrophy D",
           "exercises": 5,
           "workingSets": 13,
-          "estimatedMinutes": 42,
+          "estimatedMinutes": 44,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 360,
             "workingSetExecution": 520,
-            "prescribedInterSetRest": 1080,
+            "prescribedInterSetRest": 1170,
             "equipmentSetup": 150,
             "exerciseTransitions": 120,
             "unilateralOverhead": 0,
@@ -305,12 +305,12 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "role": "Pull hypertrophy E",
           "exercises": 6,
           "workingSets": 16,
-          "estimatedMinutes": 51,
+          "estimatedMinutes": 53,
           "durationBreakdown": {
             "generalWarmup": 240,
             "liftSpecificRamp": 420,
             "workingSetExecution": 640,
-            "prescribedInterSetRest": 1320,
+            "prescribedInterSetRest": 1440,
             "equipmentSetup": 180,
             "exerciseTransitions": 150,
             "unilateralOverhead": 0,
@@ -320,7 +320,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
           "allRetainedExercisesUseful": true
         }
       ],
-      "maximumObservedMinutes": 65
+      "maximumObservedMinutes": 68
     }
   ],
   "userSpecificLimitClaimed": true,

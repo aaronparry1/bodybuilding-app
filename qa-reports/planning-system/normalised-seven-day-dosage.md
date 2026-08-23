@@ -8,7 +8,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
   "basis": "complete_six_session_rotation_scaled_by_five_lifting_sessions_per_seven_days",
   "completeRotation": {
     "totalWorkingSets": 101,
-    "estimatedMinutes": 315,
+    "estimatedMinutes": 331,
     "directSets": {
       "chest": 10,
       "anterior_delts": 7,
@@ -51,7 +51,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
   },
   "averageSevenDays": {
     "totalWorkingSets": 84.17,
-    "estimatedMinutes": 262.5,
+    "estimatedMinutes": 275.83,
     "directSets": {
       "chest": 8.33,
       "anterior_delts": 5.83,
@@ -92,7 +92,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
     },
     "systemicFatigueUnits": 136.67,
     "cardioMinutes": 40,
-    "totalTrainingMinutes": 302.5
+    "totalTrainingMinutes": 315.83
   },
   "secondaryAccountingRule": "Meaningful secondary work is counted as whole programmed-set exposures from exercise metadata. Decimal values are rotation-to-calendar averages only, never fractional direct-set credit.",
   "calendarSlices": [
@@ -111,7 +111,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "legs": 1
       },
       "totalWorkingSets": 85,
-      "estimatedMinutes": 267,
+      "estimatedMinutes": 280,
       "directSets": {
         "chest": 10,
         "anterior_delts": 7,
@@ -166,7 +166,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "legs": 2
       },
       "totalWorkingSets": 85,
-      "estimatedMinutes": 264,
+      "estimatedMinutes": 278,
       "directSets": {
         "hip_extension": 10,
         "quadriceps": 10,
@@ -222,7 +222,7 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "legs": 2
       },
       "totalWorkingSets": 88,
-      "estimatedMinutes": 273,
+      "estimatedMinutes": 287,
       "directSets": {
         "upper_back": 10,
         "lats": 10,

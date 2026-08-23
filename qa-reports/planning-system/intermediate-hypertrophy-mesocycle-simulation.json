@@ -6193,7 +6193,7 @@
         "availableSessionMinutes": 75
       },
       "ownedDifferences": {
-        "totalWorkingSets": 110,
+        "totalWorkingSets": 109,
         "directSets": {
           "chest": 12,
           "anterior_delts": 10,
@@ -6206,7 +6206,7 @@
           "quadriceps": 7,
           "hip_extension": 6,
           "hamstrings_knee_flexion": 6,
-          "calves": 5
+          "calves": 4
         },
         "policyTargets": {
           "chest": 10,
@@ -6514,9 +6514,8 @@
             "exercises": [
               {
                 "exerciseId": "ex-donkey-calf-raise",
-                "sets": 5,
+                "sets": 4,
                 "exactReps": [
-                  15,
                   15,
                   15,
                   15,

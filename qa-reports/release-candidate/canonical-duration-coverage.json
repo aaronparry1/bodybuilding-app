@@ -19,43 +19,43 @@
     {
       "minutes": 30,
       "feasibility": "infeasible",
-      "calendarSliceWorkingSets": 44,
+      "calendarSliceWorkingSets": 40,
       "sessions": [
         {
           "role": "Push hypertrophy A",
-          "sessionWorkingSets": 9,
-          "estimatedMinutes": 30
+          "sessionWorkingSets": 8,
+          "estimatedMinutes": 28
         },
         {
           "role": "Pull hypertrophy B",
-          "sessionWorkingSets": 9,
-          "estimatedMinutes": 30
+          "sessionWorkingSets": 8,
+          "estimatedMinutes": 28
         },
         {
           "role": "Legs hypertrophy C",
           "sessionWorkingSets": 8,
-          "estimatedMinutes": 29
+          "estimatedMinutes": 30
         },
         {
           "role": "Push hypertrophy D",
-          "sessionWorkingSets": 9,
-          "estimatedMinutes": 30
+          "sessionWorkingSets": 8,
+          "estimatedMinutes": 28
         },
         {
           "role": "Pull hypertrophy E",
-          "sessionWorkingSets": 9,
-          "estimatedMinutes": 30
+          "sessionWorkingSets": 8,
+          "estimatedMinutes": 28
         }
       ],
       "completeRotationDirectSets": {
         "chest": 4,
         "anterior_delts": 4,
-        "lateral_delts": 6,
+        "lateral_delts": 4,
         "triceps": 4,
         "upper_back": 4,
         "lats": 4,
         "rear_delts": 4,
-        "biceps": 6,
+        "biceps": 4,
         "quadriceps": 4,
         "hip_extension": 4,
         "hamstrings_knee_flexion": 4,
@@ -64,12 +64,12 @@
       "normalizedSevenDayDirectSets": {
         "chest": 3.33,
         "anterior_delts": 3.33,
-        "lateral_delts": 5,
+        "lateral_delts": 3.33,
         "triceps": 3.33,
         "upper_back": 3.33,
         "lats": 3.33,
         "rear_delts": 3.33,
-        "biceps": 5,
+        "biceps": 3.33,
         "quadriceps": 3.33,
         "hip_extension": 3.33,
         "hamstrings_knee_flexion": 3.33,
@@ -125,44 +125,7 @@
           "sessionRole": "Legs hypertrophy F"
         }
       ],
-      "redistributions": [
-        {
-          "stimulus": "biceps",
-          "fromSessionIndex": 1,
-          "fromSessionRole": "Pull hypertrophy B",
-          "toSessionIndex": 4,
-          "toSessionRole": "Pull hypertrophy E",
-          "movedWorkingSets": 0,
-          "recoveredWorkingSets": 1
-        },
-        {
-          "stimulus": "biceps",
-          "fromSessionIndex": 1,
-          "fromSessionRole": "Pull hypertrophy B",
-          "toSessionIndex": 1,
-          "toSessionRole": "Pull hypertrophy B",
-          "movedWorkingSets": 0,
-          "recoveredWorkingSets": 1
-        },
-        {
-          "stimulus": "lateral_delts",
-          "fromSessionIndex": 0,
-          "fromSessionRole": "Push hypertrophy A",
-          "toSessionIndex": 3,
-          "toSessionRole": "Push hypertrophy D",
-          "movedWorkingSets": 0,
-          "recoveredWorkingSets": 1
-        },
-        {
-          "stimulus": "lateral_delts",
-          "fromSessionIndex": 0,
-          "fromSessionRole": "Push hypertrophy A",
-          "toSessionIndex": 0,
-          "toSessionRole": "Push hypertrophy A",
-          "movedWorkingSets": 0,
-          "recoveredWorkingSets": 1
-        }
-      ],
+      "redistributions": [],
       "recoveredLater": [
         {
           "stimulus": "chest",
@@ -255,81 +218,78 @@
     {
       "minutes": 45,
       "feasibility": "infeasible",
-      "calendarSliceWorkingSets": 69,
+      "calendarSliceWorkingSets": 65,
       "sessions": [
         {
           "role": "Push hypertrophy A",
-          "sessionWorkingSets": 14,
-          "estimatedMinutes": 45
+          "sessionWorkingSets": 13,
+          "estimatedMinutes": 43
         },
         {
           "role": "Pull hypertrophy B",
-          "sessionWorkingSets": 14,
-          "estimatedMinutes": 45
-        },
-        {
-          "role": "Legs hypertrophy C",
           "sessionWorkingSets": 13,
           "estimatedMinutes": 44
         },
         {
-          "role": "Push hypertrophy D",
-          "sessionWorkingSets": 14,
+          "role": "Legs hypertrophy C",
+          "sessionWorkingSets": 13,
           "estimatedMinutes": 45
         },
         {
+          "role": "Push hypertrophy D",
+          "sessionWorkingSets": 13,
+          "estimatedMinutes": 44
+        },
+        {
           "role": "Pull hypertrophy E",
-          "sessionWorkingSets": 14,
-          "estimatedMinutes": 45
+          "sessionWorkingSets": 13,
+          "estimatedMinutes": 44
         }
       ],
       "completeRotationDirectSets": {
         "chest": 10,
-        "anterior_delts": 6,
-        "lateral_delts": 6,
+        "anterior_delts": 5,
+        "lateral_delts": 5,
         "triceps": 6,
         "upper_back": 10,
         "lats": 8,
         "rear_delts": 4,
-        "biceps": 6,
+        "biceps": 4,
         "quadriceps": 8,
         "hip_extension": 8,
         "hamstrings_knee_flexion": 4,
-        "calves": 5,
-        "core": 2
+        "calves": 6
       },
       "normalizedSevenDayDirectSets": {
         "chest": 8.33,
-        "anterior_delts": 5,
-        "lateral_delts": 5,
+        "anterior_delts": 4.17,
+        "lateral_delts": 4.17,
         "triceps": 5,
         "upper_back": 8.33,
         "lats": 6.67,
         "rear_delts": 3.33,
-        "biceps": 5,
+        "biceps": 3.33,
         "quadriceps": 6.67,
         "hip_extension": 6.67,
         "hamstrings_knee_flexion": 3.33,
-        "calves": 4.17,
-        "core": 1.67
+        "calves": 5
       },
-      "omittedStimuliByCompleteRotationSession": [],
+      "omittedStimuliByCompleteRotationSession": [
+        {
+          "sessionIndex": 5,
+          "stimuli": [
+            "core"
+          ],
+          "sessionRole": "Legs hypertrophy F"
+        }
+      ],
       "redistributions": [
         {
-          "stimulus": "biceps",
-          "fromSessionIndex": 1,
-          "fromSessionRole": "Pull hypertrophy B",
-          "toSessionIndex": 4,
-          "toSessionRole": "Pull hypertrophy E",
-          "movedWorkingSets": 0,
-          "recoveredWorkingSets": 1
-        },
-        {
-          "stimulus": "biceps",
-          "fromSessionIndex": 1,
-          "fromSessionRole": "Pull hypertrophy B",
-          "toSessionIndex": 1,
-          "toSessionRole": "Pull hypertrophy B",
+          "stimulus": "calves",
+          "fromSessionIndex": 2,
+          "fromSessionRole": "Legs hypertrophy C",
+          "toSessionIndex": 5,
+          "toSessionRole": "Legs hypertrophy F",
           "movedWorkingSets": 0,
           "recoveredWorkingSets": 1
         },
@@ -341,18 +301,17 @@
           "toSessionRole": "Legs hypertrophy C",
           "movedWorkingSets": 0,
           "recoveredWorkingSets": 1
-        },
-        {
-          "stimulus": "lateral_delts",
-          "fromSessionIndex": 0,
-          "fromSessionRole": "Push hypertrophy A",
-          "toSessionIndex": 3,
-          "toSessionRole": "Push hypertrophy D",
-          "movedWorkingSets": 0,
-          "recoveredWorkingSets": 1
         }
       ],
-      "recoveredLater": [],
+      "recoveredLater": [
+        {
+          "stimulus": "core",
+          "recoveredInSessionRoles": [],
+          "normalizedSevenDayDirectSets": 0,
+          "authorisedFloor": 0,
+          "status": "recovered_later"
+        }
+      ],
       "durationInducedUnmetTargets": [
         "anterior_delts",
         "lateral_delts",
@@ -379,27 +338,27 @@
         {
           "role": "Push hypertrophy A",
           "sessionWorkingSets": 18,
-          "estimatedMinutes": 54
+          "estimatedMinutes": 57
         },
         {
           "role": "Pull hypertrophy B",
           "sessionWorkingSets": 18,
-          "estimatedMinutes": 55
+          "estimatedMinutes": 58
         },
         {
           "role": "Legs hypertrophy C",
           "sessionWorkingSets": 16,
-          "estimatedMinutes": 56
+          "estimatedMinutes": 58
         },
         {
           "role": "Push hypertrophy D",
           "sessionWorkingSets": 17,
-          "estimatedMinutes": 51
+          "estimatedMinutes": 54
         },
         {
           "role": "Pull hypertrophy E",
           "sessionWorkingSets": 16,
-          "estimatedMinutes": 51
+          "estimatedMinutes": 53
         }
       ],
       "completeRotationDirectSets": {
@@ -467,27 +426,27 @@
         {
           "role": "Push hypertrophy A",
           "sessionWorkingSets": 18,
-          "estimatedMinutes": 54
+          "estimatedMinutes": 57
         },
         {
           "role": "Pull hypertrophy B",
           "sessionWorkingSets": 18,
-          "estimatedMinutes": 55
+          "estimatedMinutes": 58
         },
         {
           "role": "Legs hypertrophy C",
           "sessionWorkingSets": 20,
-          "estimatedMinutes": 65
+          "estimatedMinutes": 68
         },
         {
           "role": "Push hypertrophy D",
           "sessionWorkingSets": 13,
-          "estimatedMinutes": 42
+          "estimatedMinutes": 44
         },
         {
           "role": "Pull hypertrophy E",
           "sessionWorkingSets": 16,
-          "estimatedMinutes": 51
+          "estimatedMinutes": 53
         }
       ],
       "completeRotationDirectSets": {
@@ -536,27 +495,27 @@
         {
           "role": "Push hypertrophy A",
           "sessionWorkingSets": 18,
-          "estimatedMinutes": 54
+          "estimatedMinutes": 57
         },
         {
           "role": "Pull hypertrophy B",
           "sessionWorkingSets": 18,
-          "estimatedMinutes": 55
+          "estimatedMinutes": 58
         },
         {
           "role": "Legs hypertrophy C",
           "sessionWorkingSets": 20,
-          "estimatedMinutes": 65
+          "estimatedMinutes": 68
         },
         {
           "role": "Push hypertrophy D",
           "sessionWorkingSets": 13,
-          "estimatedMinutes": 42
+          "estimatedMinutes": 44
         },
         {
           "role": "Pull hypertrophy E",
           "sessionWorkingSets": 16,
-          "estimatedMinutes": 51
+          "estimatedMinutes": 53
         }
       ],
       "completeRotationDirectSets": {

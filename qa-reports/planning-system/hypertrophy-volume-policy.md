@@ -260,9 +260,9 @@ Generated from `canonical_adaptive_planning_certification_v1`. This report is ev
         "triceps": 6,
         "calves": 6,
         "biceps": 6,
+        "hamstrings_knee_flexion": 6,
         "quadriceps": 8,
-        "hip_extension": 8,
-        "hamstrings_knee_flexion": 6
+        "hip_extension": 8
       },
       "secondarySets": {
         "triceps": 14,

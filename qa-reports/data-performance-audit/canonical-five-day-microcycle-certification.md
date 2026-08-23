@@ -14,7 +14,7 @@
 - Actual movement exposures: horizontal_push 4 · horizontal_pull 4 · isolation 10 · hinge 2 · vertical_pull 2 · squat 2 · hip_thrust 1
 - Lift exposures: bench primary 2, secondary variation 0 · squat primary 1, secondary variation 0 · deadlift primary 2, secondary variation 0
 - Current calendar-slice working sets by session: 15 / 14 / 14 / 15 / 14 (calendar-slice total 72 working sets)
-- Estimated minutes: 49 / 46 / 51 / 49 / 46
+- Estimated minutes: 51 / 49 / 54 / 51 / 49
 - Current calendar-slice fatigue units by session: 29 / 26 / 28 / 29 / 26 (calendar-slice total 138); overlap flags: more_than_three_primary_sessions
 - Current calendar-slice selected-exercise fatigue units by session: 29 / 26 / 28 / 29 / 26 (calendar-slice total 138)
 - Repeated exercises: ex-bench-press ×2 (stable_primary_practice) · ex-deadlift ×2 (stable_primary_practice)
@@ -23,7 +23,7 @@
 
 ## 1. Push strength and hypertrophy
 
-Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 49 minutes.
+Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 51 minutes.
 
 | # | Exercise | Slot purpose | Classification | Suitability | Repeat reason | Direct / meaningful secondary | Sets | Exact targets | Load/calibration | Rest | Fatigue |
 |---:|---|---|---|---|---|---|---:|---|---|---:|---|
@@ -35,7 +35,7 @@ Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 49 
 
 ## 2. Pull strength and hypertrophy
 
-Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 46 minutes.
+Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 49 minutes.
 
 | # | Exercise | Slot purpose | Classification | Suitability | Repeat reason | Direct / meaningful secondary | Sets | Exact targets | Load/calibration | Rest | Fatigue |
 |---:|---|---|---|---|---|---|---:|---|---|---:|---|
@@ -47,7 +47,7 @@ Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 46 
 
 ## 3. Legs strength and hypertrophy
 
-Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 51 minutes.
+Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 54 minutes.
 
 | # | Exercise | Slot purpose | Classification | Suitability | Repeat reason | Direct / meaningful secondary | Sets | Exact targets | Load/calibration | Rest | Fatigue |
 |---:|---|---|---|---|---|---|---:|---|---|---:|---|
@@ -59,7 +59,7 @@ Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 51 
 
 ## 4. Push strength and hypertrophy
 
-Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 49 minutes.
+Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 51 minutes.
 
 | # | Exercise | Slot purpose | Classification | Suitability | Repeat reason | Direct / meaningful secondary | Sets | Exact targets | Load/calibration | Rest | Fatigue |
 |---:|---|---|---|---|---|---|---:|---|---|---:|---|
@@ -71,7 +71,7 @@ Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 49 
 
 ## 5. Pull strength and hypertrophy
 
-Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 46 minutes.
+Purpose: Establish repeatable squat, bench and deadlift. Estimated duration: 49 minutes.
 
 | # | Exercise | Slot purpose | Classification | Suitability | Repeat reason | Direct / meaningful secondary | Sets | Exact targets | Load/calibration | Rest | Fatigue |
 |---:|---|---|---|---|---|---|---:|---|---|---:|---|
