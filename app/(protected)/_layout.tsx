@@ -25,7 +25,7 @@ import { PrimaryButton } from "@/ui/primitives";
 export default function ProtectedLayout() {
   const insets = useSafeAreaInsets();
   const { user, isLoading, isOfflineMode } = useAuth();
-  const { dataHydrationStatus, dataHydrationError, retryDataHydration } = useSubscription();
+  const { dataHydrationStatus, dataHydrationError, retryDataHydration, qaPremiumFixtureActive } = useSubscription();
   const { settings } = useAppSettings();
   const segments = useSegments();
   const { qaChrome, restart } = useGlobalSearchParams<{ qaChrome?: string; restart?: string }>();
@@ -113,7 +113,7 @@ export default function ProtectedLayout() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {showDesignQaChrome ? (
+      {showDesignQaChrome || qaPremiumFixtureActive ? (
         <View
           style={{
             backgroundColor: colors.accentSoft,
@@ -125,7 +125,7 @@ export default function ProtectedLayout() {
           }}
         >
           <Text selectable adjustsFontSizeToFit minimumFontScale={0.82} numberOfLines={1} style={{ color: colors.accent, fontSize: 12, lineHeight: 16, fontWeight: "900", textAlign: "center" }}>
-            Design QA fixture active: {activeFixture?.label}
+            {qaPremiumFixtureActive ? "Premium QA entitlement fixture — billing disabled for visual inspection" : `Design QA fixture active: ${activeFixture?.label}`}
           </Text>
         </View>
       ) : null}

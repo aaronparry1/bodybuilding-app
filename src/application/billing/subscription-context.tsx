@@ -6,6 +6,9 @@ import { MockRevenueCatGateway } from "@/application/billing/mock-revenuecat";
 import { restoreCloudDataForUser, syncLocalDataForUser } from "@/application/sync/cloud-data-sync";
 import { cacheSubscription, getCachedSubscription, getOfflineEntitlementFallback } from "@/application/billing/subscription-cache";
 import { elapsedSince, recordStartupTelemetry, STARTUP_RESTORE_DEADLINE_MS, StartupDeadlineError, withStartupDeadline } from "@/application/startup/startup-observability";
+import Constants from "expo-constants";
+import { getAppEnvironment } from "@/application/runtime/app-environment";
+import { applyQaPremiumFixture, isQaPremiumFixtureEnabled } from "@/application/billing/qa-premium-fixture";
 import {
   canAccess,
   buildRestorePurchasesFailureResult,
@@ -54,6 +57,7 @@ interface SubscriptionContextValue {
   presentPaywall(): Promise<void>;
   presentCustomerCenter(): Promise<void>;
   setMockStatus(status: SubscriptionStatus): Promise<void>;
+  qaPremiumFixtureActive: boolean;
 }
 
 const defaultSubscription: SubscriptionState = normalizeSubscriptionState({ status: "free", provider: "mock", willRenew: false });
@@ -81,6 +85,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [dataHydrationAttempt, setDataHydrationAttempt] = useState(0);
   const lastRestoredUserId = useRef<string | null>(null);
   const subscriptionRef = useRef(subscription);
+  const qaPremiumFixtureActive = isQaPremiumFixtureEnabled(
+    getAppEnvironment(),
+    (Constants.expoConfig?.extra as { qaPremiumFixture?: unknown } | undefined)?.qaPremiumFixture,
+  );
+  const effectiveSubscription = applyQaPremiumFixture(subscription, qaPremiumFixtureActive);
 
   useEffect(() => {
     subscriptionRef.current = subscription;
@@ -88,6 +97,12 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
+      if (qaPremiumFixtureActive) {
+        gateway.current = fallbackGateway.current;
+        setIsRevenueCatConfigured(false);
+        logBillingStage("QA premium fixture: live billing gateway disabled");
+        return;
+      }
       const nextGateway = createSubscriptionGateway();
       gateway.current = nextGateway;
       const revenueCatReady = nextGateway.getProvider?.() === "revenuecat" && nextGateway.isConfigured();
@@ -282,17 +297,18 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   );
 
   const entitlement = useCallback(
-    (nextEntitlement: EntitlementKey, context?: EntitlementContext) => getEntitlement(subscription, nextEntitlement, context),
-    [subscription],
+    (nextEntitlement: EntitlementKey, context?: EntitlementContext) => getEntitlement(effectiveSubscription, nextEntitlement, context),
+    [effectiveSubscription],
   );
 
   const canAccessEntitlement = useCallback(
-    (nextEntitlement: EntitlementKey, context?: EntitlementContext) => canAccess(subscription, nextEntitlement, context),
-    [subscription],
+    (nextEntitlement: EntitlementKey, context?: EntitlementContext) => canAccess(effectiveSubscription, nextEntitlement, context),
+    [effectiveSubscription],
   );
 
   const purchasePackage = useCallback(
     async (packageId: RevenueCatPackage["id"]) => {
+      if (qaPremiumFixtureActive) return;
       await runBillingAction(
         async (currentGateway) => {
           const fallbackPackages = currentGateway.getProvider?.() === "mock" ? subscriptionPackages : [];
@@ -308,10 +324,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         },
       );
     },
-    [packages, runBillingAction],
+    [packages, qaPremiumFixtureActive, runBillingAction],
   );
 
   const restorePurchases = useCallback(async () => {
+    if (qaPremiumFixtureActive) return { status: "no_active_purchase", message: "Billing actions are disabled while the Premium QA fixture is active." };
     setIsLoading(true);
     setError(null);
     setRestoreStatus("restoring");
@@ -336,9 +353,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [qaPremiumFixtureActive]);
 
   const presentPaywall = useCallback(async () => {
+    if (qaPremiumFixtureActive) return;
     if (!gateway.current.presentPaywall) return;
     await runBillingAction(
       async (currentGateway) => currentGateway.presentPaywall?.() ?? null,
@@ -346,9 +364,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         if (nextSubscription) setSubscription(cacheSubscription(nextSubscription));
       },
     );
-  }, [runBillingAction]);
+  }, [qaPremiumFixtureActive, runBillingAction]);
 
   const presentCustomerCenter = useCallback(async () => {
+    if (qaPremiumFixtureActive) return;
     if (!gateway.current.presentCustomerCenter) return;
     await runBillingAction(
       async (currentGateway) => {
@@ -357,26 +376,27 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       },
       (nextSubscription) => setSubscription(cacheSubscription(nextSubscription)),
     );
-  }, [runBillingAction]);
+  }, [qaPremiumFixtureActive, runBillingAction]);
 
   const setMockStatus = useCallback(async (status: SubscriptionStatus) => {
+    if (qaPremiumFixtureActive) return;
     if (!gateway.current.setMockStatus) return;
     setSubscription(cacheSubscription(await gateway.current.setMockStatus(status)));
-  }, []);
+  }, [qaPremiumFixtureActive]);
 
   const value = useMemo<SubscriptionContextValue>(
     () => ({
-      subscription,
+      subscription: effectiveSubscription,
       isLoading,
       error,
       packages,
-      planLabel: getPlanLabel(subscription),
-      provider: subscription.provider,
+      planLabel: qaPremiumFixtureActive ? "Premium QA" : getPlanLabel(effectiveSubscription),
+      provider: effectiveSubscription.provider,
       isRevenueCatConfigured,
-      isPremium: Boolean(subscription.isPremium),
-      isTrialActive: Boolean(subscription.isTrialActive),
-      trialEndsAt: subscription.trialEndsAt,
-      entitlementStatus: subscription.entitlementStatus ?? subscription.status,
+      isPremium: Boolean(effectiveSubscription.isPremium),
+      isTrialActive: Boolean(effectiveSubscription.isTrialActive),
+      trialEndsAt: effectiveSubscription.trialEndsAt,
+      entitlementStatus: effectiveSubscription.entitlementStatus ?? effectiveSubscription.status,
       purchasePending: isLoading,
       restoreAvailable: subscription.restoreAvailable ?? true,
       restoreStatus,
@@ -392,6 +412,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       presentPaywall,
       presentCustomerCenter,
       setMockStatus,
+      qaPremiumFixtureActive,
     }),
     [
       canAccessEntitlement,
@@ -410,7 +431,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       restorePurchases,
       restoreStatus,
       setMockStatus,
-      subscription,
+      effectiveSubscription,
+      qaPremiumFixtureActive,
     ],
   );
 

@@ -145,6 +145,7 @@ const config: ExpoConfig = {
     revenueCatMonthlyProductId,
     revenueCatAnnualProductId,
     ...(!isProduction ? { designQaMode: process.env.EXPO_PUBLIC_DESIGN_QA_MODE === "1" } : {}),
+    ...(!isProduction ? { qaPremiumFixture: process.env.EXPO_PUBLIC_QA_PREMIUM_FIXTURE === "1" } : {}),
     coachingEngineV3: {
       enabled: flag("ASC_COACHING_ENGINE_V3", "EXPO_PUBLIC_ASC_COACHING_ENGINE_V3"),
       activeWorkout: flag("ASC_V3_ACTIVE_WORKOUT", "EXPO_PUBLIC_ASC_V3_ACTIVE_WORKOUT"),
