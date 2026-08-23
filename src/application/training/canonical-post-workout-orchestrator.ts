@@ -15,6 +15,8 @@ import { canonicalDeterministicFingerprint, canonicalDeterministicFingerprintId 
 import type { CanonicalPostWorkoutEvaluation } from "@/domain/training/canonical-progress-evaluator";
 import type { CanonicalNumericPrescriptionDecision } from "@/domain/training/canonical-comparable-exposure-policy";
 import { adaptationAuditFromNumericDecisions } from "@/domain/training/canonical-adaptation-audit";
+import { evaluateCanonicalAdaptationOutcome } from "@/domain/training/canonical-adaptation-outcome";
+import { canonicalAdaptationOutcomeRepository } from "@/data/local/canonical-adaptation-outcome-repository";
 
 export const CANONICAL_POST_WORKOUT_ORCHESTRATOR_VERSION = "canonical_post_workout_orchestrator_v1" as const;
 
@@ -89,6 +91,15 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
   }
   canonicalCoachingAttemptRepository.save({ schemaVersion: "canonical_coaching_attempt_v1", operationId, planId: input.planId, recordedSessionId: input.recordedSessionId, completionEvidenceId: input.completionEvidenceId, status: "pending", reason: "evaluation_started", evidenceState: "complete", decisionState: "pending", applicationState: "pending", retryIdentity: operationId, updatedAt: input.occurredAt });
 
+  // Close earlier adaptation loops before making the next decision. Outcomes
+  // are immutable and idempotent, so replay/restart cannot double-apply them.
+  const allEvidence = canonicalProgressEvidenceRepository.list(input.planId);
+  for (const priorDecision of canonicalProgressDecisionRepository.list(input.planId)) {
+    if (canonicalAdaptationOutcomeRepository.get(priorDecision.decisionId).status === "found") continue;
+    const outcome = evaluateCanonicalAdaptationOutcome({ decision: priorDecision, evidence: allEvidence });
+    if (outcome) canonicalAdaptationOutcomeRepository.save(outcome);
+  }
+
   const mesocycle = mesocycleById(raw.carrier.mesocycle.id);
   const policy = resolveMesocyclePrescriptionPolicy(raw.carrier.mesocycle.id, { goal: raw.carrier.macrocycle.output.goal });
   if (!mesocycle || policy.status !== "resolved") return pending(operationId, input, "canonical_mesocycle_policy_unavailable");
@@ -116,7 +127,7 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     plan,
     session: aggregate.session,
     events: aggregate.events,
-    evidence: canonicalProgressEvidenceRepository.list(input.planId),
+    evidence: allEvidence,
     identity,
     policy: policy.policy,
     mesocycle,
