@@ -87,7 +87,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const subscriptionRef = useRef(subscription);
   const qaPremiumFixtureActive = isQaPremiumFixtureEnabled(
     getAppEnvironment(),
-    (Constants.expoConfig?.extra as { qaPremiumFixture?: unknown } | undefined)?.qaPremiumFixture,
+    (Constants.expoConfig?.extra as { qaPremiumFixture?: unknown } | undefined)?.qaPremiumFixture
+      ?? process.env.EXPO_PUBLIC_QA_PREMIUM_FIXTURE === "1",
   );
   const effectiveSubscription = applyQaPremiumFixture(subscription, qaPremiumFixtureActive);
 

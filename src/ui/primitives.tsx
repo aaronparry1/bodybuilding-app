@@ -137,10 +137,10 @@ export function PrimaryButton({
         borderCurve: "continuous",
         backgroundColor: disabled ? colors.surfaceSoft : pressed ? colors.accentPressed : colors.accent,
         paddingHorizontal: spacing.lg,
-        opacity: disabled ? 0.55 : 1,
+        opacity: 1,
       })}
     >
-      <Text adjustsFontSizeToFit minimumFontScale={0.78} numberOfLines={1} style={{ color: "#12110d", fontWeight: "900", fontSize: 15 }}>
+      <Text adjustsFontSizeToFit minimumFontScale={0.78} numberOfLines={1} style={{ color: disabled ? colors.textSubtle : "#12110d", fontWeight: "900", fontSize: 15 }}>
         {label}
       </Text>
     </Pressable>
