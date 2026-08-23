@@ -38,8 +38,9 @@ import { AppScreen, HeroPanel, PremiumCard, PrimaryButton, SecondaryButton, stab
 import { colors, radius, spacing, type } from "@/ui/theme";
 import { canonicalSessionDurationOptions, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
 import { type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
+import { canonicalTrainingPriorityOptions, type CanonicalTrainingPriority } from "@/domain/training/canonical-training-priority";
 
-type StepKey = "goal" | "commitment" | "event" | "schedule" | "split" | "experience" | "recent_training" | "recovery" | "review";
+type StepKey = "goal" | "commitment" | "event" | "schedule" | "split" | "experience" | "priority" | "recent_training" | "recovery" | "review";
 
 const goalOptions: Array<{ value: TrainingSetupGoal; label: string; detail: string }> = [
   { value: "build_muscle", label: "Hypertrophy", detail: "Build muscle with productive volume and steady performance." },
@@ -110,6 +111,7 @@ export default function OnboardingScreen() {
   const [availableSessionMinutes, setAvailableSessionMinutes] = useState<CanonicalSessionDurationMinutes>(settings.availableSessionMinutes);
   const [preferredSplit, setPreferredSplit] = useState<PreferredSplit>("let_app_choose");
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(settings.experienceLevel);
+  const [trainingPriority, setTrainingPriority] = useState<CanonicalTrainingPriority>("balanced");
   const [recoveryCardioPreference, setRecoveryCardioPreference] = useState<RecoveryCardioPreference>(settings.recoveryCardioPreference);
   const [continuity, setContinuity] = useState<CanonicalStartingVolumeContext["continuity"]>(settings.startingVolumeContext.continuity);
   const [recentTrainingDaysPerWeek, setRecentTrainingDaysPerWeek] = useState<CanonicalStartingVolumeContext["recentTrainingDaysPerWeek"]>(settings.startingVolumeContext.recentTrainingDaysPerWeek);
@@ -244,6 +246,7 @@ export default function OnboardingScreen() {
       unit,
       recoveryCardioPreference,
       startingVolumeContext,
+      trainingPriority,
     });
     const gateResult = submissionGateRef.current.begin(fingerprint);
     if (gateResult === "in_flight") return;
@@ -276,6 +279,7 @@ export default function OnboardingScreen() {
           recoveryCardioPreference,
           availableSessionMinutes,
           startingVolumeContext,
+          trainingPriority,
           exercises: exerciseLibrary,
         },
         ownerUserId: user?.id ?? null,
@@ -391,6 +395,14 @@ export default function OnboardingScreen() {
           onSelect={setExperienceLevel}
         />
       ) : null}
+      {step === "priority" ? (
+        <OptionList<CanonicalTrainingPriority>
+          options={canonicalTrainingPriorityOptions}
+          selected={trainingPriority}
+          onSelect={setTrainingPriority}
+          guidance="This is an optional emphasis, not a diagnosis. ASC keeps total starting workload bounded and reassesses it from completed training."
+        />
+      ) : null}
       {step === "recent_training" ? (
         <View style={{ gap: spacing.lg }}>
           <OptionList<CanonicalStartingVolumeContext["continuity"]> options={continuityOptions} selected={continuity} onSelect={chooseContinuity} />
@@ -428,6 +440,7 @@ export default function OnboardingScreen() {
           availableSessionMinutes={availableSessionMinutes}
           framework={frameworkSummary}
           experience={labelForExperience(experienceLevel)}
+          priority={canonicalTrainingPriorityOptions.find((option) => option.value === trainingPriority)?.label ?? "Balanced development"}
           recentTraining={continuity === "currently_training"
             ? `${labelFor(continuityOptions, continuity)} · previously ${recentTrainingDaysPerWeek} days/week · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`
             : `${labelFor(continuityOptions, continuity)} · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`}
@@ -608,6 +621,7 @@ function ReviewPanel({
   availableSessionMinutes,
   framework,
   experience,
+  priority,
   recentTraining,
   recoveryCapacity,
   unit,
@@ -620,6 +634,7 @@ function ReviewPanel({
   availableSessionMinutes: CanonicalSessionDurationMinutes;
   framework: string;
   experience: string;
+  priority: string;
   recentTraining: string;
   recoveryCapacity: string;
   unit: UnitSystem;
@@ -642,6 +657,7 @@ function ReviewPanel({
           <SummaryRow label="Workout length" value={`${availableSessionMinutes} minutes`} />
           <SummaryRow label="Framework" value={framework} />
           <SummaryRow label="Experience" value={experience} />
+          <SummaryRow label="Training emphasis" value={priority} />
           <SummaryRow label="Recent training" value={recentTraining} />
           <SummaryRow label="Recovery & Capacity" value={recoveryCapacity} />
           <SummaryRow label="Units" value={unitLabel} />
@@ -726,6 +742,7 @@ function titleForStep(step: StepKey): string {
     schedule: "What fits your week?",
     split: "Choose a training framework",
     experience: "How would you describe your lifting experience?",
+    priority: "Would you like a training emphasis?",
     recent_training: "What has your recent training looked like?",
     recovery: "Recovery & Cardio",
     review: "Your Programme",
@@ -738,6 +755,7 @@ function subtitleForStep(step: StepKey): string {
   if (step === "schedule") {
     return "Choose the number you can consistently achieve. You can change this later and ASC will adjust your programme.";
   }
+  if (step === "priority") return "Optional: shift a small amount of existing work toward one area without inflating your programme.";
   if (step === "split") return "Every option shown can build a complete programme from your choices.";
   if (step === "experience") {
     return "This helps ASC choose an appropriate starting coaching strategy. It will continue learning from your training over time.";

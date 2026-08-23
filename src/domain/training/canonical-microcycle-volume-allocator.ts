@@ -2,6 +2,7 @@ import type { CanonicalStimulusRegion, Equipment, ExerciseRole, ExperienceLevel,
 import type { ProgrammeFrameworkSessionType } from "@/domain/training/programme-framework-rules";
 import { canonicalHypertrophyLandmark, canonicalHypertrophyVolumePolicy, defaultCanonicalStartingVolumeContext, resolveCanonicalHypertrophyStartingVolume, type CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
 import { estimateCanonicalSessionDuration, normalizeCanonicalSessionDuration, resolveCanonicalSessionDuration, type CanonicalSessionDurationEstimate, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
+import { canonicalPriorityStimuli, type CanonicalTrainingPriority } from "@/domain/training/canonical-training-priority";
 
 export const canonicalMicrocycleVolumePolicy = {
   policyId: "canonical_microcycle_volume_policy_v4",
@@ -73,6 +74,7 @@ export type CanonicalMicrocycleVolumeAllocationInput = Readonly<{
    * if the athlete selected it. Direct duration audits infer it from the
    * supplied duration. */
   enforceCompleteRollingCoverage?: boolean;
+  trainingPriority?: CanonicalTrainingPriority;
 }>;
 export type CanonicalMicrocycleVolumeAllocation = Readonly<{
   schemaVersion: "canonical_microcycle_volume_allocation_v1";
@@ -188,6 +190,7 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
     }
     slots = applyCanonicalStartingDosage(input, slots, policyTargets);
   }
+  slots = applyBoundedTrainingPriority(slots, input.trainingPriority ?? "balanced", input.macrocycleGoal);
   const unconstrainedCalendarSlots = slots.map((entry) => ({ ...entry }));
 
   const duration = resolveCanonicalSessionDuration(normalizeCanonicalSessionDuration(input.availableSessionMinutes));
@@ -293,6 +296,26 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
     fatigue: { perSession: perSessionFatigue, weeklyUnits: perSessionFatigue.reduce((sum, units) => sum + units, 0), overlapFlags: profile === "powerbuilding_five_day_v1" || input.macrocycleGoal === "build_strength" || input.macrocycleGoal === "build_muscle_and_strength" ? detectCanonicalMicrocycleOverlap(slots) : [] },
     certification: { status: checks.failures.length ? "failed" : "passed", checks: checks.passed, failures: checks.failures },
   };
+}
+
+/** Moves one already-planned set toward a declared emphasis. This is deliberately
+ * conservative: total weekly sets stay fixed, primary work is never donated, and
+ * every slot retains at least one useful set. */
+function applyBoundedTrainingPriority(slots: readonly AllocatedSlot[], priority: CanonicalTrainingPriority, goal: string): AllocatedSlot[] {
+  const stimuli = canonicalPriorityStimuli(priority);
+  if (!stimuli.length || goal === "athletic_performance") return slots.map((slot) => ({ ...slot }));
+  const target = slots
+    .filter((slot) => slot.requiredStimuli.some((region) => stimuli.includes(region)))
+    .sort((a, b) => a.constructionRole.localeCompare(b.constructionRole) || a.sessionIndex - b.sessionIndex || a.order - b.order)[0];
+  const donor = slots
+    .filter((slot) => slot.constructionRole === "accessory" && slot.workingSets > 1 && !slot.requiredStimuli.some((region) => stimuli.includes(region)))
+    .sort((a, b) => b.workingSets - a.workingSets || b.sessionIndex - a.sessionIndex || b.order - a.order)[0];
+  if (!target || !donor) return slots.map((slot) => ({ ...slot }));
+  return slots.map((slot) => sameSlot(slot, target)
+    ? { ...slot, workingSets: slot.workingSets + 1, purpose: `${slot.purpose}; declared ${priority} priority` }
+    : sameSlot(slot, donor)
+      ? { ...slot, workingSets: slot.workingSets - 1 }
+      : { ...slot });
 }
 
 export function isStrictCanonicalAllocation(allocation: CanonicalMicrocycleVolumeAllocation | undefined): boolean {

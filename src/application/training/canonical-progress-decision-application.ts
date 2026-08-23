@@ -116,6 +116,7 @@ function applyPhaseOneDecision(
     recoveryCardioPreference: raw.carrier.constraints.recoveryCardioPreference,
     availableSessionMinutes: raw.carrier.constraints.availableSessionMinutes,
     startingVolumeContext: raw.carrier.constraints.startingVolumeContext,
+    trainingPriority: raw.carrier.constraints.trainingPriority,
     selectedMesocycleId: selectedMesocycleId as never,
     microcycleSequenceNumber: advance ? raw.carrier.microcycle.output.sequenceNumber + 1 : raw.carrier.microcycle.output.sequenceNumber,
     exercises: facts.facts.exercises,

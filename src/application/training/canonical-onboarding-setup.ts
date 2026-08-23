@@ -118,7 +118,7 @@ export function onboardingStepKeys(input: Readonly<{
   if (input.eventDriven) steps.push("event");
   steps.push("schedule");
   if (input.frameworkOptionCount > 1) steps.push("split");
-  steps.push("experience", "recent_training", "recovery", "review");
+  steps.push("experience", "priority", "recent_training", "recovery", "review");
   return steps;
 }
 

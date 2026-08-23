@@ -138,6 +138,7 @@ export function reconcileCanonicalReleaseState(input: Readonly<{
     recoveryCardioPreference: loaded.carrier.constraints.recoveryCardioPreference,
     availableSessionMinutes: loaded.carrier.constraints.availableSessionMinutes,
     startingVolumeContext: loaded.carrier.constraints.startingVolumeContext,
+    trainingPriority: loaded.carrier.constraints.trainingPriority,
     microcycleSequenceNumber: loaded.carrier.microcycle.output.sequenceNumber,
     exercises: facts.facts.exercises,
     limitations: facts.facts.limitations,

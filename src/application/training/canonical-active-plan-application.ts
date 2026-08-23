@@ -79,6 +79,7 @@ export function changeCanonicalSessionDuration(command: Readonly<{
     recoveryCardioPreference: raw.carrier.constraints.recoveryCardioPreference,
     availableSessionMinutes: duration.minutes,
     startingVolumeContext: raw.carrier.constraints.startingVolumeContext,
+    trainingPriority: raw.carrier.constraints.trainingPriority,
     microcycleSequenceNumber: raw.carrier.microcycle.output.sequenceNumber,
     exercises: facts.facts.exercises,
     limitations: facts.facts.limitations,
