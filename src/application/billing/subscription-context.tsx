@@ -329,7 +329,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   );
 
   const restorePurchases = useCallback(async () => {
-    if (qaPremiumFixtureActive) return { status: "no_active_purchase", message: "Billing actions are disabled while the Premium QA fixture is active." };
+    if (qaPremiumFixtureActive) return { status: "no_active_purchase", message: "Billing actions are disabled while the Premium QA fixture is active." } satisfies RestorePurchasesResult;
     setIsLoading(true);
     setError(null);
     setRestoreStatus("restoring");
