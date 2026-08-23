@@ -11,6 +11,14 @@ export type CoachAction =
 
 export type PlateauAction = "hold_load" | "reduce_load" | "reduce_volume" | "suggest_exercise_swap";
 export type VolumeRecommendation = "add_set" | "remove_set" | "maintain_volume";
+export type VolumeEvidenceConfidence = "insufficient" | "emerging" | "established";
+
+export interface VolumeEvidenceAssessment {
+  confidence: VolumeEvidenceConfidence;
+  comparableExposures: number;
+  requiredExposures: number;
+  comparisonKey: string | null;
+}
 
 export interface ProgressionCoachConfig {
   stallWarningSessions: number;
@@ -19,6 +27,8 @@ export interface ProgressionCoachConfig {
   fatigueWindow: number;
   earlyDropOffThreshold: number;
   volumeAddProgressionRate: number;
+  /** Minimum comparable exposures required before increasing exercise volume. */
+  volumeAddMinimumSessions?: number;
   volumeReduceDropOffRate: number;
   maxRecentSetsPerExercise: number;
 }
@@ -45,6 +55,7 @@ export interface ExerciseCoachAssessment {
   fatigue: FatigueDetection;
   plateauActions: PlateauAction[];
   volumeRecommendation: VolumeRecommendation;
+  volumeEvidence: VolumeEvidenceAssessment;
   coachActions: CoachAction[];
   recommendedLoad: number | null;
   rationale: string[];
@@ -76,6 +87,7 @@ export const defaultProgressionCoachConfig: ProgressionCoachConfig = {
   fatigueWindow: 3,
   earlyDropOffThreshold: 2,
   volumeAddProgressionRate: 0.6,
+  volumeAddMinimumSessions: 3,
   volumeReduceDropOffRate: 0.5,
   maxRecentSetsPerExercise: 5,
 };
@@ -137,7 +149,8 @@ export function recommendVolume(
   fatigue: FatigueDetection,
   config = defaultProgressionCoachConfig,
 ): VolumeRecommendation {
-  const recent = entries.slice(-config.fatigueWindow);
+  const comparableEntries = getComparableVolumeEntries(entries);
+  const recent = comparableEntries.slice(-config.fatigueWindow);
   if (recent.length === 0) return "maintain_volume";
 
   const progressionRate = recent.filter((entry) => entry.progressionEarned).length / recent.length;
@@ -147,11 +160,37 @@ export function recommendVolume(
     return "remove_set";
   }
 
-  if (progressionRate >= config.volumeAddProgressionRate && averageSets < config.maxRecentSetsPerExercise) {
+  const evidence = assessVolumeEvidence(entries, config);
+  if (
+    evidence.confidence === "established" &&
+    progressionRate >= config.volumeAddProgressionRate &&
+    averageSets < config.maxRecentSetsPerExercise
+  ) {
     return "add_set";
   }
 
   return "maintain_volume";
+}
+
+export function assessVolumeEvidence(
+  entries: ExerciseHistorySummary[],
+  config = defaultProgressionCoachConfig,
+): VolumeEvidenceAssessment {
+  const comparableEntries = getComparableVolumeEntries(entries);
+  const requiredExposures = config.volumeAddMinimumSessions ?? defaultProgressionCoachConfig.volumeAddMinimumSessions!;
+  const comparableExposures = Math.min(comparableEntries.length, config.fatigueWindow);
+  const comparisonKey = comparableEntries.at(-1) ? volumeComparisonKey(comparableEntries.at(-1)!) : null;
+
+  return {
+    confidence: comparableExposures >= requiredExposures
+      ? "established"
+      : comparableExposures >= Math.max(2, requiredExposures - 1)
+        ? "emerging"
+        : "insufficient",
+    comparableExposures,
+    requiredExposures,
+    comparisonKey,
+  };
 }
 
 export function assessExerciseProgression(
@@ -167,6 +206,7 @@ export function assessExerciseProgression(
   const fatigue = detectFatigue(entries, config);
   const plateauActions = recommendPlateauActions(stall, fatigue);
   const volumeRecommendation = recommendVolume(entries, fatigue, config);
+  const volumeEvidence = assessVolumeEvidence(entries, config);
   const coachActions = buildCoachActions(last, stall, fatigue, volumeRecommendation, plateauActions);
   const rationale = buildExerciseRationale(last, stall, fatigue, volumeRecommendation, plateauActions);
 
@@ -178,6 +218,7 @@ export function assessExerciseProgression(
     fatigue,
     plateauActions,
     volumeRecommendation,
+    volumeEvidence,
     coachActions,
     recommendedLoad: recommendedLoadForActions(last, coachActions),
     rationale,
@@ -258,7 +299,12 @@ function buildCoachActions(
   if (plateauActions.includes("reduce_volume") || volumeRecommendation === "remove_set") actions.add("reduce_volume");
   if (plateauActions.includes("suggest_exercise_swap")) actions.add("swap_exercise");
   if (last.progressionEarned && !fatigue.repeatedEarlyDropOffs) actions.add("increase_load");
-  if (volumeRecommendation === "add_set" && !fatigue.repeatedEarlyDropOffs) actions.add("add_volume");
+  // Change the smallest useful variable first. A newly earned load increase takes
+  // precedence over adding work, and stalled exercises need diagnosis rather than
+  // an automatic workload increase.
+  if (volumeRecommendation === "add_set" && !last.progressionEarned && !stall.stalledForThree && !fatigue.repeatedEarlyDropOffs) {
+    actions.add("add_volume");
+  }
   if (actions.size === 0 || stall.stalledForThree) actions.add("maintain_load");
 
   return [...actions];
@@ -318,7 +364,10 @@ function recommendMuscleAction(
 ): MuscleProgressionAssessment["recommendation"] {
   if (fatigueFlags >= 2) return "deload";
   if (fatigueFlags === 1) return "reduce_volume";
-  if (stalledCount >= 2) return "add_volume";
+  // Multiple simultaneous stalls are not evidence that the muscle needs more
+  // work. Preserve volume until fatigue, execution, load and exercise fit can be
+  // distinguished with better evidence.
+  if (stalledCount >= 2) return "maintain";
   if (progressionRate > 0.5) return "progressing";
   return "maintain";
 }
@@ -346,6 +395,18 @@ function hasRegressionTrend(entries: ExerciseHistorySummary[], window: number): 
 
 function isStrictlyDeclining(values: number[]): boolean {
   return values.length >= 2 && values.every((value, index) => index === 0 || value < values[index - 1]);
+}
+
+function getComparableVolumeEntries(entries: ExerciseHistorySummary[]): ExerciseHistorySummary[] {
+  const latest = entries.at(-1);
+  if (!latest) return [];
+  const latestKey = volumeComparisonKey(latest);
+  if (latestKey === null) return entries;
+  return entries.filter((entry) => volumeComparisonKey(entry) === latestKey);
+}
+
+function volumeComparisonKey(entry: ExerciseHistorySummary): string | null {
+  return entry.calibrationSetupKey ?? entry.equipmentSignature ?? null;
 }
 
 function toMuscleProgressionGroup(muscle: MuscleGroup): MuscleProgressionGroup | null {
