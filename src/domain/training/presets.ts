@@ -1036,6 +1036,8 @@ const baseExerciseLibrary: Exercise[] = [
     equipment: ["dumbbell"],
     movementPattern: "hinge",
     kind: "dumbbell",
+    role: "secondary_compound",
+    family: "hip_hinge",
     notes: ["Hips back.", "Let the dumbbells track close."],
   }),
   createExercise({

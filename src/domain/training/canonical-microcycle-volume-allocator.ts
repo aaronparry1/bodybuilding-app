@@ -627,8 +627,8 @@ function setsFor(experience: ExperienceLevel, role: AllocatedSlot["constructionR
 function canonicalContract(input: CanonicalMicrocycleVolumeAllocationInput, type: ProgrammeFrameworkSessionType, index: number): readonly SlotContract[] {
   if (input.macrocycleGoal === "athletic_performance") return athleticContract(input, index);
   const barbellDominant = input.equipment.includes("barbell") && !input.equipment.some((item) => item === "dumbbell" || item === "machine" || item === "cable" || item === "smith");
-  const dumbbellBodyweightOnly = input.equipment.every((item) => item === "dumbbell" || item === "bodyweight");
-  const machineCableOnly = input.equipment.every((item) => item === "machine" || item === "cable" || item === "bodyweight");
+  const dumbbellBodyweightOnly = input.equipment.every((item) => item === "dumbbell" || item === "bodyweight" || item === "bands");
+  const machineCableOnly = input.equipment.every((item) => item === "machine" || item === "cable" || item === "bodyweight" || item === "bands");
   const strengthOrPowerbuilding = input.macrocycleGoal === "build_strength" || input.macrocycleGoal === "build_muscle_and_strength";
   const denseHypertrophy = input.macrocycleGoal === "build_muscle" || input.macrocycleGoal === "get_leaner" || input.mesocycleId.includes("hypertrophy");
   const contract = type === "push" ? strengthOrPowerbuilding ? strengthPushContract() : pushContract(barbellDominant)
@@ -841,8 +841,10 @@ function shouldersContract(): readonly SlotContract[] { return [slot("secondary_
 function armsContract(): readonly SlotContract[] { return [slot("isolation", "secondary", ["triceps"], ["triceps"], "primary triceps work", ["isolation"], { repeatPolicy: "variation_preferred" }), slot("isolation", "secondary", ["biceps"], ["biceps"], "primary biceps work", ["isolation"], { repeatPolicy: "variation_preferred" }), slot("isolation", "accessory", ["triceps"], ["triceps"], "complementary long-head triceps isolation", ["isolation"], { repeatPolicy: "variation_preferred" }), slot("isolation", "accessory", ["biceps"], ["biceps"], "complementary elbow-flexor isolation", ["isolation"], { repeatPolicy: "variation_preferred" })]; }
 
 function athleticContract(input: CanonicalMicrocycleVolumeAllocationInput, index: number): readonly SlotContract[] {
-  const limitedToMachines = input.equipment.every((item) => item === "machine" || item === "cable");
-  const limitedToDumbbells = input.equipment.every((item) => item === "dumbbell" || item === "bodyweight");
+  // Bodyweight and bands complement a constrained strength implement; they
+  // must not accidentally promote that profile to the full-barbell contract.
+  const limitedToMachines = input.equipment.every((item) => item === "machine" || item === "cable" || item === "bodyweight" || item === "bands");
+  const limitedToDumbbells = input.equipment.every((item) => item === "dumbbell" || item === "bodyweight" || item === "bands");
   const support = limitedToMachines
     ? athleticLimitedSupport(index, "machine")
     : limitedToDumbbells
