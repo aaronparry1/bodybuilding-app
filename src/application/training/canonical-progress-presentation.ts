@@ -228,7 +228,10 @@ function adaptationReview(decision: CanonicalProgressDecision, displayUnit: "kg"
     : applicationStatus === "unchanged" ? "No programme change"
       : applicationStatus === "blocked" ? "No change made"
         : "Review only";
-  const detail = receipt?.explanation ?? decision.explanation;
+  const persistedExplanation = decision.phaseOne?.adaptationAudit?.explanation;
+  const detail = persistedExplanation
+    ? `${persistedExplanation.observation} ${persistedExplanation.decision} ${persistedExplanation.nextAction}`
+    : receipt?.explanation ?? decision.explanation;
   return {
     title,
     detail,

@@ -58,7 +58,11 @@ export function projectCanonicalCompletionSummary(input: Readonly<{
   const displayUnit = input.displayUnit ?? "kg";
   const achievements = deriveCanonicalWorkoutAchievements({ current: { session: input.session, events: input.events }, history: input.history ?? [], exerciseName: exerciseDisplayName }).map((achievement) => presentAchievement(achievement, displayUnit));
   const coachingChange = input.decision ? completionCoachingChange(input.decision, input.displayUnit ?? "kg") : undefined;
-  return { title: "Workout complete", workoutName: sessionRoleDisplayName(input.session.role), completion: completionSummary.completion, completionLabel, elapsedSeconds: activeElapsedSeconds(input.session, input.events, end), completedWorkingSets: performance.length, exercisesCompleted: exercises.size, prescribedExercises: slots.length, totalVolume, methodsPerformed, achievements, coachingOutcome: input.coachingExplanation ?? "Training recorded. Your next session is ready when you are.", ...(coachingChange ? { coachingChange } : {}), ...(input.programmePosition ? { programmePosition: input.programmePosition } : {}), nextWorkoutId: input.nextWorkoutId ?? null, ...(input.nextWorkoutLabel ? { nextWorkoutLabel: input.nextWorkoutLabel } : {}), ...(input.nextPrescription ? { nextPrescription: input.nextPrescription } : {}) };
+  const persistedExplanation = input.decision?.phaseOne?.adaptationAudit?.explanation;
+  const coachingOutcome = persistedExplanation
+    ? `${persistedExplanation.observation} ${persistedExplanation.decision} ${persistedExplanation.nextAction}`
+    : input.coachingExplanation ?? "Training recorded. Your next session is ready when you are.";
+  return { title: "Workout complete", workoutName: sessionRoleDisplayName(input.session.role), completion: completionSummary.completion, completionLabel, elapsedSeconds: activeElapsedSeconds(input.session, input.events, end), completedWorkingSets: performance.length, exercisesCompleted: exercises.size, prescribedExercises: slots.length, totalVolume, methodsPerformed, achievements, coachingOutcome, ...(coachingChange ? { coachingChange } : {}), ...(input.programmePosition ? { programmePosition: input.programmePosition } : {}), nextWorkoutId: input.nextWorkoutId ?? null, ...(input.nextWorkoutLabel ? { nextWorkoutLabel: input.nextWorkoutLabel } : {}), ...(input.nextPrescription ? { nextPrescription: input.nextPrescription } : {}) };
 }
 
 function presentAchievement(achievement: CanonicalWorkoutAchievement, displayUnit: "kg" | "lb"): CanonicalWorkoutAchievement {
