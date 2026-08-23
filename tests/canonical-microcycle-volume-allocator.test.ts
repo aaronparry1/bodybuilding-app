@@ -39,7 +39,7 @@ describe("canonical microcycle volume allocator", () => {
     expect(result.movementPatternExposures).toEqual({ horizontal_push: 3, isolation: 11, squat: 3, lunge: 2, hinge: 1, horizontal_pull: 2, vertical_pull: 1, hip_thrust: 1, core: 1 });
     expect(result.sessionWorkingSets).toEqual([11, 11, 11, 14, 12]);
     expect(result.totalWorkingSets).toBe(59);
-    expect(result.estimatedSessionMinutes).toEqual([38, 40, 39, 40, 38]);
+    expect(result.estimatedSessionMinutes).toEqual([39, 42, 41, 42, 39]);
     expect(result.durationEstimates.every((estimate) => estimate.assumptions.includes("lift_specific_ramps_included"))).toBe(true);
     expect(result.fatigue).toEqual({ perSession: [22, 22, 23, 20, 18], weeklyUnits: 105, overlapFlags: [] });
   });

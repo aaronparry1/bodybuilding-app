@@ -192,7 +192,11 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
 
   const duration = resolveCanonicalSessionDuration(normalizeCanonicalSessionDuration(input.availableSessionMinutes));
   if (duration.status !== "valid") throw new Error("canonical_session_duration_normalisation_failed");
-  const constrained = constrainSlotsToDuration(slots, input.sessionRoles.length, duration.minutes, startingContext.loadConfidence, hypertrophy);
+  // Intake confidence is not exercise-level load evidence. Until at least one
+  // selected exercise can be linked to an established load, allocation must
+  // reserve calibration ramps just as exact construction will.
+  const durationLoadConfidence = input.establishedLoadExerciseIds.length > 0 ? startingContext.loadConfidence : "calibration_required";
+  const constrained = constrainSlotsToDuration(slots, input.sessionRoles.length, duration.minutes, durationLoadConfidence, hypertrophy);
   slots = constrained.slots;
   const constrainedSessionIndexes = constrained.constrainedSessionIndexes;
 
@@ -205,7 +209,7 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
   const sessionWorkingSets = input.sessionRoles.map((_, index) => slots.filter((entry) => entry.sessionIndex === index).reduce((sum, entry) => sum + entry.workingSets, 0));
   const durationEstimates = input.sessionRoles.map((_, index) => estimateCanonicalSessionDuration(
     slots.filter((entry) => entry.sessionIndex === index),
-    startingContext.loadConfidence,
+    durationLoadConfidence,
   ));
   const estimatedSessionMinutes = durationEstimates.map((estimate) => estimate.minutes);
   const perSessionFatigue = input.sessionRoles.map((_, index) => slots.filter((entry) => entry.sessionIndex === index).reduce((sum, entry) => sum + entry.workingSets * fatigueWeight(entry.constructionRole), 0));
@@ -225,7 +229,7 @@ export function allocateCanonicalMicrocycleVolume(input: CanonicalMicrocycleVolu
       }))
       : Object.fromEntries(Object.entries(directSets).map(([region, sets]) => [region, { min: Math.max(1, Number(sets) - Math.max(1, Math.floor(Number(sets) * 0.2))), max: Number(sets) + Math.max(2, Math.ceil(Number(sets) * 0.35)) }]));
   const rollingConstraint = isRollingPpl(input)
-    ? constrainSlotsToDuration(buildCanonicalRollingPplDosage(input, policyTargets), rollingPplRoles.length, duration.minutes, startingContext.loadConfidence, hypertrophy)
+    ? constrainSlotsToDuration(buildCanonicalRollingPplDosage(input, policyTargets), rollingPplRoles.length, duration.minutes, durationLoadConfidence, hypertrophy)
     : null;
   const dosageComparison = rollingConstraint ? directSetsForSlots(rollingConstraint.slots) : directSets;
   const unconstrainedDosageComparison = isRollingPpl(input)

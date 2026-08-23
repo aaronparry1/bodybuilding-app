@@ -13,6 +13,8 @@ export type CanonicalDurationPlanningSlot = Readonly<{
   constructionRole: CanonicalDurationConstructionRole;
   workingSets: number;
   movementPatterns: readonly string[];
+  primaryLift?: "bench" | "squat" | "deadlift";
+  liftExposure?: "primary" | "secondary_variation";
   method?: string;
   prescribedRestSeconds?: number;
   loadConfidence?: CanonicalDurationLoadConfidence;
@@ -85,7 +87,7 @@ export function estimateCanonicalSessionDuration(
     const unilateral = slot.movementPatterns.includes("lunge") || slot.movementPatterns.includes("single_leg");
     workingSetExecution += slot.workingSets * 40;
     if (unilateral) unilateralOverhead += slot.workingSets * 35;
-    const rest = slot.prescribedRestSeconds ?? defaultRestSeconds(slot.constructionRole);
+    const rest = slot.prescribedRestSeconds ?? resolveCanonicalPlanningRestSeconds(slot);
     prescribedInterSetRest += Math.max(0, slot.workingSets - 1) * rest;
     if (confidence === "calibration_required") calibrationOverhead += 10;
     methodOverhead += methodSeconds(slot.method, slot.workingSets);
@@ -144,12 +146,19 @@ function rampSeconds(role: CanonicalDurationConstructionRole, confidence: Canoni
   return confidence === "calibration_required" ? 30 : 0;
 }
 
-function defaultRestSeconds(role: CanonicalDurationConstructionRole): number {
+export function resolveCanonicalPlanningRestSeconds(slot: Pick<CanonicalDurationPlanningSlot, "constructionRole" | "primaryLift" | "liftExposure">): number {
   // These are conservative pre-selection allowances. Exact Session
   // Construction rest replaces them at the post-construction gate; using the
   // upper ordinary prescription prevents allocation from promising a session
   // that the immutable snapshot cannot execute inside the chosen duration.
-  return role === "primary" ? 180 : role === "secondary" ? 150 : 90;
+  if (slot.liftExposure === "primary" && slot.primaryLift === "deadlift") return 240;
+  if (slot.liftExposure === "primary" && slot.primaryLift === "squat") return 210;
+  if (slot.liftExposure === "primary" && slot.primaryLift === "bench") return 180;
+  if (slot.liftExposure === "secondary_variation") return 150;
+  // Exercise identity is not selected yet. Accessories need the largest
+  // ordinary exact-target allowance because a moderate-fatigue selection can
+  // legitimately own 120 seconds even when its catalogue role is accessory.
+  return slot.constructionRole === "primary" ? 180 : slot.constructionRole === "secondary" ? 150 : 120;
 }
 
 function methodSeconds(method: string | undefined, workingSets: number): number {
