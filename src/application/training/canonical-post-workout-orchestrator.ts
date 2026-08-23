@@ -17,6 +17,7 @@ import type { CanonicalNumericPrescriptionDecision } from "@/domain/training/can
 import { adaptationAuditFromNumericDecisions } from "@/domain/training/canonical-adaptation-audit";
 import { evaluateCanonicalAdaptationOutcome } from "@/domain/training/canonical-adaptation-outcome";
 import { canonicalAdaptationOutcomeRepository } from "@/data/local/canonical-adaptation-outcome-repository";
+import { stabilizeCanonicalNumericDecisions } from "@/domain/training/canonical-adaptation-stability";
 
 export const CANONICAL_POST_WORKOUT_ORCHESTRATOR_VERSION = "canonical_post_workout_orchestrator_v1" as const;
 
@@ -123,7 +124,7 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     ...(raw.carrier.cycleLineage ?? []).filter((entry) => entry.mesocycleId === raw.carrier.mesocycle.id).map((entry) => entry.microcycleId),
     raw.carrier.microcycle.id,
   ]).size);
-  const currentEvaluation = evaluateCanonicalPostWorkoutProgress({
+  const evaluated = evaluateCanonicalPostWorkoutProgress({
     plan,
     session: aggregate.session,
     events: aggregate.events,
@@ -136,6 +137,15 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     completedMicrocyclesInMesocycle,
     microcycleComplete,
   });
+  const stabilizedNumericDecisions = stabilizeCanonicalNumericDecisions(evaluated.numericDecisions, canonicalProgressDecisionRepository.list(input.planId));
+  const stabilityHeld = stabilizedNumericDecisions.some((item, index) => item.reasonCode !== evaluated.numericDecisions[index]?.reasonCode);
+  const currentEvaluation = stabilityHeld ? {
+    ...evaluated,
+    numericDecisions: stabilizedNumericDecisions,
+    affectedExerciseIds: evaluated.affectedExerciseIds.filter((exerciseId) => stabilizedNumericDecisions.some((item) => item.exerciseId === exerciseId && item.after)),
+    reasonCodes: [...evaluated.reasonCodes, "numeric_oscillation_hysteresis_applied"],
+    explanation: "The latest evidence points in the opposite direction to the last adjustment. The prescription is held for one more comparable evidence window to avoid oscillation.",
+  } : evaluated;
   const evaluation = includePendingMicrocycleNumericDecisions(currentEvaluation, aggregate.session.version);
   const decisionIdentity = priorAttempt.status === "found"
     && priorAttempt.attempt.reason === "boundary_resolution_event_detected"
