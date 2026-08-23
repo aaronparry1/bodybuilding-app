@@ -73,8 +73,8 @@
     "persona-30"
   ],
   "summary": {
-    "constructed": 21,
-    "failClosed": 9,
+    "constructed": 25,
+    "failClosed": 5,
     "criticalViolations": 0
   },
   "rows": [
@@ -231,12 +231,110 @@
         "limitations": [],
         "historyScenario": "productive_history"
       },
-      "programmeIdentity": null,
-      "status": "fail_closed",
-      "severity": "acceptable_guard",
-      "confidence": "high",
-      "reason": "session_1:exact_duration_exceeds_45_minutes",
-      "metrics": null,
+      "programmeIdentity": {
+        "planId": "generator-cert:persona-02",
+        "macrocycleId": "generator-cert:persona-02:macrocycle",
+        "mesocycleId": "powerbuilding_foundation",
+        "microcycleId": "generator-cert:persona-02:microcycle:1",
+        "revision": 0
+      },
+      "status": "constructed",
+      "severity": "acceptable",
+      "confidence": "high_for_structural_metrics_low_for_outcomes",
+      "reason": null,
+      "metrics": {
+        "sessions": 3,
+        "workingSets": 36,
+        "estimatedMinutes": [
+          43,
+          41,
+          44
+        ],
+        "compoundSlots": 9,
+        "isolationSlots": 6,
+        "calibrationSlots": 15,
+        "repRange": [
+          5,
+          15
+        ],
+        "restSecondsRange": [
+          75,
+          240
+        ],
+        "uniqueExercises": 15,
+        "directStimulusExposures": {
+          "biceps": 1,
+          "calves": 1,
+          "chest": 7,
+          "hamstrings_knee_flexion": 3,
+          "hip_extension": 5,
+          "lateral_delts": 1,
+          "lats": 3,
+          "quadriceps": 7,
+          "triceps": 2,
+          "upper_back": 6
+        },
+        "meaningfulSecondaryExposures": {
+          "anterior_delts": 4,
+          "biceps": 9,
+          "hip_extension": 4,
+          "quadriceps": 3,
+          "rear_delts": 6,
+          "triceps": 7,
+          "upper_back": 3
+        },
+        "movementPatternExposures": {
+          "hinge": 1,
+          "hip_thrust": 1,
+          "horizontal_pull": 2,
+          "horizontal_push": 2,
+          "isolation": 6,
+          "squat": 2,
+          "vertical_pull": 1
+        },
+        "fatigueClassSlots": {
+          "high": 3,
+          "low": 6,
+          "moderate": 6
+        },
+        "jointStressClassSlots": {
+          "high": 3,
+          "low": 7,
+          "moderate": 5
+        },
+        "stabilityClassSlots": {
+          "high": 12,
+          "moderate": 3
+        },
+        "mainLiftSpecificity": {
+          "bench": 1,
+          "deadlift": 1,
+          "squat": 1
+        },
+        "methodExposure": {
+          "straight_sets": 15
+        },
+        "progressionOpportunities": 15,
+        "adjacentSessionSharedDirectRegions": [
+          [
+            "upper_back"
+          ],
+          [
+            "hamstrings_knee_flexion",
+            "hip_extension"
+          ]
+        ],
+        "pushPullBalance": {
+          "push": 2,
+          "pull": 3
+        },
+        "unavailableOrLowConfidence": [
+          "hard_sets_by_region: proximity cannot be reduced to a defensible binary from the snapshot",
+          "relative_intensity_distribution: unavailable until established loads exist",
+          "week_to_week_and_block_change: requires multiple immutable generations",
+          "deload_behaviour: Mesocycle policy, not an initial-week property"
+        ]
+      },
       "violations": []
     },
     {
@@ -713,9 +811,9 @@
       "reason": null,
       "metrics": {
         "sessions": 2,
-        "workingSets": 27,
+        "workingSets": 26,
         "estimatedMinutes": [
-          41,
+          38,
           41
         ],
         "compoundSlots": 7,
@@ -733,7 +831,7 @@
         "directStimulusExposures": {
           "biceps": 2,
           "calves": 3,
-          "chest": 4,
+          "chest": 3,
           "hamstrings_knee_flexion": 2,
           "hip_extension": 4,
           "lateral_delts": 2,
@@ -743,11 +841,11 @@
           "upper_back": 2
         },
         "meaningfulSecondaryExposures": {
-          "anterior_delts": 4,
+          "anterior_delts": 3,
           "biceps": 4,
           "hip_extension": 2,
           "rear_delts": 2,
-          "triceps": 4,
+          "triceps": 3,
           "upper_back": 2
         },
         "movementPatternExposures": {
@@ -1309,9 +1407,9 @@
       "reason": null,
       "metrics": {
         "sessions": 2,
-        "workingSets": 33,
+        "workingSets": 32,
         "estimatedMinutes": [
-          55,
+          53,
           52
         ],
         "compoundSlots": 8,
@@ -1332,14 +1430,14 @@
           "hip_extension": 6,
           "lats": 7,
           "quadriceps": 6,
-          "upper_back": 5
+          "upper_back": 4
         },
         "meaningfulSecondaryExposures": {
           "anterior_delts": 3,
-          "biceps": 12,
+          "biceps": 11,
           "hip_extension": 6,
           "quadriceps": 4,
-          "rear_delts": 5,
+          "rear_delts": 4,
           "triceps": 7,
           "upper_back": 4
         },
@@ -1574,12 +1672,12 @@
       "reason": null,
       "metrics": {
         "sessions": 4,
-        "workingSets": 31,
+        "workingSets": 30,
         "estimatedMinutes": [
           29,
           30,
           29,
-          30
+          28
         ],
         "compoundSlots": 12,
         "isolationSlots": 10,
@@ -1598,7 +1696,7 @@
           "calves": 2,
           "chest": 6,
           "hamstrings_knee_flexion": 2,
-          "hip_extension": 5,
+          "hip_extension": 4,
           "lateral_delts": 2,
           "lats": 2,
           "quadriceps": 6,
@@ -1608,7 +1706,7 @@
         "meaningfulSecondaryExposures": {
           "anterior_delts": 6,
           "biceps": 4,
-          "hip_extension": 7,
+          "hip_extension": 6,
           "quadriceps": 2,
           "rear_delts": 2,
           "triceps": 6,
@@ -1710,9 +1808,9 @@
         "sessions": 5,
         "workingSets": 55,
         "estimatedMinutes": [
+          39,
           41,
-          41,
-          35,
+          37,
           29,
           22
         ],
@@ -2107,12 +2205,110 @@
         "limitations": [],
         "historyScenario": "productive_history"
       },
-      "programmeIdentity": null,
-      "status": "fail_closed",
-      "severity": "acceptable_guard",
-      "confidence": "high",
-      "reason": "session_0:exact_duration_exceeds_30_minutes",
-      "metrics": null,
+      "programmeIdentity": {
+        "planId": "generator-cert:persona-17",
+        "macrocycleId": "generator-cert:persona-17:macrocycle",
+        "mesocycleId": "powerbuilding_foundation",
+        "microcycleId": "generator-cert:persona-17:microcycle:1",
+        "revision": 0
+      },
+      "status": "constructed",
+      "severity": "acceptable",
+      "confidence": "high_for_structural_metrics_low_for_outcomes",
+      "reason": null,
+      "metrics": {
+        "sessions": 3,
+        "workingSets": 21,
+        "estimatedMinutes": [
+          30,
+          30,
+          30
+        ],
+        "compoundSlots": 12,
+        "isolationSlots": 0,
+        "calibrationSlots": 15,
+        "repRange": [
+          5,
+          12
+        ],
+        "restSecondsRange": [
+          120,
+          240
+        ],
+        "uniqueExercises": 10,
+        "directStimulusExposures": {
+          "chest": 3,
+          "core": 3,
+          "hip_extension": 5,
+          "lats": 1,
+          "quadriceps": 7,
+          "upper_back": 2
+        },
+        "meaningfulSecondaryExposures": {
+          "anterior_delts": 3,
+          "biceps": 3,
+          "hip_extension": 8,
+          "quadriceps": 3,
+          "rear_delts": 2,
+          "triceps": 3,
+          "upper_back": 3
+        },
+        "movementPatternExposures": {
+          "core": 3,
+          "hinge": 1,
+          "hip_thrust": 2,
+          "horizontal_pull": 2,
+          "horizontal_push": 3,
+          "squat": 3,
+          "vertical_pull": 1
+        },
+        "fatigueClassSlots": {
+          "high": 6,
+          "moderate": 9
+        },
+        "jointStressClassSlots": {
+          "high": 6,
+          "low": 3,
+          "moderate": 6
+        },
+        "stabilityClassSlots": {
+          "high": 9,
+          "moderate": 6
+        },
+        "mainLiftSpecificity": {
+          "bench": 3,
+          "deadlift": 1,
+          "squat": 2
+        },
+        "methodExposure": {
+          "straight_sets": 15
+        },
+        "progressionOpportunities": 15,
+        "adjacentSessionSharedDirectRegions": [
+          [
+            "chest",
+            "core",
+            "hip_extension",
+            "quadriceps"
+          ],
+          [
+            "chest",
+            "core",
+            "hip_extension",
+            "quadriceps"
+          ]
+        ],
+        "pushPullBalance": {
+          "push": 3,
+          "pull": 3
+        },
+        "unavailableOrLowConfidence": [
+          "hard_sets_by_region: proximity cannot be reduced to a defensible binary from the snapshot",
+          "relative_intensity_distribution: unavailable until established loads exist",
+          "week_to_week_and_block_change: requires multiple immutable generations",
+          "deload_behaviour: Mesocycle policy, not an initial-week property"
+        ]
+      },
       "violations": []
     },
     {
@@ -2159,10 +2355,10 @@
       "reason": null,
       "metrics": {
         "sessions": 4,
-        "workingSets": 50,
+        "workingSets": 49,
         "estimatedMinutes": [
           44,
-          44,
+          42,
           45,
           44
         ],
@@ -2182,7 +2378,7 @@
           "biceps": 1,
           "calves": 1,
           "chest": 14,
-          "hamstrings_knee_flexion": 4,
+          "hamstrings_knee_flexion": 3,
           "hip_extension": 5,
           "lateral_delts": 2,
           "lats": 3,
@@ -3054,12 +3250,97 @@
         "limitations": [],
         "historyScenario": "new_app"
       },
-      "programmeIdentity": null,
-      "status": "fail_closed",
-      "severity": "acceptable_guard",
-      "confidence": "high",
-      "reason": "constructed_microcycle:unauthorised_specialist_selection",
-      "metrics": null,
+      "programmeIdentity": {
+        "planId": "generator-cert:persona-26",
+        "macrocycleId": "generator-cert:persona-26:macrocycle",
+        "mesocycleId": "hypertrophy_calibration",
+        "microcycleId": "generator-cert:persona-26:microcycle:1",
+        "revision": 0
+      },
+      "status": "constructed",
+      "severity": "acceptable",
+      "confidence": "high_for_structural_metrics_low_for_outcomes",
+      "reason": null,
+      "metrics": {
+        "sessions": 2,
+        "workingSets": 25,
+        "estimatedMinutes": [
+          38,
+          40
+        ],
+        "compoundSlots": 5,
+        "isolationSlots": 5,
+        "calibrationSlots": 8,
+        "repRange": [
+          8,
+          15
+        ],
+        "restSecondsRange": [
+          75,
+          150
+        ],
+        "uniqueExercises": 10,
+        "directStimulusExposures": {
+          "biceps": 2,
+          "calves": 3,
+          "chest": 3,
+          "hamstrings_knee_flexion": 2,
+          "hip_extension": 2,
+          "lateral_delts": 2,
+          "lats": 2,
+          "quadriceps": 5,
+          "triceps": 2,
+          "upper_back": 2
+        },
+        "meaningfulSecondaryExposures": {
+          "anterior_delts": 3,
+          "biceps": 4,
+          "hip_extension": 7,
+          "rear_delts": 2,
+          "triceps": 3,
+          "upper_back": 2
+        },
+        "movementPatternExposures": {
+          "hinge": 1,
+          "horizontal_pull": 1,
+          "horizontal_push": 1,
+          "isolation": 5,
+          "lunge": 1,
+          "vertical_pull": 1
+        },
+        "fatigueClassSlots": {
+          "high": 2,
+          "low": 4,
+          "moderate": 4
+        },
+        "jointStressClassSlots": {
+          "high": 1,
+          "low": 5,
+          "moderate": 4
+        },
+        "stabilityClassSlots": {
+          "high": 6,
+          "moderate": 4
+        },
+        "mainLiftSpecificity": {},
+        "methodExposure": {
+          "straight_sets": 10
+        },
+        "progressionOpportunities": 10,
+        "adjacentSessionSharedDirectRegions": [
+          []
+        ],
+        "pushPullBalance": {
+          "push": 1,
+          "pull": 2
+        },
+        "unavailableOrLowConfidence": [
+          "hard_sets_by_region: proximity cannot be reduced to a defensible binary from the snapshot",
+          "relative_intensity_distribution: unavailable until established loads exist",
+          "week_to_week_and_block_change: requires multiple immutable generations",
+          "deload_behaviour: Mesocycle policy, not an initial-week property"
+        ]
+      },
       "violations": []
     },
     {
@@ -3300,12 +3581,118 @@
         "limitations": [],
         "historyScenario": "concurrent_sport"
       },
-      "programmeIdentity": null,
-      "status": "fail_closed",
-      "severity": "acceptable_guard",
-      "confidence": "high",
-      "reason": "session_0:no_suitable_exercise",
-      "metrics": null,
+      "programmeIdentity": {
+        "planId": "generator-cert:persona-30",
+        "macrocycleId": "generator-cert:persona-30:macrocycle",
+        "mesocycleId": "athletic_general",
+        "microcycleId": "generator-cert:persona-30:microcycle:1",
+        "revision": 0
+      },
+      "status": "constructed",
+      "severity": "acceptable",
+      "confidence": "high_for_structural_metrics_low_for_outcomes",
+      "reason": null,
+      "metrics": {
+        "sessions": 6,
+        "workingSets": 42,
+        "estimatedMinutes": [
+          27,
+          26,
+          27,
+          26,
+          27,
+          26
+        ],
+        "compoundSlots": 18,
+        "isolationSlots": 0,
+        "calibrationSlots": 19,
+        "repRange": [
+          8,
+          12
+        ],
+        "restSecondsRange": [
+          0,
+          150
+        ],
+        "uniqueExercises": 11,
+        "directStimulusExposures": {
+          "chest": 6,
+          "core": 6,
+          "hip_extension": 12,
+          "lats": 3,
+          "quadriceps": 12,
+          "triceps": 1,
+          "upper_back": 3
+        },
+        "meaningfulSecondaryExposures": {
+          "anterior_delts": 6,
+          "biceps": 6,
+          "hip_extension": 30,
+          "rear_delts": 3,
+          "triceps": 5,
+          "upper_back": 12
+        },
+        "movementPatternExposures": {
+          "core": 6,
+          "hinge": 3,
+          "horizontal_pull": 3,
+          "horizontal_push": 6,
+          "lunge": 3,
+          "vertical_pull": 3
+        },
+        "fatigueClassSlots": {
+          "high": 6,
+          "low": 6,
+          "moderate": 12
+        },
+        "jointStressClassSlots": {
+          "high": 3,
+          "low": 6,
+          "moderate": 15
+        },
+        "stabilityClassSlots": {
+          "high": 14,
+          "moderate": 10
+        },
+        "mainLiftSpecificity": {},
+        "methodExposure": {
+          "antagonist_superset": 4,
+          "straight_sets": 20
+        },
+        "progressionOpportunities": 24,
+        "adjacentSessionSharedDirectRegions": [
+          [
+            "chest",
+            "core"
+          ],
+          [
+            "chest",
+            "core"
+          ],
+          [
+            "chest",
+            "core"
+          ],
+          [
+            "chest",
+            "core"
+          ],
+          [
+            "chest",
+            "core"
+          ]
+        ],
+        "pushPullBalance": {
+          "push": 6,
+          "pull": 6
+        },
+        "unavailableOrLowConfidence": [
+          "hard_sets_by_region: proximity cannot be reduced to a defensible binary from the snapshot",
+          "relative_intensity_distribution: unavailable until established loads exist",
+          "week_to_week_and_block_change: requires multiple immutable generations",
+          "deload_behaviour: Mesocycle policy, not an initial-week property"
+        ]
+      },
       "violations": []
     }
   ]

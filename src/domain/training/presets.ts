@@ -490,6 +490,7 @@ const baseExerciseLibrary: Exercise[] = [
     equipment: ["barbell", "dumbbell"],
     movementPattern: "hinge",
     kind: "barbell",
+    beginner: true,
     loadJump: 5,
     swapTags: ["rdl", "romanian deadlift", "stiff leg deadlift", "hip_hinge"],
     notes: ["Hips back, soft knees.", "Stop when hamstrings say the contract is signed."],
