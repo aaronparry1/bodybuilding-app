@@ -14,6 +14,7 @@ import { resolveMesocyclePrescriptionPolicy } from "@/domain/training/mesocycle-
 import { canonicalDeterministicFingerprint, canonicalDeterministicFingerprintId } from "@/domain/training/canonical-deterministic-fingerprint";
 import type { CanonicalPostWorkoutEvaluation } from "@/domain/training/canonical-progress-evaluator";
 import type { CanonicalNumericPrescriptionDecision } from "@/domain/training/canonical-comparable-exposure-policy";
+import { adaptationAuditFromNumericDecisions } from "@/domain/training/canonical-adaptation-audit";
 
 export const CANONICAL_POST_WORKOUT_ORCHESTRATOR_VERSION = "canonical_post_workout_orchestrator_v1" as const;
 
@@ -136,7 +137,7 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     : operationId;
   // The decision timestamp is part of its deterministic identity. Retries use
   // the durable completion evidence time, never the wall-clock retry time.
-  const details = phaseOneDecisionDetails(evaluation, raw.carrier.plannedSessions.map((session) => session.id), completionEvidence.evidence.observedAt, decisionIdentity);
+  const details = phaseOneDecisionDetails(evaluation, raw.carrier.plannedSessions.map((session) => session.id), completionEvidence.evidence.observedAt, decisionIdentity, aggregate.session.athleteId);
   const produced = produceCanonicalProgressDecision({
     planId: plan.planId,
     planRevision: plan.revision,
@@ -335,6 +336,7 @@ function phaseOneDecisionDetails(
   priorFutureSessionIds: readonly string[],
   decidedAt: string,
   idempotencyKey: string,
+  athleteId: string,
 ): CanonicalPhaseOneDecisionDetails {
   const decisionType = evaluation.outcome === "transition_recommended" ? "transition" : evaluation.outcome;
   const kind = decisionType === "establish_calibration" ? "establish_observed_calibration"
@@ -368,6 +370,17 @@ function phaseOneDecisionDetails(
     contextIdentity: { macrocycleId: evaluation.macrocycleId, mesocycleId: evaluation.mesocycleId, microcycleId: evaluation.microcycleId },
     decidedAt,
     idempotencyKey,
+    adaptationAudit: adaptationAuditFromNumericDecisions({
+      athleteId,
+      evidenceIds: evaluation.evidenceIds,
+      comparableExposureCount: evaluation.comparableExposureCount,
+      reasonCodes: evaluation.reasonCodes,
+      explanation: evaluation.explanation,
+      exerciseIds: evaluation.affectedExerciseIds,
+      numericDecisions: evaluation.numericDecisions,
+      decisionType,
+      recoveryEvidence: evaluation.recoveryEvidence,
+    }),
   };
 }
 

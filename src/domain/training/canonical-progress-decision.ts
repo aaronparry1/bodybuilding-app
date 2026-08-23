@@ -1,3 +1,5 @@
+import { validateCanonicalAdaptationAudit } from "@/domain/training/canonical-adaptation-audit";
+
 export const CANONICAL_PROGRESS_DECISION_SCHEMA = "canonical_progress_decision_v1" as const;
 export type CanonicalPhaseOneDecisionDetails = Readonly<{
   schemaVersion: "canonical_coaching_decision_details_v1";
@@ -25,6 +27,7 @@ export type CanonicalPhaseOneDecisionDetails = Readonly<{
   contextIdentity: Readonly<{ macrocycleId: string; mesocycleId: string; microcycleId: string }>;
   decidedAt: string;
   idempotencyKey: string;
+  adaptationAudit?: import("@/domain/training/canonical-adaptation-audit").CanonicalAdaptationAudit;
 }>;
 export type CanonicalPhaseOneApplicationReceiptV1 = Readonly<{
   schemaVersion: "canonical_coaching_application_receipt_v1";
@@ -139,6 +142,9 @@ export function validateCanonicalProgressDecision(value: unknown): { status: "va
       || !details.contextIdentity || !details.contextIdentity.macrocycleId || !details.contextIdentity.mesocycleId || !details.contextIdentity.microcycleId
       || typeof details.decidedAt !== "string" || Number.isNaN(Date.parse(details.decidedAt))
       || typeof details.idempotencyKey !== "string" || !details.idempotencyKey) return { status: "invalid", reason: "invalid_phase_one_decision" };
+    if (details.adaptationAudit !== undefined) {
+      if (!validateCanonicalAdaptationAudit(details.adaptationAudit)) return { status: "invalid", reason: "invalid_adaptation_audit" };
+    }
     const expectedResult = details.decisionType === "blocked" ? "blocked_no_change" : details.decisionType === "maintain" ? "explicit_no_change" : "future_prescription_change";
     if (details.result !== expectedResult) return { status: "invalid", reason: "invalid_phase_one_decision_result" };
   }
