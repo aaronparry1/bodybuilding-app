@@ -2,7 +2,7 @@ import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/
 import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
 import { exerciseDisplayName, methodDisplayName, sessionRoleDisplayName } from "@/application/training/display-labels";
-import { displayLoadFromBaseKg } from "@/application/training/canonical-workout-presentation";
+import { activeElapsedSeconds, displayLoadFromBaseKg } from "@/application/training/canonical-workout-presentation";
 import { deriveCanonicalWorkoutAchievements, type CanonicalWorkoutAchievement, type CanonicalWorkoutAggregate } from "@/domain/training/canonical-workout-achievements";
 import type { CanonicalProgressDecision } from "@/domain/training/canonical-progress-decision";
 
@@ -48,7 +48,6 @@ export function projectCanonicalCompletionSummary(input: Readonly<{
   const methodsPerformed = [...new Set(slots.filter((slot) => performedSlots.has(String(slot.id))).map((slot) => methodDisplayName(String(slot.method))))];
   const weighted = performance.filter((event) => typeof event.payload.load === "number" && event.payload.load > 0 && event.payload.completion === "complete");
   const totalVolume = weighted.length ? weighted.reduce((sum, event) => sum + Number(event.payload.load) * Number(event.payload.reps ?? 0), 0) : null;
-  const startedAt = input.session.startedAt ? Date.parse(input.session.startedAt) : Date.parse(input.session.createdAt);
   const completedAt = input.events.find((event) => event.type === "completed")?.occurredAt;
   const end = completedAt ? Date.parse(completedAt) : (input.now ?? Date.now());
   const completionLabel = completionSummary.completion === "complete"
@@ -59,7 +58,7 @@ export function projectCanonicalCompletionSummary(input: Readonly<{
   const displayUnit = input.displayUnit ?? "kg";
   const achievements = deriveCanonicalWorkoutAchievements({ current: { session: input.session, events: input.events }, history: input.history ?? [], exerciseName: exerciseDisplayName }).map((achievement) => presentAchievement(achievement, displayUnit));
   const coachingChange = input.decision ? completionCoachingChange(input.decision, input.displayUnit ?? "kg") : undefined;
-  return { title: "Workout complete", workoutName: sessionRoleDisplayName(input.session.role), completion: completionSummary.completion, completionLabel, elapsedSeconds: Number.isFinite(startedAt) ? Math.max(0, Math.floor((end - startedAt) / 1000)) : 0, completedWorkingSets: performance.length, exercisesCompleted: exercises.size, prescribedExercises: slots.length, totalVolume, methodsPerformed, achievements, coachingOutcome: input.coachingExplanation ?? "Training recorded. Your next session is ready when you are.", ...(coachingChange ? { coachingChange } : {}), ...(input.programmePosition ? { programmePosition: input.programmePosition } : {}), nextWorkoutId: input.nextWorkoutId ?? null, ...(input.nextWorkoutLabel ? { nextWorkoutLabel: input.nextWorkoutLabel } : {}), ...(input.nextPrescription ? { nextPrescription: input.nextPrescription } : {}) };
+  return { title: "Workout complete", workoutName: sessionRoleDisplayName(input.session.role), completion: completionSummary.completion, completionLabel, elapsedSeconds: activeElapsedSeconds(input.session, input.events, end), completedWorkingSets: performance.length, exercisesCompleted: exercises.size, prescribedExercises: slots.length, totalVolume, methodsPerformed, achievements, coachingOutcome: input.coachingExplanation ?? "Training recorded. Your next session is ready when you are.", ...(coachingChange ? { coachingChange } : {}), ...(input.programmePosition ? { programmePosition: input.programmePosition } : {}), nextWorkoutId: input.nextWorkoutId ?? null, ...(input.nextWorkoutLabel ? { nextWorkoutLabel: input.nextWorkoutLabel } : {}), ...(input.nextPrescription ? { nextPrescription: input.nextPrescription } : {}) };
 }
 
 function presentAchievement(achievement: CanonicalWorkoutAchievement, displayUnit: "kg" | "lb"): CanonicalWorkoutAchievement {
