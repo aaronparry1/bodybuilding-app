@@ -43,6 +43,7 @@
     "typecheck": "tsc --noEmit",
     "export:web": "expo export --platform web",
     "scan:production-payload": "node scripts/scan-production-payload.mjs",
+    "certify:generator": "vite-node --config vitest.config.ts scripts/generate-canonical-generator-certification.ts",
     "test:ios:release-candidate": "bash scripts/run-ios-release-candidate-ui-tests.sh",
     "eas:build:dev:ios": "npx eas-cli@latest build -p ios --profile development",
     "eas:build:dev:android": "npx eas-cli@latest build -p android --profile development",
