@@ -563,7 +563,7 @@ function OptionList<T extends string | number>({
 function resolveExistingTrainingBeforeCreation(input: Readonly<{
   authLoading: boolean;
   authenticatedUserId: string | null;
-  dataHydrationStatus: "idle" | "restoring" | "ready" | "error";
+  dataHydrationStatus: "idle" | "restoring" | "ready" | "delayed" | "error" | "conflict";
   onboardingCompleted: boolean;
   explicitSetupRestart: boolean;
 }>) {
