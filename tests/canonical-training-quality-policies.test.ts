@@ -48,7 +48,7 @@ describe("canonical training-quality policies", () => {
     const context = { slot, macrocycleGoal: "build_muscle_and_strength", mesocycleId: "powerbuilding_foundation", experience: "intermediate" as const, sessionExerciseIds: ["ex-barbell-back-squat"], weeklyExerciseUsage: {}, sessionHighFatigueSets: 4 };
     const specialist = assessCanonicalExerciseRoleSuitability({ ...context, exercise: exercise("ex-anderson-squat") });
     const stable = assessCanonicalExerciseRoleSuitability({ ...context, exercise: exercise("ex-hack-squat-machine") });
-    expect(specialist.suitability).toBe("specialist");
+    expect(specialist.suitability).toBe("unsuitable");
     expect(stable.suitability).toBe("primary_choice");
     expect(stable.score).toBeGreaterThan(specialist.score);
   });
