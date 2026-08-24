@@ -52,6 +52,7 @@ Screenshots live under `qa-reports/native-premium-certification/screenshots` in 
 | Onboarding, improved | narrow iPhone SE viewport | clean local state | `improved-onboarding-small.png` | Continue is pinned above the safe area while choices scroll | verified |
 | Genuine PR completion | iPhone 17 Pro | `completion_pr` | `completion-pr-17pro.png` | Calm completion hierarchy with retained totals | inspected |
 | Genuine PR completion | narrow iPhone SE viewport | `completion_pr` | `completion-pr-small.png` | Headline is large but untruncated; metrics remain legible | inspected |
+| Release launch without Metro | iPhone 17 Pro | production Release | `release-no-metro-17pro.png` | Packaged bundle launches with no QA banner; retained incompatible training fails closed into recovery | verified |
 
 ## Interaction-cost observations
 
@@ -85,6 +86,7 @@ Current official product evidence sets a clear benchmark: Hevy exposes previous 
 - Mounted continuity/longitudinal focus: 3 files / 32 tests passed.
 - Production Expo config with QA public flags forced on: passed; the production boundary test also passed.
 - Web export: passed (1,457 modules).
+- Native production Release simulator build: passed. The app contains `main.jsbundle`, has bundle identifier `com.aaronparry.adaptivestrengthcoach`, has no `ASC_QA` binary marker and launches with Metro stopped.
 
 Remaining broad-suite failures:
 
