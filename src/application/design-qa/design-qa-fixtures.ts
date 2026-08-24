@@ -236,7 +236,8 @@ export function ensureDesignQaLocalWorkoutReadyState(environment: AppEnvironment
   const planned = plan.plannedSessions[0];
   if (!planned) throw new Error("canonical_visual_setup_session_unavailable");
   if (!plan.activeRecordedSession) {
-    const started = startCanonicalSession({ planId: plan.planId, expectedPlanRevision: plan.revision, plannedSessionId: planned.id, expectedPrescriptionHash: prescriptionHash(planned.snapshot), operationId: "design-qa-visual-workout-start", startedAt: "2026-01-01T09:00:00.000Z", provenance: "design-qa-canonical-visual-workout" });
+    const startedAt = new Date(Date.now() - (18 * 60 * 1000)).toISOString();
+    const started = startCanonicalSession({ planId: plan.planId, expectedPlanRevision: plan.revision, plannedSessionId: planned.id, expectedPrescriptionHash: prescriptionHash(planned.snapshot), operationId: "design-qa-visual-workout-start", startedAt, provenance: "design-qa-canonical-visual-workout" });
     if (!["started", "already_started"].includes(started.status)) throw new Error(`canonical_visual_setup_start_failed:${started.reason}`);
   }
   if (!canonicalActivePlanState.getReadModel()?.activeRecordedSession) throw new Error("canonical_visual_setup_hydration_failed");
@@ -297,7 +298,7 @@ export function applyCanonicalProgressVisualPreview(state: CanonicalProgressVisu
   clearFixtureViewStateOnly();
   appSettingsStore.patch({ onboardingCompleted: true });
   cacheSubscription(seedMockSubscriptionStatus("trial"));
-  applyCanonicalProgressVisualState(state, { planId: `design-qa:progress-preview-${state}` });
+  applyCanonicalProgressVisualState(state, { planId: `design-qa:progress-preview-${state}`, now: new Date().toISOString() });
   jsonStore.set(activeFixtureKey, { id: "progress_recent_clean", label: `Certified Progress: ${state.replace("_", " ")}`, appliedAt: new Date().toISOString() } satisfies ActiveDesignQaFixture);
 }
 
@@ -325,7 +326,7 @@ function applySessionLifecycleFixture(id: DesignQaFixtureId, environment: AppEnv
     if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
     clearFixtureViewStateOnly();
     appSettingsStore.patch({ onboardingCompleted: true });
-    applyCanonicalCompletionVisualState(id.replace("completion_", "") as Parameters<typeof applyCanonicalCompletionVisualState>[0], { planId: `design-qa:${id}` });
+    applyCanonicalCompletionVisualState(id.replace("completion_", "") as Parameters<typeof applyCanonicalCompletionVisualState>[0], { planId: `design-qa:${id}`, now: new Date().toISOString() });
     const definition = getFixtureDefinition(id);
     const activeFixture = { id, label: definition.label, appliedAt: "2026-07-18T10:00:00.000Z" };
     jsonStore.set(activeFixtureKey, activeFixture);
@@ -377,7 +378,7 @@ function applyProgressDecisionFixture(id: DesignQaFixtureId, environment: AppEnv
     appSettingsStore.patch({ onboardingCompleted: true });
     canonicalActivePlanState.clear();
     if (id === "progress_adaptation_applied") {
-      applyCanonicalAdaptationVisualState({ planId: `design-qa:${id}` });
+      applyCanonicalAdaptationVisualState({ planId: `design-qa:${id}`, now: new Date().toISOString() });
       const definition = getFixtureDefinition(id);
       const activeFixture = { id, label: definition.label, appliedAt: "2026-01-01T00:00:00.000Z" };
       jsonStore.set(activeFixtureKey, activeFixture);

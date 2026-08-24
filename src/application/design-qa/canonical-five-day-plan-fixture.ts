@@ -143,30 +143,30 @@ function applyCompletedWeekHistory(planId: string, now: string) {
  */
 export function applyCanonicalProgressVisualState(
   state: CanonicalProgressVisualState,
-  options: Readonly<{ planId?: string }> = {},
+  options: Readonly<{ planId?: string; now?: string }> = {},
 ) {
   const planId = options.planId ?? `design-qa:progress-${state}`;
-  if (state === "zero") return applyCanonicalHomeVisualState("planned", { planId });
-  if (state === "one_completed") return applyCanonicalHomeVisualState("completed", { planId, now: "2026-07-18T10:00:00.000Z" });
+  if (state === "zero") return applyCanonicalHomeVisualState("planned", { planId, now: options.now });
+  if (state === "one_completed") return applyCanonicalHomeVisualState("completed", { planId, now: options.now ?? "2026-07-18T10:00:00.000Z" });
   const exposures = state === "insufficient_trend" ? 2 : 3;
-  return applyComparableProgressHistory(planId, exposures, state === "established" ? 0 : 2.5);
+  return applyComparableProgressHistory(planId, exposures, state === "established" ? 0 : 2.5, false, false, options.now);
 }
 
 /** Executable finish-screen states built from canonical immutable session history. */
 export function applyCanonicalCompletionVisualState(
   state: CanonicalCompletionVisualState,
-  options: Readonly<{ planId?: string }> = {},
+  options: Readonly<{ planId?: string; now?: string }> = {},
 ): Readonly<{ model: ReturnType<typeof requireModel>; recordedSessionId: string }> {
   const planId = options.planId ?? `design-qa:completion-${state}`;
   const exposures = state === "ordinary" || state === "missing_history" ? 1 : state === "partial" ? 2 : 3;
   const loadStepKg = state === "ordinary" || state === "missing_history" ? 0 : 2.5;
-  const model = applyComparableProgressHistory(planId, exposures, loadStepKg, state === "multiple" || state === "long_accessibility", state === "partial");
+  const model = applyComparableProgressHistory(planId, exposures, loadStepKg, state === "multiple" || state === "long_accessibility", state === "partial", options.now);
   return { model, recordedSessionId: `${planId}:comparison:${exposures}` };
 }
 
-export function applyCanonicalAdaptationVisualState(options: Readonly<{ planId?: string }> = {}) {
+export function applyCanonicalAdaptationVisualState(options: Readonly<{ planId?: string; now?: string }> = {}) {
   const planId = options.planId ?? "design-qa:progress-adaptation-applied";
-  const model = applyCanonicalProgressVisualState("established", { planId });
+  const model = applyCanonicalProgressVisualState("established", { planId, now: options.now });
   const sourceSessionId = `${planId}:comparison:3`;
   const decision: CanonicalProgressDecision = {
     schemaVersion: "canonical_progress_decision_v1",
@@ -209,7 +209,7 @@ export function applyCanonicalAdaptationVisualState(options: Readonly<{ planId?:
   return model;
 }
 
-function applyComparableProgressHistory(planId: string, exposures: number, loadStepKg: number, progressEveryExercise = false, partialFinalExposure = false) {
+function applyComparableProgressHistory(planId: string, exposures: number, loadStepKg: number, progressEveryExercise = false, partialFinalExposure = false, now?: string) {
   resetCanonicalHomeVisualState();
   const created = canonicalActivePlanState.create(canonicalProgressFixtureInput(planId));
   if (created.hydration !== "hydrated" || !created.model) throw new Error(`canonical_progress_visual_plan_failed:${created.error ?? created.hydration}`);
@@ -233,7 +233,9 @@ function applyComparableProgressHistory(planId: string, exposures: number, loadS
 
   for (let index = 0; index < exposures; index += 1) {
     const recordedSessionId = `${planId}:comparison:${index + 1}`;
-    const startedAt = new Date(Date.UTC(2026, 6, 4 + index * 6, 9, 0, 0)).toISOString();
+    const startedAt = now
+      ? offsetIso(now, ((index - (exposures - 1)) * 6 - 1) * 24 * 60 * 60_000)
+      : new Date(Date.UTC(2026, 6, 4 + index * 6, 9, 0, 0)).toISOString();
     const createdLedger = canonicalRecordedSessionLedger.create({
       schemaVersion: "canonical_recorded_session_v1",
       recordedSessionId,

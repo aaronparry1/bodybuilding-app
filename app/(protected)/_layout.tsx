@@ -1,12 +1,13 @@
-import { Redirect, useGlobalSearchParams, useSegments } from "expo-router";
+import Constants from "expo-constants";
+import { Redirect, useGlobalSearchParams, useRouter, useSegments } from "expo-router";
 import { Stack } from "expo-router/stack";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/application/auth/auth-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { useSubscription } from "@/application/billing/subscription-context";
-import { getActiveDesignQaFixture, subscribeDesignQaFixture } from "@/application/design-qa/design-qa-fixtures";
+import { applyDesignQaFixture, designQaFixtures, getActiveDesignQaFixture, subscribeDesignQaFixture } from "@/application/design-qa/design-qa-fixtures";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import {
   inspectCanonicalRetainedTrainingPresence,
@@ -28,13 +29,17 @@ export default function ProtectedLayout() {
   const { dataHydrationStatus, dataHydrationError, retryDataHydration, qaPremiumFixtureActive } = useSubscription();
   const { settings } = useAppSettings();
   const segments = useSegments();
+  const router = useRouter();
   const { qaChrome, restart } = useGlobalSearchParams<{ qaChrome?: string; restart?: string }>();
   const designQaRuntimeAvailable = isDesignQaModeAvailable(getAppEnvironment()) && isDesignQaModeRequested();
   const [activeFixture, setActiveFixture] = useState(() => designQaRuntimeAvailable ? getActiveDesignQaFixture() : null);
   const [reconciliation, setReconciliation] = useState<CanonicalReleaseReconciliationResult | null>(null);
+  const initialFixtureApplied = useRef(false);
   const isOnboardingRoute = segments.includes("onboarding");
   const explicitSetupRestart = isOnboardingRoute && restart === "1";
   const showDesignQaChrome = Boolean(activeFixture) && qaChrome === "1" && designQaRuntimeAvailable;
+  const qaBuildIdentity = (Constants.expoConfig?.extra as { qaBuildIdentity?: unknown } | undefined)?.qaBuildIdentity;
+  const qaBuildLabel = typeof qaBuildIdentity === "string" && qaBuildIdentity.length > 0 ? ` · ${qaBuildIdentity}` : "";
   const retainedTraining = inspectCanonicalRetainedTrainingPresence(user?.id ?? null);
   const startupHydration = resolveCanonicalStartupHydration({
     authLoading: isLoading,
@@ -57,6 +62,16 @@ export default function ProtectedLayout() {
     if (!designQaRuntimeAvailable) { setActiveFixture(null); return; }
     return subscribeDesignQaFixture(() => setActiveFixture(getActiveDesignQaFixture()));
   }, [designQaRuntimeAvailable]);
+  useEffect(() => {
+    if (!designQaRuntimeAvailable || initialFixtureApplied.current) return;
+    const requestedFixture = process.env.EXPO_PUBLIC_QA_INITIAL_FIXTURE;
+    if (!requestedFixture) return;
+    const definition = designQaFixtures.find((candidate) => candidate.id === requestedFixture);
+    if (!definition) return;
+    initialFixtureApplied.current = true;
+    applyDesignQaFixture(definition.id, getAppEnvironment());
+    router.replace(definition.targetHref);
+  }, [designQaRuntimeAvailable, router]);
   useEffect(() => {
     if (activeFixture) { canonicalActivePlanState.hydrate(); return; }
     if (waitingForAccountRestore || accountRestoreFailedWithoutLocalPlan) {
@@ -125,7 +140,7 @@ export default function ProtectedLayout() {
           }}
         >
           <Text selectable adjustsFontSizeToFit minimumFontScale={0.82} numberOfLines={1} style={{ color: colors.accent, fontSize: 12, lineHeight: 16, fontWeight: "900", textAlign: "center" }}>
-            {qaPremiumFixtureActive ? "Premium QA entitlement fixture — billing disabled for visual inspection" : `Design QA fixture active: ${activeFixture?.label}`}
+            {qaPremiumFixtureActive ? `Premium QA · billing disabled${qaBuildLabel}` : `Design QA: ${activeFixture?.label}${qaBuildLabel}`}
           </Text>
         </View>
       ) : null}
