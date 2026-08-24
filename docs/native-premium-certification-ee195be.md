@@ -68,12 +68,36 @@ Counts are native actions from the rendered QA journeys, not inferred competitor
 | Complete workout | 2 | Complete then confirm | 2 | Destructive/consequential safety retained |
 | Understand next prescription | 1 from completion | Explanation depends on persisted decision | 1 | Canonical explanation remains source |
 
+Current official product evidence sets a clear benchmark: Hevy exposes previous values, set types, supersets and an automatic timer in the logger; its timer starts when a set is marked complete and remains adjustable during training. Alpha Progression presents load, rep and intensity recommendations for every set based on performed training. ASC now meets the persistent-context and automatic-transition baseline on the certified active-set states, but its correction, superset and substitution flows have not yet been action-timed natively and are therefore not certified as matching those products.
+
+- [Hevy feature list](https://www.hevyapp.com/features/)
+- [Hevy automatic rest timer](https://www.hevyapp.com/features/workout-rest-timer/)
+- [Alpha Progression product and logger](https://alphaprogression.com/)
+
 ## Verification snapshot
 
 - Static generator: 25 constructed, 5 fail-closed, 0 critical violations.
 - Focused closed loop: 7 files / 37 tests passed.
 - TypeScript after native UI changes: passed.
 - Focused phone UI, QA production boundary and billing flow: 25 tests passed.
-- Broad Vitest: 2,478 / 2,486 assertions passed. Eight failures remain classified in the run ledger; protected pre-existing source-boundary tests were not modified.
+- Broad Vitest baseline: 2,478 / 2,486 assertions passed.
+- Broad Vitest after this slice: 2,479 / 2,486 assertions passed, with no new failures.
+- Mounted continuity/longitudinal focus: 3 files / 32 tests passed.
+- Production Expo config with QA public flags forced on: passed; the production boundary test also passed.
+- Web export: passed (1,457 modules).
+
+Remaining broad-suite failures:
+
+| Test | Classification | Evidence |
+| --- | --- | --- |
+| app icon Expo/iOS source string | protected pre-existing source-boundary assertion | Expects `ios.icon` to be the first iOS property; rendered/native icon hash passes |
+| mounted numeric progression aggregate | stale deterministic aggregate plus unresolved mounted behaviour | Current canonical run produces 14 rather than 13 future-slot deltas |
+| mounted repeated-miss regression | real mounted-path defect exposed by a stale assertion | The assertion mistakes an incidental reconstructed target decrease for a coached regression; the persisted decision has no matching regression outcome |
+| Train brand boundary | protected pre-existing source-boundary assertion | Expects removed `WorkoutStage` source shape |
+| specialist suitability | pre-existing canonical-policy expectation | Anderson squat now fails closed as `unsuitable`, while the test expects `specialist` |
+| onboarding/Home source boundary | protected pre-existing source-boundary assertion | Expects removed `WorkoutMetricStrip` source shape; onboarding layout expectation remains satisfied |
+| Settings simplification | protected pre-existing source-boundary assertion | Expects removed `View Progress` source string |
+
+The mounted repeated-miss failure is not being relabelled as harmless generated evidence. A diagnostic predicate requiring the persisted numeric decision, receipt and material delta to agree found no authorised mounted regression after 45 completed sessions. That explanation-to-decision mismatch remains a release-relevant defect.
 
 This report remains open until the additional fixtures, mounted longitudinal run, export/release build, accessibility pass and final broad-suite reconciliation are complete.
