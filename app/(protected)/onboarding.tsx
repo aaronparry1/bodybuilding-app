@@ -1,6 +1,7 @@
 import { Stack, router, useGlobalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { useAuth } from "@/application/auth/auth-context";
 import { useSubscription } from "@/application/billing/subscription-context";
@@ -95,6 +96,7 @@ const concurrentSportOptions: Array<{ value: CanonicalStartingVolumeContext["con
 ];
 
 export default function OnboardingScreen() {
+  const insets = useSafeAreaInsets();
   const { settings } = useAppSettings();
   const { user, isLoading: authLoading } = useAuth();
   const { dataHydrationStatus, retryDataHydration } = useSubscription();
@@ -346,141 +348,153 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <AppScreen bottom={96} respectTopSafeArea scrollRef={scrollRef}>
-      <Stack.Screen options={{ title: step === "review" ? "Your Programme" : "Welcome" }} />
-      <HeroPanel eyebrow={`Setup · ${progressLabel}`} title={titleForStep(step)} subtitle={subtitleForStep(step)} />
-      <ProgressDots count={steps.length} active={stepIndex} />
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <AppScreen bottom={96} respectTopSafeArea scrollRef={scrollRef}>
+        <Stack.Screen options={{ title: step === "review" ? "Your Programme" : "Welcome" }} />
+        <HeroPanel eyebrow={`Setup · ${progressLabel}`} title={titleForStep(step)} subtitle={subtitleForStep(step)} />
+        <ProgressDots count={steps.length} active={stepIndex} />
 
-      {step === "goal" ? <OptionList<TrainingSetupGoal> options={goalOptions} selected={setupGoal} onSelect={chooseGoal} /> : null}
-      {step === "commitment" ? <OptionList<TrainingCommitmentType> options={commitmentOptions} selected={commitmentType} onSelect={setCommitmentType} /> : null}
-      {step === "event" ? (
-        <View style={{ gap: spacing.lg }}>
-          <PremiumCard>
-            <Text style={{ color: colors.text, fontSize: 18, fontWeight: "900" }}>Training target</Text>
-            <Text style={{ color: colors.textMuted, fontSize: 14, lineHeight: 20, fontWeight: "700" }}>
-              The coach handles the macrocycle. Give it the target date so it can plan the route.
-            </Text>
-          </PremiumCard>
-          <OptionList<TrainingEventType> options={compatibleEventOptions} selected={selectedEventType} onSelect={setEventType} />
-          <LabeledInput label="Target date" value={targetDate} onChangeText={setTargetDate} placeholder="2026-12-01" />
-        </View>
-      ) : null}
-      {step === "schedule" ? (
-        <View style={{ gap: spacing.xl }}>
-          <View style={{ gap: spacing.sm }}>
-            <Text selectable style={{ ...type.section, color: colors.text }}>Training days</Text>
-            <OptionList<TrainingDaysPerWeek>
-              options={trainingFrequencyOptions.map((day) => ({ value: day, label: `${day} days` }))}
-              selected={daysPerWeek}
-              onSelect={setDaysPerWeek}
-              guidance="Choose the number of training days you can repeat most weeks."
-            />
-          </View>
-          <View style={{ gap: spacing.sm }}>
-            <Text selectable style={{ ...type.section, color: colors.text }}>Workout length</Text>
-            <OptionList<CanonicalSessionDurationMinutes>
-              options={canonicalSessionDurationOptions.map((minutes) => ({ value: minutes, label: `${minutes} minutes` }))}
-              selected={availableSessionMinutes}
-              onSelect={setAvailableSessionMinutes}
-              guidance="Choose the time you can reliably protect for each workout."
-            />
-          </View>
-        </View>
-      ) : null}
-      {step === "split" ? <OptionList<PreferredSplit> options={splitOptions} selected={preferredSplit} onSelect={setPreferredSplit} /> : null}
-      {step === "experience" ? (
-        <OptionList<ExperienceLevel>
-          options={trainingExperiences.map((experience) => ({ value: experience.id, label: experience.displayName, detail: experience.description }))}
-          selected={experienceLevel}
-          onSelect={setExperienceLevel}
-        />
-      ) : null}
-      {step === "priority" ? (
-        <OptionList<CanonicalTrainingPriority>
-          options={canonicalTrainingPriorityOptions}
-          selected={trainingPriority}
-          onSelect={setTrainingPriority}
-          guidance="This is an optional emphasis, not a diagnosis. ASC keeps total starting workload bounded and reassesses it from completed training."
-        />
-      ) : null}
-      {step === "recent_training" ? (
-        <View style={{ gap: spacing.lg }}>
-          <OptionList<CanonicalStartingVolumeContext["continuity"]> options={continuityOptions} selected={continuity} onSelect={chooseContinuity} />
-          {continuity === "currently_training" ? (
+        {step === "goal" ? <OptionList<TrainingSetupGoal> options={goalOptions} selected={setupGoal} onSelect={chooseGoal} /> : null}
+        {step === "commitment" ? <OptionList<TrainingCommitmentType> options={commitmentOptions} selected={commitmentType} onSelect={setCommitmentType} /> : null}
+        {step === "event" ? (
+          <View style={{ gap: spacing.lg }}>
             <PremiumCard>
-              <Text selectable style={{ ...type.section, color: colors.text }}>Your recent routine</Text>
-              <Text selectable style={{ ...type.body, color: colors.textMuted }}>
-                Before today, how many days per week were you usually lifting? This helps choose the starting workload; it does not change your new schedule.
+              <Text style={{ color: colors.text, fontSize: 18, fontWeight: "900" }}>Training target</Text>
+              <Text style={{ color: colors.textMuted, fontSize: 14, lineHeight: 20, fontWeight: "700" }}>
+                The coach handles the macrocycle. Give it the target date so it can plan the route.
               </Text>
-              <CompactDayOptions selected={recentTrainingDaysPerWeek} onSelect={chooseRecentTrainingDays} />
             </PremiumCard>
-          ) : null}
-          <PremiumCard>
-            <Text selectable style={{ ...type.label, color: colors.textSubtle }}>Typical recent workout</Text>
-            <OptionList<CanonicalStartingVolumeContext["recentSessionWorkload"]> options={recentWorkloadOptions} selected={recentSessionWorkload} onSelect={setRecentSessionWorkload} />
-          </PremiumCard>
-          <PremiumCard>
-            <Text selectable style={{ ...type.label, color: colors.textSubtle }}>How have you been recovering?</Text>
-            <OptionList<CanonicalStartingVolumeContext["recovery"]> options={perceivedRecoveryOptions} selected={perceivedRecovery} onSelect={setPerceivedRecovery} />
-          </PremiumCard>
-          <PremiumCard>
-            <Text selectable style={{ ...type.label, color: colors.textSubtle }}>Sport outside the gym</Text>
-            <OptionList<CanonicalStartingVolumeContext["concurrentSport"]> options={concurrentSportOptions} selected={concurrentSport} onSelect={setConcurrentSport} />
-          </PremiumCard>
-        </View>
-      ) : null}
-      {step === "recovery" ? (
-        <OptionList<RecoveryCardioPreference> options={recoveryCardioOptions} selected={recoveryCardioPreference} onSelect={setRecoveryCardioPreference} />
-      ) : null}
-      {step === "review" ? (
-        <ReviewPanel
-          goal={labelFor(goalOptions, setupGoal)}
-          commitment={trainingCommitment.userFacingSummary}
-          daysPerWeek={daysPerWeek}
-          availableSessionMinutes={availableSessionMinutes}
-          framework={frameworkSummary}
-          experience={labelForExperience(experienceLevel)}
-          priority={canonicalTrainingPriorityOptions.find((option) => option.value === trainingPriority)?.label ?? "Balanced development"}
-          recentTraining={continuity === "currently_training"
-            ? `${labelFor(continuityOptions, continuity)} · previously ${recentTrainingDaysPerWeek} days/week · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`
-            : `${labelFor(continuityOptions, continuity)} · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`}
-          recoveryCapacity={labelFor(recoveryCardioOptions, recoveryCardioPreference)}
-          unit={unit}
-          unitLabel={labelFor(unitOptions, unit)}
-          onSelectUnit={setUnit}
-        />
-      ) : null}
-      {creationError ? <PremiumCard tone="danger"><Text accessibilityRole="alert" style={{ color: colors.danger, ...type.body }}>{creationError}</Text></PremiumCard> : null}
-
-      <View style={{ flexDirection: "row", gap: spacing.sm }}>
-        {stepIndex > 0 ? <SecondaryButton label="Back" onPress={goBack} /> : null}
-        <View style={{ flex: 1 }}>
-          <PrimaryButton
-            label={step === "review"
-              ? creationRecoveryRequired
-                ? "Try restoring training"
-                : creationPending
-                  ? "Creating Programme…"
-                  : creationCommitted
-                    ? "Open Programme"
-                    : "Create Programme"
-              : "Continue"}
-            onPress={step === "review"
-              ? creationRecoveryRequired
-                ? () => {
-                    setCreationError(null);
-                    setCreationRecoveryRequired(false);
-                    retryDataHydration();
-                    router.replace("/(protected)/(tabs)");
-                  }
-                : finish
-              : goNext}
-            disabled={creationPending || (step === "split" && splitOptions.length === 0)}
-            testID={step === "review" ? "onboarding-create-programme" : undefined}
+            <OptionList<TrainingEventType> options={compatibleEventOptions} selected={selectedEventType} onSelect={setEventType} />
+            <LabeledInput label="Target date" value={targetDate} onChangeText={setTargetDate} placeholder="2026-12-01" />
+          </View>
+        ) : null}
+        {step === "schedule" ? (
+          <View style={{ gap: spacing.xl }}>
+            <View style={{ gap: spacing.sm }}>
+              <Text selectable style={{ ...type.section, color: colors.text }}>Training days</Text>
+              <OptionList<TrainingDaysPerWeek>
+                options={trainingFrequencyOptions.map((day) => ({ value: day, label: `${day} days` }))}
+                selected={daysPerWeek}
+                onSelect={setDaysPerWeek}
+                guidance="Choose the number of training days you can repeat most weeks."
+              />
+            </View>
+            <View style={{ gap: spacing.sm }}>
+              <Text selectable style={{ ...type.section, color: colors.text }}>Workout length</Text>
+              <OptionList<CanonicalSessionDurationMinutes>
+                options={canonicalSessionDurationOptions.map((minutes) => ({ value: minutes, label: `${minutes} minutes` }))}
+                selected={availableSessionMinutes}
+                onSelect={setAvailableSessionMinutes}
+                guidance="Choose the time you can reliably protect for each workout."
+              />
+            </View>
+          </View>
+        ) : null}
+        {step === "split" ? <OptionList<PreferredSplit> options={splitOptions} selected={preferredSplit} onSelect={setPreferredSplit} /> : null}
+        {step === "experience" ? (
+          <OptionList<ExperienceLevel>
+            options={trainingExperiences.map((experience) => ({ value: experience.id, label: experience.displayName, detail: experience.description }))}
+            selected={experienceLevel}
+            onSelect={setExperienceLevel}
           />
+        ) : null}
+        {step === "priority" ? (
+          <OptionList<CanonicalTrainingPriority>
+            options={canonicalTrainingPriorityOptions}
+            selected={trainingPriority}
+            onSelect={setTrainingPriority}
+            guidance="This is an optional emphasis, not a diagnosis. ASC keeps total starting workload bounded and reassesses it from completed training."
+          />
+        ) : null}
+        {step === "recent_training" ? (
+          <View style={{ gap: spacing.lg }}>
+            <OptionList<CanonicalStartingVolumeContext["continuity"]> options={continuityOptions} selected={continuity} onSelect={chooseContinuity} />
+            {continuity === "currently_training" ? (
+              <PremiumCard>
+                <Text selectable style={{ ...type.section, color: colors.text }}>Your recent routine</Text>
+                <Text selectable style={{ ...type.body, color: colors.textMuted }}>
+                  Before today, how many days per week were you usually lifting? This helps choose the starting workload; it does not change your new schedule.
+                </Text>
+                <CompactDayOptions selected={recentTrainingDaysPerWeek} onSelect={chooseRecentTrainingDays} />
+              </PremiumCard>
+            ) : null}
+            <PremiumCard>
+              <Text selectable style={{ ...type.label, color: colors.textSubtle }}>Typical recent workout</Text>
+              <OptionList<CanonicalStartingVolumeContext["recentSessionWorkload"]> options={recentWorkloadOptions} selected={recentSessionWorkload} onSelect={setRecentSessionWorkload} />
+            </PremiumCard>
+            <PremiumCard>
+              <Text selectable style={{ ...type.label, color: colors.textSubtle }}>How have you been recovering?</Text>
+              <OptionList<CanonicalStartingVolumeContext["recovery"]> options={perceivedRecoveryOptions} selected={perceivedRecovery} onSelect={setPerceivedRecovery} />
+            </PremiumCard>
+            <PremiumCard>
+              <Text selectable style={{ ...type.label, color: colors.textSubtle }}>Sport outside the gym</Text>
+              <OptionList<CanonicalStartingVolumeContext["concurrentSport"]> options={concurrentSportOptions} selected={concurrentSport} onSelect={setConcurrentSport} />
+            </PremiumCard>
+          </View>
+        ) : null}
+        {step === "recovery" ? (
+          <OptionList<RecoveryCardioPreference> options={recoveryCardioOptions} selected={recoveryCardioPreference} onSelect={setRecoveryCardioPreference} />
+        ) : null}
+        {step === "review" ? (
+          <ReviewPanel
+            goal={labelFor(goalOptions, setupGoal)}
+            commitment={trainingCommitment.userFacingSummary}
+            daysPerWeek={daysPerWeek}
+            availableSessionMinutes={availableSessionMinutes}
+            framework={frameworkSummary}
+            experience={labelForExperience(experienceLevel)}
+            priority={canonicalTrainingPriorityOptions.find((option) => option.value === trainingPriority)?.label ?? "Balanced development"}
+            recentTraining={continuity === "currently_training"
+              ? `${labelFor(continuityOptions, continuity)} · previously ${recentTrainingDaysPerWeek} days/week · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`
+              : `${labelFor(continuityOptions, continuity)} · ${labelFor(recentWorkloadOptions, recentSessionWorkload)}`}
+            recoveryCapacity={labelFor(recoveryCardioOptions, recoveryCardioPreference)}
+            unit={unit}
+            unitLabel={labelFor(unitOptions, unit)}
+            onSelectUnit={setUnit}
+          />
+        ) : null}
+        {creationError ? <PremiumCard tone="danger"><Text accessibilityRole="alert" style={{ color: colors.danger, ...type.body }}>{creationError}</Text></PremiumCard> : null}
+      </AppScreen>
+      <View
+        style={{
+          paddingHorizontal: spacing.xl,
+          paddingTop: spacing.sm,
+          paddingBottom: Math.max(spacing.sm, insets.bottom),
+          backgroundColor: colors.background,
+          borderTopWidth: 1,
+          borderTopColor: colors.line,
+        }}
+      >
+        <View style={{ flexDirection: "row", gap: spacing.sm }}>
+          {stepIndex > 0 ? <SecondaryButton label="Back" onPress={goBack} /> : null}
+          <View style={{ flex: 1 }}>
+            <PrimaryButton
+              label={step === "review"
+                ? creationRecoveryRequired
+                  ? "Try restoring training"
+                  : creationPending
+                    ? "Creating Programme…"
+                    : creationCommitted
+                      ? "Open Programme"
+                      : "Create Programme"
+                : "Continue"}
+              onPress={step === "review"
+                ? creationRecoveryRequired
+                  ? () => {
+                      setCreationError(null);
+                      setCreationRecoveryRequired(false);
+                      retryDataHydration();
+                      router.replace("/(protected)/(tabs)");
+                    }
+                  : finish
+                : goNext}
+              disabled={creationPending || (step === "split" && splitOptions.length === 0)}
+              testID={step === "review" ? "onboarding-create-programme" : undefined}
+            />
+          </View>
         </View>
       </View>
-    </AppScreen>
+    </View>
   );
 }
 

@@ -461,6 +461,8 @@ function CanonicalTrainExperience() {
   return <TrainShell
     insets={insets}
     presentation={presentation}
+    activeExerciseName={activeExercise?.name}
+    restStatus={restTimer && restTimer.state !== "skipped" ? (restTimer.state === "expired" ? "Rest complete" : `Rest ${formatTimer(restSeconds)}`) : undefined}
     onMinimise={() => { Keyboard.dismiss(); pauseAndLeave(); }}
     onActions={() => { Keyboard.dismiss(); setMessage(null); setModal("actions"); }}
   >
@@ -528,13 +530,17 @@ function CanonicalTrainExperience() {
   </TrainShell>;
 }
 
-function TrainShell({ insets, presentation, onMinimise, onActions, children }: Readonly<{ insets: { top: number; bottom: number }; presentation: WorkoutPresentation; onMinimise(): void; onActions?: () => void; children: React.ReactNode }>) {
+function TrainShell({ insets, presentation, activeExerciseName, restStatus, onMinimise, onActions, children }: Readonly<{ insets: { top: number; bottom: number }; presentation: WorkoutPresentation; activeExerciseName?: string; restStatus?: string; onMinimise(): void; onActions?: () => void; children: React.ReactNode }>) {
+  const headerTitle = activeExerciseName ?? presentation.title;
+  const headerMeta = activeExerciseName
+    ? [presentation.title, restStatus, `${presentation.completedSets} of ${presentation.totalSets} sets`].filter(Boolean).join(" · ")
+    : `${formatElapsed(presentation.elapsedSeconds)} · ${presentation.completedSets} of ${presentation.totalSets} sets`;
   return <View style={[styles.shell, { paddingTop: insets.top }]}>
     <View style={styles.header}>
       <Pressable testID="train-minimise" accessibilityRole="button" accessibilityLabel="Minimise workout and return to Home" hitSlop={8} onPress={onMinimise} style={({ pressed }) => [styles.headerControl, pressed && styles.pressed]}><Text maxFontSizeMultiplier={1.25} style={styles.minimiseGlyph}>⌄</Text></Pressable>
       <View style={styles.headerTitleArea}>
-        <Text maxFontSizeMultiplier={1.35} numberOfLines={1} ellipsizeMode="tail" style={styles.headerTitle}>{presentation.title}</Text>
-        <Text accessibilityLabel={`${formatElapsed(presentation.elapsedSeconds)} elapsed. ${presentation.completedSets} of ${presentation.totalSets} current-session working sets complete.`} maxFontSizeMultiplier={1.25} numberOfLines={1} ellipsizeMode="tail" style={styles.headerMeta}>{formatElapsed(presentation.elapsedSeconds)} · {presentation.completedSets} of {presentation.totalSets} sets</Text>
+        <Text maxFontSizeMultiplier={1.35} numberOfLines={1} ellipsizeMode="tail" style={styles.headerTitle}>{headerTitle}</Text>
+        <Text accessibilityLabel={`${headerTitle}. ${restStatus ? `${restStatus}. ` : ""}${presentation.completedSets} of ${presentation.totalSets} current-session working sets complete.`} maxFontSizeMultiplier={1.25} numberOfLines={1} ellipsizeMode="tail" style={styles.headerMeta}>{headerMeta}</Text>
       </View>
       {onActions ? <Pressable testID="train-actions" accessibilityRole="button" accessibilityLabel="Workout actions" hitSlop={8} onPress={onActions} style={({ pressed }) => [styles.headerControl, pressed && styles.pressed]}><Text maxFontSizeMultiplier={1.25} style={styles.actionsGlyph}>•••</Text></Pressable> : <View style={styles.headerPercent}><Text maxFontSizeMultiplier={1.25} numberOfLines={1} style={styles.headerPercentText}>{presentation.progressPercent}%</Text></View>}
     </View>
