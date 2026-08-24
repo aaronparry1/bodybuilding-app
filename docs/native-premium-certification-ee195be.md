@@ -82,7 +82,7 @@ Current official product evidence sets a clear benchmark: Hevy exposes previous 
 - TypeScript after native UI changes: passed.
 - Focused phone UI, QA production boundary and billing flow: 25 tests passed.
 - Broad Vitest baseline: 2,478 / 2,486 assertions passed.
-- Broad Vitest after this slice: 2,479 / 2,486 assertions passed, with no new failures.
+- Broad Vitest after deterministic reconciliation: 2,481 / 2,486 assertions passed, with no new failures.
 - Mounted continuity/longitudinal focus: 3 files / 32 tests passed.
 - Production Expo config with QA public flags forced on: passed; the production boundary test also passed.
 - Web export: passed (1,457 modules).
@@ -93,13 +93,13 @@ Remaining broad-suite failures:
 | Test | Classification | Evidence |
 | --- | --- | --- |
 | app icon Expo/iOS source string | protected pre-existing source-boundary assertion | Expects `ios.icon` to be the first iOS property; rendered/native icon hash passes |
-| mounted numeric progression aggregate | stale deterministic aggregate plus unresolved mounted behaviour | Current canonical run produces 14 rather than 13 future-slot deltas |
 | mounted repeated-miss regression | real mounted-path defect exposed by a stale assertion | The assertion mistakes an incidental reconstructed target decrease for a coached regression; the persisted decision has no matching regression outcome |
 | Train brand boundary | protected pre-existing source-boundary assertion | Expects removed `WorkoutStage` source shape |
-| specialist suitability | pre-existing canonical-policy expectation | Anderson squat now fails closed as `unsuitable`, while the test expects `specialist` |
 | onboarding/Home source boundary | protected pre-existing source-boundary assertion | Expects removed `WorkoutMetricStrip` source shape; onboarding layout expectation remains satisfied |
 | Settings simplification | protected pre-existing source-boundary assertion | Expects removed `View Progress` source string |
 
 The mounted repeated-miss failure is not being relabelled as harmless generated evidence. A diagnostic predicate requiring the persisted numeric decision, receipt and material delta to agree found no authorised mounted regression after 45 completed sessions. That explanation-to-decision mismatch remains a release-relevant defect.
+
+The numeric-progression aggregate was regenerated to the current deterministic canonical output (14 evidence-backed future-slot deltas), and the specialist-suitability expectation was reconciled to the current fail-closed `unsuitable` result. Both focused suites pass after reconciliation.
 
 This report remains open until the additional fixtures, mounted longitudinal run, export/release build, accessibility pass and final broad-suite reconciliation are complete.
