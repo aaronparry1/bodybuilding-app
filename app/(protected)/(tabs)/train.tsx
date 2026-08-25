@@ -104,7 +104,6 @@ function CanonicalTrainExperience() {
   const [editState, setEditState] = useState<EditState | null>(null);
   const [recordedId, setRecordedId] = useState<string | undefined>(undefined);
   const [activeExerciseId, setActiveExerciseId] = useState<string | null>(null);
-  const [exerciseSwitcherOpen, setExerciseSwitcherOpen] = useState(false);
   const [modal, setModal] = useState<TrainModal>(null);
   const [busy, setBusy] = useState(false);
   const [timerTick, setTimerTick] = useState(() => Date.now());
@@ -431,14 +430,13 @@ function CanonicalTrainExperience() {
   }
 
   const activeExercise = presentation.exercises.find((exercise) => exercise.id === activeExerciseId) ?? presentation.exercises[0];
-  const activeExerciseIndex = Math.max(0, presentation.exercises.findIndex((exercise) => exercise.id === activeExercise?.id));
+  const prescribedExercise = presentation.exercises.find((exercise) => exercise.sets.some((set) => set.state === "current"));
   const lastInstruction = nextInstruction ?? [...aggregate.events].reverse().find((event) => event.type === "performance" && typeof event.payload.nextInstruction === "string")?.payload.nextInstruction as string | null | undefined;
   const paused = aggregate.session.status === "paused";
   const completion = resolveCanonicalTrainCompletionAffordance(presentation.completedSets, presentation.totalSets, presentation.finishAllowed);
   const positiveFeedback = message ? isPositiveTrainFeedback(message) : false;
   const selectExercise = (exerciseId: string) => {
     setActiveExerciseId(exerciseId);
-    setExerciseSwitcherOpen(false);
     requestAnimationFrame(() => scrollRef.current?.scrollTo({ y: 0, animated: !reduceMotion }));
   };
   const keyboardAction = (() => {
@@ -474,13 +472,7 @@ function CanonicalTrainExperience() {
         {(!restTimer || restTimer.state === "skipped") && lastInstruction?.startsWith("Move directly")
           ? <View testID="train-next-instruction" accessibilityRole="summary" style={styles.nextInstruction}><Text style={styles.nextInstructionLabel}>UP NEXT</Text><Text style={styles.nextInstructionText}>{lastInstruction}</Text></View>
           : null}
-        <ExerciseNavigator
-          exercises={presentation.exercises}
-          activeIndex={activeExerciseIndex}
-          onPrevious={() => activeExerciseIndex > 0 && selectExercise(presentation.exercises[activeExerciseIndex - 1]!.id)}
-          onNext={() => activeExerciseIndex < presentation.exercises.length - 1 && selectExercise(presentation.exercises[activeExerciseIndex + 1]!.id)}
-          onOpen={() => setExerciseSwitcherOpen(true)}
-        />
+        {prescribedExercise && activeExercise?.id !== prescribedExercise.id ? <Pressable testID="train-return-current" accessibilityRole="button" accessibilityLabel={`Return to current set, ${prescribedExercise.name}`} onPress={() => selectExercise(prescribedExercise.id)} style={({ pressed }) => [styles.returnCurrent, pressed && styles.pressed]}><Text style={styles.returnCurrentText}>Return to current set · {prescribedExercise.name}</Text></Pressable> : null}
         {activeExercise ? <ActiveExerciseCard
           key={activeExercise.id}
           exercise={activeExercise}
@@ -501,6 +493,12 @@ function CanonicalTrainExperience() {
           onSaveEdit={(set) => saveEdit(activeExercise, set)}
           onComplete={(set) => recordSet(activeExercise, set)}
         /> : null}
+        <WorkoutExerciseList
+          exercises={presentation.exercises}
+          focusedId={activeExercise?.id ?? ""}
+          prescribedId={prescribedExercise?.id ?? null}
+          onSelect={selectExercise}
+        />
         <Pressable testID={stableUiIdentifier("action", "Swap or add exercise")} accessibilityRole="button" accessibilityLabel="Swap or add exercise" onPress={() => router.push({ pathname: "/(protected)/programmes/manage", params: { recordedSessionId: aggregate.session.recordedSessionId, plannedSessionId: aggregate.session.plannedSessionId } })} style={({ pressed }) => [styles.exerciseEditAction, pressed && styles.pressed]}><Text style={styles.exerciseEditActionText}>Swap or add exercise</Text><Text accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.exerciseEditGlyph}>›</Text></Pressable>
         {completion.normalFinishAvailable ? <FinishPanel presentation={presentation} busy={busy} onFinish={() => setModal("finish_complete")} /> : null}
       </ScrollView>
@@ -518,14 +516,6 @@ function CanonicalTrainExperience() {
       completion={completion}
       onRequestFinishEarly={() => setModal("finish_early")}
       onFinish={finish}
-    />
-    <ExerciseSwitcherModal
-      visible={exerciseSwitcherOpen}
-      reduceMotion={reduceMotion}
-      exercises={presentation.exercises}
-      activeId={activeExercise?.id ?? ""}
-      onSelect={selectExercise}
-      onClose={() => setExerciseSwitcherOpen(false)}
     />
   </TrainShell>;
 }
@@ -575,53 +565,28 @@ function WorkoutPreview({ presentation, busy, onStart, message }: Readonly<{ pre
   </ScrollView>;
 }
 
-function ExerciseNavigator({ exercises, activeIndex, onPrevious, onNext, onOpen }: Readonly<{
+function WorkoutExerciseList({ exercises, focusedId, prescribedId, onSelect }: Readonly<{
   exercises: readonly WorkoutExercisePresentation[];
-  activeIndex: number;
-  onPrevious(): void;
-  onNext(): void;
-  onOpen(): void;
-}>) {
-  const exercise = exercises[activeIndex];
-  if (!exercise) return null;
-  const completed = exercise.sets.filter((set) => set.state === "completed").length;
-  return <View testID="train-exercise-navigator" style={styles.exerciseNavigator}>
-    <Pressable testID="train-exercise-previous" accessibilityRole="button" accessibilityLabel="Previous exercise" accessibilityState={{ disabled: activeIndex === 0 }} disabled={activeIndex === 0} onPress={onPrevious} style={({ pressed }) => [styles.exerciseNavArrow, activeIndex === 0 && styles.disabled, pressed && styles.pressed]}><Text style={styles.exerciseNavArrowText}>‹</Text></Pressable>
-    <Pressable testID="train-exercise-switcher-open" accessibilityRole="button" accessibilityLabel={`Open exercise list. Exercise ${activeIndex + 1} of ${exercises.length}, ${exercise.name}`} onPress={onOpen} style={({ pressed }) => [styles.exerciseNavigatorMain, pressed && styles.pressed]}>
-      <Text style={styles.eyebrow}>EXERCISE {activeIndex + 1} OF {exercises.length}</Text>
-      <Text numberOfLines={1} ellipsizeMode="tail" style={styles.exerciseNavigatorName}>{exercise.name}</Text>
-      <Text style={styles.tinyMuted}>{completed} of {exercise.sets.length} sets complete · View all</Text>
-    </Pressable>
-    <Pressable testID="train-exercise-next" accessibilityRole="button" accessibilityLabel="Next exercise" accessibilityState={{ disabled: activeIndex === exercises.length - 1 }} disabled={activeIndex === exercises.length - 1} onPress={onNext} style={({ pressed }) => [styles.exerciseNavArrow, activeIndex === exercises.length - 1 && styles.disabled, pressed && styles.pressed]}><Text style={styles.exerciseNavArrowText}>›</Text></Pressable>
-  </View>;
-}
-
-function ExerciseSwitcherModal({ visible, reduceMotion, exercises, activeId, onSelect, onClose }: Readonly<{
-  visible: boolean;
-  reduceMotion: boolean;
-  exercises: readonly WorkoutExercisePresentation[];
-  activeId: string;
+  focusedId: string;
+  prescribedId: string | null;
   onSelect(id: string): void;
-  onClose(): void;
 }>) {
-  return <Modal visible={visible} transparent animationType={reduceMotion ? "none" : "slide"} onRequestClose={onClose} statusBarTranslucent>
-    <View style={styles.modalBackdrop}><View accessibilityViewIsModal style={styles.modalSheet}>
-      <ScrollView bounces={false} contentContainerStyle={styles.modalContent}>
-        <View style={styles.switcherHeading}><View style={styles.flex}><Text style={styles.modalTitle}>Exercises</Text><Text style={styles.smallMuted}>Choose an exercise without changing its prescription or method order.</Text></View><Pressable testID="train-exercise-switcher-close" accessibilityRole="button" accessibilityLabel="Close exercise list" onPress={onClose} style={styles.switcherClose}><Text style={styles.switcherCloseText}>×</Text></Pressable></View>
-        <View accessibilityRole="tablist" style={styles.switcherList}>{exercises.map((exercise) => {
+  return <View testID="train-workout-exercise-list" style={styles.workoutExerciseList}>
+    <View style={styles.workoutExerciseListHeading}><View><Text style={styles.eyebrow}>FULL WORKOUT</Text><Text style={styles.workoutExerciseListTitle}>{exercises.length} exercises</Text></View><Text style={styles.tinyMuted}>Tap to view · prescription unchanged</Text></View>
+    <View accessibilityRole="list" style={styles.switcherList}>{exercises.map((exercise) => {
           const completedSets = exercise.sets.filter((set) => set.state === "completed").length;
           const complete = completedSets === exercise.sets.length;
-          const active = exercise.id === activeId;
-          const status = complete ? "completed" : active ? "current" : "upcoming";
-          return <Pressable key={exercise.id} testID={`train-exercise-${exercise.order}`} accessibilityRole="tab" accessibilityState={{ selected: active }} accessibilityLabel={`Exercise ${exercise.order} of ${exercises.length}, ${exercise.name}, ${status}, ${completedSets} of ${exercise.sets.length} sets complete`} onPress={() => onSelect(exercise.id)} style={({ pressed }) => [styles.switcherItem, active && styles.switcherItemActive, pressed && styles.pressed]}>
+          const focused = exercise.id === focusedId;
+          const prescribed = exercise.id === prescribedId;
+          const status = complete ? "completed" : prescribed ? "current set" : "upcoming";
+          const method = exercise.methodExecution.sequenceLabel ?? (exercise.groupType === "straight_set" ? exercise.method : `${exercise.groupType.replace("_", " ")} · ${exercise.method}`);
+          return <Pressable key={exercise.id} testID={`train-exercise-${exercise.order}`} accessibilityRole="button" accessibilityState={{ selected: focused }} accessibilityLabel={`Exercise ${exercise.order} of ${exercises.length}, ${exercise.name}, ${status}, ${completedSets} of ${exercise.sets.length} sets complete${focused ? ", viewing" : ""}`} onPress={() => onSelect(exercise.id)} style={({ pressed }) => [styles.switcherItem, focused && styles.switcherItemActive, complete && styles.workoutExerciseComplete, pressed && styles.pressed]}>
             <View style={[styles.switcherIndex, complete && styles.switcherIndexComplete]}><Text style={styles.switcherIndexText}>{complete ? "✓" : exercise.order}</Text></View>
-            <View style={styles.flex}><Text numberOfLines={1} style={[styles.exerciseTabName, active && styles.accentText]}>{exercise.name}</Text><Text style={styles.tinyMuted}>{completedSets} of {exercise.sets.length} sets · {exercise.methodExecution.sequenceLabel ?? exercise.method}</Text></View>
-            <Text style={[styles.switcherStatus, complete && styles.successText]}>{status}</Text>
+            <View style={styles.flex}><Text numberOfLines={2} style={[styles.exerciseTabName, focused && styles.accentText, complete && styles.workoutExerciseNameComplete]}>{exercise.name}</Text><Text numberOfLines={2} style={styles.tinyMuted}>{completedSets} of {exercise.sets.length} sets · {method}</Text></View>
+            <View style={styles.exerciseStatusColumn}><Text style={[styles.switcherStatus, complete && styles.successText, prescribed && styles.accentText]}>{status}</Text>{focused && !prescribed ? <Text style={styles.viewingStatus}>VIEWING</Text> : null}</View>
           </Pressable>;
         })}</View>
-      </ScrollView>
-    </View></View>
-  </Modal>;
+  </View>;
 }
 
 function ActiveExerciseCard(props: Readonly<{
@@ -875,6 +840,15 @@ const styles = StyleSheet.create({
   switcherIndexComplete: { backgroundColor: TRAIN.success },
   switcherIndexText: { color: TRAIN.text, fontSize: 13, fontWeight: "900" },
   switcherStatus: { color: TRAIN.subtle, fontSize: 10, fontWeight: "900", textTransform: "uppercase" },
+  workoutExerciseList: { gap: 10, padding: 12, borderRadius: 16, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.line },
+  workoutExerciseListHeading: { minHeight: 38, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12 },
+  workoutExerciseListTitle: { color: TRAIN.text, fontSize: 18, lineHeight: 23, fontWeight: "900" },
+  workoutExerciseComplete: { opacity: 0.72, backgroundColor: TRAIN.surfaceRaised },
+  workoutExerciseNameComplete: { color: TRAIN.muted },
+  exerciseStatusColumn: { minWidth: 58, alignItems: "flex-end", gap: 3 },
+  viewingStatus: { color: TRAIN.muted, fontSize: 9, fontWeight: "900", letterSpacing: 0.4 },
+  returnCurrent: { minHeight: 48, alignItems: "center", justifyContent: "center", paddingHorizontal: 14, borderRadius: 13, backgroundColor: TRAIN.accentSoft, borderWidth: 1, borderColor: TRAIN.accent },
+  returnCurrentText: { color: TRAIN.accent, fontSize: 13, lineHeight: 18, fontWeight: "900", textAlign: "center" },
   exerciseTab: { minHeight: 48, flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 12, borderRadius: 12, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.line },
   exerciseTabActive: { borderColor: TRAIN.accent, backgroundColor: TRAIN.accentSoft },
   exerciseTabIndex: { width: 20, color: TRAIN.muted, fontSize: 13, fontWeight: "900", textAlign: "center" },

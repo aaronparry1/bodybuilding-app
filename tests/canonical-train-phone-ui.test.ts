@@ -8,7 +8,7 @@ const tabsSource = readFileSync("app/(protected)/(tabs)/_layout.tsx", "utf8");
 
 describe("phone-first canonical Train UI", () => {
   it("keeps preview read-only until its explicit Start action", () => {
-    const preview = trainSource.slice(trainSource.indexOf("function WorkoutPreview"), trainSource.indexOf("function ExerciseNavigator"));
+    const preview = trainSource.slice(trainSource.indexOf("function WorkoutPreview"), trainSource.indexOf("function WorkoutExerciseList"));
     expect(preview).toContain("Start workout");
     expect(preview.indexOf('testID="train-start"')).toBeLessThan(preview.indexOf("presentation.exercises.map"));
     expect(preview).toContain('testID="train-preview-details-toggle"');
@@ -97,13 +97,13 @@ describe("phone-first canonical Train UI", () => {
     expect(trainSource).toContain('positiveFeedback ? "polite" : "assertive"');
   });
 
-  it("keeps the current exercise focused and opens the full list only on demand", () => {
-    expect(trainSource).toContain("function ExerciseNavigator");
-    expect(trainSource).toContain("function ExerciseSwitcherModal");
-    expect(trainSource).toContain('testID="train-exercise-switcher-open"');
+  it("keeps the current set focused while the complete workout remains directly browsable", () => {
+    expect(trainSource).toContain("function WorkoutExerciseList");
+    expect(trainSource).toContain('testID="train-workout-exercise-list"');
+    expect(trainSource).toContain('testID="train-return-current"');
+    expect(trainSource).toContain("Tap to view · prescription unchanged");
     expect(trainSource).toContain('testID="train-all-sets-toggle"');
-    expect(trainSource).not.toContain("function ExerciseRail");
-    expect(trainSource).not.toContain("<ExerciseRail");
+    expect(trainSource).not.toContain("function ExerciseSwitcherModal");
   });
 
   it("rejects legacy authority and raw internal labels recursively", () => {
