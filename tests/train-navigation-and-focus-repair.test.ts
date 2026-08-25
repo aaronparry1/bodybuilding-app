@@ -56,18 +56,19 @@ describe("active Train navigation and focus repair", () => {
     expect(train).toContain("does not count the remaining sets as performed");
   });
 
-  it("keeps only one exercise and one current set expanded by default", () => {
-    expect(train).toContain("function ExerciseNavigator");
-    expect(train).toContain("function ExerciseSwitcherModal");
+  it("keeps one current-set editor expanded while the complete exercise order remains inline", () => {
+    expect(train).toContain("function WorkoutExerciseList");
+    expect(train).toContain('testID="train-workout-exercise-list"');
+    expect(train).toContain('testID="train-return-current"');
     expect(train).toContain("firstIncomplete ? [firstIncomplete] : exercise.sets.slice(-1)");
     expect(train).toContain("All sets ·");
     expect(train).toContain("Method and coaching details");
     expect(train).not.toContain("function ExerciseRail");
   });
 
-  it("retains grouped-method context in the on-demand exercise switcher", () => {
-    expect(train).toContain("exercise.methodExecution.sequenceLabel ?? exercise.method");
-    expect(train).toContain("without changing its prescription or method order");
+  it("retains grouped-method context in the directly browsable workout list", () => {
+    expect(train).toContain("exercise.methodExecution.sequenceLabel ?? (exercise.groupType");
+    expect(train).toContain("Tap to view · prescription unchanged");
   });
 
   it("uses accessible non-blocking completion feedback instead of a loose page-bottom message", () => {

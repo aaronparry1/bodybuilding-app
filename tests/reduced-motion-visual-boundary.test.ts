@@ -24,7 +24,6 @@ describe("premium motion accessibility boundary", () => {
 
   it("keeps Train motion, modals and scroll transitions on the same preference", () => {
     expect(train).toContain("const reduceMotion = useReducedMotion()");
-    expect(train).toContain('animationType={reduceMotion ? "none" : "slide"}');
     expect(train).toContain('animationType={reduceMotion ? "none" : "fade"}');
     expect(train).toContain("animated: !reduceMotion");
   });
