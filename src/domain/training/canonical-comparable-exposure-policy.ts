@@ -45,6 +45,8 @@ export type CanonicalNumericPrescriptionDecision = Readonly<{
   before: CanonicalNumericPrescriptionState;
   after?: CanonicalNumericPrescriptionState;
   exactNumericDelta?: Readonly<{ loadKg: number; repetitions: readonly number[] }>;
+  /** Decision that authorised this adjustment when it is carried to a later comparable slot. */
+  sourceDecisionId?: string;
 }>;
 
 type ComparableExposure = Readonly<{

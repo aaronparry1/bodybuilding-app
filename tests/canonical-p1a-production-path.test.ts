@@ -145,7 +145,8 @@ describe("P1A mounted completed-workout production route", () => {
     seedPlan(planId);
     const intentSave = vi.spyOn(canonicalCoachingApplicationIntentRepository, "save");
     let regression: ReturnType<typeof canonicalProgressDecisionRepository.list>[number] | undefined;
-    for (let ordinal = 0; ordinal < 36 && !regression; ordinal += 1) {
+    let regressionApplication: ReturnType<typeof canonicalProgressDecisionRepository.list>[number] | undefined;
+    for (let ordinal = 0; ordinal < 36 && !regressionApplication; ordinal += 1) {
       canonicalActivePlanState.hydrate();
       const model = canonicalActivePlanState.getReadModel();
       if (!model?.nextSession) throw new Error(`next session missing at ${ordinal}`);
@@ -158,48 +159,57 @@ describe("P1A mounted completed-workout production route", () => {
         ordinal,
         ordinal >= 15 ? "underperform_all" : "success",
       );
-      regression = canonicalProgressDecisionRepository.list(planId).findLast((decision) =>
+      const decisions = canonicalProgressDecisionRepository.list(planId);
+      regressionApplication = decisions.findLast((decision) =>
         decision.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
-        && decision.phaseOneApplication.materialDeltas.some((delta) =>
-          delta.field === "exactTargets"
-          && isRepetitionRegression(delta.before, delta.after)));
+        && decision.phaseOneApplication.appliedDecisionSources?.some((source) => {
+          const origin = decisions.find((candidate) => candidate.decisionId === source.decisionId);
+          return source.outcome === "regress_repetitions"
+            && origin?.phaseOne?.boundedAdjustment.numericDecisions?.some((item) => item.comparableExposureKey === source.comparableExposureKey && item.outcome === source.outcome);
+        })
+        && decision.phaseOneApplication.materialDeltas.some((delta) => delta.field === "exactTargets" && isRepetitionRegression(delta.before, delta.after)));
+      const sourceId = regressionApplication?.phaseOneApplication?.schemaVersion === "canonical_coaching_application_receipt_v2"
+        ? regressionApplication.phaseOneApplication.appliedDecisionSources?.find((source) => source.outcome === "regress_repetitions")?.decisionId
+        : undefined;
+      regression = decisions.find((decision) => decision.decisionId === sourceId);
     }
-    if (!regression?.phaseOne || regression.phaseOneApplication?.schemaVersion !== "canonical_coaching_application_receipt_v2") {
+    if (!regression?.phaseOne || regressionApplication?.phaseOneApplication?.schemaVersion !== "canonical_coaching_application_receipt_v2") {
       throw new Error("bounded regression receipt missing");
     }
     expect(summarizePipeline(
       canonicalProgressDecisionRepository.list(planId),
       preparedIntentCount(intentSave.mock.calls),
     )).toEqual({
-      evaluatorDecisions: 21,
-      numericDecisionRecords: 173,
+      evaluatorDecisions: 27,
+      numericDecisionRecords: 199,
       outcomes: {
-        hold: 22,
-        insufficient_evidence: 44,
-        phase_prohibited: 7,
-        progress_repetitions: 76,
-        regress_repetitions: 24,
+        hold: 69,
+        insufficient_evidence: 42,
+        phase_prohibited: 9,
+        progress_repetitions: 78,
+        regress_repetitions: 1,
       },
-      applicationIntents: 7,
-      applicationStatuses: { applied: 7, unchanged: 14 },
-      successfulCasApplications: 7,
-      affectedExercises: 17,
-      affectedFutureSlots: 17,
+      applicationIntents: 9,
+      applicationStatuses: { applied: 9, unchanged: 18 },
+      successfulCasApplications: 9,
+      affectedExercises: 18,
+      affectedFutureSlots: 18,
       affectedFutureSessions: 3,
-      progressionFieldDeltas: 43,
-      regressionFieldDeltas: 13,
-      materialFieldDeltas: 56,
-      receipts: 21,
+      progressionFieldDeltas: 45,
+      regressionFieldDeltas: 1,
+      materialFieldDeltas: 46,
+      receipts: 27,
       duplicateOrReplayedDecisions: 0,
     });
     expect(regression.phaseOne.boundedAdjustment.numericDecisions?.some((decision) =>
       decision.outcome === "regress_repetitions"
       && decision.exposureCount >= 3
       && decision.failedExposureCount >= 2)).toBe(true);
-    expect(regression.phaseOneApplication).toMatchObject({
+    expect(regressionApplication.phaseOneApplication).toMatchObject({
       status: "applied",
       actualResult: "future_prescription_change",
-      newRevision: regression.phaseOneApplication.priorRevision + 1,
+      newRevision: regressionApplication.phaseOneApplication.priorRevision + 1,
+      appliedDecisionSources: expect.arrayContaining([expect.objectContaining({ decisionId: regression.decisionId, outcome: "regress_repetitions" })]),
     });
   }, 60_000);
 
@@ -340,7 +350,8 @@ function completePlannedSession(
     const load = loadPrescription.state === "established" ? Number(loadPrescription.prescribedBaseLoad) : 0;
     for (let setOrder = 1; setOrder <= required; setOrder += 1) {
       const target = Number(targets[setOrder - 1] ?? slot.targetReps);
-      const underperformed = mode === "underperform_all" || mode === "partial_first" && setOrdinal === 0;
+      const underperformed = mode === "underperform_all"
+        || mode === "partial_first" && setOrdinal === 0;
       const performed = recordCanonicalPerformedWork({
         planId,
         expectedPlanRevision: started.planRevision,

@@ -229,6 +229,18 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
     .filter((assessment) => !assessment.successful && failedComparableExposureCount(relevant, assessment.exerciseId, input.session.recordedSessionId) >= 2)
     .map((assessment) => assessment.exerciseId)
     .sort();
+  const regressionCandidates = numericDecisions.filter((item) =>
+    item.after && (item.outcome === "regress_load" || item.outcome === "regress_repetitions"));
+  const selectedRegressionKey = regressionCandidates
+    .slice()
+    .sort((left, right) => left.comparableExposureKey.localeCompare(right.comparableExposureKey))[0]?.comparableExposureKey;
+  if (regressionCandidates.length > 1) {
+    numericDecisions = numericDecisions.map((item) => item.after
+      && (item.outcome === "regress_load" || item.outcome === "regress_repetitions")
+      && item.comparableExposureKey !== selectedRegressionKey
+      ? { ...item, outcome: "hold" as const, after: undefined, exactNumericDelta: undefined, reasonCode: "bounded_regression_budget_held" }
+      : item);
+  }
   const authorisedRegressions = numericDecisions.filter((item) =>
     item.after && (item.outcome === "regress_load" || item.outcome === "regress_repetitions"));
   if (!successful && repeatedFailureExerciseIds.length) {

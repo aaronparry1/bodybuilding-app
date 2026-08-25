@@ -169,7 +169,7 @@ function applyPhaseOneDecision(
   const currentNumericDecisions = details.boundedAdjustment.numericDecisions ?? [];
   const retainedPendingNumericDecisions = raw.carrier.constructionContext?.pendingNumericDecisions ?? [];
   const numericCandidates = [...new Map(
-    [...retainedPendingNumericDecisions, ...currentNumericDecisions]
+    [...retainedPendingNumericDecisions, ...currentNumericDecisions.map((item) => ({ ...item, sourceDecisionId: command.decisionId }))]
       .filter((item) => item.after)
       .map((item) => [item.comparableExposureKey, item] as const),
   ).values()];
@@ -216,7 +216,7 @@ function applyPhaseOneDecision(
       // only inside the same Mesocycle. A successor boundary retains the
       // factual history but drops an unmatched phase-specific prescription
       // intent rather than inventing cross-phase compatibility.
-      pendingNumericDecisions: transition ? [] : numericApplication.unresolved,
+      pendingNumericDecisions: transition ? [] : numericApplication.unresolved.map((item) => ({ ...item, sourceDecisionId: item.sourceDecisionId ?? command.decisionId })),
       recalibrationRequiredExerciseIds: [
         ...new Set([
           ...((raw.carrier.constructionContext?.recalibrationRequiredExerciseIds ?? []).filter((exerciseId) => !establishedNow.has(exerciseId))),
@@ -314,6 +314,7 @@ function applyPhaseOneDecision(
     nextRevision,
     plannedSessions.map((session) => session.id),
     truthfulDeltas,
+    numericApplication.applied.flatMap((item) => item.sourceDecisionId ? [{ decisionId: item.sourceDecisionId, comparableExposureKey: item.comparableExposureKey, outcome: item.outcome as "progress_load" | "progress_repetitions" | "regress_load" | "regress_repetitions" }] : []),
   );
   const prepared = canonicalCoachingApplicationIntentRepository.save({
     schemaVersion: "canonical_coaching_application_intent_v1",
@@ -407,6 +408,7 @@ function phaseOneReceipt(
   newRevision: number,
   resultingFutureSessionIds: readonly string[],
   materialDeltas: readonly CanonicalMaterialPrescriptionDelta[],
+  appliedDecisionSources: CanonicalPhaseOneApplicationReceiptV2["appliedDecisionSources"] = [],
 ): CanonicalPhaseOneApplicationReceiptV2 {
   return {
     schemaVersion: "canonical_coaching_application_receipt_v2",
@@ -418,6 +420,7 @@ function phaseOneReceipt(
     newRevision,
     resultingFutureSessionIds: [...resultingFutureSessionIds].sort(),
     materialDeltas,
+    ...(appliedDecisionSources.length ? { appliedDecisionSources } : {}),
     ...(status === "blocked" ? {
       boundaryState: {
         schemaVersion: "canonical_coaching_boundary_state_v1" as const,

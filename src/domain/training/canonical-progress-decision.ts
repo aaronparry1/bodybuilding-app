@@ -47,6 +47,7 @@ export type CanonicalPhaseOneApplicationReceiptV2 = Readonly<{
   newRevision: number;
   resultingFutureSessionIds: readonly string[];
   materialDeltas: readonly import("@/domain/training/canonical-material-prescription-delta").CanonicalMaterialPrescriptionDelta[];
+  appliedDecisionSources?: readonly Readonly<{ decisionId: string; comparableExposureKey: string; outcome: "progress_load" | "progress_repetitions" | "regress_load" | "regress_repetitions" }>[];
   boundaryState?: CanonicalCoachingBoundaryState;
   appliedAt: string;
 }>;
@@ -165,6 +166,7 @@ export function validateCanonicalProgressDecision(value: unknown): { status: "va
         || typeof value.explanation !== "string" || !value.explanation
         || !Array.isArray(value.materialDeltas)
         || value.materialDeltas.some((item) => !item || item.schemaVersion !== "canonical_material_prescription_delta_v1" || !item.sessionKey || !item.field)
+        || (value.appliedDecisionSources !== undefined && (!Array.isArray(value.appliedDecisionSources) || value.appliedDecisionSources.some((item) => !item || typeof item.decisionId !== "string" || !item.decisionId || typeof item.comparableExposureKey !== "string" || !item.comparableExposureKey || !["progress_load", "progress_repetitions", "regress_load", "regress_repetitions"].includes(item.outcome))))
         || (value.status === "applied" && (value.actualResult !== "future_prescription_change" || value.materialDeltas.length === 0 || value.newRevision === value.priorRevision))
         || (value.status === "unchanged" && value.actualResult !== "explicit_no_change")
         || (value.status === "blocked" && value.actualResult !== "blocked_no_change")
