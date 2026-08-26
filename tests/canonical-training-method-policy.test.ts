@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   applyCanonicalSessionMethodStructures,
+  CANONICAL_TRAINING_METHOD_CONTRACT_VERSION,
   canonicalTrainingMethodDefinitions,
   resolveCanonicalTrainingMethod,
 } from "@/domain/training/canonical-training-method-policy";
@@ -78,6 +79,7 @@ describe("canonical training-method policy", () => {
     ]);
     expect(structures[0]?.structure).toMatchObject({ position: 1, intraMethodRestSeconds: 0, interRoundRestSeconds: 60, pairedExerciseName: "Chest Supported Row" });
     expect(structures[1]?.structure).toMatchObject({ position: 2, intraMethodRestSeconds: 0, interRoundRestSeconds: 60, pairedExerciseName: "Incline Dumbbell Press" });
+    expect(structures[0]?.structure.contract).toMatchObject({ contractVersion: CANONICAL_TRAINING_METHOD_CONTRACT_VERSION, progressionRule: "progress each paired exercise independently", setRoles: ["standard", "standard", "standard"] });
   });
 
   it("uses the source-bounded rest-pause structure only with compatible established-load accessory work", () => {
@@ -103,6 +105,13 @@ describe("canonical training-method policy", () => {
       slots: [sessionSlot("row", 0, row, "amrap", 3, 10, 90, "calibration_required")],
     });
     expect(missingLoad[0]).toMatchObject({ method: "amrap", structure: { kind: "standalone" } });
+    expect(eligible[0]?.structure.contract).toMatchObject({ setRoles: ["activation", "mini_set", "mini_set"], evidenceAuthorityVersion: "canonical_progress_evidence_v1" });
+  });
+
+  it("distinguishes one top set from its back-offs in the additive method contract", () => {
+    const bench = exercise("ex-bench-press");
+    const [structured] = applyCanonicalSessionMethodStructures({ goal: "build_muscle_and_strength", mesocycleId: "powerbuilding_strength", specialState: "none", experience: "intermediate", readiness: "ready", slots: [sessionSlot("bench", 0, bench, "back_off_sets", 4, 5, 150, "established")] });
+    expect(structured).toMatchObject({ method: "back_off_sets", structure: { executionLabel: "1 top set · 3 back-off sets", contract: { setRoles: ["top_set", "back_off", "back_off", "back_off"], progressionRule: "evaluate the top set and back-offs separately; change the smallest supported variable" } } });
   });
 
   it("projects linked rounds in executable A1/B1/A2/B2 order and rest-pause rounds explicitly", () => {
@@ -170,7 +179,7 @@ function selection(item: ReturnType<typeof exercise>, overrides: Partial<Paramet
   };
 }
 
-function sessionSlot(id: string, index: number, item: ReturnType<typeof exercise>, method: "straight_sets" | "amrap", requiredSets: number, targetReps: number, restSeconds: number, loadState: string) {
+function sessionSlot(id: string, index: number, item: ReturnType<typeof exercise>, method: "straight_sets" | "amrap" | "back_off_sets", requiredSets: number, targetReps: number, restSeconds: number, loadState: string) {
   return { id, index, exercise: item, method, requiredSets, targetReps, restSeconds, loadState };
 }
 
