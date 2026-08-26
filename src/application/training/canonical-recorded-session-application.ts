@@ -151,7 +151,8 @@ export function recordCanonicalPerformedWork(command: CanonicalPerformedWorkComm
     return { status: equivalent ? "idempotent" : "rejected", reason: equivalent ? "performed_work_already_recorded" : "performed_set_conflict", ledgerVersion: aggregate.session.version };
   }
   const next = deriveCanonicalNextSetInstruction(aggregate.session.prescriptionSnapshot, command.slotId, command.setOrder, command.reps, command.load);
-  const event = { eventId: `${command.recordedSessionId}:performance:${command.setId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "performance" as const, occurredAt: command.occurredAt, operationId: command.operationId, payload: { setId: command.setId, slotId: command.slotId, exerciseId: command.exerciseId, setOrder: command.setOrder, reps: command.reps, load: command.load, unit: command.unit, effort: command.effort, substitutionId: command.substitutionId, completion: command.completion, provenance: command.provenance, nextInstruction: next.text, nextRestSeconds: next.restSeconds } };
+  const substitutionId = command.substitutionId ?? (typeof slot.activeSubstitutionId === "string" ? slot.activeSubstitutionId : undefined);
+  const event = { eventId: `${command.recordedSessionId}:performance:${command.setId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "performance" as const, occurredAt: command.occurredAt, operationId: command.operationId, payload: { setId: command.setId, slotId: command.slotId, exerciseId: command.exerciseId, setOrder: command.setOrder, reps: command.reps, load: command.load, unit: command.unit, effort: command.effort, substitutionId, completion: command.completion, provenance: command.provenance, nextInstruction: next.text, nextRestSeconds: next.restSeconds } };
   const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, event);
   if (appended.status === "stale") return { status: "rejected", reason: "stale_ledger_version" };
   if (appended.status !== "saved") return { status: "rejected", reason: appended.reason ?? "performed_work_conflict" };
@@ -174,14 +175,19 @@ export function editCanonicalPerformedWork(command: CanonicalEditPerformedWorkCo
   if (!original) return { status: "rejected", reason: "performed_set_not_found" };
   const snapshot = aggregate.session.prescriptionSnapshot as Record<string, unknown>;
   const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
-  const slot = slots.find((candidate) => String(candidate.id) === command.slotId && String(candidate.exerciseId) === command.exerciseId);
+  const slot = slots.find((candidate) => String(candidate.id) === command.slotId && (String(candidate.exerciseId) === command.exerciseId || substitutionContains(candidate, command.exerciseId)));
   if (!slot) return { status: "rejected", reason: "performed_slot_not_in_prescription" };
   if (String(original.payload.slotId) !== command.slotId || String(original.payload.exerciseId) !== command.exerciseId || Number(original.payload.setOrder) !== command.setOrder) return { status: "rejected", reason: "performed_set_identity_mismatch" };
   const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, { eventId: `${command.recordedSessionId}:repair:${command.operationId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "repair", occurredAt: command.occurredAt, operationId: command.operationId, payload: { ...command, editedSetId: command.setId, replacesEventId: original.eventId } });
   if (appended.status !== "saved") return { status: "rejected", reason: "performed_work_edit_conflict" };
-  const evidence = canonicalProgressEvidenceRepository.replace({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:evidence:${command.setId}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, slotId: command.slotId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}:repair`, kind: "performance", observations: canonicalPerformedEvidenceObservations(snapshot, slot, aggregate.session.mesocycleId, aggregate.session.prescriptionHash, command), evidenceVersion: "progress_v1" });
+  const evidenceSlot = String(slot.exerciseId) === command.exerciseId ? slot : { ...slot, exerciseId: command.exerciseId, activeSubstitutionId: original.payload.substitutionId };
+  const evidence = canonicalProgressEvidenceRepository.replace({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:evidence:${command.setId}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, slotId: command.slotId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}:repair`, kind: "performance", observations: canonicalPerformedEvidenceObservations(snapshot, evidenceSlot, aggregate.session.mesocycleId, aggregate.session.prescriptionHash, command), evidenceVersion: "progress_v1" });
   canonicalActivePlanState.hydrate();
   return { status: evidence.status === "saved" ? "applied" : "retryable", reason: evidence.status === "saved" ? "performed_work_edited" : "performed_work_edited_with_evidence_pending", ledgerVersion: appended.session!.version, nextInstruction: deriveCanonicalNextSetInstruction(aggregate.session.prescriptionSnapshot, command.slotId, command.setOrder, command.reps, command.load).text };
+}
+
+function substitutionContains(slot: Record<string, unknown>, exerciseId: string): boolean {
+  return Array.isArray(slot.substitutionHistory) && slot.substitutionHistory.some((entry) => entry && typeof entry === "object" && String((entry as Record<string, unknown>).fromExerciseId) === exerciseId);
 }
 
 export type CanonicalDiscardSessionCommand = CanonicalRecordedLifecycleCommand;

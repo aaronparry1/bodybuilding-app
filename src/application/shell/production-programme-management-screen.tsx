@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { availableExerciseCatalogue, editCanonicalExercise, rankExerciseReplacements, type ExerciseEditAction, type ExerciseEditScope } from "@/application/training/canonical-exercise-management";
+import { availableExerciseCatalogue, editCanonicalExercise, rankExerciseReplacements, type ExerciseEditAction, type ExerciseEditScope, type ExerciseSubstitutionReason } from "@/application/training/canonical-exercise-management";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
@@ -22,6 +22,7 @@ export default function ProductionProgrammeManagementScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [reviewing, setReviewing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [reason, setReason] = useState<ExerciseSubstitutionReason>("preference");
   useEffect(() => { canonicalActivePlanState.hydrate(); return canonicalActivePlanState.subscribe(() => refresh((value) => value + 1)); }, []);
   const plan = canonicalActivePlanState.getReadModel();
   const carrier = canonicalActivePlanV2Repository.get();
@@ -54,6 +55,7 @@ export default function ProductionProgrammeManagementScreen() {
       slotId: slotId ?? (action === "add" ? "new-optional-slot" : undefined),
       sourceExerciseId: selectedSlot ? String(selectedSlot.exerciseId) : undefined,
       exerciseId: exerciseId ?? undefined,
+      reason,
     });
     setSaving(false);
     const resultMessage = friendly(result.reason);
@@ -79,6 +81,7 @@ export default function ProductionProgrammeManagementScreen() {
       <Text style={styles.section}>{action === "add" ? "Choose an exercise to add" : "Choose the exercise to change"}</Text>
       {action !== "add" ? slots.map((slot) => <Choice key={String(slot.id)} label={`${exerciseDisplayName(String(slot.exerciseId))}${slot.constructionRole === "primary" ? " · required" : ""}`} selected={slotId === slot.id} onPress={() => { setSlotId(String(slot.id)); setExerciseId(null); setReviewing(false); }} />) : null}
       {action !== "remove" && (action === "add" || selectedSlot) ? <><Text style={styles.section}>{action === "add" ? "Available optional exercises" : "Compatible replacements first"}</Text>{options.slice(0, 40).map(({ exercise, compatibility }) => <Choice key={exercise.id} label={`${exercise.name}${compatibility === "equivalent" ? " · compatible" : " · new starting load required"}`} selected={exerciseId === exercise.id} onPress={() => { setExerciseId(exercise.id); setReviewing(false); }} />)}</> : null}
+      {action === "replace" && exerciseId ? <View style={styles.scope}><Text style={styles.section}>Why are you changing it?</Text><Choice label="Equipment unavailable" selected={reason === "equipment_unavailable"} onPress={() => setReason("equipment_unavailable")} /><Choice label="Discomfort or incompatibility" selected={reason === "discomfort"} onPress={() => setReason("discomfort")} /><Choice label="Personal preference" selected={reason === "preference"} onPress={() => setReason("preference")} /></View> : null}
       {!reviewing ? <PrimaryButton label="Review change" disabled={saving || (action !== "add" && !slotId) || (action !== "remove" && !exerciseId)} onPress={confirm} /> : <View testID="exercise-change-review" style={styles.review}>
         <Text accessibilityRole="header" style={styles.section}>{action === "remove" ? "Remove this exercise?" : action === "add" ? "Add this exercise?" : "Replace this exercise?"}</Text>
         <Text style={styles.muted}>{scope === "current_session" ? "Only this active workout will change." : "Matching exercises in future planned workouts will change. Completed workouts and performance history will stay unchanged."}</Text>
@@ -92,7 +95,7 @@ export default function ProductionProgrammeManagementScreen() {
 }
 
 function Choice({ label, selected, onPress }: Readonly<{ label: string; selected: boolean; onPress(): void }>) { return <Pressable accessibilityRole="button" accessibilityState={{ selected }} onPress={onPress} style={[styles.choice, selected && styles.choiceSelected]}><Text style={[styles.choiceText, selected && styles.choiceTextSelected]}>{label}</Text></Pressable>; }
-function friendly(reason: string): string { return ({ exercise_replaced: "Exercise replaced. Your previous records are unchanged.", exercise_replaced_recalibration_required: "Exercise replaced. Establish a safe starting load before its first working set.", future_exercises_replaced: "Future exercises updated. Completed workouts are unchanged.", optional_exercise_added: "Optional exercise added.", future_exercise_added: "Optional exercise added to the future workout.", optional_exercise_removed: "Optional exercise removed.", future_optional_exercises_removed: "Optional exercise removed from future workouts.", required_exercise_requires_replacement: "Required primary work cannot be removed. Choose a compatible replacement instead.", performed_exercise_cannot_be_changed: "This exercise already has completed sets in the active workout and cannot be changed.", duplicate_exercise_not_allowed: "That exercise is already in this workout.", incompatible_replacement: "That exercise does not meet this slot’s role, muscle target or equipment requirements." } as Record<string, string>)[reason] ?? "The change could not be saved safely. Nothing was modified."; }
+function friendly(reason: string): string { return ({ exercise_replaced: "Exercise replaced for the remaining sets. Earlier work and each exercise’s history stay separate.", exercise_replaced_recalibration_required: "Exercise replaced for the remaining sets. Earlier work is saved; establish a safe starting load for the replacement.", future_exercises_replaced: "Future exercises updated. Completed workouts are unchanged.", optional_exercise_added: "Optional exercise added.", future_exercise_added: "Optional exercise added to the future workout.", optional_exercise_removed: "Optional exercise removed.", future_optional_exercises_removed: "Optional exercise removed from future workouts.", required_exercise_requires_replacement: "Required primary work cannot be removed. Choose a compatible replacement instead.", duplicate_exercise_not_allowed: "That exercise is already in this workout.", incompatible_replacement: "That exercise does not meet this slot’s role, muscle target, method or equipment requirements." } as Record<string, string>)[reason] ?? "The change could not be saved safely. Nothing was modified."; }
 
 const styles = {
   screen: { flexGrow: 1, backgroundColor: colors.background, padding: spacing.lg, gap: spacing.md } as const,

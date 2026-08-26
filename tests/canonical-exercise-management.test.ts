@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { editCanonicalExercise, rankExerciseReplacements } from "@/application/training/canonical-exercise-management";
 import { prescriptionHash, startCanonicalSession } from "@/application/training/canonical-recorded-session-application";
+import { editCanonicalPerformedWork, recordCanonicalPerformedWork } from "@/application/training/canonical-recorded-session-application";
+import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 import { canonicalFiveDayFixtureInput } from "@/application/design-qa/canonical-five-day-plan-fixture";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
@@ -72,6 +74,43 @@ describe("canonical exercise management", () => {
     const regenerated = canonicalActivePlanV2Repository.get();
     if (regenerated.status !== "saved") throw new Error("regenerated plan missing");
     expect(regenerated.carrier.plannedSessions.flatMap((item) => item.prescriptionSnapshot.slots as Array<Record<string, unknown>>).some((item) => item.exerciseId === replacement.exercise.id)).toBe(true);
+  });
+
+  it("preserves and separates work when a partially completed exercise is substituted offline", () => {
+    const { carrier, session, slot, replacement } = setup();
+    const started = startCanonicalSession({ planId: carrier.planId, expectedPlanRevision: carrier.revision, plannedSessionId: session.id, expectedPrescriptionHash: prescriptionHash(session.prescriptionSnapshot), operationId: "partial-sub:start", startedAt: "2026-08-07T10:00:00.000Z", provenance: "test" });
+    const first = canonicalRecordedSessionLedger.get(started.recordedSessionId!);
+    if (first.status !== "found") throw new Error("recorded session missing");
+    expect(recordCanonicalPerformedWork({ planId: carrier.planId, expectedPlanRevision: started.planRevision!, recordedSessionId: first.session.recordedSessionId, expectedLedgerVersion: first.session.version, slotId: String(slot.id), exerciseId: String(slot.exerciseId), setId: "original:set:1", setOrder: 1, reps: 8, load: 60, unit: "kg", completion: "complete", operationId: "partial-sub:original", occurredAt: "2026-08-07T10:01:00.000Z", provenance: "offline_queue" }).status).toBe("applied");
+    const afterFirst = canonicalRecordedSessionLedger.get(first.session.recordedSessionId);
+    if (afterFirst.status !== "found") throw new Error("recorded session missing");
+    const swap = editCanonicalExercise({ action: "replace", scope: "current_session", reason: "equipment_unavailable", planId: carrier.planId, expectedPlanRevision: started.planRevision!, recordedSessionId: afterFirst.session.recordedSessionId, expectedLedgerVersion: afterFirst.session.version, slotId: String(slot.id), sourceExerciseId: String(slot.exerciseId), exerciseId: replacement.exercise.id, operationId: "partial-sub:swap", occurredAt: "2026-08-07T10:02:00.000Z" });
+    expect(swap).toMatchObject({ status: "applied", changedSessions: 1 });
+    const restored = canonicalRecordedSessionLedger.get(first.session.recordedSessionId);
+    if (restored.status !== "found") throw new Error("recorded session missing");
+    const restoredSlot = (restored.session.prescriptionSnapshot.slots as Array<Record<string, unknown>>).find((candidate) => candidate.id === slot.id)!;
+    expect(restoredSlot).toMatchObject({ exerciseId: replacement.exercise.id, substitutionScope: "current_session", substitutionReason: "equipment_unavailable" });
+    expect(restored.events.find((event) => event.type === "prescription_adjusted")?.payload).toMatchObject({ performedSetsPreserved: 1, sourceExerciseId: slot.exerciseId, exerciseId: replacement.exercise.id });
+    expect(editCanonicalPerformedWork({ planId: carrier.planId, expectedPlanRevision: started.planRevision!, recordedSessionId: restored.session.recordedSessionId, expectedLedgerVersion: restored.session.version, slotId: String(slot.id), exerciseId: String(slot.exerciseId), setId: "original:set:1", setOrder: 1, reps: 9, load: 60, unit: "kg", completion: "complete", operationId: "partial-sub:repair-original", occurredAt: "2026-08-07T10:03:00.000Z", provenance: "test" }).status).toBe("applied");
+    const afterRepair = canonicalRecordedSessionLedger.get(first.session.recordedSessionId);
+    if (afterRepair.status !== "found") throw new Error("recorded session missing");
+    expect(recordCanonicalPerformedWork({ planId: carrier.planId, expectedPlanRevision: started.planRevision!, recordedSessionId: afterRepair.session.recordedSessionId, expectedLedgerVersion: afterRepair.session.version, slotId: String(slot.id), exerciseId: replacement.exercise.id, setId: "replacement:set:2", setOrder: 2, reps: 8, load: 40, unit: "kg", completion: "complete", operationId: "partial-sub:replacement", occurredAt: "2026-08-07T10:04:00.000Z", provenance: "offline_replay" }).status).toBe("applied");
+    const final = canonicalRecordedSessionLedger.get(first.session.recordedSessionId);
+    if (final.status !== "found") throw new Error("recorded session missing");
+    const effective = effectiveCanonicalPerformedWork(final.events);
+    expect(effective.map((event) => [event.payload.exerciseId, event.payload.reps])).toEqual([[slot.exerciseId, 9], [replacement.exercise.id, 8]]);
+    expect(effective[0]?.payload.substitutionId).toBeUndefined();
+    expect(effective[1]?.payload.substitutionId).toContain("partial-sub:swap");
+    expect(editCanonicalExercise({ action: "replace", scope: "current_session", reason: "equipment_unavailable", planId: carrier.planId, expectedPlanRevision: started.planRevision!, recordedSessionId: final.session.recordedSessionId, expectedLedgerVersion: final.session.version, slotId: String(slot.id), sourceExerciseId: String(slot.exerciseId), exerciseId: replacement.exercise.id, operationId: "partial-sub:swap", occurredAt: "2026-08-07T10:02:00.000Z" })).toMatchObject({ status: "idempotent", changedSessions: 0 });
+  });
+
+  it("keeps replacement candidates compatible with rest-pause and top-set methods", () => {
+    const { carrier, session } = setup();
+    const slots = session.prescriptionSnapshot.slots as Array<Record<string, unknown>>;
+    const restPauseSlot = { ...slots.find((candidate) => candidate.exerciseRole !== "primary_compound")!, method: "rest_pause", methodStructure: { kind: "rest_pause", method: "rest_pause" } };
+    expect(rankExerciseReplacements(restPauseSlot, carrier.constraints.equipment).every(({ exercise }) => exercise.stability === "high" && exercise.skillDemand !== "high" && exercise.fatigueCost !== "high" && !exercise.equipment.includes("barbell"))).toBe(true);
+    const topSetSlot = { ...slots.find((candidate) => candidate.exerciseRole === "primary_compound")!, method: "back_off_sets", methodStructure: { kind: "standalone", method: "back_off_sets" } };
+    expect(rankExerciseReplacements(topSetSlot, carrier.constraints.equipment).every(({ exercise }) => exercise.setMethodEligibility?.includes("top_set_backoffs"))).toBe(true);
   });
 });
 

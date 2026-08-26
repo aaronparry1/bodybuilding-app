@@ -9,6 +9,7 @@ import { exerciseLibrary } from "@/domain/training/presets";
 
 export type ExerciseEditScope = "current_session" | "future_programme";
 export type ExerciseEditAction = "replace" | "add" | "remove";
+export type ExerciseSubstitutionReason = "equipment_unavailable" | "discomfort" | "preference";
 export type ExerciseCompatibility = "equivalent" | "recalibration_required" | "invalid";
 export type ExerciseEditCommand = Readonly<{
   action: ExerciseEditAction;
@@ -23,6 +24,7 @@ export type ExerciseEditCommand = Readonly<{
   slotId?: string;
   sourceExerciseId?: string;
   exerciseId?: string;
+  reason?: ExerciseSubstitutionReason;
 }>;
 export type ExerciseEditResult = Readonly<{
   status: "applied" | "idempotent" | "rejected" | "retryable";
@@ -65,8 +67,8 @@ function editCurrentSession(command: ExerciseEditCommand, carrier: CanonicalActi
   if (aggregate.session.version !== command.expectedLedgerVersion) return rejected("stale_ledger_version");
   const changed = editSnapshot(aggregate.session.prescriptionSnapshot, command, carrier);
   if (changed.status !== "changed") return { status: changed.status === "unchanged" ? "idempotent" : "rejected", reason: changed.reason, changedSessions: 0, ledgerVersion: aggregate.session.version };
-  if (performedSlotIds(aggregate.events).has(command.slotId ?? "")) return rejected("performed_exercise_cannot_be_changed");
-  const saved = canonicalRecordedSessionLedger.adjustActivePrescription(command.recordedSessionId, aggregate.session.version, command.operationId, command.occurredAt, changed.snapshot, { action: command.action, scope: command.scope, slotId: command.slotId ?? null, exerciseId: command.exerciseId ?? null, originalPrescriptionHash: aggregate.session.prescriptionHash });
+  const performedSets = aggregate.events.filter((event) => event.type === "performance" && String(event.payload.slotId) === command.slotId).length;
+  const saved = canonicalRecordedSessionLedger.adjustActivePrescription(command.recordedSessionId, aggregate.session.version, command.operationId, command.occurredAt, changed.snapshot, { action: command.action, scope: command.scope, slotId: command.slotId ?? null, sourceExerciseId: command.sourceExerciseId ?? null, exerciseId: command.exerciseId ?? null, substitutionReason: command.reason ?? "preference", performedSetsPreserved: performedSets, originalPrescriptionHash: aggregate.session.prescriptionHash });
   if (saved.status === "duplicate") return { status: "idempotent", reason: "edit_already_applied", changedSessions: 0, ledgerVersion: saved.session.version };
   if (saved.status !== "saved") return { status: saved.status === "stale" || saved.status === "storage_failure" ? "retryable" : "rejected", reason: saved.reason ?? saved.status, changedSessions: 0 };
   canonicalActivePlanState.hydrate();
@@ -127,7 +129,7 @@ function editSnapshot(snapshot: Readonly<Record<string, unknown>>, command: Exer
     const current = availableExerciseCatalogue().find((exercise) => exercise.id === slots[index]!.exerciseId);
     const suitability = compatibility(current, replacement, slots[index]!, carrier.constraints.equipment);
     if (suitability === "invalid") return { status: "invalid", reason: "incompatible_replacement", snapshot };
-    slots[index] = replacementSlot(slots[index]!, replacement, suitability);
+    slots[index] = replacementSlot(slots[index]!, replacement, suitability, command);
     return { status: "changed", reason: suitability === "equivalent" ? "exercise_replaced" : "exercise_replaced_recalibration_required", snapshot: reindex(snapshot, slots) };
   }
   if (slots.length >= 8) return { status: "invalid", reason: "session_exercise_limit_reached", snapshot };
@@ -138,7 +140,7 @@ function editSnapshot(snapshot: Readonly<Record<string, unknown>>, command: Exer
   return { status: "changed", reason: "optional_exercise_added", snapshot: reindex(snapshot, slots) };
 }
 
-function replacementSlot(slot: Slot, exercise: Exercise, suitability: Exclude<ExerciseCompatibility, "invalid">): Slot {
+function replacementSlot(slot: Slot, exercise: Exercise, suitability: Exclude<ExerciseCompatibility, "invalid">, command?: ExerciseEditCommand): Slot {
   const settings = slot.settings as Record<string, unknown>;
   const targetReps = Number(slot.targetReps ?? (settings?.repRange as Record<string, unknown> | undefined)?.min ?? 8);
   const workingSets = Number(settings?.requiredSets ?? settings?.requiredWorkSets ?? 1);
@@ -146,16 +148,34 @@ function replacementSlot(slot: Slot, exercise: Exercise, suitability: Exclude<Ex
   const loadPrescription = bodyweight
     ? { schemaVersion: "canonical_load_prescription_v1", state: "bodyweight", loadingMode: "bodyweight", instruction: "Use controlled bodyweight repetitions." }
     : withCanonicalCalibrationProtocol({ schemaVersion: "canonical_load_prescription_v1", state: "calibration_required", loadingMode: String(slot.loadingMode ?? "external_load"), instruction: "Establish a safe working load for this exercise.", reason: suitability === "equivalent" ? "replacement_requires_own_exercise_evidence" : "incompatible_mechanics", evidenceStatus: "incompatible" }, targetReps, workingSets);
-  return { ...slot, exerciseId: exercise.id, exerciseRole: exercise.roles.includes(String(slot.exerciseRole) as never) ? slot.exerciseRole : exercise.roles[0], prescribedLoad: undefined, loadPrescription, selection: { policyId: "canonical_user_exercise_edit_v1", suitability, reasons: ["user_selected", "history_kept_by_exercise_identity"], repeatReason: "not_repeated" } };
+  const prior = Array.isArray(slot.substitutionHistory) ? slot.substitutionHistory : [];
+  const substitutionId = command ? `${command.operationId}:${String(slot.exerciseId)}:${exercise.id}` : undefined;
+  return { ...slot, exerciseId: exercise.id, exerciseRole: exercise.roles.includes(String(slot.exerciseRole) as never) ? slot.exerciseRole : exercise.roles[0], prescribedLoad: undefined, loadPrescription, ...(substitutionId ? { activeSubstitutionId: substitutionId, substitutionScope: command?.scope, substitutionReason: command?.reason ?? "preference", substitutionHistory: [...prior, { substitutionId, fromExerciseId: slot.exerciseId, toExerciseId: exercise.id, scope: command?.scope, reason: command?.reason ?? "preference", occurredAt: command?.occurredAt }] } : {}), selection: { policyId: "canonical_user_exercise_edit_v2", suitability, reasons: ["user_selected", suitability === "equivalent" ? "close_equivalent_separate_exercise_history" : "materially_different_exposure_recalibrates"], repeatReason: "not_repeated" } };
 }
 
 function compatibility(current: Exercise | undefined, candidate: Exercise, slot: Readonly<Slot>, equipment: readonly string[]): ExerciseCompatibility {
   if (!candidate.equipment.some((item) => equipment.includes(item)) || !candidate.roles.includes(String(slot.exerciseRole) as never)) return "invalid";
   if (!current) return "recalibration_required";
+  if (!methodCompatible(candidate, slot)) return "invalid";
   const samePattern = candidate.movementPattern === current.movementPattern;
   const sameTarget = candidate.primaryMuscles.some((muscle) => current.primaryMuscles.includes(muscle));
   if (!sameTarget) return "invalid";
-  return samePattern ? "equivalent" : "recalibration_required";
+  const sameFamily = candidate.family === current.family;
+  const defensibleProfile = candidate.stability === current.stability
+    && candidate.skillDemand === current.skillDemand
+    && candidate.loadability === current.loadability
+    && candidate.fatigueCost === current.fatigueCost
+    && candidate.jointStress === current.jointStress;
+  return samePattern && sameFamily && defensibleProfile ? "equivalent" : "recalibration_required";
+}
+
+function methodCompatible(exercise: Exercise, slot: Readonly<Slot>): boolean {
+  const structure = slot.methodStructure as Record<string, unknown> | undefined;
+  const method = String(structure?.method ?? slot.method ?? "straight_sets");
+  if (method === "rest_pause") return exercise.stability === "high" && exercise.skillDemand !== "high" && exercise.fatigueCost !== "high" && !exercise.equipment.includes("barbell") && ["secondary_compound", "accessory", "isolation"].some((role) => exercise.roles.includes(role as never));
+  if (method === "back_off_sets") return exercise.setMethodEligibility?.includes("top_set_backoffs") === true;
+  if (method === "antagonist_superset") return exercise.skillDemand !== "high" && exercise.fatigueCost !== "high" && !exercise.roles.includes("primary_compound");
+  return true;
 }
 
 function reindex(snapshot: Readonly<Record<string, unknown>>, slots: Slot[]): Readonly<Record<string, unknown>> {
@@ -164,5 +184,4 @@ function reindex(snapshot: Readonly<Record<string, unknown>>, slots: Slot[]): Re
 function isOptional(slot: Readonly<Slot>): boolean { return slot.constructionRole === "accessory" && slot.exerciseRole !== "primary_compound"; }
 function isGrouped(slot: Readonly<Slot>): boolean { const structure = slot.methodStructure as Record<string, unknown> | undefined; return Boolean(structure && structure.kind !== "standalone"); }
 function compatibilityRank(value: ExerciseCompatibility): number { return value === "equivalent" ? 0 : value === "recalibration_required" ? 1 : 2; }
-function performedSlotIds(events: readonly { type: string; payload: Readonly<Record<string, unknown>> }[]): Set<string> { return new Set(events.filter((event) => event.type === "performance").map((event) => String(event.payload.slotId))); }
 function rejected(reason: string): ExerciseEditResult { return { status: "rejected", reason, changedSessions: 0 }; }
