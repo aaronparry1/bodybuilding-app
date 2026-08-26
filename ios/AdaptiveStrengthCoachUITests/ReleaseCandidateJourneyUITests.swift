@@ -373,6 +373,10 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
       currentAction.tap()
       return true
     }
+    // Calibration deliberately keeps its primary confirmation visible above
+    // the numeric keyboard. Let the caller tap that real action when iOS does
+    // not expose InputAccessoryView descendants to XCTest.
+    if context == "calibration" { return false }
     else {
       app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.14)).tap()
       if app.keyboards.firstMatch.exists { app.swipeDown() }
