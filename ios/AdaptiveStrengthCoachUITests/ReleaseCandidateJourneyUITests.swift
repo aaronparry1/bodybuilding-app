@@ -265,8 +265,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     replaceText(load, in: loadField)
     XCTAssertEqual(loadField.value as? String, load, "Calibration input must contain the complete deterministic test load")
     attachScreenshot("03a-calibration-keyboard-open")
-    dismissTrainKeyboard()
-    tap("train-confirm-calibration")
+    if !dismissTrainKeyboard() { tap("train-confirm-calibration") }
   }
 
   private func calibrateCurrentExerciseIfRequired(load: String) {
@@ -304,10 +303,11 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     let reps = element("train-reps-1-1")
     XCTAssertTrue(reps.waitForExistence(timeout: 5))
     replaceText("9", in: reps)
-    dismissTrainKeyboard()
-    let save = app.buttons.matching(NSPredicate(format: "label == %@", "Save edits to set 1")).firstMatch
-    XCTAssertTrue(save.waitForExistence(timeout: 5))
-    save.tap()
+    if !dismissTrainKeyboard() {
+      let save = app.buttons.matching(NSPredicate(format: "label == %@", "Save edits to set 1")).firstMatch
+      XCTAssertTrue(save.waitForExistence(timeout: 5))
+      save.tap()
+    }
   }
 
   private func verifyDurationSettings() {
@@ -364,10 +364,14 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     }
   }
 
-  private func dismissTrainKeyboard() {
-    guard app.keyboards.firstMatch.exists else { return }
-    let done = element("train-keyboard-done")
-    if done.exists && done.isHittable { done.tap() }
+  @discardableResult private func dismissTrainKeyboard() -> Bool {
+    guard app.keyboards.firstMatch.exists else { return false }
+    let currentAction = element("train-keyboard-action")
+    var performedCurrentAction = false
+    if currentAction.exists && currentAction.isHittable {
+      currentAction.tap()
+      performedCurrentAction = true
+    }
     else {
       app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.14)).tap()
       if app.keyboards.firstMatch.exists { app.swipeDown() }
@@ -377,6 +381,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     let result = XCTWaiter.wait(for: [keyboardGone], timeout: 3)
     let noVisibleIntersection = !keyboard.exists || keyboard.frame.isEmpty || !keyboard.frame.intersects(app.frame)
     XCTAssertTrue(result == .completed || noVisibleIntersection, "Keyboard must not obscure the next workout action")
+    return performedCurrentAction
   }
 
   private func element(_ identifier: String) -> XCUIElement {
