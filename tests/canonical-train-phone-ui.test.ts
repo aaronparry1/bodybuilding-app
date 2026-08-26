@@ -93,6 +93,7 @@ describe("phone-first canonical Train UI", () => {
     expect(resolveCanonicalTrainCompletionAffordance(22, 22, true)).toEqual({ normalFinishAvailable: true, earlyFinishAvailable: false, completedSets: 22, remainingSets: 0 });
     expect(trainSource).not.toContain("Your recorded working sets are ready to complete.");
     expect(trainSource).toContain("isPositiveTrainFeedback");
+    expect(trainSource).toContain('["Exercise replaced", "Optional exercise"');
     expect(trainSource).toContain("feedbackBannerPositive");
     expect(trainSource).toContain('positiveFeedback ? "polite" : "assertive"');
   });

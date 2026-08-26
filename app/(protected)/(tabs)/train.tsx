@@ -783,7 +783,7 @@ function friendlyReason(reason: string): string {
   return labels[reason] ?? reason.replace(/_/g, " ");
 }
 function isPositiveTrainFeedback(message: string): boolean {
-  return ["Exercise replaced.", "Optional exercise", "Workout restored", "Workout started", "Workout paused", "Workout resumed", "Workout complete", "Set updated", "Starting load confirmed", "Active attempt discarded"].some((prefix) => message.startsWith(prefix));
+  return ["Exercise replaced", "Optional exercise", "Workout restored", "Workout started", "Workout paused", "Workout resumed", "Workout complete", "Set updated", "Starting load confirmed", "Active attempt discarded"].some((prefix) => message.startsWith(prefix));
 }
 
 export { recordCanonicalPerformedWork };
