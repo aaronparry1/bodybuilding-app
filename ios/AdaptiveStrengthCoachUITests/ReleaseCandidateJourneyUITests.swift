@@ -167,6 +167,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     )
     tap("action-swap-or-add-exercise")
     XCTAssertTrue(app.staticTexts["Edit exercises"].waitForExistence(timeout: 10))
+    tap("action-swap-or-replace-an-exercise")
     let source = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", "Bench Press")).firstMatch
     XCTAssertTrue(source.waitForExistence(timeout: 8))
     source.tap()
