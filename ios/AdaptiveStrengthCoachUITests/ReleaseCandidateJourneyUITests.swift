@@ -178,7 +178,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     tapButton(label: "Review change")
     tapButton(label: "Save change")
     XCTAssertTrue(app.staticTexts["Incline Barbell Bench"].waitForExistence(timeout: 10))
-    XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] %@", "Earlier work is saved")).firstMatch.exists)
+    XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] %@", "1 of 4 sets complete")).firstMatch.waitForExistence(timeout: 8))
     attachScreenshot("15-top-set-back-offs-substituted")
   }
 
