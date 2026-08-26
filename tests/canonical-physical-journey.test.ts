@@ -9,6 +9,8 @@ import { projectCanonicalHome } from "@/application/training/canonical-home-proj
 import { projectCanonicalPlanPresentation } from "@/application/training/canonical-plan-presentation";
 import { projectCanonicalTrainSession } from "@/application/training/canonical-train-session-boundary";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
+import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
+import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
 
 describe("canonical physical journey", () => {
   beforeEach(() => { canonicalActivePlanV2Repository.clear(); canonicalRecordedSessionLedger.clear(); canonicalProgressEvidenceRepository.clear(); canonicalRestTimerRepository.clear(); });
@@ -48,6 +50,24 @@ describe("canonical physical journey", () => {
     const edited = editCanonicalPerformedWork({ planId: created.model.planId, expectedPlanRevision: started.planRevision!, recordedSessionId, expectedLedgerVersion: ledgerVersion, operationId: "journey-edit", occurredAt: new Date(Date.parse("2026-01-01T08:01:00.000Z") + (setNumber + 1) * 180_000).toISOString(), provenance: "canonical_journey_test", slotId: first.id, exerciseId: first.exerciseId, setId: `${first.id}:set:1`, setOrder: 1, reps: first.exactTargets?.[0] ?? first.targetReps, load: 77.5, unit: "kg", completion: "complete" });
     expect(edited.status).toBe("applied");
     ledgerVersion = edited.ledgerVersion!;
+    const correctedAggregate = canonicalRecordedSessionLedger.get(recordedSessionId);
+    expect(correctedAggregate.status).toBe("found");
+    if (correctedAggregate.status !== "found") return;
+    const correctedSet = effectiveCanonicalPerformedWork(correctedAggregate.events).find((event) => event.payload.setId === `${first.id}:set:1`);
+    expect(correctedSet?.payload.load).toBe(77.5);
+    expect(correctedAggregate.events.filter((event) => event.type === "performance" && event.payload.setId === `${first.id}:set:1`)).toHaveLength(1);
+    expect(deriveCanonicalCompletionSummary(correctedAggregate.session, correctedAggregate.events).performedLoad).toBe((prescribedWorkingSets - 1) * 80 + 77.5);
+    expect(canonicalProgressEvidenceRepository.get(`${recordedSessionId}:evidence:${first.id}:set:1`)).toMatchObject({
+      status: "found",
+      evidence: { source: `ledger:${recordedSessionId}:v${ledgerVersion}:repair` },
+    });
+
+    const second = slots[1]!;
+    const eventsBeforeWrongFocus = correctedAggregate.events.length;
+    const wrongFocus = editCanonicalPerformedWork({ planId: created.model.planId, expectedPlanRevision: started.planRevision!, recordedSessionId, expectedLedgerVersion: ledgerVersion, operationId: "journey-wrong-focus-edit", occurredAt: "2026-01-01T09:09:00.000Z", provenance: "canonical_journey_test", slotId: second.id, exerciseId: second.exerciseId, setId: `${first.id}:set:1`, setOrder: 1, reps: first.targetReps, load: 90, unit: "kg", completion: "complete" });
+    expect(wrongFocus).toMatchObject({ status: "rejected", reason: "performed_set_identity_mismatch" });
+    const afterWrongFocus = canonicalRecordedSessionLedger.get(recordedSessionId);
+    expect(afterWrongFocus.status === "found" ? afterWrongFocus.events.length : -1).toBe(eventsBeforeWrongFocus);
     const activeProjection = projectCanonicalTrainSession(created.model.planId, recordedSessionId);
     expect(activeProjection.status).toBe("projected");
     if (activeProjection.status === "projected") {
