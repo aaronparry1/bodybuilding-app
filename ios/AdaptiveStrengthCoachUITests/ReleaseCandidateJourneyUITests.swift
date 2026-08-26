@@ -366,8 +366,10 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
 
   @discardableResult private func dismissTrainKeyboard() -> Bool {
     guard app.keyboards.firstMatch.exists else { return false }
-    let currentAction = element("train-keyboard-action")
-    if currentAction.exists && currentAction.isHittable {
+    let identifiedAction = element("train-keyboard-action")
+    let labelledActions = app.buttons.matching(NSPredicate(format: "label IN %@", ["Confirm load", "Save set", "Log set", "Done"])).allElementsBoundByIndex
+    let currentAction = ([identifiedAction] + labelledActions).first(where: { $0.exists && $0.isHittable && $0.frame.midY > app.frame.midY })
+    if let currentAction {
       currentAction.tap()
       return true
     }
