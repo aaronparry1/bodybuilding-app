@@ -22,6 +22,7 @@ export type WorkoutSetPresentation = Readonly<{
   actualReps: number | null;
   actualLoad: number | null;
   state: "current" | "completed" | "upcoming";
+  role: "standard" | "top_set" | "back_off" | "activation" | "mini_set";
 }>;
 
 export type WorkoutCalibrationPresentation = Readonly<{
@@ -109,6 +110,8 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
     const evidenceLoad = compatibleEvidence ? numberOrNull(compatibleEvidence.observations.load) : null;
     const baseDefaultLoad = prescribedBaseLoad ?? performedLoad ?? evidenceLoad;
     const exactTargets = Array.isArray(slot.exactTargets) ? slot.exactTargets : [];
+    const contract = object(object(slot.methodStructure).contract);
+    const setRoles = Array.isArray(contract.setRoles) ? contract.setRoles : [];
     const sets = Array.from({ length: requiredSets }, (_, offset) => {
       const setNumber = offset + 1;
       const event = actual.find((candidate) => String(candidate.payload.setId ?? "") === `${String(slot.id)}:set:${setNumber}` || number(candidate.payload.setOrder, 0) === setNumber);
@@ -140,6 +143,7 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
         actualReps: event ? numberOrNull(event.payload.reps) : null,
         actualLoad,
         state: completed ? "completed" as const : "upcoming" as const,
+        role: (["top_set", "back_off", "activation", "mini_set"].includes(String(setRoles[offset])) ? String(setRoles[offset]) : "standard") as WorkoutSetPresentation["role"],
       };
     });
     const protocol = object(loadPrescription.protocol);
