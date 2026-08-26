@@ -674,7 +674,7 @@ function ActiveExerciseCard(props: Readonly<{
         <Text style={styles.tinyMuted}>{exercise.methodExecution.kind === "linked_rounds"
           ? `${exercise.methodExecution.intraMethodRestSeconds ?? 0}s between exercises · ${exercise.methodExecution.interRoundRestSeconds}s between rounds`
           : exercise.methodExecution.kind === "rest_pause"
-            ? `${exercise.methodExecution.intraMethodRestSeconds ?? 0}s reset between single reps · ${exercise.methodExecution.interRoundRestSeconds}s between rounds`
+            ? `${exercise.methodExecution.intraMethodRestSeconds ?? 0}s before each mini-set · stop when clean repetitions fall below the prescription`
             : `${exercise.methodExecution.interRoundRestSeconds}s between sets`}</Text>
       </View>
       {exercise.coachingNote ? <View style={styles.coaching}><Text style={styles.coachingText}>{exercise.coachingNote}</Text></View> : null}

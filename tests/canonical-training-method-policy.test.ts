@@ -94,7 +94,7 @@ describe("canonical training-method policy", () => {
     });
     expect(eligible[0]).toMatchObject({
       method: "rest_pause",
-      structure: { kind: "rest_pause", rounds: 3, segmentReps: 1, segmentsPerRound: 10, intraMethodRestSeconds: 1, interRoundRestSeconds: 90 },
+      structure: { kind: "rest_pause", rounds: 3, activationReps: 10, miniSetTargetReps: 4, minimumMiniSetReps: 3, maximumMiniSets: 2, intraMethodRestSeconds: 20, interRoundRestSeconds: 90 },
     });
     const missingLoad = applyCanonicalSessionMethodStructures({
       goal: "build_muscle",
@@ -132,9 +132,9 @@ describe("canonical training-method policy", () => {
     const restPause = projectCanonicalWorkoutPresentation({ session: null, snapshot: restPauseSnapshot() });
     expect(restPause.exercises[0]?.method).toBe("Rest-pause");
     expect(restPause.exercises[0]?.sets.map((set) => set.target)).toEqual([
-      "10 × 1 rep · 1 sec reset",
-      "10 × 1 rep · 1 sec reset",
-      "10 × 1 rep · 1 sec reset",
+      "Activation · 10 reps",
+      "Mini-set 1 · 4 reps · 20 sec",
+      "Mini-set 2 · 4 reps · 20 sec",
     ]);
   });
 
@@ -149,8 +149,8 @@ describe("canonical training-method policy", () => {
       restSeconds: 60,
     });
     expect(deriveCanonicalNextSetInstruction(restPauseSnapshot(), "row", 1, 10, 30)).toEqual({
-      text: "Rest 90 sec, then repeat the 10-rep rest-pause round",
-      restSeconds: 90,
+      text: "Rest 20 sec, then complete mini-set 1 for 4 clean reps",
+      restSeconds: 20,
     });
   });
 });
@@ -225,9 +225,9 @@ function restPauseSnapshot() {
       loadingMode: "rep_progression",
       prescribedLoad: 30,
       settings: { requiredSets: 3, repRange: { min: 10, max: 10 } },
-      exactTargets: [10, 10, 10],
+      exactTargets: [10, 4, 4],
       rest: { seconds: 90 },
-      methodStructure: { kind: "rest_pause", policyId: "canonical_training_method_policy_v1", method: "rest_pause", rounds: 3, segmentReps: 1, segmentsPerRound: 10, intraMethodRestSeconds: 1, interRoundRestSeconds: 90, executionLabel: "3 rounds · 10 single reps · 1 sec reset each rep" },
+      methodStructure: { kind: "rest_pause", policyId: "canonical_training_method_policy_v1", method: "rest_pause", rounds: 3, activationReps: 10, miniSetTargetReps: 4, minimumMiniSetReps: 3, maximumMiniSets: 2, intraMethodRestSeconds: 20, interRoundRestSeconds: 90, executionLabel: "10-rep activation · up to 2 × 4 mini-sets · 20 sec" },
     }],
   };
 }

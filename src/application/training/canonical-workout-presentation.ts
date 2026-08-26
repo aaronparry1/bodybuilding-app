@@ -114,7 +114,7 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
       const event = actual.find((candidate) => String(candidate.payload.setId ?? "") === `${String(slot.id)}:set:${setNumber}` || number(candidate.payload.setOrder, 0) === setNumber);
       const targetReps = number(exactTargets[offset], number(slot.targetReps, min));
       const target = methodExecution.kind === "rest_pause"
-        ? `${targetReps} × 1 rep · ${methodExecution.intraMethodRestSeconds ?? 0} sec reset`
+        ? `${setNumber === 1 ? "Activation" : `Mini-set ${setNumber - 1}`} · ${targetReps} reps${setNumber === 1 ? "" : ` · ${methodExecution.intraMethodRestSeconds ?? 0} sec`}`
         : methodExecution.kind === "linked_rounds"
           ? `Round ${setNumber} · ${targetReps} reps`
           : `${targetReps} reps`;

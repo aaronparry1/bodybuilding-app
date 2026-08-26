@@ -31,7 +31,7 @@ describe("production Session Construction method reachability", () => {
     expect(linked.map((slot) => slot.settings.requiredSets)).toEqual(linked.map((slot) => slot.methodStructure?.rounds));
   });
 
-  it("emits the source-bounded rest-pause row in an established powerbuilding hypertrophy session", () => {
+  it("emits the bounded observable rest-pause structure in an established powerbuilding hypertrophy session", () => {
     const result = construct("powerbuilding_hypertrophy", 1, true);
     expect(result.status).toBe("constructed");
     if (result.status !== "constructed" || result.snapshot.schemaVersion !== "canonical_session_snapshot_v3") return;
@@ -40,8 +40,8 @@ describe("production Session Construction method reachability", () => {
     expect(restPause[0]).toMatchObject({
       method: "rest_pause",
       targetReps: 10,
-      exactTargets: [10, 10, 10],
-      methodStructure: { kind: "rest_pause", rounds: 3, segmentsPerRound: 10, intraMethodRestSeconds: 1 },
+      exactTargets: [10, 4, 4],
+      methodStructure: { kind: "rest_pause", rounds: 3, activationReps: 10, miniSetTargetReps: 4, minimumMiniSetReps: 3, maximumMiniSets: 2, intraMethodRestSeconds: 20 },
       loadPrescription: { state: "established" },
     });
   });

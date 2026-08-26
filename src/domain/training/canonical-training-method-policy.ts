@@ -61,9 +61,11 @@ export type CanonicalMethodStructure =
     policyId: typeof CANONICAL_TRAINING_METHOD_POLICY_ID;
     method: "rest_pause";
     rounds: number;
-    segmentReps: 1;
-    segmentsPerRound: 10;
-    intraMethodRestSeconds: 1;
+    activationReps: number;
+    miniSetTargetReps: number;
+    minimumMiniSetReps: number;
+    maximumMiniSets: number;
+    intraMethodRestSeconds: number;
     interRoundRestSeconds: number;
     executionLabel: string;
     reasonCodes: readonly string[];
@@ -326,12 +328,14 @@ export function applyCanonicalSessionMethodStructures(input: Readonly<{
           policyId: CANONICAL_TRAINING_METHOD_POLICY_ID,
           method: "rest_pause",
           rounds: 3,
-          segmentReps: 1,
-          segmentsPerRound: 10,
-          intraMethodRestSeconds: 1,
+          activationReps: 10,
+          miniSetTargetReps: 4,
+          minimumMiniSetReps: 3,
+          maximumMiniSets: 2,
+          intraMethodRestSeconds: 20,
           interRoundRestSeconds: slot.restSeconds,
-          executionLabel: "3 rounds · 10 single reps · 1 sec reset each rep",
-          reasonCodes: ["established_load", "stable_accessory", `mesocycle:${input.mesocycleId}`, "source:vault_pdf_132"],
+          executionLabel: "10-rep activation · up to 2 × 4 mini-sets · 20 sec",
+          reasonCodes: ["established_load", "stable_accessory", `mesocycle:${input.mesocycleId}`, "observable_rep_stop_rule"],
           contract: methodContract("rest_pause", 3, slot.restSeconds),
         },
       };
@@ -415,7 +419,7 @@ function methodContract(method: PrescriptionMethodFamily, rounds: number, restSe
     contractVersion: CANONICAL_TRAINING_METHOD_CONTRACT_VERSION,
     setRoles,
     completionRule: method === "rest_pause" ? "complete prescribed observable repetitions without forced effort entry" : "complete each immutable prescribed set role",
-    stopRule: method === "rest_pause" ? "stop on technical failure or prescribed repetition drop-off" : "apply the slot canonical stop rule",
+    stopRule: method === "rest_pause" ? "stop when a mini-set falls below 3 clean reps or technique fails; the ordinary 15% set drop rule does not apply to intentionally smaller mini-sets" : "apply the slot canonical stop rule",
     progressionRule: method === "back_off_sets" ? "evaluate the top set and back-offs separately; change the smallest supported variable" : grouped ? "progress each paired exercise independently" : "use canonical exercise evidence",
     adaptationEligibility: "comparable completed exposure through persisted canonical evidence",
     substitutionCompatibility: method === "rest_pause" ? "stable low-skill non-barbell exercise retaining the same method" : method === "back_off_sets" ? "top-set/back-off eligible loadable exercise" : grouped ? "non-primary low-interference antagonist preserving the pair" : "compatible canonical exercise",

@@ -185,8 +185,8 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
       methodStructure: structure,
       rest,
       ...(structure.kind === "rest_pause" ? {
-        targetReps: structure.segmentsPerRound,
-        exactTargets: Array.from({ length: structure.rounds }, () => structure.segmentsPerRound),
+        targetReps: structure.activationReps,
+        exactTargets: [structure.activationReps, ...Array.from({ length: structure.maximumMiniSets }, () => structure.miniSetTargetReps)],
         exactTargetKinds: Array.from({ length: structure.rounds }, () => "reps" as const),
       } : {}),
     };

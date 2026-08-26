@@ -265,7 +265,8 @@ export function deriveCanonicalNextSetInstruction(snapshot: Readonly<Record<stri
     if (setOrder < required) return { text: `Rest ${Number(structure.interRoundRestSeconds ?? 60)} sec, then start paired round ${setOrder + 1}`, restSeconds: Number(structure.interRoundRestSeconds ?? 60) };
   }
   if (structure?.kind === "rest_pause" && setOrder < required) {
-    return { text: `Rest ${Number(structure.interRoundRestSeconds ?? rest)} sec, then repeat the ${Number(structure.segmentsPerRound ?? reps)}-rep rest-pause round`, restSeconds: Number(structure.interRoundRestSeconds ?? rest) };
+    const seconds = Number(structure.intraMethodRestSeconds ?? 20);
+    return { text: `Rest ${seconds} sec, then complete mini-set ${setOrder} for ${Number(structure.miniSetTargetReps ?? reps)} clean reps`, restSeconds: seconds };
   }
   if (setOrder < required) return { text: `Rest ${rest} sec, then repeat ${load} kg × ${reps}`, restSeconds: rest };
   const currentIndex = slots.findIndex((candidate) => String(candidate.id) === slotId);
