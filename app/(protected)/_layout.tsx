@@ -39,7 +39,9 @@ export default function ProtectedLayout() {
   const explicitSetupRestart = isOnboardingRoute && restart === "1";
   const showDesignQaChrome = Boolean(activeFixture) && qaChrome === "1" && designQaRuntimeAvailable;
   const qaBuildIdentity = (Constants.expoConfig?.extra as { qaBuildIdentity?: unknown } | undefined)?.qaBuildIdentity;
-  const qaBuildLabel = typeof qaBuildIdentity === "string" && qaBuildIdentity.length > 0 ? ` · ${qaBuildIdentity}` : "";
+  const qaNativeBuildLabel = typeof qaBuildIdentity === "string" && qaBuildIdentity.length > 0 ? ` · native ${qaBuildIdentity}` : "";
+  const qaBundleIdentity = designQaRuntimeAvailable ? process.env.EXPO_PUBLIC_QA_BUNDLE_ID : undefined;
+  const qaBundleLabel = typeof qaBundleIdentity === "string" && qaBundleIdentity.length > 0 ? ` · JS ${qaBundleIdentity}` : "";
   const retainedTraining = inspectCanonicalRetainedTrainingPresence(user?.id ?? null);
   const startupHydration = resolveCanonicalStartupHydration({
     authLoading: isLoading,
@@ -140,7 +142,7 @@ export default function ProtectedLayout() {
           }}
         >
           <Text selectable adjustsFontSizeToFit minimumFontScale={0.82} numberOfLines={1} style={{ color: colors.accent, fontSize: 12, lineHeight: 16, fontWeight: "900", textAlign: "center" }}>
-            {qaPremiumFixtureActive ? `Premium QA · billing disabled${qaBuildLabel}` : `Design QA: ${activeFixture?.label}${qaBuildLabel}`}
+            {qaPremiumFixtureActive ? `Premium QA · billing disabled${qaNativeBuildLabel}${qaBundleLabel}` : `Design QA: ${activeFixture?.label}${qaNativeBuildLabel}${qaBundleLabel}`}
           </Text>
         </View>
       ) : null}
