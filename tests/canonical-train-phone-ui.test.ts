@@ -106,6 +106,14 @@ describe("phone-first canonical Train UI", () => {
     expect(trainSource).not.toContain("function ExerciseSwitcherModal");
   });
 
+  it("exposes grouped navigation and avoids announcing every timer tick", () => {
+    expect(trainSource).toContain('accessibilityActions={[{ name: "increment", label: "Next exercise" }, { name: "decrement", label: "Previous exercise" }]}');
+    expect(trainSource).toContain('exercise.methodExecution.sequenceLabel');
+    expect(trainSource).toContain('Previous comparable performance');
+    expect(trainSource).toContain('announceForAccessibility("Rest complete. Continue with the next prescribed action.")');
+    expect(trainSource).not.toContain('style={styles.restPanel} accessibilityLiveRegion="polite"');
+  });
+
   it("rejects legacy authority and raw internal labels recursively", () => {
     expect(trainSource).not.toMatch(/ActiveTrainingPlan|TrainingBlock|TrainingYear|activeBlockId|currentBlock|progressionState|workoutSessionRepository|buildWorkout|legacyProgramme/);
     const result = projectCanonicalWorkoutPresentation({ session: null, snapshot: snapshot({ state: "unavailable", loadingMode: "unavailable" }) });

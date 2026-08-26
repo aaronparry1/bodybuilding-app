@@ -580,7 +580,8 @@ function WorkoutExerciseList({ exercises, focusedId, prescribedId, onSelect }: R
           const prescribed = exercise.id === prescribedId;
           const status = complete ? "completed" : prescribed ? "current set" : "upcoming";
           const method = exercise.methodExecution.sequenceLabel ?? (exercise.groupType === "straight_set" ? exercise.method : `${exercise.groupType.replace("_", " ")} · ${exercise.method}`);
-          return <Pressable key={exercise.id} testID={`train-exercise-${exercise.order}`} accessibilityRole="button" accessibilityState={{ selected: focused }} accessibilityLabel={`Exercise ${exercise.order} of ${exercises.length}, ${exercise.name}, ${status}, ${completedSets} of ${exercise.sets.length} sets complete${focused ? ", viewing" : ""}`} onPress={() => onSelect(exercise.id)} style={({ pressed }) => [styles.switcherItem, focused && styles.switcherItemActive, complete && styles.workoutExerciseComplete, pressed && styles.pressed]}>
+          const group = exercise.methodExecution.kind === "linked_rounds" ? `, ${exercise.methodExecution.sequenceLabel ?? "superset member"}` : exercise.methodExecution.kind === "rest_pause" ? ", rest-pause exercise" : "";
+          return <Pressable key={exercise.id} testID={`train-exercise-${exercise.order}`} accessibilityRole="button" accessibilityState={{ selected: focused }} accessibilityActions={[{ name: "increment", label: "Next exercise" }, { name: "decrement", label: "Previous exercise" }]} onAccessibilityAction={(event) => { const delta = event.nativeEvent.actionName === "increment" ? 1 : event.nativeEvent.actionName === "decrement" ? -1 : 0; const candidate = exercises[Math.max(0, Math.min(exercises.length - 1, exercise.order - 1 + delta))]; if (candidate) onSelect(candidate.id); }} accessibilityLabel={`Exercise ${exercise.order} of ${exercises.length}, ${exercise.name}${group}, ${status}, ${completedSets} of ${exercise.sets.length} sets complete${focused ? ", viewing" : ""}`} onPress={() => onSelect(exercise.id)} style={({ pressed }) => [styles.switcherItem, focused && styles.switcherItemActive, complete && styles.workoutExerciseComplete, pressed && styles.pressed]}>
             <View style={[styles.switcherIndex, complete && styles.switcherIndexComplete]}><Text style={styles.switcherIndexText}>{complete ? "✓" : exercise.order}</Text></View>
             <View style={styles.flex}><Text numberOfLines={2} style={[styles.exerciseTabName, focused && styles.accentText, complete && styles.workoutExerciseNameComplete]}>{exercise.name}</Text><Text numberOfLines={2} style={styles.tinyMuted}>{completedSets} of {exercise.sets.length} sets · {method}</Text></View>
             <View style={styles.exerciseStatusColumn}><Text style={[styles.switcherStatus, complete && styles.successText, prescribed && styles.accentText]}>{status}</Text>{focused && !prescribed ? <Text style={styles.viewingStatus}>VIEWING</Text> : null}</View>
@@ -622,7 +623,7 @@ function ActiveExerciseCard(props: Readonly<{
     <View style={styles.exerciseHeading}>
       <View style={styles.exerciseHeadingText}>
         <Text style={styles.eyebrow}>EXERCISE {exercise.order}</Text>
-        <Text style={styles.activeExerciseName}>{exercise.name}</Text>
+        <Text accessibilityRole="header" accessibilityLabel={`${exercise.name}. ${exercise.methodExecution.sequenceLabel ? `${exercise.methodExecution.sequenceLabel}. ` : ""}${completedSetCount} of ${exercise.sets.length} sets complete. ${firstIncomplete ? `Current set ${firstIncomplete.number}, target ${firstIncomplete.target}. ${firstIncomplete.previous ? `Previous comparable performance ${firstIncomplete.previous}.` : "No previous comparable performance."}` : "All prescribed sets complete."}`} style={styles.activeExerciseName}>{exercise.name}</Text>
         <Text style={styles.body}>{completedSetCount} of {exercise.sets.length} sets complete · {exercise.method}</Text>
         <Text style={styles.smallMuted}>{firstIncomplete ? `Current target ${firstIncomplete.target} · ${exercise.loadState}` : "All prescribed sets complete"}</Text>
         {exercise.previousPerformance ? <Text style={styles.previous}>Previous: {exercise.previousPerformance}</Text> : null}
@@ -684,7 +685,7 @@ function ActiveExerciseCard(props: Readonly<{
 function RestPanel({ timer, seconds, nextInstruction, onAction }: Readonly<{ timer: NonNullable<ReturnType<typeof restoreCanonicalRestTimer>>; seconds: number; nextInstruction: string | null; onAction(action: "pause" | "resume" | "add" | "skip"): void }>) {
   const expired = timer.state === "expired";
   const paused = timer.state === "paused";
-  return <View style={styles.restPanel} accessibilityLiveRegion="polite">
+  return <View style={styles.restPanel}>
     <View style={styles.restTop}><View><Text style={styles.eyebrow}>{expired ? "REST COMPLETE" : paused ? "REST PAUSED" : "REST"}</Text><Text accessibilityLabel={expired ? "Rest complete" : `${seconds} seconds remaining`} style={styles.restTime}>{expired ? "GO" : formatTimer(seconds)}</Text></View><Text style={styles.restPrescribed}>{timer.prescribedDurationSeconds}s prescribed</Text></View>
     {nextInstruction ? <Text testID="train-next-instruction" numberOfLines={2} style={styles.restInstruction}>{nextInstruction}</Text> : null}
     {!expired ? <View style={styles.restActions}>
