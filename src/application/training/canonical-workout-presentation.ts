@@ -112,6 +112,7 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
     const exactTargets = Array.isArray(slot.exactTargets) ? slot.exactTargets : [];
     const contract = object(object(slot.methodStructure).contract);
     const setRoles = Array.isArray(contract.setRoles) ? contract.setRoles : [];
+    const loadMultipliers = Array.isArray(contract.loadMultipliers) ? contract.loadMultipliers : [];
     const sets = Array.from({ length: requiredSets }, (_, offset) => {
       const setNumber = offset + 1;
       const event = actual.find((candidate) => String(candidate.payload.setId ?? "") === `${String(slot.id)}:set:${setNumber}` || number(candidate.payload.setOrder, 0) === setNumber);
@@ -121,8 +122,12 @@ export function projectCanonicalWorkoutPresentation(input: Readonly<{
         : methodExecution.kind === "linked_rounds"
           ? `Round ${setNumber} · ${targetReps} reps`
           : `${targetReps} reps`;
-      const displayedPrescription = toDisplayLoad(prescribedBaseLoad, displayUnit);
-      const displayedDefault = toDisplayLoad(baseDefaultLoad, displayUnit);
+      const multiplier = number(loadMultipliers[offset], 1);
+      const increment = Math.max(0.01, number(object(loadPrescription.rounding).increment, 0.5));
+      const setPrescribedLoad = prescribedBaseLoad === null ? null : Math.round((prescribedBaseLoad * multiplier) / increment) * increment;
+      const setDefaultLoad = baseDefaultLoad === null ? null : Math.round((baseDefaultLoad * multiplier) / increment) * increment;
+      const displayedPrescription = toDisplayLoad(setPrescribedLoad, displayUnit);
+      const displayedDefault = toDisplayLoad(setDefaultLoad, displayUnit);
       const actualBaseLoad = event ? numberOrNull(event.payload.load) : null;
       const actualLoad = loadSemantic === "bodyweight" ? null : toDisplayLoad(actualBaseLoad, displayUnit);
       const completed = Boolean(event);

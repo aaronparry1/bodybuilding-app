@@ -8,6 +8,7 @@ export const CANONICAL_TRAINING_METHOD_CONTRACT_VERSION = "canonical_training_me
 export type CanonicalMethodContract = Readonly<{
   contractVersion: typeof CANONICAL_TRAINING_METHOD_CONTRACT_VERSION;
   setRoles: readonly ("standard" | "top_set" | "back_off" | "activation" | "mini_set")[];
+  loadMultipliers: readonly number[];
   completionRule: string;
   stopRule: string;
   progressionRule: string;
@@ -418,6 +419,7 @@ function methodContract(method: PrescriptionMethodFamily, rounds: number, restSe
   return {
     contractVersion: CANONICAL_TRAINING_METHOD_CONTRACT_VERSION,
     setRoles,
+    loadMultipliers: method === "back_off_sets" ? Array.from({ length: rounds }, (_, index) => index === 0 ? 1 : 0.9) : Array.from({ length: rounds }, () => 1),
     completionRule: method === "rest_pause" ? "complete prescribed observable repetitions without forced effort entry" : "complete each immutable prescribed set role",
     stopRule: method === "rest_pause" ? "stop when a mini-set falls below 3 clean reps or technique fails; the ordinary 15% set drop rule does not apply to intentionally smaller mini-sets" : "apply the slot canonical stop rule",
     progressionRule: method === "back_off_sets" ? "evaluate the top set and back-offs separately; change the smallest supported variable" : grouped ? "progress each paired exercise independently" : "use canonical exercise evidence",

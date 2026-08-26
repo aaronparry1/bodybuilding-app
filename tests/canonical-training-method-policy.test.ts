@@ -111,7 +111,9 @@ describe("canonical training-method policy", () => {
   it("distinguishes one top set from its back-offs in the additive method contract", () => {
     const bench = exercise("ex-bench-press");
     const [structured] = applyCanonicalSessionMethodStructures({ goal: "build_muscle_and_strength", mesocycleId: "powerbuilding_strength", specialState: "none", experience: "intermediate", readiness: "ready", slots: [sessionSlot("bench", 0, bench, "back_off_sets", 4, 5, 150, "established")] });
-    expect(structured).toMatchObject({ method: "back_off_sets", structure: { executionLabel: "1 top set · 3 back-off sets", contract: { setRoles: ["top_set", "back_off", "back_off", "back_off"], progressionRule: "evaluate the top set and back-offs separately; change the smallest supported variable" } } });
+    expect(structured).toMatchObject({ method: "back_off_sets", structure: { executionLabel: "1 top set · 3 back-off sets", contract: { setRoles: ["top_set", "back_off", "back_off", "back_off"], loadMultipliers: [1, 0.9, 0.9, 0.9], progressionRule: "evaluate the top set and back-offs separately; change the smallest supported variable" } } });
+    const projected = projectCanonicalWorkoutPresentation({ session: null, snapshot: { schemaVersion: "canonical_session_snapshot_v3", sessionId: "top-backoff", role: "Strength", slots: [{ id: "bench", index: 0, exerciseId: bench.id, method: "back_off_sets", prescribedLoad: 100, loadingMode: "external_load", settings: { requiredSets: 4, repRange: { min: 5, max: 8 } }, exactTargets: [5, 7, 7, 7], rest: { seconds: 150 }, loadPrescription: { state: "established", loadingMode: "external_load", prescribedBaseLoad: 100, rounding: { increment: 2.5 } }, methodStructure: structured!.structure }] } });
+    expect(projected.exercises[0]?.sets.map((set) => [set.role, set.prescribedLoad])).toEqual([["top_set", 100], ["back_off", 90], ["back_off", 90], ["back_off", 90]]);
   });
 
   it("projects linked rounds in executable A1/B1/A2/B2 order and rest-pause rounds explicitly", () => {
