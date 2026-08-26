@@ -23,6 +23,8 @@ run_method() {
   local test_name
   if [[ "$method" == "antagonist_superset" ]]; then
     test_name="testInjectedCanonicalAntagonistSupersetIsExecutable"
+  elif [[ "$method" == "back_off_sets" ]]; then
+    test_name="testInjectedCanonicalTopSetBackOffIsExecutable"
   else
     test_name="testInjectedCanonicalRestPauseIsExecutable"
   fi
@@ -43,4 +45,5 @@ run_method() {
 
 run_method antagonist_superset
 run_method rest_pause
+run_method back_off_sets
 python3 "$FIXTURE" restore --device-id "$DEVICE_ID" --snapshot "$BASELINE"

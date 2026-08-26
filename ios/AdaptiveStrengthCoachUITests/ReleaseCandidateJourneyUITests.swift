@@ -102,6 +102,17 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     verifyDurationSettings()
   }
 
+  func testReleaseColdLaunchPerformance() throws {
+    app.terminate()
+    let options = XCTMeasureOptions()
+    options.iterationCount = 5
+    measure(metrics: [XCTApplicationLaunchMetric(waitUntilResponsive: true)], options: options) {
+      app.launch()
+      XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10))
+      app.terminate()
+    }
+  }
+
   func testInjectedHistoricalFutureReconcilesWithoutChangingCompletedHistory() throws {
     enterOfflineModeIfNeeded()
     XCTAssertTrue(element("action-preview-next-workout").waitForExistence(timeout: 20), "Stale future work must reconstruct through the canonical owners")
@@ -145,6 +156,29 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
       screenshotPrefix: "14-rest-pause",
       expectedNextInstruction: "rest-pause round"
     )
+  }
+
+  func testInjectedCanonicalTopSetBackOffIsExecutable() throws {
+    try assertInjectedCanonicalMethod(
+      methodLabel: "Top set + back-offs",
+      methodSlotOrder: 1,
+      screenshotPrefix: "15-top-set-back-offs",
+      expectedNextInstruction: "repeat"
+    )
+    tap("action-swap-or-add-exercise")
+    XCTAssertTrue(app.staticTexts["Edit exercises"].waitForExistence(timeout: 10))
+    let source = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", "Bench Press")).firstMatch
+    XCTAssertTrue(source.waitForExistence(timeout: 8))
+    source.tap()
+    let replacement = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", "Incline Barbell Bench")).firstMatch
+    XCTAssertTrue(replacement.waitForExistence(timeout: 8), "Top-set replacement must retain method-compatible loadability")
+    replacement.tap()
+    tapButton(label: "Equipment unavailable")
+    tapButton(label: "Review change")
+    tapButton(label: "Save change")
+    XCTAssertTrue(app.staticTexts["Incline Barbell Bench"].waitForExistence(timeout: 10))
+    XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] %@", "Earlier work is saved")).firstMatch.exists)
+    attachScreenshot("15-top-set-back-offs-substituted")
   }
 
   private func assertInjectedCanonicalMethod(
@@ -382,6 +416,12 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
 
   private func element(_ identifier: String) -> XCUIElement {
     app.descendants(matching: .any)[identifier]
+  }
+
+  private func tapButton(label: String) {
+    let button = app.buttons.matching(NSPredicate(format: "label == %@", label)).firstMatch
+    XCTAssertTrue(button.waitForExistence(timeout: 8), "Expected button \(label)")
+    button.tap()
   }
 
   private func replaceText(_ expected: String, in field: XCUIElement) {

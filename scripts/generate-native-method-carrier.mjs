@@ -7,12 +7,12 @@ import { constructRepresentativeMethodSessions } from "../tests/helpers/canonica
 
 const method = process.argv[2];
 const outputPath = process.argv[3];
-if ((method !== "antagonist_superset" && method !== "rest_pause") || !outputPath) {
-  throw new Error("usage: generate-native-method-carrier.ts <antagonist_superset|rest_pause> <output-path>");
+if (!["antagonist_superset", "rest_pause", "back_off_sets"].includes(method) || !outputPath) {
+  throw new Error("usage: generate-native-method-carrier.ts <antagonist_superset|rest_pause|back_off_sets> <output-path>");
 }
 
 const fixtureId = `native-method:${method}`;
-const mesocycleId = "powerbuilding_hypertrophy";
+const mesocycleId = method === "back_off_sets" ? "powerbuilding_strength" : "powerbuilding_hypertrophy";
 const goal = "build_muscle_and_strength";
 const experience = "intermediate";
 const daysPerWeek = 5;
