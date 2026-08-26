@@ -154,7 +154,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
       methodLabel: "Rest-pause",
       methodSlotOrder: 4,
       screenshotPrefix: "14-rest-pause",
-      expectedNextInstruction: "rest-pause round"
+      expectedNextInstruction: "Rest 20 sec, then complete mini-set 1"
     )
   }
 
