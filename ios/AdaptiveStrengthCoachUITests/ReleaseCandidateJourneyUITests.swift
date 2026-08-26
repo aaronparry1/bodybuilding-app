@@ -376,6 +376,10 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
       app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.14)).tap()
       if app.keyboards.firstMatch.exists { app.swipeDown() }
     }
+    if app.keyboards.firstMatch.exists {
+      app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.14)).tap()
+      if app.keyboards.firstMatch.exists { app.swipeDown() }
+    }
     let keyboard = app.keyboards.firstMatch
     let keyboardGone = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == false"), object: keyboard)
     let result = XCTWaiter.wait(for: [keyboardGone], timeout: 3)
