@@ -265,7 +265,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     replaceText(load, in: loadField)
     XCTAssertEqual(loadField.value as? String, load, "Calibration input must contain the complete deterministic test load")
     attachScreenshot("03a-calibration-keyboard-open")
-    if !dismissTrainKeyboard() { tap("train-confirm-calibration") }
+    if !dismissTrainKeyboard(context: "calibration") { tap("train-confirm-calibration") }
   }
 
   private func calibrateCurrentExerciseIfRequired(load: String) {
@@ -303,7 +303,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     let reps = element("train-reps-1-1")
     XCTAssertTrue(reps.waitForExistence(timeout: 5))
     replaceText("9", in: reps)
-    if !dismissTrainKeyboard() {
+    if !dismissTrainKeyboard(context: "completed-set edit") {
       let save = app.buttons.matching(NSPredicate(format: "label == %@", "Save edits to set 1")).firstMatch
       XCTAssertTrue(save.waitForExistence(timeout: 5))
       save.tap()
@@ -364,7 +364,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     }
   }
 
-  @discardableResult private func dismissTrainKeyboard() -> Bool {
+  @discardableResult private func dismissTrainKeyboard(context: String) -> Bool {
     guard app.keyboards.firstMatch.exists else { return false }
     let identifiedAction = element("train-keyboard-action")
     let labelledActions = app.buttons.matching(NSPredicate(format: "label IN %@", ["Confirm load", "Save set", "Log set", "Done"])).allElementsBoundByIndex
@@ -381,7 +381,7 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     let keyboardGone = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == false"), object: keyboard)
     let result = XCTWaiter.wait(for: [keyboardGone], timeout: 3)
     let noVisibleIntersection = !keyboard.exists || keyboard.frame.isEmpty || !keyboard.frame.intersects(app.frame)
-    XCTAssertTrue(result == .completed || noVisibleIntersection, "Keyboard must not obscure the next workout action")
+    XCTAssertTrue(result == .completed || noVisibleIntersection, "Keyboard must not obscure the next workout action during \(context)")
     return false
   }
 
