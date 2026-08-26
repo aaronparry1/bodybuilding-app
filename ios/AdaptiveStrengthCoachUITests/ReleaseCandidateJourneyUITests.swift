@@ -227,6 +227,9 @@ final class ReleaseCandidateJourneyUITests: XCTestCase {
     tap("action-continue")
     tap("option-intermediate")
     tap("action-continue")
+    // At large Dynamic Type on the narrow device, the next step's lower
+    // choices are clipped out of the accessibility tree until it is scrolled.
+    app.swipeUp()
     tap("option-currently-training")
     tap("recent-routine-5")
     tap("option-moderate")
