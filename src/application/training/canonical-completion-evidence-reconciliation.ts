@@ -241,6 +241,14 @@ function performanceEvidence(input: Readonly<{
   const exactTargets = Array.isArray(input.slot.exactTargets) ? input.slot.exactTargets as number[] : [];
   const setOrder = Number(input.event.payload.setOrder);
   const structure = input.slot.methodStructure as Record<string, unknown> | undefined;
+  const contract = structure?.contract as Record<string, unknown> | undefined;
+  const setRoles = Array.isArray(structure?.setRoles) ? structure.setRoles.map(String) : [];
+  const loadMultipliers = Array.isArray(structure?.loadMultipliers) ? structure.loadMultipliers.map(Number) : [];
+  const prescribedBaseLoad = Number(loadPrescription?.prescribedBaseLoad ?? 0);
+  const setMultiplier = Number(loadMultipliers[setOrder - 1] ?? 1);
+  const prescribedRestSeconds = structure?.kind === "rest_pause" && setOrder > 1
+    ? Number(structure.intraMethodRestSeconds ?? 0)
+    : Number(structure?.interRoundRestSeconds ?? (input.slot.rest as Record<string, unknown> | undefined)?.seconds ?? 0);
   return {
     schemaVersion: "canonical_progress_evidence_v1",
     evidenceId: input.evidenceId,
@@ -267,10 +275,22 @@ function performanceEvidence(input: Readonly<{
       method: String(input.slot.method ?? "straight_sets"),
       methodExecutionKind: String(structure?.kind ?? "standalone"),
       methodPolicyId: String(structure?.policyId ?? "canonical_training_method_policy_v1"),
+      methodContractVersion: String(contract?.contractVersion ?? "legacy_or_unversioned"),
+      methodGroupIdentity: structure?.groupId ? String(structure.groupId) : null,
+      methodGroupPosition: Number.isInteger(Number(structure?.position)) ? Number(structure?.position) : null,
+      pairedExerciseId: structure?.pairedExerciseId ? String(structure.pairedExerciseId) : null,
       loadState: String(loadPrescription?.state ?? "unavailable"),
       progressionRule: String(progression?.rule ?? "unknown"),
       prescribedSets: Number(settings?.requiredSets ?? settings?.requiredWorkSets ?? 0),
       prescribedTargetReps: Number(exactTargets[setOrder - 1] ?? input.slot.targetReps ?? 0),
+      prescribedBaseLoad,
+      prescribedSetLoad: prescribedBaseLoad > 0 ? prescribedBaseLoad * setMultiplier : 0,
+      prescribedRestSeconds,
+      actualRestSeconds: null,
+      setRole: setRoles[setOrder - 1] ?? (setOrder === 1 ? "working_set" : `working_set_${setOrder}`),
+      correctionProvenance: input.event.eventId === input.event.originalEventId ? "original" : "corrected",
+      executionEventId: input.event.eventId,
+      originalExecutionEventId: input.event.originalEventId,
       stopThreshold: typeof stopRule?.threshold === "number" ? Number(stopRule.threshold) : null,
       setOrder,
       reps: Number(input.event.payload.reps),

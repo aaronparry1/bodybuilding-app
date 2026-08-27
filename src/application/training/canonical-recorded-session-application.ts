@@ -181,7 +181,7 @@ export function editCanonicalPerformedWork(command: CanonicalEditPerformedWorkCo
   const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, { eventId: `${command.recordedSessionId}:repair:${command.operationId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "repair", occurredAt: command.occurredAt, operationId: command.operationId, payload: { ...command, editedSetId: command.setId, replacesEventId: original.eventId } });
   if (appended.status !== "saved") return { status: "rejected", reason: "performed_work_edit_conflict" };
   const evidenceSlot = String(slot.exerciseId) === command.exerciseId ? slot : { ...slot, exerciseId: command.exerciseId, activeSubstitutionId: original.payload.substitutionId };
-  const evidence = canonicalProgressEvidenceRepository.replace({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:evidence:${command.setId}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, slotId: command.slotId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}:repair`, kind: "performance", observations: canonicalPerformedEvidenceObservations(snapshot, evidenceSlot, aggregate.session.mesocycleId, aggregate.session.prescriptionHash, command), evidenceVersion: "progress_v1" });
+  const evidence = canonicalProgressEvidenceRepository.replace({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:evidence:${command.setId}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, slotId: command.slotId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}:repair`, kind: "performance", observations: canonicalPerformedEvidenceObservations(snapshot, evidenceSlot, aggregate.session.mesocycleId, aggregate.session.prescriptionHash, command, "corrected"), evidenceVersion: "progress_v1" });
   canonicalActivePlanState.hydrate();
   return { status: evidence.status === "saved" ? "applied" : "retryable", reason: evidence.status === "saved" ? "performed_work_edited" : "performed_work_edited_with_evidence_pending", ledgerVersion: appended.session!.version, nextInstruction: deriveCanonicalNextSetInstruction(aggregate.session.prescriptionSnapshot, command.slotId, command.setOrder, command.reps, command.load).text };
 }
@@ -287,12 +287,21 @@ function canonicalSlotMethodFacts(slot: Record<string, unknown> | undefined): Re
   method: string;
   methodExecutionKind: string;
   methodPolicyId: string;
+  methodContractVersion: string;
+  methodGroupIdentity: string | null;
+  methodGroupPosition: number | null;
+  pairedExerciseId: string | null;
 }> {
   const structure = slot?.methodStructure as Record<string, unknown> | undefined;
+  const contract = structure?.contract as Record<string, unknown> | undefined;
   return {
     method: String(slot?.method ?? "straight_sets"),
     methodExecutionKind: String(structure?.kind ?? "standalone"),
     methodPolicyId: String(structure?.policyId ?? "canonical_training_method_policy_v1"),
+    methodContractVersion: String(contract?.contractVersion ?? "legacy_or_unversioned"),
+    methodGroupIdentity: structure?.groupId ? String(structure.groupId) : null,
+    methodGroupPosition: Number.isInteger(Number(structure?.position)) ? Number(structure?.position) : null,
+    pairedExerciseId: structure?.pairedExerciseId ? String(structure.pairedExerciseId) : null,
   };
 }
 
@@ -302,6 +311,7 @@ function canonicalPerformedEvidenceObservations(
   mesocycleId: string,
   immutablePrescriptionHash: string,
   command: CanonicalPerformedWorkCommand,
+  correctionProvenance: "original" | "corrected" = "original",
 ): Readonly<Record<string, string | number | boolean | null>> {
   const settings = slot?.settings as Record<string, unknown> | undefined;
   const loadPrescription = slot?.loadPrescription as Record<string, unknown> | undefined;
@@ -309,6 +319,14 @@ function canonicalPerformedEvidenceObservations(
   const stopRule = slot?.stopRule as Record<string, unknown> | undefined;
   const exactTargets = Array.isArray(slot?.exactTargets) ? slot?.exactTargets as number[] : [];
   const targetForSet = Number(exactTargets[command.setOrder - 1] ?? slot?.targetReps ?? 0);
+  const structure = slot?.methodStructure as Record<string, unknown> | undefined;
+  const setRoles = Array.isArray(structure?.setRoles) ? structure.setRoles.map(String) : [];
+  const loadMultipliers = Array.isArray(structure?.loadMultipliers) ? structure.loadMultipliers.map(Number) : [];
+  const prescribedBaseLoad = Number(loadPrescription?.prescribedBaseLoad ?? 0);
+  const setMultiplier = Number(loadMultipliers[command.setOrder - 1] ?? 1);
+  const prescribedRestSeconds = structure?.kind === "rest_pause" && command.setOrder > 1
+    ? Number(structure.intraMethodRestSeconds ?? 0)
+    : Number(structure?.interRoundRestSeconds ?? (slot?.rest as Record<string, unknown> | undefined)?.seconds ?? 0);
   return {
     exerciseId: command.exerciseId,
     slotId: command.slotId,
@@ -320,6 +338,15 @@ function canonicalPerformedEvidenceObservations(
     progressionRule: String(progression?.rule ?? "unknown"),
     prescribedSets: Number(settings?.requiredSets ?? settings?.requiredWorkSets ?? 0),
     prescribedTargetReps: targetForSet,
+    prescribedBaseLoad,
+    prescribedSetLoad: prescribedBaseLoad > 0 ? prescribedBaseLoad * setMultiplier : 0,
+    prescribedRestSeconds,
+    actualRestSeconds: null,
+    setRole: setRoles[command.setOrder - 1] ?? (command.setOrder === 1 ? "working_set" : `working_set_${command.setOrder}`),
+    correctionProvenance,
+    executionEventId: correctionProvenance === "corrected"
+      ? `${command.recordedSessionId}:repair:${command.operationId}`
+      : `${command.recordedSessionId}:performance:${command.setId}`,
     stopThreshold: typeof stopRule?.threshold === "number" ? Number(stopRule.threshold) : null,
     setOrder: command.setOrder,
     reps: command.reps,

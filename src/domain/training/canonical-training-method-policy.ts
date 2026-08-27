@@ -53,6 +53,7 @@ export type CanonicalMethodStructure =
     intraMethodRestSeconds: 0;
     interRoundRestSeconds: 60;
     pairedExerciseName: string;
+    pairedExerciseId?: string;
     executionLabel: string;
     reasonCodes: readonly string[];
     contract?: CanonicalMethodContract;
@@ -354,12 +355,12 @@ export function applyCanonicalSessionMethodStructures(input: Readonly<{
     output[leftIndex] = {
       id: left.id,
       method: "antagonist_superset",
-      structure: linked(groupId, 1, left.requiredSets, left.exercise.name, right.exercise.name),
+      structure: linked(groupId, 1, left.requiredSets, left.exercise.id, right.exercise.id, left.exercise.name, right.exercise.name),
     };
     output[leftIndex + 1] = {
       id: right.id,
       method: "antagonist_superset",
-      structure: linked(groupId, 2, right.requiredSets, left.exercise.name, right.exercise.name),
+      structure: linked(groupId, 2, right.requiredSets, left.exercise.id, right.exercise.id, left.exercise.name, right.exercise.name),
     };
     break;
   }
@@ -393,7 +394,7 @@ function standalone(method: PrescriptionMethodFamily, rounds: number, restSecond
   return { kind: "standalone", policyId: CANONICAL_TRAINING_METHOD_POLICY_ID, method, rounds, interRoundRestSeconds: restSeconds, executionLabel: method === "back_off_sets" ? `1 top set · ${Math.max(0, rounds - 1)} back-off sets` : `${rounds} standalone working sets`, reasonCodes, contract: methodContract(method, rounds, restSeconds) };
 }
 
-function linked(groupId: string, position: 1 | 2, rounds: number, leftName: string, rightName: string): Extract<CanonicalMethodStructure, { kind: "linked_rounds" }> {
+function linked(groupId: string, position: 1 | 2, rounds: number, leftId: string, rightId: string, leftName: string, rightName: string): Extract<CanonicalMethodStructure, { kind: "linked_rounds" }> {
   return {
     kind: "linked_rounds",
     policyId: CANONICAL_TRAINING_METHOD_POLICY_ID,
@@ -405,6 +406,7 @@ function linked(groupId: string, position: 1 | 2, rounds: number, leftName: stri
     intraMethodRestSeconds: 0,
     interRoundRestSeconds: 60,
     pairedExerciseName: position === 1 ? rightName : leftName,
+    pairedExerciseId: position === 1 ? rightId : leftId,
     executionLabel: `${position === 1 ? "A" : "B"} · ${rounds} rounds · ${leftName} + ${rightName}`,
     reasonCodes: ["antagonist_pair", "equal_rounds", "source:tier_manual_pdf_103_printed_87", "source:tier_manual_pdf_232"],
     contract: methodContract("antagonist_superset", rounds, 60),

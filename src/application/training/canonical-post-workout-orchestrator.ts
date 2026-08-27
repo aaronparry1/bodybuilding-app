@@ -18,6 +18,10 @@ import { adaptationAuditFromNumericDecisions } from "@/domain/training/canonical
 import { evaluateCanonicalAdaptationOutcome } from "@/domain/training/canonical-adaptation-outcome";
 import { canonicalAdaptationOutcomeRepository } from "@/data/local/canonical-adaptation-outcome-repository";
 import { stabilizeCanonicalNumericDecisions } from "@/domain/training/canonical-adaptation-stability";
+import { canonicalMethodOutcomeRepository } from "@/data/local/canonical-method-outcome-repository";
+import { canonicalSupersetShadowDecisionRepository } from "@/data/local/canonical-superset-shadow-decision-repository";
+import { methodOutcomeFromPerformanceEvidence } from "@/domain/training/canonical-method-outcome";
+import { deriveAntagonistSupersetShadowDecision } from "@/domain/training/canonical-antagonist-superset-adaptation";
 
 export const CANONICAL_POST_WORKOUT_ORCHESTRATOR_VERSION = "canonical_post_workout_orchestrator_v1" as const;
 
@@ -95,6 +99,16 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
   // Close earlier adaptation loops before making the next decision. Outcomes
   // are immutable and idempotent, so replay/restart cannot double-apply them.
   const allEvidence = canonicalProgressEvidenceRepository.list(input.planId);
+  for (const evidence of allEvidence) {
+    const methodOutcome = methodOutcomeFromPerformanceEvidence(evidence);
+    if (methodOutcome) canonicalMethodOutcomeRepository.saveEffective(methodOutcome);
+  }
+  const methodOutcomes = canonicalMethodOutcomeRepository.list(input.planId);
+  const supersetPairs = [...new Set(methodOutcomes.filter((item) => item.method === "antagonist_superset").map((item) => item.pairComparableIdentity).filter(Boolean))];
+  for (const pairIdentity of supersetPairs) {
+    const shadowDecision = deriveAntagonistSupersetShadowDecision(methodOutcomes.filter((item) => item.pairComparableIdentity === pairIdentity));
+    if (shadowDecision) canonicalSupersetShadowDecisionRepository.record(shadowDecision);
+  }
   for (const priorDecision of canonicalProgressDecisionRepository.list(input.planId)) {
     if (canonicalAdaptationOutcomeRepository.get(priorDecision.decisionId).status === "found") continue;
     const outcome = evaluateCanonicalAdaptationOutcome({ decision: priorDecision, evidence: allEvidence });
