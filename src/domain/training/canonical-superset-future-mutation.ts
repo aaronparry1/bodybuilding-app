@@ -24,6 +24,7 @@ export type CanonicalSupersetFutureMutationProposal = Readonly<{
   evidenceIds: readonly string[];
   pairIdentity: string;
   planId: string;
+  expectedPlanRevision: number;
   targetMicrocycleId: string | null;
   targetSessionId: string | null;
   targetPlanSessionIndex: number | null;
@@ -34,7 +35,7 @@ export type CanonicalSupersetFutureMutationProposal = Readonly<{
   restAfterSeconds: number | null;
   expectedDurationDeltaMinutes: number;
   comparabilityConsequence: "continues" | "pairing_history_stops_exercise_history_continues" | "unresolved";
-  applicationAuthority: "shadow_only";
+  applicationAuthority: "shadow_only" | "production";
   applicationEligibility: "eligible" | "held" | "rejected";
   reason: string;
   mutations: readonly CanonicalSupersetMutation[];
@@ -43,12 +44,13 @@ export type CanonicalSupersetFutureMutationProposal = Readonly<{
 
 export function proposeCanonicalSupersetFutureMutation(input: Readonly<{
   decision: CanonicalSupersetShadowDecision;
+  planRevision?: number;
   sessions: readonly CanonicalPlannedSessionSnapshot[];
   startedSessionIds?: readonly string[];
   sessionDurationCeilingMinutes?: number;
   equipmentIncrementByExercise?: Readonly<Record<string, number>>;
 }>): CanonicalSupersetFutureMutationProposal {
-  const base = baseProposal(input.decision, input.sessions);
+  const base = baseProposal(input.decision, input.sessions, input.planRevision ?? 0);
   if (input.decision.decisionAuthority !== "shadow_only" || input.decision.eligibleForProductionApplication !== false) return { ...base, applicationEligibility: "rejected", reason: "uncertified_decision_authority" };
   if (["hold", "delay_for_evidence"].includes(input.decision.action)) return { ...base, applicationEligibility: "held", reason: input.decision.reason };
   const started = new Set(input.startedSessionIds ?? []);
@@ -174,6 +176,6 @@ function mutateMember(slot: Record<string, unknown>, member: "a" | "b", regressi
   return null;
 }
 
-function baseProposal(decision: CanonicalSupersetShadowDecision, sessions: readonly CanonicalPlannedSessionSnapshot[]): CanonicalSupersetFutureMutationProposal {
-  return { schemaVersion: CANONICAL_SUPERSET_MUTATION_CONTRACT, originatingDecisionId: decision.decisionId, decisionVersion: decision.schemaVersion, policyVersion: decision.policyVersion, evidenceIds: decision.evidenceIds, pairIdentity: decision.pairIdentity, planId: decision.planId, targetMicrocycleId: null, targetSessionId: null, targetPlanSessionIndex: null, targetComparableExposureIdentity: null, pairStateBefore: null, pairStateAfter: null, restBeforeSeconds: null, restAfterSeconds: null, expectedDurationDeltaMinutes: 0, comparabilityConsequence: "unresolved", applicationAuthority: "shadow_only", applicationEligibility: "held", reason: "not_evaluated", mutations: [], proposedSessions: sessions };
+function baseProposal(decision: CanonicalSupersetShadowDecision, sessions: readonly CanonicalPlannedSessionSnapshot[], expectedPlanRevision = 0): CanonicalSupersetFutureMutationProposal {
+  return { schemaVersion: CANONICAL_SUPERSET_MUTATION_CONTRACT, originatingDecisionId: decision.decisionId, decisionVersion: decision.schemaVersion, policyVersion: decision.policyVersion, evidenceIds: decision.evidenceIds, pairIdentity: decision.pairIdentity, planId: decision.planId, expectedPlanRevision, targetMicrocycleId: null, targetSessionId: null, targetPlanSessionIndex: null, targetComparableExposureIdentity: null, pairStateBefore: null, pairStateAfter: null, restBeforeSeconds: null, restAfterSeconds: null, expectedDurationDeltaMinutes: 0, comparabilityConsequence: "unresolved", applicationAuthority: "shadow_only", applicationEligibility: "held", reason: "not_evaluated", mutations: [], proposedSessions: sessions };
 }
