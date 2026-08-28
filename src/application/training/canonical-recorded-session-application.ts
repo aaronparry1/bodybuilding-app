@@ -6,6 +6,8 @@ import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-co
 import { reconcileCanonicalRecordedReference } from "@/application/training/canonical-recorded-reference-reconciliation";
 import { pauseCanonicalRestTimer, resumeCanonicalRestTimer, startCanonicalRestTimer } from "@/application/training/canonical-rest-timer";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
+import { canonicalRecoveryTimingRepository } from "@/data/local/canonical-recovery-timing-repository";
+import { observeCanonicalRecoveryTiming, startCanonicalRecoveryTiming, type CanonicalRecoveryTimingObservation } from "@/application/training/canonical-recovery-timing";
 import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
 import { comparableExposureObservationFacts } from "@/domain/training/canonical-comparable-exposure-policy";
 import { orchestrateCanonicalPostWorkoutAdaptation } from "@/application/training/canonical-post-workout-orchestrator";
@@ -113,6 +115,7 @@ export function completeCanonicalSession(command: CanonicalRecordedLifecycleComm
     planRevision: command.expectedPlanRevision,
   });
   canonicalRestTimerRepository.clear(command.recordedSessionId);
+  canonicalRecoveryTimingRepository.clear(command.recordedSessionId);
   if (evidence.status !== "reconciled" && evidence.status !== "already_complete") {
     canonicalActivePlanState.hydrate();
     return { status: "retryable", reason: "completed_with_evidence_pending", ledgerVersion: appended.session!.version };
@@ -152,15 +155,17 @@ export function recordCanonicalPerformedWork(command: CanonicalPerformedWorkComm
   }
   const next = deriveCanonicalNextSetInstruction(aggregate.session.prescriptionSnapshot, command.slotId, command.setOrder, command.reps, command.load);
   const substitutionId = command.substitutionId ?? (typeof slot.activeSubstitutionId === "string" ? slot.activeSubstitutionId : undefined);
-  const event = { eventId: `${command.recordedSessionId}:performance:${command.setId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "performance" as const, occurredAt: command.occurredAt, operationId: command.operationId, payload: { setId: command.setId, slotId: command.slotId, exerciseId: command.exerciseId, setOrder: command.setOrder, reps: command.reps, load: command.load, unit: command.unit, effort: command.effort, substitutionId, completion: command.completion, provenance: command.provenance, nextInstruction: next.text, nextRestSeconds: next.restSeconds } };
+  const recoveryTiming = observeCanonicalRecoveryTiming({ workoutId: command.recordedSessionId, slotId: command.slotId, exerciseId: command.exerciseId, setOrder: command.setOrder, occurredAt: command.occurredAt, substitutionId });
+  const event = { eventId: `${command.recordedSessionId}:performance:${command.setId}`, aggregateId: command.recordedSessionId, expectedVersion: command.expectedLedgerVersion, type: "performance" as const, occurredAt: command.occurredAt, operationId: command.operationId, payload: { setId: command.setId, slotId: command.slotId, exerciseId: command.exerciseId, setOrder: command.setOrder, reps: command.reps, load: command.load, unit: command.unit, effort: command.effort, substitutionId, completion: command.completion, provenance: command.provenance, nextInstruction: next.text, nextRestSeconds: next.restSeconds, recoveryTiming } };
   const appended = canonicalRecordedSessionLedger.append(command.recordedSessionId, event);
   if (appended.status === "stale") return { status: "rejected", reason: "stale_ledger_version" };
   if (appended.status !== "saved") return { status: "rejected", reason: appended.reason ?? "performed_work_conflict" };
-  const evidence = canonicalProgressEvidenceRepository.record({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:evidence:${command.setId}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, slotId: command.slotId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}`, kind: "performance", observations: canonicalPerformedEvidenceObservations(snapshot, slot, aggregate.session.mesocycleId, aggregate.session.prescriptionHash, command), evidenceVersion: "progress_v1" });
+  const evidence = canonicalProgressEvidenceRepository.record({ schemaVersion: "canonical_progress_evidence_v1", evidenceId: `${command.recordedSessionId}:evidence:${command.setId}`, planId: command.planId, planRevision: command.expectedPlanRevision, macrocycleId: aggregate.session.macrocycleId, mesocycleId: aggregate.session.mesocycleId as never, microcycleId: aggregate.session.microcycleId, sessionId: command.recordedSessionId, slotId: command.slotId, athleteId: aggregate.session.athleteId, observedAt: command.occurredAt, source: `ledger:${command.recordedSessionId}:v${appended.session!.version}`, kind: "performance", observations: canonicalPerformedEvidenceObservations(snapshot, slot, aggregate.session.mesocycleId, aggregate.session.prescriptionHash, command, "original", recoveryTiming), evidenceVersion: "progress_v1" });
   canonicalActivePlanState.hydrate();
   if ((evidence.status === "saved" || evidence.status === "duplicate") && next.restSeconds > 0) {
     startCanonicalRestTimer({ workoutId: aggregate.session.recordedSessionId, setId: command.setId, durationSeconds: next.restSeconds });
   }
+  if (evidence.status === "saved" || evidence.status === "duplicate") startNextSupersetRecoveryTiming(snapshot, slot, command);
   return { status: evidence.status === "saved" || evidence.status === "duplicate" ? "applied" : "retryable", reason: evidence.status === "saved" || evidence.status === "duplicate" ? "performed_work_recorded" : "progress_evidence_pending", ledgerVersion: appended.session!.version, nextInstruction: next.text };
 }
 
@@ -283,6 +288,48 @@ function canonicalSlotLoadingMode(slot: Record<string, unknown> | undefined): st
   return String(prescribedMode ?? slot.loadingMode ?? "unavailable");
 }
 
+function startNextSupersetRecoveryTiming(snapshot: Record<string, unknown>, slot: Record<string, unknown> | undefined, command: CanonicalPerformedWorkCommand): void {
+  const structure = slot?.methodStructure as Record<string, unknown> | undefined;
+  if (structure?.kind !== "linked_rounds" || !structure.groupId || !structure.pairedExerciseId) {
+    canonicalRecoveryTimingRepository.clear(command.recordedSessionId);
+    return;
+  }
+  const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
+  const position = Number(structure.position);
+  const settings = slot?.settings as Record<string, unknown> | undefined;
+  const requiredSets = Number(settings?.requiredSets ?? settings?.requiredWorkSets ?? 0);
+  const nextSetOrder = position === 1 ? command.setOrder : command.setOrder + 1;
+  if (position === 2 && command.setOrder >= requiredSets) {
+    canonicalRecoveryTimingRepository.clear(command.recordedSessionId);
+    return;
+  }
+  const expected = slots.find((candidate) => {
+    const candidateStructure = candidate.methodStructure as Record<string, unknown> | undefined;
+    return candidateStructure?.kind === "linked_rounds"
+      && String(candidateStructure.groupId) === String(structure.groupId)
+      && Number(candidateStructure.position) === (position === 1 ? 2 : 1);
+  });
+  if (!expected) {
+    canonicalRecoveryTimingRepository.clear(command.recordedSessionId);
+    return;
+  }
+  const pairedExerciseId = String(structure.pairedExerciseId);
+  const pairIdentity = [command.exerciseId, pairedExerciseId].sort().join("::");
+  startCanonicalRecoveryTiming({
+    workoutId: command.recordedSessionId,
+    sourceSetId: command.setId,
+    sourceSlotId: command.slotId,
+    sourceExerciseId: command.exerciseId,
+    pairIdentity,
+    phase: position === 1 ? "a_to_b_transition" : "between_round_recovery",
+    expectedSlotId: String(expected.id),
+    expectedExerciseId: String(expected.exerciseId),
+    expectedSetOrder: nextSetOrder,
+    prescribedSeconds: position === 1 ? Number(structure.intraMethodRestSeconds ?? 0) : Number(structure.interRoundRestSeconds ?? 0),
+    startedAt: Date.parse(command.occurredAt),
+  });
+}
+
 function canonicalSlotMethodFacts(slot: Record<string, unknown> | undefined): Readonly<{
   method: string;
   methodExecutionKind: string;
@@ -312,6 +359,7 @@ function canonicalPerformedEvidenceObservations(
   immutablePrescriptionHash: string,
   command: CanonicalPerformedWorkCommand,
   correctionProvenance: "original" | "corrected" = "original",
+  recoveryTiming?: CanonicalRecoveryTimingObservation,
 ): Readonly<Record<string, string | number | boolean | null>> {
   const settings = slot?.settings as Record<string, unknown> | undefined;
   const loadPrescription = slot?.loadPrescription as Record<string, unknown> | undefined;
@@ -341,7 +389,13 @@ function canonicalPerformedEvidenceObservations(
     prescribedBaseLoad,
     prescribedSetLoad: prescribedBaseLoad > 0 ? prescribedBaseLoad * setMultiplier : 0,
     prescribedRestSeconds,
-    actualRestSeconds: null,
+    actualRestSeconds: recoveryTiming?.timingConfidence === "reliable" && recoveryTiming.phase === "between_round_recovery" ? recoveryTiming.observedUsableSeconds : null,
+    observedTransitionSeconds: recoveryTiming?.timingConfidence === "reliable" && recoveryTiming.phase === "a_to_b_transition" ? recoveryTiming.observedUsableSeconds : null,
+    recoveryTimingConfidence: recoveryTiming?.timingConfidence ?? "unreliable",
+    recoveryTimingReason: recoveryTiming?.timingReason ?? "recovery_timing_not_started",
+    recoveryPausedSeconds: recoveryTiming?.pausedSeconds ?? 0,
+    recoveryBackgroundSeconds: recoveryTiming?.backgroundSeconds ?? 0,
+    recoveryManualAdjustmentSeconds: recoveryTiming?.manualAdjustmentSeconds ?? 0,
     setRole: setRoles[command.setOrder - 1] ?? (command.setOrder === 1 ? "working_set" : `working_set_${command.setOrder}`),
     correctionProvenance,
     executionEventId: correctionProvenance === "corrected"

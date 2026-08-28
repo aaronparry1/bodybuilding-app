@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AccessibilityInfo,
+  AppState,
   BackHandler,
   InputAccessoryView,
   Keyboard,
@@ -61,6 +62,7 @@ import { AppScreen, PrimaryButton, SecondaryButton, stableUiIdentifier } from "@
 import { type, workoutColors } from "@/ui/theme";
 import { WorkoutMetricStrip, WorkoutStage } from "@/ui/workout-visuals";
 import { useReducedMotion } from "@/ui/motion";
+import { backgroundCanonicalRecoveryTiming, foregroundCanonicalRecoveryTiming } from "@/application/training/canonical-recovery-timing";
 
 type RouteParams = Readonly<{
   planId?: string;
@@ -159,6 +161,15 @@ function CanonicalTrainExperience() {
     const timer = setInterval(() => setTimerTick(Date.now()), 1000);
     return () => clearInterval(timer);
   }, [aggregate.status === "found" ? aggregate.session.status : "missing", recordedId]);
+
+  useEffect(() => {
+    if (!recordedId) return;
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") foregroundCanonicalRecoveryTiming(recordedId);
+      else backgroundCanonicalRecoveryTiming(recordedId);
+    });
+    return () => subscription.remove();
+  }, [recordedId]);
 
   useEffect(() => {
     if (!recordedId || restTimer?.state !== "expired" || restTimer.expiryAcknowledged) return;

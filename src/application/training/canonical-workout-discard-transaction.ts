@@ -2,6 +2,7 @@ import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-p
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
+import { canonicalRecoveryTimingRepository } from "@/data/local/canonical-recovery-timing-repository";
 import {
   canonicalWorkoutDiscardIntentRepository,
   type CanonicalWorkoutDiscardIntent,
@@ -342,6 +343,7 @@ function cleanupDiscardedAttempt(planId: string, recordedSessionId: string): boo
   try {
     canonicalProgressEvidenceRepository.removeSession(planId, recordedSessionId);
     canonicalRestTimerRepository.clear(recordedSessionId);
+    canonicalRecoveryTimingRepository.clear(recordedSessionId);
     return true;
   } catch {
     return false;

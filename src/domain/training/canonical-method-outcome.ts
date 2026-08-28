@@ -31,6 +31,9 @@ export type CanonicalMethodOutcome = Readonly<{
   performedRepetitions: number;
   prescribedRestSeconds: number | null;
   actualRestSeconds: number | null;
+  observedTransitionSeconds: number | null;
+  recoveryTimingConfidence: "reliable" | "unreliable";
+  recoveryTimingReason: string;
   completion: "complete" | "partial" | "missed";
   correctionProvenance: "original" | "corrected" | "unknown";
   substitutionId: string | null;
@@ -100,6 +103,9 @@ export function methodOutcomeFromPerformanceEvidence(evidence: CanonicalProgress
     performedRepetitions,
     prescribedRestSeconds: finiteOrNull(facts.prescribedRestSeconds),
     actualRestSeconds: finiteOrNull(facts.actualRestSeconds),
+    observedTransitionSeconds: finiteOrNull(facts.observedTransitionSeconds),
+    recoveryTimingConfidence: facts.recoveryTimingConfidence === "reliable" ? "reliable" : "unreliable",
+    recoveryTimingReason: String(facts.recoveryTimingReason ?? "recovery_timing_not_started"),
     completion,
     correctionProvenance: facts.correctionProvenance === "corrected" ? "corrected" : facts.correctionProvenance === "original" ? "original" : "unknown",
     substitutionId: facts.substitutionId ? String(facts.substitutionId) : null,

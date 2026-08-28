@@ -249,6 +249,7 @@ function performanceEvidence(input: Readonly<{
   const prescribedRestSeconds = structure?.kind === "rest_pause" && setOrder > 1
     ? Number(structure.intraMethodRestSeconds ?? 0)
     : Number(structure?.interRoundRestSeconds ?? (input.slot.rest as Record<string, unknown> | undefined)?.seconds ?? 0);
+  const recoveryTiming = input.event.payload.recoveryTiming as Record<string, unknown> | undefined;
   return {
     schemaVersion: "canonical_progress_evidence_v1",
     evidenceId: input.evidenceId,
@@ -286,7 +287,13 @@ function performanceEvidence(input: Readonly<{
       prescribedBaseLoad,
       prescribedSetLoad: prescribedBaseLoad > 0 ? prescribedBaseLoad * setMultiplier : 0,
       prescribedRestSeconds,
-      actualRestSeconds: null,
+      actualRestSeconds: recoveryTiming?.timingConfidence === "reliable" && recoveryTiming?.phase === "between_round_recovery" ? Number(recoveryTiming.observedUsableSeconds) : null,
+      observedTransitionSeconds: recoveryTiming?.timingConfidence === "reliable" && recoveryTiming?.phase === "a_to_b_transition" ? Number(recoveryTiming.observedUsableSeconds) : null,
+      recoveryTimingConfidence: String(recoveryTiming?.timingConfidence ?? "unreliable"),
+      recoveryTimingReason: String(recoveryTiming?.timingReason ?? "recovery_timing_not_started"),
+      recoveryPausedSeconds: Number(recoveryTiming?.pausedSeconds ?? 0),
+      recoveryBackgroundSeconds: Number(recoveryTiming?.backgroundSeconds ?? 0),
+      recoveryManualAdjustmentSeconds: Number(recoveryTiming?.manualAdjustmentSeconds ?? 0),
       setRole: setRoles[setOrder - 1] ?? (setOrder === 1 ? "working_set" : `working_set_${setOrder}`),
       correctionProvenance: input.event.eventId === input.event.originalEventId ? "original" : "corrected",
       executionEventId: input.event.eventId,
