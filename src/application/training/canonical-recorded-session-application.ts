@@ -364,6 +364,7 @@ function canonicalPerformedEvidenceObservations(
   const settings = slot?.settings as Record<string, unknown> | undefined;
   const loadPrescription = slot?.loadPrescription as Record<string, unknown> | undefined;
   const progression = slot?.progression as Record<string, unknown> | undefined;
+  const selection = slot?.selection as Record<string, unknown> | undefined;
   const stopRule = slot?.stopRule as Record<string, unknown> | undefined;
   const exactTargets = Array.isArray(slot?.exactTargets) ? slot?.exactTargets as number[] : [];
   const targetForSet = Number(exactTargets[command.setOrder - 1] ?? slot?.targetReps ?? 0);
@@ -408,6 +409,7 @@ function canonicalPerformedEvidenceObservations(
     unit: command.unit,
     completion: command.completion,
     substitutionId: command.substitutionId ?? null,
+    substitutionComparability: command.substitutionId ? (selection?.suitability === "equivalent" ? "comparable" : "non_comparable") : "not_substituted",
     ...(command.effort === undefined ? {} : { effort: command.effort }),
   };
 }

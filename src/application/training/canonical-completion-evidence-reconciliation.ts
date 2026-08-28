@@ -237,6 +237,7 @@ function performanceEvidence(input: Readonly<{
   const settings = input.slot.settings as Record<string, unknown> | undefined;
   const loadPrescription = input.slot.loadPrescription as Record<string, unknown> | undefined;
   const progression = input.slot.progression as Record<string, unknown> | undefined;
+  const selection = input.slot.selection as Record<string, unknown> | undefined;
   const stopRule = input.slot.stopRule as Record<string, unknown> | undefined;
   const exactTargets = Array.isArray(input.slot.exactTargets) ? input.slot.exactTargets as number[] : [];
   const setOrder = Number(input.event.payload.setOrder);
@@ -305,6 +306,7 @@ function performanceEvidence(input: Readonly<{
       unit: String(input.event.payload.unit),
       completion: String(input.event.payload.completion),
       substitutionId: input.event.payload.substitutionId ? String(input.event.payload.substitutionId) : null,
+      substitutionComparability: input.event.payload.substitutionId ? (selection?.suitability === "equivalent" ? "comparable" : "non_comparable") : "not_substituted",
       ...(input.event.payload.effort === undefined ? {} : { effort: Number(input.event.payload.effort) }),
     },
     evidenceVersion: "progress_v1",

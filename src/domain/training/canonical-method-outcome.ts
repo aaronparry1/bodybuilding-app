@@ -37,6 +37,7 @@ export type CanonicalMethodOutcome = Readonly<{
   completion: "complete" | "partial" | "missed";
   correctionProvenance: "original" | "corrected" | "unknown";
   substitutionId: string | null;
+  substitutionComparability: "not_substituted" | "comparable" | "non_comparable" | "unknown";
   executionEventId: string | null;
   originalExecutionEventId: string | null;
   replayProvenance: string;
@@ -109,6 +110,7 @@ export function methodOutcomeFromPerformanceEvidence(evidence: CanonicalProgress
     completion,
     correctionProvenance: facts.correctionProvenance === "corrected" ? "corrected" : facts.correctionProvenance === "original" ? "original" : "unknown",
     substitutionId: facts.substitutionId ? String(facts.substitutionId) : null,
+    substitutionComparability: facts.substitutionComparability === "comparable" || facts.substitutionComparability === "non_comparable" || facts.substitutionComparability === "not_substituted" ? facts.substitutionComparability : "unknown",
     executionEventId: facts.executionEventId ? String(facts.executionEventId) : null,
     originalExecutionEventId: facts.originalExecutionEventId ? String(facts.originalExecutionEventId) : null,
     replayProvenance: evidence.source,
