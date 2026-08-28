@@ -394,6 +394,10 @@ function standalone(method: PrescriptionMethodFamily, rounds: number, restSecond
   return { kind: "standalone", policyId: CANONICAL_TRAINING_METHOD_POLICY_ID, method, rounds, interRoundRestSeconds: restSeconds, executionLabel: method === "back_off_sets" ? `1 top set · ${Math.max(0, rounds - 1)} back-off sets` : `${rounds} standalone working sets`, reasonCodes, contract: methodContract(method, rounds, restSeconds) };
 }
 
+export function createCanonicalStraightSetStructure(rounds: number, restSeconds: number, reasonCodes: readonly string[] = ["method_adaptation:pair_removed"]): Extract<CanonicalMethodStructure, { kind: "standalone" }> {
+  return standalone("straight_sets", rounds, restSeconds, reasonCodes) as Extract<CanonicalMethodStructure, { kind: "standalone" }>;
+}
+
 function linked(groupId: string, position: 1 | 2, rounds: number, leftId: string, rightId: string, leftName: string, rightName: string): Extract<CanonicalMethodStructure, { kind: "linked_rounds" }> {
   return {
     kind: "linked_rounds",
