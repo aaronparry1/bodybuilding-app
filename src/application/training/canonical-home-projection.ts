@@ -6,6 +6,7 @@ import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-prog
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import type { CanonicalProgressEvidence } from "@/domain/training/canonical-progress-evidence";
 import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/domain/training/canonical-recorded-session-ledger";
+import { projectCanonicalSupersetAdaptation, type CanonicalSupersetAdaptationPresentation } from "@/application/training/canonical-superset-adaptation-presentation";
 
 export const CANONICAL_HOME_PROJECTION_VERSION = "canonical_home_projection_v3" as const;
 
@@ -67,6 +68,7 @@ export type CanonicalHomeProjection = Readonly<{
   recent?: Readonly<{ title: string; detail: string; completedAt?: string }>;
   conditioning?: Readonly<{ title: string; detail: string; placement: string }>;
   attention?: Readonly<{ tone: "info" | "warning"; title: string; detail: string; action?: CanonicalHomeAction }>;
+  supersetAdaptation?: CanonicalSupersetAdaptationPresentation;
   actions: readonly CanonicalHomeAction[];
 }>;
 
@@ -89,7 +91,7 @@ export function readCanonicalHomeProjection(input: Readonly<{
   if (activeReference && (!aggregate || aggregate.status !== "found")) {
     return projectCanonicalHome({ status: "ready", model: state.model, activeAggregateStatus: "missing", now: input.now });
   }
-  return projectCanonicalHome({
+  const projection = projectCanonicalHome({
     status: "ready",
     model: state.model,
     activeAggregate: aggregate?.status === "found" ? aggregate : undefined,
@@ -97,6 +99,8 @@ export function readCanonicalHomeProjection(input: Readonly<{
     displayUnit: input.displayUnit,
     now: input.now,
   });
+  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: state.model.planId, surface: "today" });
+  return supersetAdaptation ? { ...projection, supersetAdaptation } : projection;
 }
 
 export function projectCanonicalHome(input: Readonly<{

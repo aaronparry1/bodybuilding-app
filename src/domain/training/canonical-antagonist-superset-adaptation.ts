@@ -13,6 +13,7 @@ export type CanonicalSupersetShadowDecision = Readonly<{
   exerciseAId: string;
   exerciseBId: string;
   evidenceIds: readonly string[];
+  evidenceFingerprint: string;
   comparableExposureCount: number;
   memberA: Readonly<{ successfulExposures: number; regressedExposures: number; laneOutcome: "progress_candidate" | "hold" | "regress_candidate" }>;
   memberB: Readonly<{ successfulExposures: number; regressedExposures: number; laneOutcome: "progress_candidate" | "hold" | "regress_candidate" }>;
@@ -86,15 +87,17 @@ export function deriveAntagonistSupersetShadowDecision(outcomes: readonly Canoni
     reason = "smallest_justified_change_is_no_change";
   }
   const evidenceIds = samePair.map((item) => item.evidenceId).sort();
+  const evidenceFingerprint = canonicalDeterministicFingerprintId(samePair.map((item) => ({ evidenceId: item.evidenceId, performedLoad: item.performedLoad, performedRepetitions: item.performedRepetitions, completion: item.completion, correctionProvenance: item.correctionProvenance, substitutionComparability: item.substitutionComparability, actualRestSeconds: item.actualRestSeconds, recoveryTimingConfidence: item.recoveryTimingConfidence })).sort((left, right) => left.evidenceId.localeCompare(right.evidenceId)));
   return {
     schemaVersion: CANONICAL_SUPERSET_ADAPTATION_SCHEMA,
     policyVersion: CANONICAL_SUPERSET_ADAPTATION_POLICY,
-    decisionId: `superset-shadow:${canonicalDeterministicFingerprintId({ planId: head.planId, pairIdentity: head.pairComparableIdentity, evidenceIds })}`,
+    decisionId: `superset-shadow:${canonicalDeterministicFingerprintId({ planId: head.planId, pairIdentity: head.pairComparableIdentity, evidenceFingerprint })}`,
     planId: head.planId,
     pairIdentity: head.pairComparableIdentity!,
     exerciseAId: memberAId,
     exerciseBId: memberBId,
     evidenceIds,
+    evidenceFingerprint,
     comparableExposureCount: comparableSessions.length,
     memberA,
     memberB,

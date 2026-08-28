@@ -9,6 +9,7 @@ import type { CanonicalProgressDecision } from "@/domain/training/canonical-prog
 import type { CanonicalProgressEvidence } from "@/domain/training/canonical-progress-evidence";
 import { effectiveCanonicalPerformedWork, type CanonicalEffectivePerformedWork } from "@/domain/training/canonical-performed-work";
 import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/domain/training/canonical-recorded-session-ledger";
+import { projectCanonicalSupersetAdaptation, type CanonicalSupersetAdaptationPresentation } from "@/application/training/canonical-superset-adaptation-presentation";
 
 export const CANONICAL_PROGRESS_PRESENTATION_VERSION = "canonical_progress_presentation_v1" as const;
 export const PROGRESS_STATUS_MINIMUM_COMPLETED_SESSIONS = 3;
@@ -64,6 +65,7 @@ export type CanonicalProgressPresentation = Readonly<{
   }>;
   attention?: Readonly<{ title: string; detail: string; action?: CanonicalProgressPresentationAction }>;
   primaryAction?: CanonicalProgressPresentationAction;
+  supersetAdaptation?: CanonicalSupersetAdaptationPresentation;
 }>;
 
 type Aggregate = Readonly<{ session: CanonicalRecordedSession; events: readonly CanonicalRecordedSessionEvent[] }>;
@@ -105,7 +107,7 @@ export function readCanonicalProgressPresentation(input: Readonly<{
   const decision = canonicalProgressDecisionRepository.current(state.model.planId, state.model.mesocycle.id)[0]
     ?? decisions.slice().reverse().find((candidate) => candidate.phaseOneApplication !== undefined)
     ?? null;
-  return projectCanonicalProgressPresentation({
+  const projection = projectCanonicalProgressPresentation({
     status: "ready",
     plan: state.model,
     completedAggregates: aggregates,
@@ -114,6 +116,8 @@ export function readCanonicalProgressPresentation(input: Readonly<{
     displayUnit: input.displayUnit,
     now: input.now,
   });
+  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: state.model.planId, surface: "progress" });
+  return supersetAdaptation ? { ...projection, supersetAdaptation } : projection;
 }
 
 export function projectCanonicalProgressPresentation(input: Readonly<{

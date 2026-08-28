@@ -6,6 +6,7 @@ import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-prog
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { mesocycleById, type MesocycleId } from "@/domain/training/mesocycle-library";
 import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/domain/training/canonical-recorded-session-ledger";
+import { projectCanonicalSupersetAdaptation, type CanonicalSupersetAdaptationPresentation } from "@/application/training/canonical-superset-adaptation-presentation";
 
 export const CANONICAL_PLAN_PRESENTATION_VERSION = "canonical_plan_presentation_v1" as const;
 
@@ -64,6 +65,7 @@ export type CanonicalPlanPresentation = Readonly<{
   phaseRationale?: string;
   primaryAction?: CanonicalPlanPresentationAction;
   attention?: Readonly<{ title: string; detail: string; action?: CanonicalPlanPresentationAction }>;
+  supersetAdaptation?: CanonicalSupersetAdaptationPresentation;
 }>;
 
 type RecordedAggregate = Readonly<{ session: CanonicalRecordedSession; events: readonly CanonicalRecordedSessionEvent[] }>;
@@ -87,13 +89,15 @@ export function readCanonicalPlanPresentation(input: Readonly<{
     if (aggregate.status !== "found") return projectCanonicalPlanPresentation({ status: "recoverable_error", model: state.model });
     aggregates.push(aggregate);
   }
-  return projectCanonicalPlanPresentation({
+  const projection = projectCanonicalPlanPresentation({
     status: "ready",
     model: state.model,
     recordedAggregates: aggregates,
     evidence: canonicalProgressEvidenceRepository.list(state.model.planId),
     displayUnit: input.displayUnit,
   });
+  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: state.model.planId, surface: "preview" });
+  return supersetAdaptation ? { ...projection, supersetAdaptation } : projection;
 }
 
 export function projectCanonicalPlanPresentation(input: Readonly<{

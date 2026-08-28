@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { applyCanonicalPlanVisualState } from "@/application/design-qa/canonical-five-day-plan-fixture";
-import { applyCanonicalSupersetMutation } from "@/application/training/canonical-superset-application";
+import { applyCanonicalSupersetMutation, recordCanonicalSupersetShadowEvaluation } from "@/application/training/canonical-superset-application";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { canonicalSupersetApplicationRepository } from "@/data/local/canonical-superset-application-repository";
 import type { CanonicalSupersetFutureMutationProposal } from "@/domain/training/canonical-superset-future-mutation";
@@ -14,6 +14,17 @@ describe("canonical superset durable application protocol", () => {
     expect(applyCanonicalSupersetMutation({ proposal, appliedAt: "2026-08-28T12:00:00.000Z", authority: "disabled" })).toMatchObject({ status: "held", reason: "superset_production_authority_disabled" });
     expect(canonicalActivePlanV2Repository.get()).toEqual(before);
     expect(canonicalSupersetApplicationRepository.get(proposal.originatingDecisionId).status).toBe("not_found");
+  });
+
+  it("durably records mounted shadow evaluation without changing plan revision", () => {
+    const proposal = fixture("mounted-shadow");
+    const before = canonicalActivePlanV2Repository.get();
+    const first = recordCanonicalSupersetShadowEvaluation(proposal, "2026-08-28T12:00:00.000Z");
+    expect(first).toEqual({ status: "held", reason: "shadow_authority_no_plan_write" });
+    expect(canonicalSupersetApplicationRepository.get(proposal.originatingDecisionId)).toMatchObject({ status: "found", record: { status: "held", terminalReason: "shadow_authority_no_plan_write", proposal } });
+    expect(canonicalActivePlanV2Repository.get()).toEqual(before);
+    expect(recordCanonicalSupersetShadowEvaluation(proposal, "2026-08-28T12:05:00.000Z")).toEqual(first);
+    expect(canonicalActivePlanV2Repository.get()).toEqual(before);
   });
 
   it("applies once and returns the immutable existing receipt on replay", () => {

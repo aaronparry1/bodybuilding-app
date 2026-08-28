@@ -6,6 +6,20 @@ import type { CanonicalSupersetFutureMutationProposal } from "@/domain/training/
 
 export type CanonicalSupersetApplicationResult = Readonly<{ status: "applied" | "unchanged" | "held" | "rejected" | "retryable"; reason: string; receipt?: CanonicalSupersetApplicationReceipt }>;
 
+/** Persists the exact proposal evaluated by the mounted production path while
+ * preserving the hard shadow boundary: this function never writes a plan. */
+export function recordCanonicalSupersetShadowEvaluation(proposal: CanonicalSupersetFutureMutationProposal, evaluatedAt: string): CanonicalSupersetApplicationResult {
+  const proposalFingerprint = canonicalDeterministicFingerprint(proposal);
+  const intendedPrescriptionFingerprint = canonicalDeterministicFingerprint(proposal.proposedSessions);
+  const prepared = canonicalSupersetApplicationRepository.prepare({ schemaVersion: "canonical_superset_application_v1", decisionId: proposal.originatingDecisionId, proposal, proposalFingerprint, intendedPrescriptionFingerprint, status: "prepared", preparedAt: evaluatedAt });
+  if (prepared.status === "conflict" || prepared.status === "invalid") return { status: "rejected", reason: prepared.reason };
+  if (prepared.record.status === "held" || prepared.record.status === "rejected") return { status: prepared.record.status, reason: prepared.record.terminalReason ?? proposal.reason };
+  const reason = proposal.applicationEligibility === "eligible" ? "shadow_authority_no_plan_write" : proposal.reason;
+  const status = proposal.applicationEligibility === "rejected" ? "rejected" as const : "held" as const;
+  const terminal = canonicalSupersetApplicationRepository.terminal(proposal.originatingDecisionId, status, reason);
+  return terminal.status === "saved" ? { status, reason } : { status: "retryable", reason: "shadow_evaluation_persistence_failed" };
+}
+
 export function applyCanonicalSupersetMutation(input: Readonly<{
   proposal: CanonicalSupersetFutureMutationProposal;
   appliedAt: string;

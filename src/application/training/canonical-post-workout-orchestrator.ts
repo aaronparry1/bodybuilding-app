@@ -22,6 +22,8 @@ import { canonicalMethodOutcomeRepository } from "@/data/local/canonical-method-
 import { canonicalSupersetShadowDecisionRepository } from "@/data/local/canonical-superset-shadow-decision-repository";
 import { methodOutcomeFromPerformanceEvidence } from "@/domain/training/canonical-method-outcome";
 import { deriveAntagonistSupersetShadowDecision } from "@/domain/training/canonical-antagonist-superset-adaptation";
+import { proposeCanonicalSupersetFutureMutation } from "@/domain/training/canonical-superset-future-mutation";
+import { recordCanonicalSupersetShadowEvaluation } from "@/application/training/canonical-superset-application";
 
 export const CANONICAL_POST_WORKOUT_ORCHESTRATOR_VERSION = "canonical_post_workout_orchestrator_v1" as const;
 
@@ -107,7 +109,17 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
   const supersetPairs = [...new Set(methodOutcomes.filter((item) => item.method === "antagonist_superset").map((item) => item.pairComparableIdentity).filter(Boolean))];
   for (const pairIdentity of supersetPairs) {
     const shadowDecision = deriveAntagonistSupersetShadowDecision(methodOutcomes.filter((item) => item.pairComparableIdentity === pairIdentity));
-    if (shadowDecision) canonicalSupersetShadowDecisionRepository.record(shadowDecision);
+    if (shadowDecision) {
+      canonicalSupersetShadowDecisionRepository.record(shadowDecision);
+      const proposal = proposeCanonicalSupersetFutureMutation({
+        decision: shadowDecision,
+        planRevision: raw.carrier.revision,
+        sessions: raw.carrier.plannedSessions,
+        startedSessionIds: (raw.carrier.recordedSessionReferences ?? []).filter((item) => item.status === "started" || item.status === "paused").map((item) => item.sessionId),
+        sessionDurationCeilingMinutes: raw.carrier.constraints.availableSessionMinutes,
+      });
+      recordCanonicalSupersetShadowEvaluation(proposal, input.occurredAt);
+    }
   }
   for (const priorDecision of canonicalProgressDecisionRepository.list(input.planId)) {
     if (canonicalAdaptationOutcomeRepository.get(priorDecision.decisionId).status === "found") continue;

@@ -31,5 +31,6 @@ export const canonicalSupersetApplicationRepository = {
     return { status: "saved" as const, record: next };
   },
   get(decisionId: string) { const value = jsonStore.get<Records>(KEY, {})[decisionId]; return value ? { status: "found" as const, record: value } : { status: "not_found" as const }; },
+  list(planId: string) { return Object.values(jsonStore.get<Records>(KEY, {})).filter((item) => item.proposal.planId === planId); },
   clear() { jsonStore.remove(KEY); },
 };

@@ -47,6 +47,21 @@ describe("antagonist-superset longitudinal shadow adaptation", () => {
     const substituted = exposures(["met", "met", "met"], ["met", "met", "met"]).map((item, index) => index === 5 ? { ...item, substitutionId: "sub", substitutionComparability: "non_comparable" as const } : item);
     expect(deriveAntagonistSupersetShadowDecision(substituted)).toMatchObject({ action: "delay_for_evidence", outcomeClassification: "non_comparable_substitution", pairingSuitability: "reassess" });
   });
+
+  it("changes decision identity when corrected evidence changes without changing evidence ids", () => {
+    const original = exposures(["met", "met", "met"], ["met", "met", "met"]);
+    const corrected = original.map((item, index) => index === original.length - 1
+      ? { ...item, performedRepetitions: 7, exercisePerformance: "missed" as const, setRolePerformance: "missed" as const, correctionProvenance: "corrected" as const }
+      : item);
+    const before = deriveAntagonistSupersetShadowDecision(original);
+    const after = deriveAntagonistSupersetShadowDecision(corrected);
+    expect(before).not.toBeNull();
+    expect(after).not.toBeNull();
+    if (!before || !after) throw new Error("expected comparable superset decisions");
+    expect(after.evidenceIds).toEqual(before.evidenceIds);
+    expect(after.evidenceFingerprint).not.toBe(before.evidenceFingerprint);
+    expect(after.decisionId).not.toBe(before.decisionId);
+  });
 });
 
 function adequateRecovery(item: CanonicalMethodOutcome): CanonicalMethodOutcome {
