@@ -73,35 +73,35 @@ export default function CompletionSummaryScreen() {
       { value: duration, label: "elapsed" },
     ]} /></CompletionReveal>
 
-    {displayedVolume !== null ? <CompletionReveal index={2} reduceMotion={reduceMotion}><PremiumCard tone="quiet"><Text style={styles.cardLabel}>WORK COMPLETED</Text><Text style={styles.volume}>{formatNumber(displayedVolume)} {settings.unit}</Text><Text style={styles.muted}>Evidence-backed load volume from completed weighted sets.</Text></PremiumCard></CompletionReveal> : null}
+    {displayedVolume !== null ? <CompletionReveal index={2} reduceMotion={reduceMotion}><PremiumCard tone="quiet"><Text maxFontSizeMultiplier={1.5} style={styles.cardLabel}>WORK COMPLETED</Text><Text maxFontSizeMultiplier={1.5} style={styles.volume}>{formatNumber(displayedVolume)} {settings.unit}</Text><Text maxFontSizeMultiplier={1.5} style={styles.muted}>Evidence-backed load volume from completed weighted sets.</Text></PremiumCard></CompletionReveal> : null}
 
     {summary.achievements.length ? <CompletionReveal index={3} reduceMotion={reduceMotion}><PremiumCard tone="success">
-      <Text style={styles.cardLabel}>{summary.achievements.length === 1 ? "GENUINE ACHIEVEMENT" : `${summary.achievements.length} GENUINE ACHIEVEMENTS`}</Text>
-      {summary.achievements.map((achievement) => <View key={achievement.id} style={styles.achievement}><Text selectable style={styles.cardTitle}>{achievement.title}</Text><Text selectable style={styles.body}>{achievement.exerciseName ? `${achievement.exerciseName} · ` : ""}{achievement.detail}</Text></View>)}
+      <Text maxFontSizeMultiplier={1.5} style={styles.cardLabel}>{summary.achievements.length === 1 ? "GENUINE ACHIEVEMENT" : `${summary.achievements.length} GENUINE ACHIEVEMENTS`}</Text>
+      {summary.achievements.map((achievement) => <View key={achievement.id} style={styles.achievement}><Text maxFontSizeMultiplier={1.5} selectable style={styles.cardTitle}>{achievement.title}</Text><Text maxFontSizeMultiplier={1.5} selectable style={styles.body}>{achievement.exerciseName ? `${achievement.exerciseName} · ` : ""}{achievement.detail}</Text></View>)}
     </PremiumCard></CompletionReveal> : null}
 
     <CompletionReveal index={4} reduceMotion={reduceMotion}><PremiumCard tone={summary.coachingChange?.status === "applied" ? "success" : "quiet"}>
-      <Text style={styles.cardLabel}>{decision ? "COACH REVIEW" : "SESSION SAVED"}</Text>
-      <Text style={styles.cardTitle}>{summary.coachingChange?.label ?? (decision ? "Your training evidence was reviewed" : "Your programme state is up to date")}</Text>
-      <Text style={styles.body}>{summary.coachingOutcome}</Text>
-      {summary.coachingChange?.changes.map((change) => <View key={`${change.exerciseName}:${change.before}:${change.after}`} style={styles.change}><Text selectable style={styles.detail}>{change.exerciseName}</Text><Text selectable style={styles.cardTitle}>{change.before}</Text><Text style={styles.changeArrow}>↓</Text><Text selectable style={styles.cardTitle}>{change.after}</Text><Text selectable style={styles.body}>{change.reason}</Text></View>)}
-      {summary.methodsPerformed.length ? <Text style={styles.detail}>Methods performed · {summary.methodsPerformed.join(" · ")}</Text> : null}
+      <Text maxFontSizeMultiplier={1.5} style={styles.cardLabel}>{decision ? "COACH REVIEW" : "SESSION SAVED"}</Text>
+      <Text maxFontSizeMultiplier={1.5} style={styles.cardTitle}>{summary.coachingChange?.label ?? (decision ? "Your training evidence was reviewed" : "Your programme state is up to date")}</Text>
+      <Text maxFontSizeMultiplier={1.5} style={styles.body}>{summary.coachingOutcome}</Text>
+      {summary.coachingChange?.changes.map((change) => <View key={`${change.exerciseName}:${change.before}:${change.after}`} style={styles.change}><Text maxFontSizeMultiplier={1.5} selectable style={styles.detail}>{change.exerciseName}</Text><Text maxFontSizeMultiplier={1.5} selectable style={styles.cardTitle}>{change.before}</Text><Text maxFontSizeMultiplier={1.5} style={styles.changeArrow}>↓</Text><Text maxFontSizeMultiplier={1.5} selectable style={styles.cardTitle}>{change.after}</Text><Text maxFontSizeMultiplier={1.5} selectable style={styles.body}>{change.reason}</Text></View>)}
+      {summary.methodsPerformed.length ? <Text maxFontSizeMultiplier={1.5} style={styles.detail}>Methods performed · {summary.methodsPerformed.join(" · ")}</Text> : null}
     </PremiumCard></CompletionReveal>
 
     {summary.supersetAdaptation ? <CompletionReveal index={5} reduceMotion={reduceMotion}><SupersetAdaptationNotice presentation={summary.supersetAdaptation} /></CompletionReveal> : null}
 
     <CompletionReveal index={6} reduceMotion={reduceMotion}><PremiumCard tone="default">
-      <Text style={styles.cardLabel}>WHAT’S NEXT</Text>
-      {summary.programmePosition ? <Text selectable style={styles.detail}>{summary.programmePosition}</Text> : null}
-      <Text style={styles.cardTitle}>{summary.nextWorkoutLabel ? `${summary.nextWorkoutLabel} is next` : nextWorkout ? `${nextWorkout} is next` : "Recovery comes next"}</Text>
-      <Text style={styles.body}>{nextWorkout ? "Return home to see the updated programme and start only when the next session is due." : "This block has no immediate next session. Review Progress for the latest coaching outcome."}</Text>
-      {summary.nextPrescription ? <Text selectable style={styles.nextPrescription}>{summary.nextPrescription}</Text> : null}
+      <Text maxFontSizeMultiplier={1.5} style={styles.cardLabel}>WHAT’S NEXT</Text>
+      {summary.programmePosition ? <Text maxFontSizeMultiplier={1.5} selectable style={styles.detail}>{summary.programmePosition}</Text> : null}
+      <Text maxFontSizeMultiplier={1.5} style={styles.cardTitle}>{summary.nextWorkoutLabel ? `${summary.nextWorkoutLabel} is next` : nextWorkout ? `${nextWorkout} is next` : "Recovery comes next"}</Text>
+      <Text maxFontSizeMultiplier={1.5} style={styles.body}>{nextWorkout ? "Return home to see the updated programme and start only when the next session is due." : "This block has no immediate next session. Review Progress for the latest coaching outcome."}</Text>
+      {summary.nextPrescription ? <Text maxFontSizeMultiplier={1.5} selectable style={styles.nextPrescription}>{summary.nextPrescription}</Text> : null}
       <PrimaryButton label="Return home" onPress={() => router.replace("/(protected)/(tabs)")} />
       <SecondaryButton label="View progress" onPress={() => router.replace("/(protected)/(tabs)/analytics")} />
     </PremiumCard></CompletionReveal>
 
     <SecondaryButton testID="completion-share" label={summary.achievements.length ? "Preview achievement share card" : "Preview workout share card"} onPress={() => setSharePayload(payload)} />
-    <Text style={styles.privacy}>The share card contains workout totals only—never your name, account, notes, bodyweight or full workout log.</Text>
+    <Text maxFontSizeMultiplier={1.5} style={styles.privacy}>The share card contains workout totals only—never your name, account, notes, bodyweight or full workout log.</Text>
     <BrandedShareCardPreviewModal payload={sharePayload} onClose={() => setSharePayload(null)} />
   </AppScreen>;
 }
