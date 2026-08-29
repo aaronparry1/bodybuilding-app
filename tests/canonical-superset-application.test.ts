@@ -31,6 +31,10 @@ describe("canonical superset durable application protocol", () => {
     const proposal = fixture("once");
     const first = applyCanonicalSupersetMutation({ proposal, appliedAt: "2026-08-28T12:00:00.000Z", authority: "shadow_certification" });
     expect(first).toMatchObject({ status: "applied", receipt: { originatingDecisionId: proposal.originatingDecisionId, pairIdentity: "press::row", exactMutations: proposal.mutations, appliedAuthority: "shadow_certification" } });
+    expect(first.receipt?.explanation).toBe("Exercise unavailable is ready to progress next time. Exercise unavailable stays unchanged.");
+    expect(first.receipt?.explanation).not.toContain("press");
+    expect(first.receipt?.explanation).not.toContain("row");
+    expect(first.receipt?.explanation).not.toContain("::");
     const revision = canonicalActivePlanV2Repository.get();
     const replay = applyCanonicalSupersetMutation({ proposal, appliedAt: "2026-08-28T12:05:00.000Z", authority: "shadow_certification" });
     expect(replay).toMatchObject({ status: "unchanged", reason: "existing_application_receipt", receipt: first.receipt });

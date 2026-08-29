@@ -59,7 +59,9 @@ export function HomeNextAction({ primary, onAction }: Readonly<{ primary: Canoni
 
 function Objective({ primary, projection, onAction, prep }: Readonly<{ primary: CanonicalHomePrimary; projection: CanonicalHomeProjection | null; onAction(action: CanonicalHomeAction): void; prep?: CanonicalHomeAction }>) {
   const actionable = primary.kind === "planned" || primary.kind === "active";
-  const decision = projection?.attention && projection.attention.tone === "warning"
+  const decision = projection?.supersetAdaptation?.state === "applied"
+    ? { title: "Your next prescription was updated", detail: "The applied coaching change is recorded below.", tone: living.complete }
+    : projection?.attention && projection.attention.tone === "warning"
     ? { title: projection.attention.title, detail: projection.attention.detail, tone: living.attention }
     : primary.kind === "active"
       ? { title: "Your completed work is preserved", detail: "Continue from the exact saved workout position.", tone: living.action }

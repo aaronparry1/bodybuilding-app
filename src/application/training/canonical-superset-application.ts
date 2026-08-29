@@ -3,6 +3,7 @@ import { canonicalSupersetApplicationRepository } from "@/data/local/canonical-s
 import { canonicalDeterministicFingerprint, canonicalDeterministicFingerprintId } from "@/domain/training/canonical-deterministic-fingerprint";
 import type { CanonicalSupersetApplicationReceipt } from "@/domain/training/canonical-superset-application";
 import type { CanonicalSupersetFutureMutationProposal } from "@/domain/training/canonical-superset-future-mutation";
+import { exerciseDisplayName } from "@/application/training/display-labels";
 
 export type CanonicalSupersetApplicationResult = Readonly<{ status: "applied" | "unchanged" | "held" | "rejected" | "retryable"; reason: string; receipt?: CanonicalSupersetApplicationReceipt }>;
 
@@ -65,12 +66,22 @@ function persistReceipt(proposal: CanonicalSupersetFutureMutationProposal, resul
 
 function explanationFor(proposal: CanonicalSupersetFutureMutationProposal): string {
   const mutations = proposal.mutations;
-  if (mutations.some((item) => item.mutationType === "remove_pairing")) return "This pairing has continued to reduce performance despite enough recovery. Both exercises return to straight sets next time.";
-  if (mutations.some((item) => item.mutationType === "increase_round_rest")) return `Both exercises dropped off when recovery was short, so you’ll get ${Number(proposal.restAfterSeconds) - Number(proposal.restBeforeSeconds)} seconds more between rounds next time.`;
+  const [firstName, secondName] = pairExerciseNames(proposal);
+  if (mutations.some((item) => item.mutationType === "remove_pairing")) return `${firstName} and ${secondName} continued to lose performance despite enough recovery. Both remain in your workout as straight sets next time.`;
+  if (mutations.some((item) => item.mutationType === "increase_round_rest")) return `${firstName} and ${secondName} dropped off when recovery was short, so you’ll get ${Number(proposal.restAfterSeconds) - Number(proposal.restBeforeSeconds)} seconds more between rounds next time.`;
   const a = mutations.find((item) => item.member === "a");
   const b = mutations.find((item) => item.member === "b");
-  if (a && b) return `${a.exerciseId} and ${b.exerciseId} are ready to progress independently next time.`;
+  if (a && b) return `${exerciseDisplayName(String(a.exerciseId))} and ${exerciseDisplayName(String(b.exerciseId))} are ready to progress independently next time.`;
   const changed = a ?? b;
-  if (changed) return `${changed.exerciseId} is ready to progress next time. Its paired exercise stays unchanged.`;
+  if (changed) {
+    const changedId = String(changed.exerciseId);
+    const partnerId = proposal.pairIdentity.split("::").find((exerciseId) => exerciseId !== changedId);
+    return `${exerciseDisplayName(changedId)} is ready to progress next time. ${partnerId ? exerciseDisplayName(partnerId) : "The paired exercise"} stays unchanged.`;
+  }
   return "The next comparable pairing stays unchanged while more reliable evidence is gathered.";
+}
+
+function pairExerciseNames(proposal: CanonicalSupersetFutureMutationProposal): readonly [string, string] {
+  const [first = "First exercise", second = "Second exercise"] = proposal.pairIdentity.split("::");
+  return [exerciseDisplayName(first), exerciseDisplayName(second)];
 }
