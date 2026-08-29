@@ -30,7 +30,7 @@ export function certifyCanonicalDesignQaMatrix(): CanonicalDesignQaFinalCertific
     }
   }
   const uniqueIds = new Set(ids).size === ids.length;
-  const countsComplete = ids.length === 90 && familyCounts.plan_state === 13 && familyCounts.session_lifecycle === 37 && familyCounts.progress_decision === 40;
+  const countsComplete = ids.length === 98 && familyCounts.plan_state === 13 && familyCounts.session_lifecycle === 37 && familyCounts.progress_decision === 48;
   const allCanonicalSetup = failedFixtureIds.length === 0;
   const legacyReachabilityZero = ids.every((id) => designQaFixtureFamily(id) !== "failure_recovery");
   const unsupportedMutationsFailClosed = allCanonicalSetup;
