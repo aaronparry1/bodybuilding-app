@@ -61,6 +61,24 @@ describe("canonical superset durable application protocol", () => {
     expect(afterRecovery.status === "saved" && afterRecovery.carrier.revision).toBe(before.carrier.revision + 1);
     expect(canonicalSupersetApplicationRepository.get(proposal.originatingDecisionId)).toMatchObject({ status: "found", record: { status: "applied", receipt: recovered.receipt } });
   });
+
+  it("preserves an applied receipt across rollback and does not replay it when authority is re-enabled", () => {
+    const prior = fixture("rollback-prior");
+    const applied = applyCanonicalSupersetMutation({ proposal: prior, appliedAt: "2026-08-28T12:00:00.000Z", authority: "shadow_certification" });
+    expect(applied.status).toBe("applied");
+    const priorReceipt = applied.receipt;
+
+    const future = fixture("rollback-future");
+    const beforeDisabled = canonicalActivePlanV2Repository.get();
+    expect(applyCanonicalSupersetMutation({ proposal: future, appliedAt: "2026-08-28T13:00:00.000Z", authority: "disabled" })).toMatchObject({ status: "held", reason: "superset_production_authority_disabled" });
+    expect(canonicalActivePlanV2Repository.get()).toEqual(beforeDisabled);
+    expect(canonicalSupersetApplicationRepository.get(future.originatingDecisionId).status).toBe("not_found");
+    expect(canonicalSupersetApplicationRepository.get(prior.originatingDecisionId)).toMatchObject({ status: "found", record: { receipt: priorReceipt } });
+
+    expect(applyCanonicalSupersetMutation({ proposal: prior, appliedAt: "2026-08-28T14:00:00.000Z", authority: "shadow_certification" })).toMatchObject({ status: "unchanged", reason: "existing_application_receipt", receipt: priorReceipt });
+    expect(applyCanonicalSupersetMutation({ proposal: future, appliedAt: "2026-08-28T14:00:00.000Z", authority: "shadow_certification" }).status).toBe("applied");
+    expect(canonicalSupersetApplicationRepository.list(future.planId).filter((record) => record.receipt)).toHaveLength(1);
+  });
 });
 
 function fixture(id: string): CanonicalSupersetFutureMutationProposal {
