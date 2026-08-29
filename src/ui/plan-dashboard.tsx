@@ -4,6 +4,7 @@ import type { CanonicalPlanPresentation, CanonicalPlanPresentationAction, Canoni
 import { DetailToggle, EmptyActionState, Pill, PrimaryButton, stableUiIdentifier } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
 import { WorkoutMetricStrip, WorkoutStage } from "@/ui/workout-visuals";
+import { SupersetAdaptationNotice } from "@/ui/superset-adaptation-notice";
 
 export function PlanDashboard({ projection, selectedSessionId, onSelectSession, onAction, guideAction }: Readonly<{
   projection: CanonicalPlanPresentation;
@@ -24,6 +25,7 @@ export function PlanDashboard({ projection, selectedSessionId, onSelectSession, 
     </View>
     {projection.programme ? <ProgrammeContext projection={projection} /> : null}
     {projection.primaryAction ? <PrimaryButton label={projection.primaryAction.label} onPress={() => onAction(projection.primaryAction!)} /> : null}
+    {projection.supersetAdaptation ? <SupersetAdaptationNotice presentation={projection.supersetAdaptation} /> : null}
     <View style={{ gap: spacing.md }}>
       <SectionHeading title="This week" detail={`${projection.schedule.length} sessions`} />
       {projection.schedule.map((session) => <SessionRow key={session.id} session={session} selected={selected?.id === session.id} onPress={() => onSelectSession(selected?.id === session.id ? null : session.id)} />)}

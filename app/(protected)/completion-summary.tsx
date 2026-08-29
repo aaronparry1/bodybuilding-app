@@ -15,6 +15,7 @@ import { AppScreen, PremiumCard, PrimaryButton, SecondaryButton } from "@/ui/pri
 import { spacing, type, workoutColors } from "@/ui/theme";
 import { WorkoutMetricStrip } from "@/ui/workout-visuals";
 import { useReducedMotion } from "@/ui/motion";
+import { SupersetAdaptationNotice } from "@/ui/superset-adaptation-notice";
 
 const TRAIN = workoutColors;
 
@@ -87,7 +88,9 @@ export default function CompletionSummaryScreen() {
       {summary.methodsPerformed.length ? <Text style={styles.detail}>Methods performed · {summary.methodsPerformed.join(" · ")}</Text> : null}
     </PremiumCard></CompletionReveal>
 
-    <CompletionReveal index={5} reduceMotion={reduceMotion}><PremiumCard tone="default">
+    {summary.supersetAdaptation ? <CompletionReveal index={5} reduceMotion={reduceMotion}><SupersetAdaptationNotice presentation={summary.supersetAdaptation} /></CompletionReveal> : null}
+
+    <CompletionReveal index={6} reduceMotion={reduceMotion}><PremiumCard tone="default">
       <Text style={styles.cardLabel}>WHAT’S NEXT</Text>
       {summary.programmePosition ? <Text selectable style={styles.detail}>{summary.programmePosition}</Text> : null}
       <Text style={styles.cardTitle}>{summary.nextWorkoutLabel ? `${summary.nextWorkoutLabel} is next` : nextWorkout ? `${nextWorkout} is next` : "Recovery comes next"}</Text>

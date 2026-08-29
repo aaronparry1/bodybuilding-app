@@ -7,6 +7,7 @@ import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-
 import type { CanonicalProgressEvidence } from "@/domain/training/canonical-progress-evidence";
 import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/domain/training/canonical-recorded-session-ledger";
 import { projectCanonicalSupersetAdaptation, type CanonicalSupersetAdaptationPresentation } from "@/application/training/canonical-superset-adaptation-presentation";
+import { isDesignQaModeRequested } from "@/application/design-qa/design-qa-runtime";
 
 export const CANONICAL_HOME_PROJECTION_VERSION = "canonical_home_projection_v3" as const;
 
@@ -99,7 +100,7 @@ export function readCanonicalHomeProjection(input: Readonly<{
     displayUnit: input.displayUnit,
     now: input.now,
   });
-  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: state.model.planId, surface: "today" });
+  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: state.model.planId, surface: "today", includeQaOnly: isDesignQaModeRequested() });
   return supersetAdaptation ? { ...projection, supersetAdaptation } : projection;
 }
 

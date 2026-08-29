@@ -7,6 +7,7 @@ import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-
 import { mesocycleById, type MesocycleId } from "@/domain/training/mesocycle-library";
 import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/domain/training/canonical-recorded-session-ledger";
 import { projectCanonicalSupersetAdaptation, type CanonicalSupersetAdaptationPresentation } from "@/application/training/canonical-superset-adaptation-presentation";
+import { isDesignQaModeRequested } from "@/application/design-qa/design-qa-runtime";
 
 export const CANONICAL_PLAN_PRESENTATION_VERSION = "canonical_plan_presentation_v1" as const;
 
@@ -96,7 +97,7 @@ export function readCanonicalPlanPresentation(input: Readonly<{
     evidence: canonicalProgressEvidenceRepository.list(state.model.planId),
     displayUnit: input.displayUnit,
   });
-  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: state.model.planId, surface: "preview" });
+  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: state.model.planId, surface: "preview", includeQaOnly: isDesignQaModeRequested() });
   return supersetAdaptation ? { ...projection, supersetAdaptation } : projection;
 }
 

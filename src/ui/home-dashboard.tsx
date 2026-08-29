@@ -2,6 +2,7 @@ import { Pressable, Text, View } from "react-native";
 import type { CanonicalHomeAction, CanonicalHomePrimary, CanonicalHomeProjection } from "@/application/training/canonical-home-projection";
 import { colors, livingProgrammeColors as living, radius, shellTokens, spacing, type } from "@/ui/theme";
 import { stableUiIdentifier } from "@/ui/primitives";
+import { SupersetAdaptationNotice } from "@/ui/superset-adaptation-notice";
 
 type StartupStatus = "idle" | "restoring" | "ready" | "delayed" | "error" | "conflict" | "offline";
 
@@ -15,6 +16,7 @@ export function HomeDashboard({ projection, onAction, startup }: Readonly<{
     <TodayHeader projection={projection} />
     {startup && startup.status !== "ready" && startup.status !== "idle" ? <StartupNotice status={startup.status} onRetry={startup.onRetry} /> : null}
     {projection.primary ? <Objective primary={projection.primary} projection={projection} onAction={onAction} prep={prep} /> : null}
+    {projection.supersetAdaptation ? <SupersetAdaptationNotice presentation={projection.supersetAdaptation} compact /> : null}
     {projection.programme ? <ProgrammePosition projection={projection} /> : null}
     {projection.attention && !projection.primary ? <EvidenceNotice projection={projection} onAction={onAction} /> : null}
     {projection.conditioning ? <FlatSection eyebrow="Next support work" title={projection.conditioning.title} detail={`${projection.conditioning.detail} · ${projection.conditioning.placement}`} /> : null}

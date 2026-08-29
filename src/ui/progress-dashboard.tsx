@@ -3,6 +3,7 @@ import type { CanonicalProgressPresentation, CanonicalProgressPresentationAction
 import { DetailToggle, EmptyActionState, Pill, PrimaryButton } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
 import { WorkoutStage } from "@/ui/workout-visuals";
+import { SupersetAdaptationNotice } from "@/ui/superset-adaptation-notice";
 
 export function ProgressDashboard({ projection, onAction }: Readonly<{ projection: CanonicalProgressPresentation; onAction(action: CanonicalProgressPresentationAction): void }>) {
   if (["empty", "recoverable_error", "storage_error"].includes(projection.status)) return <ProgressUnavailable projection={projection} onAction={onAction} />;
@@ -13,6 +14,7 @@ export function ProgressDashboard({ projection, onAction }: Readonly<{ projectio
     {projection.progressionHighlight ? <ProgressionHighlight projection={projection} onAction={onAction} /> : projection.status === "early" ? <EarlyHistoryNote /> : null}
     {projection.trend ? <TrendPanel projection={projection} /> : null}
     {projection.review ? <AdaptationReview projection={projection} /> : null}
+    {projection.supersetAdaptation ? <SupersetAdaptationNotice presentation={projection.supersetAdaptation} /> : null}
     <RecentTraining projection={projection} onAction={onAction} />
   </>;
 }

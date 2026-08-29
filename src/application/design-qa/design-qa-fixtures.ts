@@ -19,6 +19,7 @@ import { applyCanonicalAdaptationVisualState, applyCanonicalCompletionVisualStat
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { canonicalRestTimerRepository } from "@/data/local/canonical-rest-timer-repository";
+import { applyCanonicalSupersetCertificationFixture, type CanonicalSupersetCertificationFixture } from "@/application/design-qa/canonical-superset-certification-fixtures";
 
 export type DesignQaFixtureId =
   | "completion_ordinary"
@@ -106,7 +107,11 @@ export type DesignQaFixtureId =
   | "plan_single_hypertrophy"
   | "plan_event_custom"
   | "plan_block_ending"
-  | "plan_no_plan";
+  | "plan_no_plan"
+  | "completion_superset_member_a_progress"
+  | "completion_superset_round_rest_increase"
+  | "completion_superset_pair_removal"
+  | "completion_superset_held_shadow";
 
 export interface DesignQaFixtureDefinition {
   id: DesignQaFixtureId;
@@ -136,6 +141,10 @@ export const designQaFixtures: DesignQaFixtureDefinition[] = [
   { id: "completion_partial", area: "Finish", label: "Partial completion", description: "Saved work is explicit while unfinished work is not invented.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_partial:comparison:2" },
   { id: "completion_long_accessibility", area: "Finish", label: "Long and accessible", description: "Bounded multi-achievement content at large text and narrow widths.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_long_accessibility:comparison:3" },
   { id: "completion_share", area: "Finish", label: "Sharing preview", description: "A privacy-safe single-achievement share-card entry point.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_share:comparison:3" },
+  { id: "completion_superset_member_a_progress", area: "Finish", label: "Superset: one member progresses", description: "A persisted certified receipt changes one exercise while its partner holds.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_round_rest_increase", area: "Finish", label: "Superset: more round recovery", description: "A persisted certified receipt adds bounded recovery between rounds.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_pair_removal", area: "Finish", label: "Superset: return to straight sets", description: "Both exercises remain while the pairing is removed.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_held_shadow", area: "Progress", label: "Superset: QA-only hold", description: "An insufficient-evidence shadow result visible only in explicit QA mode.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_low", area: "Progress", label: "Low history", description: "One completed workout, no strategic verdict yet.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_healthy", area: "Progress", label: "Healthy/adapting", description: "Progression moving, fatigue low, clean recent cards.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_strength_dashboard", area: "Progress", label: "Strength dashboard", description: "Powerlifting Meet history with SBD total and recent PRs.", targetHref: "/(protected)/(tabs)/analytics" },
@@ -247,6 +256,7 @@ export function ensureDesignQaLocalWorkoutReadyState(environment: AppEnvironment
 export type DesignQaFixtureFamily = "plan_state" | "session_lifecycle" | "progress_decision" | "failure_recovery";
 
 export function designQaFixtureFamily(id: DesignQaFixtureId): DesignQaFixtureFamily {
+  if (id.includes("_superset_")) return "progress_decision";
   if (id.startsWith("completion_")) return "session_lifecycle";
   if (id === "home_active_workout") return "session_lifecycle";
   if (id === "home_recovery_capacity") return "progress_decision";
@@ -258,6 +268,7 @@ export function designQaFixtureFamily(id: DesignQaFixtureId): DesignQaFixtureFam
 }
 
 export function applyDesignQaFixture(id: DesignQaFixtureId, environment: AppEnvironment = "development"): ActiveDesignQaFixture {
+  if (id.includes("_superset_")) return applySupersetCertificationFixture(id, environment);
   const family = designQaFixtureFamily(id);
   // Dispatch is explicit even while non-plan families retain their legacy-compatible fixtures.
   // This prevents future branches from silently crossing family boundaries.
@@ -265,6 +276,20 @@ export function applyDesignQaFixture(id: DesignQaFixtureId, environment: AppEnvi
   if (family === "session_lifecycle") return applySessionLifecycleFixture(id, environment);
   if (family === "progress_decision") return applyProgressDecisionFixture(id, environment);
   throw new Error(`unsupported_design_qa_fixture_family:${id}`);
+}
+
+function applySupersetCertificationFixture(id: DesignQaFixtureId, environment: AppEnvironment): ActiveDesignQaFixture {
+  if (!isDesignQaModeAvailable(environment)) throw new Error("Design QA fixtures are not available in production.");
+  clearFixtureViewStateOnly();
+  appSettingsStore.patch({ onboardingCompleted: true });
+  cacheSubscription(seedMockSubscriptionStatus("trial"));
+  const kind = id.replace(/^.*_superset_/, "") as CanonicalSupersetCertificationFixture;
+  const result = applyCanonicalSupersetCertificationFixture(kind, `design-qa:${id}`);
+  const definition = getFixtureDefinition(id);
+  const activeFixture = { id, label: definition.label, appliedAt: "2026-08-29T08:02:00.000Z" };
+  jsonStore.set(activeFixtureKey, activeFixture);
+  if (result.recordedSessionId && definition.targetHref === "/(protected)/completion-summary") definition.targetHref = `${definition.targetHref}?recordedSessionId=${encodeURIComponent(result.recordedSessionId)}`;
+  return activeFixture;
 }
 
 export function applyCanonicalHomeVisualPreview(state: CanonicalHomeVisualState, environment: AppEnvironment = "development"): ActiveDesignQaFixture {

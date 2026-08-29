@@ -10,6 +10,7 @@ import type { CanonicalProgressEvidence } from "@/domain/training/canonical-prog
 import { effectiveCanonicalPerformedWork, type CanonicalEffectivePerformedWork } from "@/domain/training/canonical-performed-work";
 import type { CanonicalRecordedSession, CanonicalRecordedSessionEvent } from "@/domain/training/canonical-recorded-session-ledger";
 import { projectCanonicalSupersetAdaptation, type CanonicalSupersetAdaptationPresentation } from "@/application/training/canonical-superset-adaptation-presentation";
+import { isDesignQaModeRequested } from "@/application/design-qa/design-qa-runtime";
 
 export const CANONICAL_PROGRESS_PRESENTATION_VERSION = "canonical_progress_presentation_v1" as const;
 export const PROGRESS_STATUS_MINIMUM_COMPLETED_SESSIONS = 3;
@@ -116,7 +117,7 @@ export function readCanonicalProgressPresentation(input: Readonly<{
     displayUnit: input.displayUnit,
     now: input.now,
   });
-  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: state.model.planId, surface: "progress" });
+  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: state.model.planId, surface: "progress", includeQaOnly: isDesignQaModeRequested() });
   return supersetAdaptation ? { ...projection, supersetAdaptation } : projection;
 }
 

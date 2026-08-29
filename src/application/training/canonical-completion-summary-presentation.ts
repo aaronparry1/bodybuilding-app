@@ -6,6 +6,7 @@ import { activeElapsedSeconds, displayLoadFromBaseKg } from "@/application/train
 import { deriveCanonicalWorkoutAchievements, type CanonicalWorkoutAchievement, type CanonicalWorkoutAggregate } from "@/domain/training/canonical-workout-achievements";
 import type { CanonicalProgressDecision } from "@/domain/training/canonical-progress-decision";
 import { projectCanonicalSupersetAdaptation, type CanonicalSupersetAdaptationPresentation } from "@/application/training/canonical-superset-adaptation-presentation";
+import { isDesignQaModeRequested } from "@/application/design-qa/design-qa-runtime";
 
 export type CanonicalCompletionSummaryPresentation = Readonly<{
   title: "Workout complete";
@@ -64,7 +65,7 @@ export function projectCanonicalCompletionSummary(input: Readonly<{
   const coachingOutcome = persistedExplanation
     ? `${persistedExplanation.observation} ${persistedExplanation.decision} ${persistedExplanation.nextAction}`
     : input.coachingExplanation ?? "Training recorded. Your next session is ready when you are.";
-  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: input.session.planId, surface: "completion" });
+  const supersetAdaptation = projectCanonicalSupersetAdaptation({ planId: input.session.planId, surface: "completion", includeQaOnly: isDesignQaModeRequested() });
   return { title: "Workout complete", workoutName: sessionRoleDisplayName(input.session.role), completion: completionSummary.completion, completionLabel, elapsedSeconds: activeElapsedSeconds(input.session, input.events, end), completedWorkingSets: performance.length, exercisesCompleted: exercises.size, prescribedExercises: slots.length, totalVolume, methodsPerformed, achievements, coachingOutcome, ...(coachingChange ? { coachingChange } : {}), ...(input.programmePosition ? { programmePosition: input.programmePosition } : {}), nextWorkoutId: input.nextWorkoutId ?? null, ...(input.nextWorkoutLabel ? { nextWorkoutLabel: input.nextWorkoutLabel } : {}), ...(input.nextPrescription ? { nextPrescription: input.nextPrescription } : {}), ...(supersetAdaptation ? { supersetAdaptation } : {}) };
 }
 
