@@ -42,8 +42,8 @@ export function WorkoutMetricStrip({ items, centered = false, compact = false }:
 }>) {
   return <View style={{ flexDirection: "row", gap: spacing.sm }}>
     {items.map((item) => <View key={item.label} style={{ flex: 1, minWidth: 0, minHeight: compact ? 48 : 68, justifyContent: "center", alignItems: centered ? "center" : "flex-start", paddingHorizontal: compact ? 0 : spacing.sm, paddingVertical: compact ? 2 : 8, gap: 2, borderRadius: radius.md, backgroundColor: compact ? "transparent" : colors.backgroundElevated, borderWidth: compact ? 0 : 1, borderColor: colors.lineSoft }}>
-      <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={{ color: colors.text, fontSize: compact ? 15 : 20, lineHeight: compact ? 19 : 24, fontWeight: "900", fontVariant: ["tabular-nums"], textAlign: centered ? "center" : "left" }}>{item.value}</Text>
-      <Text numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8} style={{ color: colors.textSubtle, fontSize: compact ? 10 : 11, lineHeight: compact ? 13 : 14, fontWeight: "800", textTransform: "uppercase", textAlign: centered ? "center" : "left" }}>{item.label}</Text>
+      <Text maxFontSizeMultiplier={1.5} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={{ color: colors.text, fontSize: compact ? 15 : 20, lineHeight: compact ? 19 : 24, fontWeight: "900", fontVariant: ["tabular-nums"], textAlign: centered ? "center" : "left" }}>{item.value}</Text>
+      <Text maxFontSizeMultiplier={1.5} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8} style={{ color: colors.textSubtle, fontSize: compact ? 10 : 11, lineHeight: compact ? 13 : 14, fontWeight: "800", textTransform: "uppercase", textAlign: centered ? "center" : "left" }}>{item.label}</Text>
     </View>)}
   </View>;
 }

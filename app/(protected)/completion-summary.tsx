@@ -63,8 +63,8 @@ export default function CompletionSummaryScreen() {
     <CompletionReveal index={0} reduceMotion={reduceMotion}><View accessibilityRole="summary" style={styles.successHeader}>
       <View style={styles.successMark}><Text style={styles.successGlyph}>✓</Text></View>
       <Text maxFontSizeMultiplier={1.5} style={styles.eyebrow}>{summary.completionLabel.toUpperCase()}</Text>
-      <Text maxFontSizeMultiplier={1.35} style={styles.hero}>{summary.workoutName}</Text>
-      <Text style={styles.muted}>{summary.completion === "complete" ? "Strong work. Every prescribed exercise was represented in the retained session." : "Your completed work is saved exactly as performed. Unfinished work was not invented."}</Text>
+      <Text maxFontSizeMultiplier={1.05} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.72} style={styles.hero}>{summary.workoutName}</Text>
+      <Text maxFontSizeMultiplier={1.2} style={styles.muted}>{summary.completion === "complete" ? "Strong work. Every prescribed exercise was represented in the retained session." : "Your completed work is saved exactly as performed. Unfinished work was not invented."}</Text>
     </View></CompletionReveal>
 
     <CompletionReveal index={1} reduceMotion={reduceMotion}><WorkoutMetricStrip centered items={[
