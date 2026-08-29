@@ -109,8 +109,16 @@ export type DesignQaFixtureId =
   | "plan_block_ending"
   | "plan_no_plan"
   | "completion_superset_member_a_progress"
+  | "completion_superset_member_b_progress"
+  | "completion_superset_both_progress"
+  | "completion_superset_member_a_regression"
   | "completion_superset_round_rest_increase"
   | "completion_superset_pair_removal"
+  | "completion_superset_unreliable_recovery_hold"
+  | "completion_superset_substitution_non_comparable_hold"
+  | "completion_superset_correction_invalidation"
+  | "completion_superset_transition_reassessment"
+  | "completion_superset_no_eligible_adaptation"
   | "completion_superset_held_shadow";
 
 export interface DesignQaFixtureDefinition {
@@ -142,8 +150,16 @@ export const designQaFixtures: DesignQaFixtureDefinition[] = [
   { id: "completion_long_accessibility", area: "Finish", label: "Long and accessible", description: "Bounded multi-achievement content at large text and narrow widths.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_long_accessibility:comparison:3" },
   { id: "completion_share", area: "Finish", label: "Sharing preview", description: "A privacy-safe single-achievement share-card entry point.", targetHref: "/(protected)/completion-summary?recordedSessionId=design-qa:completion_share:comparison:3" },
   { id: "completion_superset_member_a_progress", area: "Finish", label: "Superset: one member progresses", description: "A persisted certified receipt changes one exercise while its partner holds.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_member_b_progress", area: "Finish", label: "Superset: second member progresses", description: "The second exercise progresses while the first remains unchanged.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_both_progress", area: "Finish", label: "Superset: both progress", description: "Both members progress independently through one persisted receipt.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_member_a_regression", area: "Finish", label: "Superset: one member regresses", description: "One exercise receives a bounded repetition regression while its partner holds.", targetHref: "/(protected)/completion-summary" },
   { id: "completion_superset_round_rest_increase", area: "Finish", label: "Superset: more round recovery", description: "A persisted certified receipt adds bounded recovery between rounds.", targetHref: "/(protected)/completion-summary" },
   { id: "completion_superset_pair_removal", area: "Finish", label: "Superset: return to straight sets", description: "Both exercises remain while the pairing is removed.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_unreliable_recovery_hold", area: "Finish", label: "Superset: recovery unclear", description: "Unreliable recovery evidence holds the pairing steady.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_substitution_non_comparable_hold", area: "Finish", label: "Superset: substitution reset", description: "A non-comparable substitution resets pair evidence without changing the plan.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_correction_invalidation", area: "Finish", label: "Superset: correction invalidates", description: "Corrected evidence no longer supports the previous proposed change.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_transition_reassessment", area: "Finish", label: "Superset: phase reassessment", description: "A phase transition retains both exercises and requires pair reassessment.", targetHref: "/(protected)/completion-summary" },
+  { id: "completion_superset_no_eligible_adaptation", area: "Finish", label: "Superset: no change needed", description: "Comparable evidence supports continuing the current pairing and targets.", targetHref: "/(protected)/completion-summary" },
   { id: "completion_superset_held_shadow", area: "Progress", label: "Superset: QA-only hold", description: "An insufficient-evidence shadow result visible only in explicit QA mode.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_low", area: "Progress", label: "Low history", description: "One completed workout, no strategic verdict yet.", targetHref: "/(protected)/(tabs)/analytics" },
   { id: "progress_healthy", area: "Progress", label: "Healthy/adapting", description: "Progression moving, fatigue low, clean recent cards.", targetHref: "/(protected)/(tabs)/analytics" },

@@ -7,7 +7,21 @@ import type { CanonicalPlannedSessionSnapshot } from "@/domain/training/canonica
 import type { CanonicalSupersetFutureMutationProposal, CanonicalSupersetMutation } from "@/domain/training/canonical-superset-future-mutation";
 import { createCanonicalStraightSetStructure } from "@/domain/training/canonical-training-method-policy";
 
-export type CanonicalSupersetCertificationFixture = "member_a_progress" | "round_rest_increase" | "pair_removal" | "held_shadow";
+export const canonicalSupersetCertificationMatrix = [
+  "member_a_progress",
+  "member_b_progress",
+  "both_progress",
+  "member_a_regression",
+  "round_rest_increase",
+  "pair_removal",
+  "unreliable_recovery_hold",
+  "substitution_non_comparable_hold",
+  "correction_invalidation",
+  "transition_reassessment",
+  "no_eligible_adaptation",
+] as const;
+
+export type CanonicalSupersetCertificationFixture = typeof canonicalSupersetCertificationMatrix[number] | "held_shadow";
 
 export function applyCanonicalSupersetCertificationFixture(kind: CanonicalSupersetCertificationFixture, fixturePlanId = `design-qa:superset:${kind}`) {
   const planId = fixturePlanId;
@@ -20,7 +34,7 @@ export function applyCanonicalSupersetCertificationFixture(kind: CanonicalSupers
   const seeded = canonicalActivePlanV2Repository.saveAtomically({ ...loaded.carrier, revision: nextRevision, updatedAt: "2026-08-29T08:01:00.000Z", plannedSessions: pairedSessions, progress: { ...loaded.carrier.progress, revision: nextRevision } }, loaded.carrier.revision);
   if (seeded.status !== "saved") throw new Error(`superset_fixture_pair_seed_failed:${"reason" in seeded ? seeded.reason : seeded.status}`);
   const proposal = proposalFor(kind, seeded.carrier.revision, seeded.carrier.planId, seeded.carrier.plannedSessions);
-  const result = kind === "held_shadow"
+  const result = isHeldFixture(kind)
     ? recordCanonicalSupersetShadowEvaluation(proposal, "2026-08-29T08:02:00.000Z")
     : applyCanonicalSupersetMutation({ proposal, appliedAt: "2026-08-29T08:02:00.000Z", authority: "shadow_certification" });
   canonicalActivePlanState.refresh();
@@ -50,10 +64,19 @@ function proposalFor(kind: CanonicalSupersetCertificationFixture, revision: numb
   let pairStateAfter: "paired" | "straight" = "paired";
   let restAfterSeconds = 60;
   let durationDelta = 0;
-  if (kind === "member_a_progress") {
+  if (kind === "member_a_progress" || kind === "member_b_progress" || kind === "both_progress") {
     const before = Number(first.targetReps ?? 8);
-    first.targetReps = before + 1;
-    mutations = [{ member: "a", exerciseId: String(first.exerciseId), slotId: String(first.id), mutationType: "progress_repetitions", field: "targetReps", before, after: before + 1, equipmentIncrement: null, roundingBasis: "one_repetition" }];
+    const secondBefore = Number(second.targetReps ?? 8);
+    if (kind !== "member_b_progress") first.targetReps = before + 1;
+    if (kind !== "member_a_progress") second.targetReps = secondBefore + 1;
+    mutations = [
+      ...(kind !== "member_b_progress" ? [{ member: "a" as const, exerciseId: String(first.exerciseId), slotId: String(first.id), mutationType: "progress_repetitions" as const, field: "targetReps", before, after: before + 1, equipmentIncrement: null, roundingBasis: "one_repetition" }] : []),
+      ...(kind !== "member_a_progress" ? [{ member: "b" as const, exerciseId: String(second.exerciseId), slotId: String(second.id), mutationType: "progress_repetitions" as const, field: "targetReps", before: secondBefore, after: secondBefore + 1, equipmentIncrement: null, roundingBasis: "one_repetition" }] : []),
+    ];
+  } else if (kind === "member_a_regression") {
+    const before = Number(first.targetReps ?? 8);
+    first.targetReps = Math.max(1, before - 1);
+    mutations = [{ member: "a", exerciseId: String(first.exerciseId), slotId: String(first.id), mutationType: "regress_repetitions", field: "targetReps", before, after: Math.max(1, before - 1), equipmentIncrement: null, roundingBasis: "one_repetition" }];
   } else if (kind === "round_rest_increase") {
     restAfterSeconds = 90;
     durationDelta = 1;
@@ -66,5 +89,19 @@ function proposalFor(kind: CanonicalSupersetCertificationFixture, revision: numb
     mutations = [{ member: "pair", exerciseId: null, slotId: null, mutationType: "remove_pairing", field: "method", before: "antagonist_superset", after: "straight_sets", equipmentIncrement: null, roundingBasis: null }];
   }
   const proposedSessions = sessions.map((session, index) => index === 0 ? { ...session, prescriptionSnapshot: { ...snapshot, estimatedDurationMinutes: 60 + durationDelta, slots } } : session);
-  return { schemaVersion: "canonical_superset_future_mutation_v1", originatingDecisionId: `qa-superset:${kind}`, decisionVersion: "canonical_antagonist_superset_decision_v1", policyVersion: "canonical_antagonist_superset_adaptation_v1", evidenceIds: [`qa-evidence:${kind}`], pairIdentity: [String(first.exerciseId), String(second.exerciseId)].sort().join("::"), planId, expectedPlanRevision: revision, targetMicrocycleId: target.microcycleId, targetSessionId: target.id, targetPlanSessionIndex: target.planSessionIndex, targetComparableExposureIdentity: `${target.microcycleId}:${target.planSessionIndex}:qa-pair`, pairStateBefore: "paired", pairStateAfter, restBeforeSeconds: 60, restAfterSeconds, expectedDurationDeltaMinutes: durationDelta, comparabilityConsequence: pairStateAfter === "straight" ? "pairing_history_stops_exercise_history_continues" : "continues", applicationAuthority: "shadow_only", applicationEligibility: kind === "held_shadow" ? "held" : "eligible", reason: kind === "held_shadow" ? "insufficient_comparable_evidence" : `qa_certification:${kind}`, mutations, proposedSessions };
+  return { schemaVersion: "canonical_superset_future_mutation_v1", originatingDecisionId: `qa-superset:${kind}`, decisionVersion: "canonical_antagonist_superset_decision_v1", policyVersion: "canonical_antagonist_superset_adaptation_v1", evidenceIds: [`qa-evidence:${kind}`], pairIdentity: [String(first.exerciseId), String(second.exerciseId)].sort().join("::"), planId, expectedPlanRevision: revision, targetMicrocycleId: target.microcycleId, targetSessionId: target.id, targetPlanSessionIndex: target.planSessionIndex, targetComparableExposureIdentity: `${target.microcycleId}:${target.planSessionIndex}:qa-pair`, pairStateBefore: "paired", pairStateAfter, restBeforeSeconds: 60, restAfterSeconds, expectedDurationDeltaMinutes: durationDelta, comparabilityConsequence: pairStateAfter === "straight" ? "pairing_history_stops_exercise_history_continues" : "continues", applicationAuthority: "shadow_only", applicationEligibility: isHeldFixture(kind) ? "held" : "eligible", reason: reasonFor(kind), mutations, proposedSessions };
+}
+
+function isHeldFixture(kind: CanonicalSupersetCertificationFixture) {
+  return ["held_shadow", "unreliable_recovery_hold", "substitution_non_comparable_hold", "correction_invalidation", "transition_reassessment", "no_eligible_adaptation"].includes(kind);
+}
+
+function reasonFor(kind: CanonicalSupersetCertificationFixture): string {
+  if (kind === "unreliable_recovery_hold") return "recovery_evidence_unreliable";
+  if (kind === "substitution_non_comparable_hold") return "non_comparable_substitution_resets_pair_evidence";
+  if (kind === "correction_invalidation") return "corrected_evidence_invalidated_previous_decision";
+  if (kind === "transition_reassessment") return "phase_transition_requires_pair_reassessment";
+  if (kind === "no_eligible_adaptation") return "no_eligible_superset_adaptation";
+  if (kind === "held_shadow") return "insufficient_comparable_evidence";
+  return `qa_certification:${kind}`;
 }
