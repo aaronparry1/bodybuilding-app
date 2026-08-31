@@ -23,7 +23,7 @@ export const canonicalSupersetCertificationMatrix = [
 
 export type CanonicalSupersetCertificationFixture = typeof canonicalSupersetCertificationMatrix[number] | "held_shadow";
 
-export function applyCanonicalSupersetCertificationFixture(kind: CanonicalSupersetCertificationFixture, fixturePlanId = `design-qa:superset:${kind}`) {
+export function seedCanonicalSupersetCertificationPlan(fixturePlanId: string) {
   const planId = fixturePlanId;
   canonicalSupersetApplicationRepository.clear();
   applyCanonicalCompletionVisualState("pr", { planId, now: "2026-08-29T08:00:00.000Z" });
@@ -33,13 +33,19 @@ export function applyCanonicalSupersetCertificationFixture(kind: CanonicalSupers
   const nextRevision = loaded.carrier.revision + 1;
   const seeded = canonicalActivePlanV2Repository.saveAtomically({ ...loaded.carrier, revision: nextRevision, updatedAt: "2026-08-29T08:01:00.000Z", plannedSessions: pairedSessions, progress: { ...loaded.carrier.progress, revision: nextRevision } }, loaded.carrier.revision);
   if (seeded.status !== "saved") throw new Error(`superset_fixture_pair_seed_failed:${"reason" in seeded ? seeded.reason : seeded.status}`);
-  const proposal = proposalFor(kind, seeded.carrier.revision, seeded.carrier.planId, seeded.carrier.plannedSessions);
+  canonicalActivePlanState.refresh();
+  return seeded.carrier;
+}
+
+export function applyCanonicalSupersetCertificationFixture(kind: CanonicalSupersetCertificationFixture, fixturePlanId = `design-qa:superset:${kind}`) {
+  const seeded = seedCanonicalSupersetCertificationPlan(fixturePlanId);
+  const proposal = proposalFor(kind, seeded.revision, seeded.planId, seeded.plannedSessions);
   const result = isHeldFixture(kind)
     ? recordCanonicalSupersetShadowEvaluation(proposal, "2026-08-29T08:02:00.000Z")
     : applyCanonicalSupersetMutation({ proposal, appliedAt: "2026-08-29T08:02:00.000Z", authority: "shadow_certification" });
   canonicalActivePlanState.refresh();
   const historical = (canonicalActivePlanState.getReadModel()?.historicalRecordedSessions ?? []).at(-1);
-  return { fixtureId: kind, planId, recordedSessionId: historical?.recordedSessionId ?? null, result };
+  return { fixtureId: kind, planId: seeded.planId, recordedSessionId: historical?.recordedSessionId ?? null, result };
 }
 
 function seedPair(sessions: readonly CanonicalPlannedSessionSnapshot[]): readonly CanonicalPlannedSessionSnapshot[] {

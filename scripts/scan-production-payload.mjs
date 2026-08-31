@@ -22,6 +22,8 @@ export const forbiddenProductionPayloadMarkers = [
   "exdevlauncher",
   "exdevmenu",
   "expo-dev-client",
+  "superset-lifecycle-qa",
+  "qa_antagonist_superset_offline_lifecycle_v1",
 ];
 
 export function scanProductionPayload(root) {

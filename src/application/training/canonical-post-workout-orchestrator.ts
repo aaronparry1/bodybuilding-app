@@ -23,7 +23,8 @@ import { canonicalSupersetShadowDecisionRepository } from "@/data/local/canonica
 import { methodOutcomeFromPerformanceEvidence } from "@/domain/training/canonical-method-outcome";
 import { deriveAntagonistSupersetShadowDecision } from "@/domain/training/canonical-antagonist-superset-adaptation";
 import { proposeCanonicalSupersetFutureMutation } from "@/domain/training/canonical-superset-future-mutation";
-import { recordCanonicalSupersetShadowEvaluation } from "@/application/training/canonical-superset-application";
+import { applyCanonicalSupersetMutation, recordCanonicalSupersetDisabledEvaluation, recordCanonicalSupersetShadowEvaluation } from "@/application/training/canonical-superset-application";
+import { resolveCanonicalSupersetAuthority } from "@/application/training/canonical-superset-authority";
 
 export const CANONICAL_POST_WORKOUT_ORCHESTRATOR_VERSION = "canonical_post_workout_orchestrator_v1" as const;
 
@@ -105,22 +106,9 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     const methodOutcome = methodOutcomeFromPerformanceEvidence(evidence);
     if (methodOutcome) canonicalMethodOutcomeRepository.saveEffective(methodOutcome);
   }
-  const methodOutcomes = canonicalMethodOutcomeRepository.list(input.planId);
-  const supersetPairs = [...new Set(methodOutcomes.filter((item) => item.method === "antagonist_superset").map((item) => item.pairComparableIdentity).filter(Boolean))];
-  for (const pairIdentity of supersetPairs) {
-    const shadowDecision = deriveAntagonistSupersetShadowDecision(methodOutcomes.filter((item) => item.pairComparableIdentity === pairIdentity));
-    if (shadowDecision) {
-      canonicalSupersetShadowDecisionRepository.record(shadowDecision);
-      const proposal = proposeCanonicalSupersetFutureMutation({
-        decision: shadowDecision,
-        planRevision: raw.carrier.revision,
-        sessions: raw.carrier.plannedSessions,
-        startedSessionIds: (raw.carrier.recordedSessionReferences ?? []).filter((item) => item.status === "started" || item.status === "paused").map((item) => item.sessionId),
-        sessionDurationCeilingMinutes: raw.carrier.constraints.availableSessionMinutes,
-      });
-      recordCanonicalSupersetShadowEvaluation(proposal, input.occurredAt);
-    }
-  }
+  const superset = reconcileCanonicalSupersetAuthority({ planId: input.planId, occurredAt: input.occurredAt });
+  if (superset.status === "applied" || superset.status === "unchanged") return { status: superset.status, reason: superset.reason, operationId, decisionId: superset.decisionId, explanation: superset.explanation, priorRevision: superset.priorRevision, newRevision: superset.newRevision };
+  if (superset.status === "retryable") return { status: "retryable", reason: superset.reason, operationId, decisionId: superset.decisionId };
   for (const priorDecision of canonicalProgressDecisionRepository.list(input.planId)) {
     if (canonicalAdaptationOutcomeRepository.get(priorDecision.decisionId).status === "found") continue;
     const outcome = evaluateCanonicalAdaptationOutcome({ decision: priorDecision, evidence: allEvidence });
@@ -223,6 +211,51 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     ? committed.decision.phaseOneApplication.explanation
     : evaluation.explanation;
   return { status: finalStatus, reason: applied.reason, operationId, evaluationId: evaluation.evaluationId, decisionId: produced.decision.decisionId, explanation, priorRevision: applied.priorRevision, newRevision: applied.newRevision };
+}
+
+export function reconcileCanonicalSupersetAuthority(input: Readonly<{ planId: string; occurredAt: string }>): Readonly<{
+  status: "none" | "shadowed" | "held" | "applied" | "unchanged" | "retryable";
+  reason: string;
+  decisionId?: string;
+  explanation?: string;
+  priorRevision?: number;
+  newRevision?: number;
+}> {
+  const loaded = canonicalActivePlanV2Repository.get();
+  if (loaded.status !== "saved" || loaded.carrier.planId !== input.planId) return { status: "retryable", reason: "canonical_plan_unavailable" };
+  const authority = resolveCanonicalSupersetAuthority();
+  const outcomes = canonicalMethodOutcomeRepository.list(input.planId);
+  const pairs = [...new Set(outcomes.filter((item) => item.method === "antagonist_superset").map((item) => item.pairComparableIdentity).filter((item): item is string => Boolean(item)))];
+  if (!pairs.length) return { status: "none", reason: "no_antagonist_superset_evidence" };
+  for (const pairIdentity of pairs) {
+    const decision = deriveAntagonistSupersetShadowDecision(outcomes.filter((item) => item.pairComparableIdentity === pairIdentity));
+    if (!decision) continue;
+    canonicalSupersetShadowDecisionRepository.record(decision);
+    const current = canonicalActivePlanV2Repository.get();
+    if (current.status !== "saved") return { status: "retryable", reason: "canonical_plan_unavailable", decisionId: decision.decisionId };
+    const proposal = proposeCanonicalSupersetFutureMutation({
+      decision,
+      planRevision: current.carrier.revision,
+      sessions: current.carrier.plannedSessions,
+      startedSessionIds: (current.carrier.recordedSessionReferences ?? []).filter((item) => item.status === "started" || item.status === "paused").map((item) => item.sessionId),
+      sessionDurationCeilingMinutes: current.carrier.constraints.availableSessionMinutes,
+      applicationAuthority: authority.mode === "production_authority" ? "production" : "shadow_only",
+    });
+    if (authority.mode === "shadow_only") {
+      const result = recordCanonicalSupersetShadowEvaluation(proposal, input.occurredAt);
+      return { status: "shadowed", reason: result.reason, decisionId: decision.decisionId };
+    }
+    if (authority.mode === "disabled") {
+      const result = recordCanonicalSupersetDisabledEvaluation(proposal, input.occurredAt);
+      return { status: result.status === "retryable" ? "retryable" : "held", reason: result.reason, decisionId: decision.decisionId };
+    }
+    const before = current.carrier.revision;
+    const result = applyCanonicalSupersetMutation({ proposal, appliedAt: input.occurredAt, authority: authority.mode === "production_authority" ? "production" : "shadow_certification" });
+    if (result.status === "applied" || result.status === "unchanged") return { status: result.status, reason: result.reason, decisionId: decision.decisionId, explanation: result.receipt?.explanation, priorRevision: result.receipt?.priorRevision ?? before, newRevision: result.receipt?.resultingRevision };
+    if (result.status === "retryable") return { status: "retryable", reason: result.reason, decisionId: decision.decisionId };
+    return { status: "held", reason: result.reason, decisionId: decision.decisionId };
+  }
+  return { status: "none", reason: "no_antagonist_superset_decision" };
 }
 
 /**

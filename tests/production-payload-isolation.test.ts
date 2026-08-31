@@ -63,4 +63,14 @@ describe("production payload isolation", () => {
       findings: [],
     });
   });
+
+  it("treats the profiling-only superset lifecycle route and authority control as forbidden Release payload", () => {
+    const directory = mkdtempSync(join(tmpdir(), "asc-payload-scan-"));
+    temporaryDirectories.push(directory);
+    const root = join(directory, "AdaptiveStrengthCoach.app");
+    mkdirSync(root);
+    writeFileSync(join(root, "main.jsbundle"), "superset-lifecycle-qa certification_authority");
+    const result = scanPackagedReleaseApplication(root);
+    expect(result.status).toBe("failed");
+  });
 });

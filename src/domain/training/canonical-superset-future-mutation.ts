@@ -49,8 +49,9 @@ export function proposeCanonicalSupersetFutureMutation(input: Readonly<{
   startedSessionIds?: readonly string[];
   sessionDurationCeilingMinutes?: number;
   equipmentIncrementByExercise?: Readonly<Record<string, number>>;
+  applicationAuthority?: "shadow_only" | "production";
 }>): CanonicalSupersetFutureMutationProposal {
-  const base = baseProposal(input.decision, input.sessions, input.planRevision ?? 0);
+  const base = { ...baseProposal(input.decision, input.sessions, input.planRevision ?? 0), applicationAuthority: input.applicationAuthority ?? "shadow_only" };
   if (input.decision.decisionAuthority !== "shadow_only" || input.decision.eligibleForProductionApplication !== false) return { ...base, applicationEligibility: "rejected", reason: "uncertified_decision_authority" };
   if (["hold", "delay_for_evidence"].includes(input.decision.action)) return { ...base, applicationEligibility: "held", reason: input.decision.reason };
   const started = new Set(input.startedSessionIds ?? []);

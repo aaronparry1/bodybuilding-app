@@ -110,6 +110,12 @@ function DesignQaContent({ environment }: { environment: ReturnType<typeof getAp
 
       {error ? <ErrorState message={error} /> : null}
 
+      <PremiumCard tone="locked">
+        <Text selectable style={{ color: colors.text, fontSize: 20, lineHeight: 25, fontWeight: "900" }}>Antagonist-superset lifecycle</Text>
+        <Text selectable style={{ ...type.body, color: colors.textMuted }}>Profiling-only offline, reconciliation and rollback certification through the mounted repositories.</Text>
+        <SecondaryButton label="Open superset lifecycle QA" onPress={() => router.push("/(protected)/superset-lifecycle-qa")} testID="open-superset-lifecycle-qa" />
+      </PremiumCard>
+
       {showV2BenchmarkQa ? (
         <PremiumCard tone="locked">
           <Text selectable style={{ color: colors.text, fontSize: 20, lineHeight: 25, fontWeight: "900" }}>

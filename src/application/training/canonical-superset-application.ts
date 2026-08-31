@@ -21,6 +21,17 @@ export function recordCanonicalSupersetShadowEvaluation(proposal: CanonicalSuper
   return terminal.status === "saved" ? { status, reason } : { status: "retryable", reason: "shadow_evaluation_persistence_failed" };
 }
 
+export function recordCanonicalSupersetDisabledEvaluation(proposal: CanonicalSupersetFutureMutationProposal, evaluatedAt: string): CanonicalSupersetApplicationResult {
+  const proposalFingerprint = canonicalDeterministicFingerprint(proposal);
+  const intendedPrescriptionFingerprint = canonicalDeterministicFingerprint(proposal.proposedSessions);
+  const prepared = canonicalSupersetApplicationRepository.prepare({ schemaVersion: "canonical_superset_application_v1", decisionId: proposal.originatingDecisionId, proposal, proposalFingerprint, intendedPrescriptionFingerprint, status: "prepared", preparedAt: evaluatedAt });
+  if (prepared.status === "conflict" || prepared.status === "invalid") return { status: "rejected", reason: prepared.reason };
+  if (prepared.record.receipt) return { status: "unchanged", reason: "existing_application_receipt", receipt: prepared.record.receipt };
+  if (prepared.record.status === "held" || prepared.record.status === "rejected") return { status: prepared.record.status, reason: prepared.record.terminalReason ?? "superset_production_authority_disabled" };
+  const terminal = canonicalSupersetApplicationRepository.terminal(proposal.originatingDecisionId, "held", "superset_production_authority_disabled");
+  return terminal.status === "saved" ? { status: "held", reason: "superset_production_authority_disabled" } : { status: "retryable", reason: "disabled_evaluation_persistence_failed" };
+}
+
 export function applyCanonicalSupersetMutation(input: Readonly<{
   proposal: CanonicalSupersetFutureMutationProposal;
   appliedAt: string;
