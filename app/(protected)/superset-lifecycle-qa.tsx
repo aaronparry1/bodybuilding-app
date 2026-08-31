@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
-import { Redirect } from "expo-router";
-import { useState } from "react";
+import { Redirect, useLocalSearchParams } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import { Text } from "react-native";
 import { useSubscription } from "@/application/billing/subscription-context";
 import { isDesignQaModeAvailable, isDesignQaModeRequested } from "@/application/design-qa/design-qa-runtime";
@@ -18,11 +18,30 @@ export default function SupersetLifecycleQaScreen() {
 }
 
 function Content() {
+  const { action } = useLocalSearchParams<{ action?: string }>();
+  const handledAction = useRef<string | null>(null);
   const [state, setState] = useState(() => getCanonicalSupersetLifecycleState());
   const [error, setError] = useState<string | null>(null);
   const extra = Constants.expoConfig?.extra as { qaBuildIdentity?: string } | undefined;
   const run = (action: () => ReturnType<typeof getCanonicalSupersetLifecycleState>) => { try { setError(null); setState(action()); } catch (next) { setError(next instanceof Error ? next.message : "QA lifecycle action failed"); } };
   const setAuthority = (mode: "shadow_only" | "certification_authority" | "disabled") => run(() => { const result = setCanonicalSupersetProfilingAuthority(mode); if (result.status !== "saved") throw new Error(result.reason); return { ...getCanonicalSupersetLifecycleState(), authority: resolveCanonicalSupersetAuthority() }; });
+  useEffect(() => {
+    if (!action || handledAction.current === action) return;
+    handledAction.current = action;
+    const actions: Record<string, () => void> = {
+      reset: () => run(resetCanonicalSupersetLifecycleFixture),
+      certification: () => setAuthority("certification_authority"),
+      seed_offline: () => run(seedCanonicalSupersetOfflineCompletion),
+      reconcile: () => run(reconcileCanonicalSupersetLifecycleFixture),
+      disable: () => setAuthority("disabled"),
+      disabled_exposure: () => run(seedCanonicalSupersetDisabledExposure),
+      reenable: () => setAuthority("certification_authority"),
+      replay: () => run(reconcileCanonicalSupersetLifecycleFixture),
+    };
+    const selected = actions[action];
+    if (!selected) { setError(`Unknown QA lifecycle action: ${action}`); return; }
+    selected();
+  }, [action]);
   return <AppScreen>
     <Text accessibilityRole="header" style={{ ...type.title, color: colors.text }}>Superset lifecycle QA</Text>
     <PremiumCard tone="locked">
