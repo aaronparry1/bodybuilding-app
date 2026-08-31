@@ -11,6 +11,8 @@ describe("profiling development-server resolution", () => {
     expect(source).toContain('environment["ASC_METRO_HOST"]');
     expect(source).toContain('environment["ASC_METRO_PORT"]');
     expect(source).toContain('provider.jsLocation = "\\(host):\\(port)"');
+    expect(source).toContain('URL(string: "http://\\(host):\\(port)/status")');
+    expect(source).toContain("DispatchQueue.main.async(execute: startReactNative)");
     expect(source).not.toContain('jsLocation = "localhost:8081"');
     expect(source).not.toContain("192.168.");
     const profiling = project.slice(project.indexOf("DQA00000000000000000001"));

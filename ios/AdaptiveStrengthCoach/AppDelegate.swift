@@ -21,11 +21,27 @@ class AppDelegate: ExpoAppDelegate {
     reactNativeFactory = factory
 
 #if os(iOS) || os(tvOS)
-    window = UIWindow(frame: UIScreen.main.bounds)
-    factory.startReactNative(
-      withModuleName: "main",
-      in: window,
-      launchOptions: launchOptions)
+    let startReactNative = {
+      self.window = UIWindow(frame: UIScreen.main.bounds)
+      factory.startReactNative(
+        withModuleName: "main",
+        in: self.window,
+        launchOptions: launchOptions)
+    }
+#if ASC_QA
+    if let host = ProcessInfo.processInfo.environment["ASC_METRO_HOST"], !host.isEmpty {
+      let port = ProcessInfo.processInfo.environment["ASC_METRO_PORT"] ?? "8081"
+      var request = URLRequest(url: URL(string: "http://\(host):\(port)/status")!)
+      request.timeoutInterval = 15
+      URLSession.shared.dataTask(with: request) { _, _, _ in
+        DispatchQueue.main.async(execute: startReactNative)
+      }.resume()
+    } else {
+      startReactNative()
+    }
+#else
+    startReactNative()
+#endif
 #endif
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
