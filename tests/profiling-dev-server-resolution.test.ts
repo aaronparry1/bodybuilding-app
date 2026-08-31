@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 describe("profiling development-server resolution", () => {
   it("accepts a QA-only physical-device packager host without embedding one", () => {
     const source = readFileSync("ios/AdaptiveStrengthCoach/AppDelegate.swift", "utf8");
+    const project = readFileSync("ios/AdaptiveStrengthCoach.xcodeproj/project.pbxproj", "utf8");
 
     expect(source).toContain("#if ASC_QA");
     expect(source).toContain('environment["ASC_METRO_HOST"]');
@@ -11,5 +12,7 @@ describe("profiling development-server resolution", () => {
     expect(source).toContain('provider.jsLocation = "\\(host):\\(port)"');
     expect(source).not.toContain('jsLocation = "localhost:8081"');
     expect(source).not.toContain("192.168.");
+    const profiling = project.slice(project.indexOf("DQA00000000000000000001"));
+    expect(profiling).toContain("INFOPLIST_KEY_NSLocalNetworkUsageDescription");
   });
 });
