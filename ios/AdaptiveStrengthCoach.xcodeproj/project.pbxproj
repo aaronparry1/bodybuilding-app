@@ -701,9 +701,8 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = AdaptiveStrengthCoach/Info.plist;
+				INFOPLIST_FILE = "AdaptiveStrengthCoach/Info-Profiling.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Adaptive Strength QA";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Allow the Profiling build to connect to Metro on your local network.";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
