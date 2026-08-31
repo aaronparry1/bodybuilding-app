@@ -5,7 +5,7 @@ export type CanonicalSupersetAuthorityMode = "shadow_only" | "certification_auth
 
 // Promotion changes this one versioned production default. Profiling overrides
 // are persisted separately and are ignored by production builds.
-export const CANONICAL_ANTAGONIST_SUPERSET_PRODUCTION_AUTHORITY: CanonicalSupersetAuthorityMode = "shadow_only";
+export const CANONICAL_ANTAGONIST_SUPERSET_PRODUCTION_AUTHORITY: CanonicalSupersetAuthorityMode = "production_authority";
 const QA_KEY = "iron-logic.qa-antagonist-superset-authority-v1";
 
 export type CanonicalSupersetAuthorityState = Readonly<{

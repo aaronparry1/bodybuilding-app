@@ -13,12 +13,12 @@ describe("versioned antagonist-superset authority lifecycle", () => {
     resetCanonicalSupersetLifecycleFixture();
   });
 
-  it("defaults to shadow and persists only the profiling certification override", () => {
+  it("uses the promoted production authority and persists only the profiling certification override", () => {
     expect(resolveCanonicalSupersetAuthority()).toMatchObject({ version: CANONICAL_ANTAGONIST_SUPERSET_AUTHORITY_VERSION, mode: "shadow_only" });
     expect(setCanonicalSupersetProfilingAuthority("certification_authority").status).toBe("saved");
     expect(resolveCanonicalSupersetAuthority()).toMatchObject({ mode: "certification_authority", source: "profiling_override" });
     process.env.APP_ENV = "production";
-    expect(resolveCanonicalSupersetAuthority()).toMatchObject({ mode: "shadow_only", source: "production_default" });
+    expect(resolveCanonicalSupersetAuthority()).toMatchObject({ mode: "production_authority", source: "production_default" });
   });
 
   it("retains offline evidence, reconciles once, and preserves rollback across replay", () => {
