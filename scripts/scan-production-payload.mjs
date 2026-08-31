@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, extname, resolve } from "node:path";
 
 export const forbiddenProductionPayloadMarkers = [
   "train_load_escalation_modal",
@@ -35,6 +35,22 @@ export function scanProductionPayload(root) {
   return { schemaVersion: "canonical_production_payload_scan_v1", root: absoluteRoot, scannedFiles: filesUnder(absoluteRoot).length, status: findings.length ? "failed" : "passed", findings };
 }
 
+export function scanPackagedReleaseApplication(root) {
+  if (!root) throw new Error("production_release_app_path_required");
+  const absoluteRoot = resolve(root);
+  if (extname(absoluteRoot).toLowerCase() !== ".app") {
+    throw new Error(`production_release_app_required:${absoluteRoot}`);
+  }
+  if (!existsSync(absoluteRoot) || !statSync(absoluteRoot).isDirectory()) {
+    throw new Error(`production_payload_missing:${absoluteRoot}`);
+  }
+  const bundlePath = resolve(absoluteRoot, "main.jsbundle");
+  if (!existsSync(bundlePath)) {
+    throw new Error(`production_release_bundle_missing:${basename(absoluteRoot)}`);
+  }
+  return scanProductionPayload(absoluteRoot);
+}
+
 function filesUnder(root) {
   if (statSync(root).isFile()) return [root];
   return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
@@ -44,7 +60,7 @@ function filesUnder(root) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(import.meta.filename)) {
-  const result = scanProductionPayload(process.argv[2] ?? "");
+  const result = scanPackagedReleaseApplication(process.argv[2]);
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   if (result.status !== "passed") process.exitCode = 1;
 }

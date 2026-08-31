@@ -1,9 +1,10 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   forbiddenProductionPayloadMarkers,
+  scanPackagedReleaseApplication,
   scanProductionPayload,
 } from "../scripts/scan-production-payload.mjs";
 
@@ -41,6 +42,25 @@ describe("production payload isolation", () => {
       status: "passed",
       findings: [],
       scannedFiles: 1,
+    });
+  });
+
+  it("requires the command-facing scan to target a packaged Release application", () => {
+    const directory = mkdtempSync(join(tmpdir(), "asc-payload-scan-"));
+    temporaryDirectories.push(directory);
+    writeFileSync(join(directory, "main.jsbundle"), "canonical_session_snapshot_v3");
+
+    expect(() => scanPackagedReleaseApplication(directory)).toThrow(
+      `production_release_app_required:${directory}`,
+    );
+
+    const app = join(directory, "AdaptiveStrengthCoach.app");
+    mkdirSync(app);
+    writeFileSync(join(app, "main.jsbundle"), "canonical_session_snapshot_v3");
+    expect(scanPackagedReleaseApplication(app)).toMatchObject({
+      root: app,
+      status: "passed",
+      findings: [],
     });
   });
 });
