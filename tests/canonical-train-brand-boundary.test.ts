@@ -71,8 +71,10 @@ describe("canonical Train brand boundary", () => {
   it("carries one workout identity and metric hierarchy through Home, preview and completion", () => {
     expect(workoutVisualsSource).toContain("export function WorkoutStage");
     expect(workoutVisualsSource).toContain("export function WorkoutMetricStrip");
-    expect(homeSource).toContain("<WorkoutStage");
-    expect(homeSource).toContain("<WorkoutMetricStrip");
+    expect(homeSource).toContain("projection.primary");
+    expect(homeSource).toContain("primary.exerciseCount");
+    expect(homeSource).toContain("primary.workSetCount");
+    expect(homeSource).toContain("onAction(projection.primary.action)");
     expect(source).toContain("<WorkoutStage");
     expect(source).toContain("<WorkoutMetricStrip");
     expect(completionSummarySource).toContain("<WorkoutMetricStrip centered");

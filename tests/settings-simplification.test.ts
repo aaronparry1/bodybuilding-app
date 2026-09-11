@@ -46,7 +46,8 @@ describe("settings simplification", () => {
     expect(capacity).not.toContain("capacityFocusRepository.save");
     expect(home).toContain("canonicalActivePlanState");
     expect(home).toContain("projectCanonicalHome");
-    expect(home).toContain("View Progress");
+    expect(home).toContain('action.type === "open_progress"');
+    expect(home).toContain('router.push("/(protected)/(tabs)/analytics")');
     expect(home).not.toContain("Recovery target evidence");
     expect(home).not.toContain('{ value: "capacity", label: "Capacity" }');
     expect(home).not.toContain('{ value: "recovery_cardio", label: "Recovery Cardio" }');

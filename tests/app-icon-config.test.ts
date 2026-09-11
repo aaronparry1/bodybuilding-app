@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import config from "../app.config";
 
 const root = process.cwd();
 const assetIconPath = join(root, "assets/icon.png");
@@ -13,10 +14,8 @@ function fileHash(path: string) {
 
 describe("app icon configuration", () => {
   it("uses the Adaptive Strength Coach icon for Expo and iOS", () => {
-    const config = readFileSync(join(root, "app.config.ts"), "utf8");
-
-    expect(config).toContain('icon: "./assets/icon.png"');
-    expect(config).toContain('ios: {\n    icon: "./assets/icon.png"');
+    expect(config.icon).toBe("./assets/icon.png");
+    expect(config.ios?.icon).toBe("./assets/icon.png");
   });
 
   it("keeps the native iOS AppIcon synced to the branded source icon", () => {
