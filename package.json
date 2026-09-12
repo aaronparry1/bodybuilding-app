@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
+    "@expo-google-fonts/oswald": "^0.2.3",
     "@supabase/supabase-js": "^2.106.2",
     "expo": "~56.0.19",
     "expo-build-properties": "~56.0.25",
+    "expo-font": "~56.0.7",
     "expo-haptics": "~56.0.3",
     "expo-linear-gradient": "~56.0.4",
     "expo-linking": "~56.0.16",

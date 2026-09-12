@@ -1,18 +1,19 @@
 export const colors = {
-  background: "#07090d",
-  backgroundElevated: "#0b0f16",
-  surface: "#101722",
-  surfaceSoft: "#151d2a",
-  surfaceMuted: "#0d121a",
-  line: "#202a39",
-  lineSoft: "#182230",
-  text: "#f4f0e8",
-  textMuted: "#a7b0bf",
-  textSubtle: "#6f7b8d",
-  accent: "#d8b56d",
-  accentPressed: "#e7c67b",
-  accentSoft: "#2a2418",
-  success: "#72d49f",
+  background: "#050B14",
+  backgroundElevated: "#0B1522",
+  surface: "#0B1522",
+  surfaceSoft: "#101E2E",
+  surfaceMuted: "#0D1721",
+  line: "#1E2D3F",
+  lineSoft: "#16212F",
+  text: "#F3E9DA",
+  textMuted: "#97A3B5",
+  textSubtle: "#5C6C82",
+  accent: "#F3D08A",
+  accentPressed: "#F7DBA3",
+  accentDeep: "#C9973F",
+  accentSoft: "#241E10",
+  success: "#7FB088",
   successSoft: "#102519",
   warning: "#e2b866",
   warningSoft: "#241d10",
@@ -20,8 +21,8 @@ export const colors = {
   dangerSoft: "#241314",
   blue: "#9ab8ff",
   blueSoft: "#121a2d",
-  focus: "#d8b56d",
-  scrim: "rgba(3, 5, 8, 0.72)",
+  focus: "#F3D08A",
+  scrim: "rgba(3, 6, 11, 0.72)",
   transparent: "transparent",
 } as const;
 
@@ -69,14 +70,20 @@ export const radius = {
   pill: 999,
 };
 
+/**
+ * fontFamily values reference fonts loaded via useFonts() in the root layout
+ * (see app/_layout.tsx). "Oswald" is the display/number face used for hero
+ * numerals and titles; body text uses the platform system font (no
+ * fontFamily override) as before.
+ */
 export const type = {
-  hero: { fontSize: 36, lineHeight: 40, fontWeight: "900" as const, letterSpacing: -0.4 },
-  title: { fontSize: 30, lineHeight: 34, fontWeight: "900" as const, letterSpacing: 0 },
-  display: { fontSize: 26, lineHeight: 31, fontWeight: "900" as const, letterSpacing: -0.2 },
-  section: { fontSize: 18, lineHeight: 23, fontWeight: "800" as const, letterSpacing: 0 },
+  hero: { fontSize: 36, lineHeight: 40, fontWeight: "600" as const, letterSpacing: -0.4, fontFamily: "Oswald_600SemiBold" },
+  title: { fontSize: 30, lineHeight: 34, fontWeight: "600" as const, letterSpacing: 0, fontFamily: "Oswald_600SemiBold" },
+  display: { fontSize: 26, lineHeight: 31, fontWeight: "600" as const, letterSpacing: -0.2, fontFamily: "Oswald_600SemiBold" },
+  section: { fontSize: 18, lineHeight: 23, fontWeight: "600" as const, letterSpacing: 0, fontFamily: "Oswald_600SemiBold" },
   body: { fontSize: 15, lineHeight: 22, fontWeight: "500" as const, letterSpacing: 0 },
-  label: { fontSize: 12, lineHeight: 16, fontWeight: "800" as const, letterSpacing: 0 },
-  metric: { fontSize: 28, lineHeight: 32, fontWeight: "900" as const, letterSpacing: 0 },
+  label: { fontSize: 12, lineHeight: 16, fontWeight: "600" as const, letterSpacing: 0 },
+  metric: { fontSize: 28, lineHeight: 32, fontWeight: "600" as const, letterSpacing: 0, fontFamily: "Oswald_600SemiBold" },
 };
 
 /** Shared semantic design tokens for the mounted application shell. */
@@ -89,19 +96,22 @@ export const shellTokens = {
   focus: colors.focus,
 };
 
-/** Living Programme semantic roles. Kept separate while Stage 1 is introduced so
- * untouched production surfaces do not change by accident. */
+/**
+ * Living Programme semantic roles, now unified with the brand palette sampled
+ * from the app's own logo (navy canvas, warm gold accent, cream text) instead
+ * of the previous unrelated acid-green/dark-green scheme.
+ */
 export const livingProgrammeColors = {
-  action: "#c9f35c",
-  actionPressed: "#b7df50",
-  actionSoft: "#1b2418",
-  complete: "#70e0ad",
-  attention: "#f0b35a",
-  risk: "#ff766d",
+  action: colors.accent,
+  actionPressed: colors.accentPressed,
+  actionSoft: colors.accentSoft,
+  complete: colors.success,
+  attention: colors.warning,
+  risk: colors.danger,
   canvas: colors.background,
-  surface: "#111513",
-  surfaceRaised: "#171c19",
-  line: "#2a302d",
+  surface: colors.surface,
+  surfaceRaised: colors.surfaceSoft,
+  line: colors.line,
   text: colors.text,
   muted: colors.textMuted,
 } as const;

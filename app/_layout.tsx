@@ -1,5 +1,6 @@
 import { Stack } from "expo-router/stack";
 import { StatusBar } from "expo-status-bar";
+import { useFonts, Oswald_500Medium, Oswald_600SemiBold, Oswald_700Bold } from "@expo-google-fonts/oswald";
 import { Pressable, Text, View } from "react-native";
 import { AuthProvider } from "@/application/auth/auth-context";
 import { SubscriptionProvider } from "@/application/billing/subscription-context";
@@ -26,6 +27,8 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => voi
 }
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({ Oswald_500Medium, Oswald_600SemiBold, Oswald_700Bold });
+  if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   return (
     <AuthProvider>
       <SubscriptionProvider>

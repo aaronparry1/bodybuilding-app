@@ -281,9 +281,10 @@ describe("onboarding programme integrity", () => {
     expect(onboarding).not.toContain('"first dose"');
     expect(onboarding).not.toContain('"recovery budget"');
     expect(onboarding).not.toContain('"provisional starting point"');
-    expect(home).toContain("primary.exerciseCount");
-    expect(home).toContain("primary.workSetCount");
-    expect(home).toContain("projection.progress.completedSessions");
+    expect(home).toContain("primary.workout.exerciseCount");
+    expect(home).toContain("primary.workout.workingSetCount");
+    expect(home).toContain("projection.progress.headline");
+    expect(home).toContain("projection.progress.completedThisMicrocycle");
     expect(home).not.toContain("CURRENT SESSION WORKING SETS");
   });
 });
