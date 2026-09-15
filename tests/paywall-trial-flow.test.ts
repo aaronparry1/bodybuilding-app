@@ -34,7 +34,7 @@ describe("paywall and trial flow", () => {
     const source = paywallSource();
 
     expect(source).toContain("Loading price...");
-    expect(source).toContain("Loading secure App Store prices...");
+    expect(source).toContain("Loading secure ${STORE_NAME} prices...");
     expect(source).toContain("InlinePlanStatus");
     expect(source).toContain("Price unavailable");
     expect(source).toContain("Prices could not be loaded yet. Check your connection and try again.");

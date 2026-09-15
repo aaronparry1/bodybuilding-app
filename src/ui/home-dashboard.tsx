@@ -1,4 +1,4 @@
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import type { CanonicalHomeAction, CanonicalHomePrimary, CanonicalHomeProjection } from "@/application/training/canonical-home-projection";
 import { colors, livingProgrammeColors as living, radius, shellTokens, spacing, type } from "@/ui/theme";
 import { stableUiIdentifier } from "@/ui/primitives";
@@ -8,15 +8,6 @@ type StartupStatus = "idle" | "restoring" | "ready" | "delayed" | "error" | "con
 
 const oswaldSemiBold = { fontFamily: "Oswald_600SemiBold" } as const;
 
-function Wordmark() {
-  return <View style={{ flexDirection: "row", alignItems: "center", gap: 9, paddingBottom: spacing.sm, borderBottomWidth: 1, borderBottomColor: living.line }}>
-    <Image source={require("../../assets/icon.png")} style={{ width: 24, height: 24, borderRadius: 12 }} />
-    <Text style={{ ...oswaldSemiBold, fontSize: 13, color: living.text, letterSpacing: 0.3 }}>
-      Adaptive <Text style={{ color: living.action }}>Strength</Text> Coach
-    </Text>
-  </View>;
-}
-
 export function HomeDashboard({ projection, onAction, startup }: Readonly<{
   projection: CanonicalHomeProjection;
   onAction(action: CanonicalHomeAction): void;
@@ -24,7 +15,6 @@ export function HomeDashboard({ projection, onAction, startup }: Readonly<{
 }>) {
   const prep = projection.actions.find((action) => action.type === "open_session_prep");
   return <View style={{ gap: spacing.lg, paddingBottom: spacing.xl }}>
-    <Wordmark />
     <TodayHeader projection={projection} />
     {startup && startup.status !== "ready" && startup.status !== "idle" ? <StartupNotice status={startup.status} onRetry={startup.onRetry} /> : null}
     {projection.primary ? <Objective primary={projection.primary} projection={projection} onAction={onAction} prep={prep} /> : null}

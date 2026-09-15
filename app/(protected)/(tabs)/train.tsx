@@ -18,6 +18,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useExerciseLibrary } from "@/features/exercise-library/use-exercise-library";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { loadPlannedSession } from "@/application/training/canonical-active-plan-application";
 import {
@@ -621,6 +622,8 @@ function ActiveExerciseCard(props: Readonly<{
   onComplete(set: WorkoutSetPresentation): void;
 }>) {
   const { exercise } = props;
+  const { filteredExercises } = useExerciseLibrary();
+  const catalogueEntry = filteredExercises.find((candidate) => candidate.name === exercise.name);
   const [allSetsOpen, setAllSetsOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const firstIncomplete = exercise.sets.find((set) => set.state !== "completed");
@@ -638,6 +641,8 @@ function ActiveExerciseCard(props: Readonly<{
         <Text style={styles.body}>{completedSetCount} of {exercise.sets.length} sets complete · {exercise.method}</Text>
         <Text style={styles.smallMuted}>{firstIncomplete ? `Current target ${firstIncomplete.target} · ${exercise.loadState}` : "All prescribed sets complete"}</Text>
         {exercise.previousPerformance ? <Text style={styles.previous}>Previous: {exercise.previousPerformance}</Text> : null}
+        {catalogueEntry?.jointStress === "high" ? <Text style={styles.smallMuted}>⚠ Higher joint stress — warm up thoroughly, stop if you feel joint pain rather than muscle fatigue.</Text> : null}
+        {catalogueEntry?.notes[0] ? <Text style={styles.smallMuted}>{catalogueEntry.notes[0]}</Text> : null}
       </View>
     </View>
     {calibration?.required && !props.calibrationConfirmed ? <View style={styles.calibrationPanel}>
@@ -747,10 +752,10 @@ function Field({ testID, label, value, unit, keyboardType, error, onChange, onSu
 function NumericTextInput(props: React.ComponentProps<typeof TextInput> & Readonly<{ testID: string }>) {
   return <TextInput maxFontSizeMultiplier={1.35} {...props} inputAccessoryViewID={Platform.OS === "ios" ? TRAIN_NUMERIC_KEYBOARD_ACCESSORY_ID : undefined} />;
 }
-function UnavailableState({ message, detail, onReturn, onRestore }: Readonly<{ message: string; detail?: string | null; onReturn(): void; onRestore?: () => void }>) { return <AppScreen><Text style={{ color: TRAIN.text, fontSize: 28, fontWeight: "900" }}>Train safely</Text><Text style={{ color: TRAIN.muted }}>{message}</Text>{detail ? <Text style={{ color: TRAIN.muted }}>{detail}</Text> : null}{onRestore ? <SecondaryButton label="Restore workout" onPress={onRestore} /> : null}<SecondaryButton label="Return to Home" onPress={onReturn} /></AppScreen>; }
+function UnavailableState({ message, detail, onReturn, onRestore }: Readonly<{ message: string; detail?: string | null; onReturn(): void; onRestore?: () => void }>) { return <AppScreen respectTopSafeArea><Text style={{ color: TRAIN.text, fontSize: 28, fontWeight: "900" }}>Train safely</Text><Text style={{ color: TRAIN.muted }}>{message}</Text>{detail ? <Text style={{ color: TRAIN.muted }}>{detail}</Text> : null}{onRestore ? <SecondaryButton label="Restore workout" onPress={onRestore} /> : null}<SecondaryButton label="Return to Home" onPress={onReturn} /></AppScreen>; }
 
 function TrainPaywall({ onRestore }: Readonly<{ onRestore(): void }>) {
-  return <AppScreen>
+  return <AppScreen respectTopSafeArea>
     <Text style={{ color: TRAIN.text, ...type.hero }}>Build More Muscle.</Text>
     <Text style={{ color: TRAIN.text, ...type.hero }}>Get Stronger.</Text>
     <Text style={{ color: TRAIN.text, ...type.hero }}>Stop Guessing.</Text>
@@ -851,10 +856,10 @@ const styles = StyleSheet.create({
   switcherIndex: { width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center", backgroundColor: TRAIN.surfaceRaised },
   switcherIndexComplete: { backgroundColor: TRAIN.success },
   switcherIndexText: { color: TRAIN.text, fontSize: 13, fontWeight: "900" },
-  switcherStatus: { color: TRAIN.subtle, fontSize: 10, fontWeight: "900", textTransform: "uppercase" },
+  switcherStatus: { color: TRAIN.subtle, fontSize: 10, fontWeight: "900" },
   workoutExerciseList: { gap: 10, padding: 12, borderRadius: 16, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.line },
   workoutExerciseListHeading: { minHeight: 38, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12 },
-  workoutExerciseListTitle: { color: TRAIN.text, fontSize: 18, lineHeight: 23, fontWeight: "900" },
+  workoutExerciseListTitle: { color: TRAIN.text, fontSize: 18, lineHeight: 23, fontFamily: "Oswald_600SemiBold" },
   workoutExerciseComplete: { opacity: 0.72, backgroundColor: TRAIN.surfaceRaised },
   workoutExerciseNameComplete: { color: TRAIN.muted },
   exerciseStatusColumn: { minWidth: 58, alignItems: "flex-end", gap: 3 },
@@ -870,7 +875,7 @@ const styles = StyleSheet.create({
   exerciseCard: { gap: 12, padding: 14, borderRadius: 18, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.lineStrong },
   exerciseHeading: { flexDirection: "row", gap: 10 },
   exerciseHeadingText: { flex: 1, minWidth: 0, gap: 4 },
-  activeExerciseName: { color: TRAIN.text, fontSize: 24, lineHeight: 29, fontWeight: "900" },
+  activeExerciseName: { color: TRAIN.text, fontSize: 24, lineHeight: 29, fontFamily: "Oswald_600SemiBold" },
   previous: { color: TRAIN.accent, fontSize: 12, lineHeight: 17, fontWeight: "700" },
   coaching: { padding: 10, borderRadius: 10, backgroundColor: TRAIN.surfaceRaised, borderLeftWidth: 3, borderLeftColor: TRAIN.accent },
   coachingText: { color: TRAIN.muted, fontSize: 12, lineHeight: 17, fontWeight: "600" },
@@ -884,29 +889,29 @@ const styles = StyleSheet.create({
   nextInstructionLabel: { color: TRAIN.accent, fontSize: 11, lineHeight: 15, fontWeight: "900", letterSpacing: 0.8 },
   nextInstructionText: { color: TRAIN.text, fontSize: 14, lineHeight: 20, fontWeight: "800" },
   calibrationPanel: { gap: 10, padding: 14, borderRadius: 14, backgroundColor: TRAIN.accentSoft, borderWidth: 1, borderColor: TRAIN.accent },
-  calibrationTitle: { color: TRAIN.text, fontSize: 20, lineHeight: 25, fontWeight: "900" },
+  calibrationTitle: { color: TRAIN.text, fontSize: 20, lineHeight: 25, fontFamily: "Oswald_600SemiBold" },
   calibrationInputs: { flexDirection: "row", gap: 8 },
   field: { flex: 1, minWidth: 0, gap: 5 },
   fieldInputWrap: { minHeight: 48, flexDirection: "row", alignItems: "center", borderRadius: 10, backgroundColor: TRAIN.background, borderWidth: 1, borderColor: TRAIN.lineStrong },
-  fieldInput: { flex: 1, minWidth: 0, minHeight: 46, color: TRAIN.text, fontSize: 17, fontWeight: "800", paddingLeft: 10, paddingRight: 42 },
+  fieldInput: { flex: 1, minWidth: 0, minHeight: 46, color: TRAIN.text, fontSize: 17, fontFamily: "Oswald_600SemiBold", paddingLeft: 10, paddingRight: 42 },
   keyboardAccessory: { minHeight: 44, alignItems: "flex-end", justifyContent: "center", paddingHorizontal: 12, backgroundColor: TRAIN.surface },
   keyboardDone: { minWidth: 56, minHeight: 44, alignItems: "center", justifyContent: "center" },
   keyboardDoneText: { color: TRAIN.accent, fontSize: 16, fontWeight: "900" },
-  unitLabel: { position: "absolute", right: 0, color: TRAIN.muted, fontSize: 11, fontWeight: "900", textTransform: "uppercase", paddingRight: 8 },
+  unitLabel: { position: "absolute", right: 0, color: TRAIN.muted, fontSize: 11, fontWeight: "900", paddingRight: 8 },
   calibrationAction: { minHeight: 50, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: TRAIN.accent, paddingHorizontal: 12 },
   calibrationActionText: { color: TRAIN.background, fontSize: 15, fontWeight: "900" },
   calibrationReady: { gap: 3, padding: 10, borderRadius: 10, backgroundColor: TRAIN.successSoft, borderWidth: 1, borderColor: TRAIN.success },
   setHeader: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 8 },
-  columnLabel: { color: TRAIN.subtle, fontSize: 10, lineHeight: 14, fontWeight: "900", textTransform: "uppercase", letterSpacing: 0.5 },
+  columnLabel: { color: TRAIN.subtle, fontSize: 10, lineHeight: 14, fontWeight: "900", letterSpacing: 0.5 },
   loadColumn: { flex: 1.18, minWidth: 0 },
   setBlock: { gap: 5, padding: 7, borderRadius: 12, borderWidth: 1, borderColor: TRAIN.line, backgroundColor: TRAIN.background },
   setBlockCurrent: { borderColor: TRAIN.accent, backgroundColor: TRAIN.accentSoft },
   setBlockCompleted: { borderColor: TRAIN.success, backgroundColor: TRAIN.successSoft },
   setRow: { minHeight: 48, flexDirection: "row", alignItems: "center", gap: 6 },
   setIdentity: { alignItems: "center", justifyContent: "center" },
-  setNumber: { color: TRAIN.text, fontSize: 17, lineHeight: 20, fontWeight: "900", fontVariant: ["tabular-nums"] },
-  setStateText: { color: TRAIN.subtle, fontSize: 9, lineHeight: 12, fontWeight: "900", textTransform: "uppercase" },
-  compactInput: { minWidth: 0, minHeight: 44, borderRadius: 9, backgroundColor: TRAIN.surfaceRaised, borderWidth: 1, borderColor: TRAIN.lineStrong, color: TRAIN.text, fontSize: 16, fontWeight: "800", textAlign: "center", paddingHorizontal: 6, fontVariant: ["tabular-nums"] },
+  setNumber: { color: TRAIN.text, fontSize: 17, lineHeight: 20, fontFamily: "Oswald_600SemiBold", fontVariant: ["tabular-nums"] },
+  setStateText: { color: TRAIN.subtle, fontSize: 9, lineHeight: 12, fontWeight: "900" },
+  compactInput: { minWidth: 0, minHeight: 44, borderRadius: 9, backgroundColor: TRAIN.surfaceRaised, borderWidth: 1, borderColor: TRAIN.lineStrong, color: TRAIN.text, fontSize: 16, fontFamily: "Oswald_600SemiBold", textAlign: "center", paddingHorizontal: 6, fontVariant: ["tabular-nums"] },
   lockedInput: { opacity: 0.7 },
   inputError: { borderColor: TRAIN.danger, borderWidth: 2 },
   completedValue: { color: TRAIN.text, fontSize: 14, fontWeight: "800", textAlign: "center" },

@@ -1,9 +1,12 @@
 import { Stack } from "expo-router/stack";
 import { StatusBar } from "expo-status-bar";
 import { useFonts, Oswald_500Medium, Oswald_600SemiBold, Oswald_700Bold } from "@expo-google-fonts/oswald";
-import { Pressable, Text, View } from "react-native";
+import { useEffect } from "react";
+import { AppState, Pressable, Text, View } from "react-native";
 import { AuthProvider } from "@/application/auth/auth-context";
 import { SubscriptionProvider } from "@/application/billing/subscription-context";
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { rescheduleTrainingReminders } from "@/application/notifications/training-reminders";
 import { colors, radius, spacing, type } from "@/ui/theme";
 
 export function ErrorBoundary({ error, retry }: { error: Error; retry: () => void }) {
@@ -28,6 +31,21 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => voi
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({ Oswald_500Medium, Oswald_600SemiBold, Oswald_700Bold });
+
+  useEffect(() => {
+    rescheduleTrainingReminders().catch(() => {});
+    const unsubscribePlan = canonicalActivePlanState.subscribe(() => {
+      rescheduleTrainingReminders().catch(() => {});
+    });
+    const appStateSub = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active") rescheduleTrainingReminders().catch(() => {});
+    });
+    return () => {
+      unsubscribePlan();
+      appStateSub.remove();
+    };
+  }, []);
+
   if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   return (
     <AuthProvider>

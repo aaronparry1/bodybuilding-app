@@ -50,7 +50,7 @@ export function ScreenHeader({
   return (
     <View style={{ gap: spacing.sm }}>
       {eyebrow ? (
-        <Text selectable style={{ ...type.label, color: colors.accent, textTransform: "uppercase" }}>
+        <Text selectable style={{ ...type.label, color: colors.accent }}>
           {eyebrow}
         </Text>
       ) : null}
@@ -535,7 +535,7 @@ export function HeroPanel({
   return (
     <View style={{ gap: spacing.md }}>
       {eyebrow ? (
-        <Text selectable style={{ ...type.label, color: colors.accent, textTransform: "uppercase" }}>
+        <Text selectable style={{ ...type.label, color: colors.accent }}>
           {eyebrow}
         </Text>
       ) : null}

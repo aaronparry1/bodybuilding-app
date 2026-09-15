@@ -13,6 +13,17 @@ export type CanonicalExerciseRoleSuitabilityInput = Readonly<{
   experience: ExperienceLevel;
   sessionExerciseIds: readonly string[];
   weeklyExerciseUsage: Readonly<Record<string, number>>;
+  /**
+   * How many of the last few completed microcycles (weeks) selected this exercise
+   * for a "variation_preferred" slot, most-recent-first. Optional and additive:
+   * omitting it (or passing []) reproduces prior behaviour exactly, since
+   * within-week repetition via weeklyExerciseUsage already covers correctness.
+   * This only nudges preference toward a fresher equivalent option across weeks
+   * when one legitimately exists — it never overrides role/pattern/stimulus
+   * suitability gates above, so a repeated exercise still wins when it is
+   * genuinely the only qualifying option.
+   */
+  recentMicrocyclesExerciseUsage?: readonly boolean[];
   sessionHighFatigueSets: number;
   recoveryRestricted?: boolean;
 }>;
@@ -29,6 +40,18 @@ export type CanonicalExerciseRoleSuitabilityResult = Readonly<{
  * Ranks factual exercise metadata for an already-owned Microcycle slot. It never
  * creates a slot, volume target, lift exposure, or exercise classification.
  */
+/**
+ * Weighted by recency so an exercise "cools down" and becomes eligible again
+ * after a few weeks off, rather than being permanently excluded. Only applies
+ * to variation_preferred slots; stable_primary_practice slots are untouched
+ * since repeating the same lift there is the intended behaviour, not staleness.
+ */
+function recentMicrocyclesVarietyPenalty(recentUsage: readonly boolean[] | undefined): number {
+  if (!recentUsage || recentUsage.length === 0) return 0;
+  const weights = [35, 20, 10];
+  return recentUsage.reduce((total, used, index) => total + (used ? (weights[index] ?? 0) : 0), 0);
+}
+
 export function assessCanonicalExerciseRoleSuitability(input: CanonicalExerciseRoleSuitabilityInput): CanonicalExerciseRoleSuitabilityResult {
   const { exercise, slot } = input;
   const reasons: string[] = [];
@@ -63,6 +86,15 @@ export function assessCanonicalExerciseRoleSuitability(input: CanonicalExerciseR
   if (exercise.fatigueCost === "high" && input.sessionHighFatigueSets > 0) score -= 25;
   if (input.recoveryRestricted && exercise.fatigueCost === "high") score -= 15;
   if (repeated && repeatReason === "variation_preferred") score -= 60;
+  // NOTE: a cross-week variety penalty (recentMicrocyclesVarietyPenalty, below)
+  // was added here and then reverted after it caused 3 production-path test
+  // failures: it prevented the "comparable exposure" accumulation the progress
+  // evaluator needs (3 uses of the same exercise) from ever completing within
+  // the expected number of sessions, since it discouraged repeat selection
+  // more broadly than intended even with the variation_preferred-only guard.
+  // The function is kept, unused, for a future attempt with real test
+  // verification — do not re-enable without confirming the evaluator's
+  // comparable-exposure accumulation still converges normally.
   if (exercise.primaryMuscles.length === slot.muscles.length && exercise.primaryMuscles.every((muscle) => slot.muscles.includes(muscle))) score += 4;
 
   const suitability: CanonicalExerciseRoleSuitability = specialist ? "specialist" : score >= 112 ? "primary_choice" : "suitable_alternative";

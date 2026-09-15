@@ -11,6 +11,8 @@ import { compareCanonicalMaterialPrescriptions, type CanonicalMaterialPrescripti
 import { canonicalDeterministicFingerprint } from "@/domain/training/canonical-deterministic-fingerprint";
 import { mesocycleById, type MesocycleId } from "@/domain/training/mesocycle-library";
 import { applyCanonicalNumericDecisionsToPlannedSessions } from "@/domain/training/canonical-comparable-exposure-policy";
+import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
+import { buildWorkoutHistoryForPlan } from "@/domain/training/canonical-recorded-session-legacy-history-bridge";
 
 export type CanonicalProgressDecisionApplicationCommand = Readonly<{ planId: string; expectedPlanRevision: number; macrocycleId: string; mesocycleId: string; microcycleId: string; decisionId: string; evaluationId: string; expectedEvidenceIds: readonly string[] }>;
 export type CanonicalProgressDecisionApplicationResult = Readonly<{ status: "unchanged" | "applied" | "rejected"; receiptStatus?: "applied" | "unchanged" | "blocked"; reason: string; planId: string; priorRevision: number; newRevision: number; decisionId: string; stateChanged: boolean; futureSessionsRegenerated: boolean; reviewRequired: boolean }>;
@@ -51,7 +53,8 @@ export function applyCanonicalProgressDecision(command: CanonicalProgressDecisio
     if (raw.status !== "saved") return rejected(command, plan.revision, "canonical_plan_unavailable");
     const facts = resolveCanonicalConstructionFacts(raw.carrier);
     if (facts.status !== "ready") return rejected(command, plan.revision, facts.reason);
-    const constructed = constructCanonicalActivePlanFromCanonicalInputs({ planId: raw.carrier.planId, createdAt: raw.carrier.createdAt, updatedAt: new Date().toISOString(), goal: raw.carrier.constraints.goal, macrocycleGoal: successor.successor.engine === "hypertrophy" ? "build_muscle" : successor.successor.engine === "powerbuilding" ? "build_muscle_and_strength" : successor.successor.engine === "strength" ? "build_strength" : "athletic_performance", experienceLevel: raw.carrier.constraints.experienceLevel, daysPerWeek: raw.carrier.constraints.daysPerWeek as 2 | 3 | 4 | 5 | 6, preferredSplit: raw.carrier.constraints.preferredSplit as never, equipment: facts.facts.equipment, units: raw.carrier.constraints.units, availableSessionMinutes: raw.carrier.constraints.availableSessionMinutes, startingVolumeContext: raw.carrier.constraints.startingVolumeContext, selectedMesocycleId: successor.successorMesocycleId, microcycleSequenceNumber: successor.sequenceNumber, exercises: facts.facts.exercises, limitations: facts.facts.limitations, exercisePreferences: facts.facts.exercisePreferences, history: facts.facts.history, establishedLoads: facts.facts.establishedLoads, loadEvidence: facts.facts.loadEvidence });
+    const realHistory = buildWorkoutHistoryForPlan(canonicalRecordedSessionLedger.exportPlan(raw.carrier.planId), facts.facts.exercises, raw.carrier.constraints.units);
+    const constructed = constructCanonicalActivePlanFromCanonicalInputs({ planId: raw.carrier.planId, createdAt: raw.carrier.createdAt, updatedAt: new Date().toISOString(), goal: raw.carrier.constraints.goal, macrocycleGoal: successor.successor.engine === "hypertrophy" ? "build_muscle" : successor.successor.engine === "powerbuilding" ? "build_muscle_and_strength" : successor.successor.engine === "strength" ? "build_strength" : "athletic_performance", experienceLevel: raw.carrier.constraints.experienceLevel, daysPerWeek: raw.carrier.constraints.daysPerWeek as 2 | 3 | 4 | 5 | 6, preferredSplit: raw.carrier.constraints.preferredSplit as never, equipment: facts.facts.equipment, units: raw.carrier.constraints.units, availableSessionMinutes: raw.carrier.constraints.availableSessionMinutes, startingVolumeContext: raw.carrier.constraints.startingVolumeContext, selectedMesocycleId: successor.successorMesocycleId, microcycleSequenceNumber: successor.sequenceNumber, exercises: facts.facts.exercises, limitations: facts.facts.limitations, exercisePreferences: facts.facts.exercisePreferences, history: realHistory, establishedLoads: facts.facts.establishedLoads, loadEvidence: facts.facts.loadEvidence });
     if (constructed.status !== "constructed") return rejected(command, plan.revision, "canonical_future_session_construction_failed");
     const nextRevision = raw.carrier.revision + 1;
     const generated = { ...constructed.carrier, mesocycle: { ...constructed.carrier.mesocycle, position: raw.carrier.mesocycle.position + 1, transitionReference: decision.decision.decisionId }, revision: nextRevision, progress: { ...constructed.carrier.progress, revision: nextRevision, decisionReference: decision.decision.decisionId }, constructionInputs: facts.facts.references, constructionContext: raw.carrier.constructionContext ?? constructed.carrier.constructionContext, recordedSessionReferences: raw.carrier.recordedSessionReferences ?? [], cycleLineage: [...(raw.carrier.cycleLineage ?? []).map((entry) => entry.microcycleId === raw.carrier.microcycle.id ? { ...entry, status: "predecessor" as const, transitionDecisionId: decision.decision.decisionId } : entry), ...(constructed.carrier.cycleLineage ?? [])] };
@@ -89,6 +92,7 @@ function applyPhaseOneDecision(
   if (raw.status !== "saved" || raw.carrier.revision !== command.expectedPlanRevision) return rejected(command, currentRevision, "stale_plan_revision");
   const facts = resolveCanonicalConstructionFacts(raw.carrier);
   if (facts.status !== "ready") return rejected(command, currentRevision, facts.reason);
+  const realHistory = buildWorkoutHistoryForPlan(canonicalRecordedSessionLedger.exportPlan(raw.carrier.planId), facts.facts.exercises, raw.carrier.constraints.units);
   const recalibrated = new Set(details.decisionType === "recalibrate" ? details.boundedAdjustment.exerciseIds : []);
   const establishedNow = new Set(details.decisionType === "establish_calibration" ? details.boundedAdjustment.exerciseIds : []);
   const establishedLoads = Object.fromEntries(Object.entries(facts.facts.establishedLoads).filter(([exerciseId]) => !recalibrated.has(exerciseId)));
@@ -122,7 +126,7 @@ function applyPhaseOneDecision(
     exercises: facts.facts.exercises,
     limitations: facts.facts.limitations,
     exercisePreferences: facts.facts.exercisePreferences,
-    history: facts.facts.history,
+    history: realHistory,
     establishedLoads,
     loadEvidence,
   } satisfies Parameters<typeof constructCanonicalActivePlanFromCanonicalInputs>[0];

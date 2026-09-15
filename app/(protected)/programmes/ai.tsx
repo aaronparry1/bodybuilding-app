@@ -26,7 +26,7 @@ export default function AIWorkoutScreen() {
   };
 
   return (
-    <AppScreen>
+    <AppScreen respectTopSafeArea>
       <HeroPanel eyebrow="Create session" title="Extra session" subtitle="Choose a factual focus. Session Construction owns the prescription." />
       <SectionList title="Session focus">
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm }}>

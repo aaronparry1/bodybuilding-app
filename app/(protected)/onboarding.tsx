@@ -467,6 +467,7 @@ export default function OnboardingScreen() {
       >
         <View style={{ flexDirection: "row", gap: spacing.sm }}>
           {stepIndex > 0 ? <SecondaryButton label="Back" onPress={goBack} /> : null}
+          {step === "priority" || step === "recovery" ? <SecondaryButton label="Skip" onPress={goNext} /> : null}
           <View style={{ flex: 1 }}>
             <PrimaryButton
               label={step === "review"

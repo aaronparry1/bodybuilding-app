@@ -15,6 +15,7 @@ import type { CanonicalCardioPrescription } from "@/domain/training/canonical-ca
 import { normalizeCanonicalSessionDuration, type CanonicalSessionDurationMinutes } from "@/domain/training/canonical-session-duration";
 import type { CanonicalStartingVolumeContext } from "@/domain/training/canonical-hypertrophy-volume-policy";
 import { resolveCanonicalConstructionFacts } from "@/application/training/canonical-construction-facts";
+import { buildWorkoutHistoryForPlan } from "@/domain/training/canonical-recorded-session-legacy-history-bridge";
 import { resolveCanonicalSessionDuration } from "@/domain/training/canonical-session-duration";
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
 import { exerciseCustomisations, reapplyCanonicalExerciseCustomisations } from "@/domain/training/canonical-exercise-customisations";
@@ -64,6 +65,7 @@ export function changeCanonicalSessionDuration(command: Readonly<{
   if (raw.carrier.operational.openWorkoutId || projectCanonicalActivePlan(raw.carrier).activeRecordedSession) return { ...durationRejected(raw.carrier.revision, "active_session_must_be_completed_or_discarded"), customerGuidance: "Finish or discard the active workout before changing workout length." };
   const facts = resolveCanonicalConstructionFacts(raw.carrier);
   if (facts.status !== "ready") return durationRejected(raw.carrier.revision, facts.reason);
+  const realHistory = buildWorkoutHistoryForPlan(canonicalRecordedSessionLedger.exportPlan(raw.carrier.planId), facts.facts.exercises, raw.carrier.constraints.units);
   const constructed = constructCanonicalActivePlanFromCanonicalInputs({
     planId: raw.carrier.planId,
     createdAt: raw.carrier.createdAt,
@@ -83,7 +85,7 @@ export function changeCanonicalSessionDuration(command: Readonly<{
     microcycleSequenceNumber: raw.carrier.microcycle.output.sequenceNumber,
     exercises: facts.facts.exercises,
     limitations: facts.facts.limitations,
-    history: facts.facts.history,
+    history: realHistory,
     establishedLoads: facts.facts.establishedLoads,
   });
   if (constructed.status !== "constructed") return { ...durationRejected(raw.carrier.revision, `session_duration_infeasible:${constructed.reason}`), customerGuidance: "That workout length cannot preserve the required training coverage for this programme. Choose a longer workout or fewer training constraints." };

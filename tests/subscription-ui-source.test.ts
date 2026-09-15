@@ -34,7 +34,7 @@ describe("subscription UI surfaces", () => {
     expect(source).toContain("Cancel anytime.");
     expect(source).toContain("Managed securely through your App Store or Google Play account.");
     expect(source).toContain("Loading price...");
-    expect(source).toContain("Loading secure App Store prices...");
+    expect(source).toContain("Loading secure ${STORE_NAME} prices...");
     expect(source).toContain("InlinePlanStatus");
     expect(source).toContain("Price unavailable");
     expect(source).toContain("Billed monthly");

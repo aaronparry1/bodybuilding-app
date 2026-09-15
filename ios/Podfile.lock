@@ -41,7 +41,7 @@ PODS:
     - ExpoModulesCore
   - ExpoFileSystem (56.0.9):
     - ExpoModulesCore
-  - ExpoFont (57.0.1):
+  - ExpoFont (56.0.7):
     - ExpoModulesCore
   - ExpoGlassEffect (56.0.4):
     - ExpoModulesCore
@@ -3344,7 +3344,7 @@ SPEC CHECKSUMS:
   ExpoAsset: 16c1d38758be9a8d2f781f8e5f8a352f5ecb3626
   ExpoDomWebView: fc6ec6e9a8e1ea00e6b13511768e70ffc7a71e04
   ExpoFileSystem: 7cebe8a361ad7ec3e77321a68acf8288030ed50e
-  ExpoFont: 17668fb7b4e06edf35e015183eb7bc09d83be637
+  ExpoFont: fac52e4d28848a270f198ec8d7bfa45dde9752c6
   ExpoGlassEffect: d810f0fc327071aa61d129ec2ec5618b60d18707
   ExpoHaptics: 4f104baed863f132c390b802ea2f59ecc55b99a5
   ExpoKeepAwake: edf05a0a5cdeddbb9fe705b49243ec6aef9cfded
@@ -3365,7 +3365,7 @@ SPEC CHECKSUMS:
   FBLazyVector: 473b935415b82ae4f7f9aa9d5b3378491143ccbf
   fmt: 530618a01105dae0fa3a2f27c81ae11fa8f67eac
   glog: e56ede4028c4b7418e6b1195a36b1656bb35e225
-  hermes-engine: 72c0bbcdcaffdef03caf1a682d307d76400e599e
+  hermes-engine: d176cd6b985cea9637ca9b5ed6bd3f3af0602816
   PurchasesHybridCommon: 8563d6a7d832332beb9b30478dbe56eeaa0dd425
   PurchasesHybridCommonUI: 32f7edc00832b451d2fcbcf8ace064a5b8e936de
   RCT-Folly: 957659fd132051eccf60310f242798220177d26e

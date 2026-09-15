@@ -93,6 +93,8 @@ export default function ExerciseDetailScreen() {
         <StatTile label={getExerciseMeasurementType(exercise.defaultSettings) === "duration" ? "Typical duration boundary" : "Typical prescription boundary"} value={formatTargetRange(exercise.defaultRepRange, getExerciseMeasurementType(exercise.defaultSettings))} />
         <StatTile label="Load jump" value={`${exercise.defaultLoadJump}${exercise.defaultSettings.unit}`} />
         <StatTile label="Kind" value={exerciseKindStatValue(exercise.kind)} detail={exerciseKindStatDetail(exercise.kind)} />
+        <StatTile label="Joint stress" value={titleCase(exercise.jointStress)} detail={jointStressDetail(exercise.jointStress)} />
+        {exercise.skillDemand ? <StatTile label="Technique demand" value={titleCase(exercise.skillDemand)} detail={exercise.skillDemand === "high" ? "Learn the movement pattern with lighter loads first." : undefined} /> : null}
       </View>
       <Text selectable style={{ ...type.body, color: colors.textMuted }}>
         This boundary guides safe session construction. Your generated workout uses exact per-set targets, not this as a goal to chase.
@@ -216,6 +218,12 @@ function ChoiceRail({
       </ScrollView>
     </View>
   );
+}
+
+function jointStressDetail(level: string): string | undefined {
+  if (level === "high") return "Loads the joint through a demanding range. Warm up thoroughly and stop if you feel joint pain, not just muscle fatigue.";
+  if (level === "moderate") return "Typical joint loading for this movement pattern.";
+  return undefined;
 }
 
 function exerciseKindStatValue(kind: string): string {

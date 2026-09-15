@@ -31,6 +31,8 @@ export interface AppSettings {
   experienceLevel: ExperienceLevel;
   availableSessionMinutes: CanonicalSessionDurationMinutes;
   startingVolumeContext: CanonicalStartingVolumeContext;
+  trainingRemindersEnabled: boolean;
+  trainingRemindersPermissionRequested: boolean;
 }
 
 export const defaultAppSettings: AppSettings = {
@@ -48,6 +50,8 @@ export const defaultAppSettings: AppSettings = {
   experienceLevel: "intermediate",
   availableSessionMinutes: 75,
   startingVolumeContext: defaultCanonicalStartingVolumeContext(3),
+  trainingRemindersEnabled: true,
+  trainingRemindersPermissionRequested: false,
 };
 
 export function normalizeAppSettings(settings: AppSettings): AppSettings {

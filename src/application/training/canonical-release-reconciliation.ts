@@ -1,5 +1,6 @@
 import { constructCanonicalActivePlanFromCanonicalInputs, type CanonicalGeneratedPlanInput } from "@/application/training/canonical-active-plan-construction";
 import { resolveCanonicalConstructionFacts } from "@/application/training/canonical-construction-facts";
+import { buildWorkoutHistoryForPlan } from "@/domain/training/canonical-recorded-session-legacy-history-bridge";
 import { canonicalActivePlanV2Repository } from "@/data/local/canonical-active-plan-v2-repository";
 import { canonicalActivePlanOwnerRepository } from "@/data/local/canonical-active-plan-owner-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
@@ -123,6 +124,7 @@ export function reconcileCanonicalReleaseState(input: Readonly<{
 
   const facts = resolveCanonicalConstructionFacts(loaded.carrier);
   if (facts.status !== "ready") return result("recovery_required", facts.reason, false, true, active.status, 0, { ...common, priorRevision: loaded.carrier.revision, newRevision: loaded.carrier.revision, customerGuidance: "The exercise catalogue needed to rebuild future workouts is unavailable. Recorded history remains unchanged." });
+  const realHistory = buildWorkoutHistoryForPlan(canonicalRecordedSessionLedger.exportPlan(loaded.carrier.planId), facts.facts.exercises, loaded.carrier.constraints.units);
   const constructed = constructCanonicalActivePlanFromCanonicalInputs({
     planId: loaded.carrier.planId,
     createdAt: loaded.carrier.createdAt,
@@ -142,7 +144,7 @@ export function reconcileCanonicalReleaseState(input: Readonly<{
     microcycleSequenceNumber: loaded.carrier.microcycle.output.sequenceNumber,
     exercises: facts.facts.exercises,
     limitations: facts.facts.limitations,
-    history: facts.facts.history,
+    history: realHistory,
     establishedLoads: facts.facts.establishedLoads,
   });
   if (constructed.status !== "constructed") {

@@ -1,11 +1,13 @@
 import Constants from "expo-constants";
 import { router } from "expo-router";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Linking, Platform, Pressable, Text, View } from "react-native";
 import { useSubscription } from "@/application/billing/subscription-context";
 import { customerSafeServiceMessage, shouldShowDeveloperDiagnostics } from "@/application/runtime/customer-facing-errors";
 import { normalizeAppEnvironment } from "@/application/runtime/app-environment";
 import { AppScreen, GhostButton, PremiumCard, PrimaryButton, SecondaryButton, SectionList } from "@/ui/primitives";
 import { colors, radius, spacing, type } from "@/ui/theme";
+
+const STORE_NAME = Platform.OS === "android" ? "Google Play" : "App Store";
 
 const benefits = [
   "Build muscle and strength with confidence",
@@ -98,10 +100,10 @@ export default function PaywallScreen() {
 function PaywallHero() {
   return (
     <View style={{ gap: spacing.md }}>
-      <Text selectable style={{ ...type.label, color: colors.accent, textTransform: "uppercase" }}>
+      <Text selectable style={{ ...type.label, color: colors.accent }}>
         Adaptive Strength Coach Premium
       </Text>
-      <Text selectable adjustsFontSizeToFit minimumFontScale={0.78} style={{ color: colors.text, fontSize: 38, lineHeight: 42, fontWeight: "900" }}>
+      <Text selectable adjustsFontSizeToFit minimumFontScale={0.78} style={{ color: colors.text, fontSize: 38, lineHeight: 42, fontFamily: "Oswald_600SemiBold" }}>
         Build More Muscle.{"\n"}Get Stronger.{"\n"}Stop Guessing.
       </Text>
       <Text selectable style={{ ...type.body, color: colors.textMuted }}>
@@ -116,7 +118,7 @@ function TrialOfferCard() {
     <PremiumCard tone="locked">
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.md }}>
         <View style={{ flex: 1, gap: spacing.xs }}>
-          <Text selectable style={{ color: colors.accent, fontSize: 28, lineHeight: 32, fontWeight: "900" }}>
+          <Text selectable style={{ color: colors.accent, fontSize: 28, lineHeight: 32, fontFamily: "Oswald_600SemiBold" }}>
             14-Day Free Trial
           </Text>
           <Text selectable style={{ ...type.body, color: colors.textMuted }}>
@@ -175,7 +177,7 @@ function PlanCard({
       <View style={{ flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
         <View style={{ flex: 1, gap: spacing.xs }}>
           <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: spacing.sm }}>
-            <Text selectable style={{ color: colors.text, fontSize: 20, lineHeight: 25, fontWeight: "900" }}>
+            <Text selectable style={{ color: colors.text, fontSize: 20, lineHeight: 25, fontFamily: "Oswald_600SemiBold" }}>
               {title}
             </Text>
             {featured ? <PlanBadge label="Recommended" /> : null}
@@ -195,7 +197,7 @@ function PlanCard({
             </Text>
           ) : null}
         </View>
-        <Text selectable style={{ color: featured ? colors.accent : colors.text, fontSize: 17, lineHeight: 22, fontWeight: "900", textAlign: "right" }}>
+        <Text selectable style={{ color: featured ? colors.accent : colors.text, fontSize: 17, lineHeight: 22, fontFamily: "Oswald_600SemiBold", textAlign: "right" }}>
           {displayPriceLabel(pack)}
         </Text>
       </View>
@@ -241,7 +243,7 @@ function PlanLoadingCards() {
           <PrimaryButton label="Start 14-Day Free Trial" onPress={() => {}} disabled compact />
         </PremiumCard>
       ))}
-      <InlinePlanStatus message="Loading secure App Store prices..." />
+      <InlinePlanStatus message={`Loading secure ${STORE_NAME} prices...`} />
     </>
   );
 }
@@ -252,7 +254,7 @@ function PlanUnavailableCards({ showDeveloperDiagnostics, onRetry, isLoading }: 
       <InlinePlanStatus
         message={
           showDeveloperDiagnostics
-            ? "App Store prices could not be loaded yet. Check connection or billing offering setup."
+            ? `${STORE_NAME} prices could not be loaded yet. Check connection or billing offering setup.`
             : "Prices could not be loaded yet. Check your connection and try again."
         }
         actionLabel="Retry"

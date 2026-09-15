@@ -29,7 +29,7 @@ export type CanonicalSessionConstructionInput = Readonly<{
   progress: Readonly<{ evidenceVersion: string; readiness?: "ready" | "restricted"; recoveryConstraint?: string; history: readonly WorkoutHistorySummary[]; establishedLoads?: Readonly<Record<string, number>>; loadEvidence?: Readonly<Record<string, CanonicalLoadEvidence>>; calibration?: Readonly<Record<string, { confidence: "low" | "moderate" | "high"; fresh: boolean }>>; fatigueEvidence?: readonly string[] }>;
   operational: Readonly<{ constructionVersion: string; seed: string; identity: string; revision: string }>;
   allocation?: CanonicalMicrocycleVolumeAllocation;
-  selectionContext?: Readonly<{ weeklyExerciseUsage: Readonly<Record<string, number>> }>;
+  selectionContext?: Readonly<{ weeklyExerciseUsage: Readonly<Record<string, number>>; recentMicrocyclesExerciseUsage?: Readonly<Record<string, readonly boolean[]>> }>;
 }>;
 
 export type SessionBlueprint = Readonly<{ sessionId: string; role: string; purpose: string; slots: readonly Readonly<{ role: ExerciseRole; constructionRole: ConstructionRole; muscles: readonly MuscleGroup[]; index: number; reason: string }>[]; strengthAnchorRequired: boolean; specialState: string }>;
@@ -112,7 +112,7 @@ export function constructCanonicalSession(input: CanonicalSessionConstructionInp
     const qualityAwareAllocation = Boolean(allocatedSlot && allRoleExercises.some((candidate) => candidate.stimulusProfile));
     const ranked = allocatedSlot && qualityAwareAllocation ? allRoleExercises.map((exercise) => ({
       exercise,
-      result: withPreferenceScore(assessCanonicalExerciseRoleSuitability({ exercise, slot: allocatedSlot, macrocycleGoal: input.macrocycle.goal, mesocycleId: input.mesocycle.id, experience: input.athlete.experienceLevel, sessionExerciseIds: [...usedExerciseIds], weeklyExerciseUsage: input.selectionContext?.weeklyExerciseUsage ?? {}, sessionHighFatigueSets, recoveryRestricted: input.allocation?.recoveryRestricted }), scoreExercisePreference(exercise, input.athlete.exercisePreferences)),
+      result: withPreferenceScore(assessCanonicalExerciseRoleSuitability({ exercise, slot: allocatedSlot, macrocycleGoal: input.macrocycle.goal, mesocycleId: input.mesocycle.id, experience: input.athlete.experienceLevel, sessionExerciseIds: [...usedExerciseIds], weeklyExerciseUsage: input.selectionContext?.weeklyExerciseUsage ?? {}, recentMicrocyclesExerciseUsage: input.selectionContext?.recentMicrocyclesExerciseUsage?.[exercise.id], sessionHighFatigueSets, recoveryRestricted: input.allocation?.recoveryRestricted }), scoreExercisePreference(exercise, input.athlete.exercisePreferences)),
     })).filter((candidate) => candidate.result.suitability !== "unsuitable") : [];
     const selected = ranked.sort((a, b) => b.result.score - a.result.score || a.exercise.id.localeCompare(b.exercise.id))[0];
     const selectedResult = selected?.result.repeatReason === "variation_preferred"

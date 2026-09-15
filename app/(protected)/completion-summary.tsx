@@ -9,6 +9,7 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import { displayLoadFromBaseKg } from "@/application/training/canonical-workout-presentation";
 import { exerciseDisplayName, mesocyclePurposeDisplayName, sessionRoleDisplayName } from "@/application/training/display-labels";
 import { useAppSettings } from "@/application/settings/app-settings";
+import { requestTrainingReminderPermission, rescheduleTrainingReminders } from "@/application/notifications/training-reminders";
 import { buildWorkoutAchievementSharePayload, buildWorkoutSummarySharePayload, type BrandedSharePayload } from "@/domain/training/share-cards";
 import { BrandedShareCardPreviewModal } from "@/features/social-sharing/branded-share-card-preview";
 import { AppScreen, PremiumCard, PrimaryButton, SecondaryButton } from "@/ui/primitives";
@@ -21,7 +22,7 @@ const TRAIN = workoutColors;
 
 export default function CompletionSummaryScreen() {
   const { recordedSessionId } = useLocalSearchParams<{ recordedSessionId?: string }>();
-  const { settings } = useAppSettings();
+  const { settings, updateSettings } = useAppSettings();
   const [, refresh] = useState(0);
   const [sharePayload, setSharePayload] = useState<BrandedSharePayload | null>(null);
   const reduceMotion = useReducedMotion();
@@ -31,9 +32,17 @@ export default function CompletionSummaryScreen() {
     return canonicalActivePlanState.subscribe(() => refresh((value) => value + 1));
   }, []);
 
+  useEffect(() => {
+    if (settings.trainingRemindersPermissionRequested) return;
+    updateSettings({ trainingRemindersPermissionRequested: true });
+    requestTrainingReminderPermission()
+      .then(() => rescheduleTrainingReminders())
+      .catch(() => {});
+  }, [settings.trainingRemindersPermissionRequested, updateSettings]);
+
   const aggregate = recordedSessionId ? canonicalRecordedSessionLedger.get(String(recordedSessionId)) : { status: "not_found" as const };
   const plan = canonicalActivePlanState.getReadModel();
-  if (aggregate.status !== "found") return <AppScreen><Text style={styles.hero}>Workout complete</Text><Text style={styles.muted}>This summary is no longer available, but your retained training history is unchanged.</Text><PrimaryButton label="Return home" onPress={() => router.replace("/(protected)/(tabs)")} /></AppScreen>;
+  if (aggregate.status !== "found") return <AppScreen respectTopSafeArea><Text style={styles.hero}>Workout complete</Text><Text style={styles.muted}>This summary is no longer available, but your retained training history is unchanged.</Text><PrimaryButton label="Return home" onPress={() => router.replace("/(protected)/(tabs)")} /></AppScreen>;
 
   const decision = canonicalProgressDecisionRepository.list(aggregate.session.planId)
     .filter((candidate) => candidate.phaseOne?.sourceRecordedSessionId === aggregate.session.recordedSessionId)
@@ -59,7 +68,7 @@ export default function CompletionSummaryScreen() {
     ? buildWorkoutAchievementSharePayload(summary.achievements[0], settings.unit)
     : buildWorkoutSummarySharePayload({ workoutName: summary.workoutName, exercisesCompleted: summary.exercisesCompleted, workSetsCompleted: summary.completedWorkingSets, prCount: 0 });
 
-  return <AppScreen>
+  return <AppScreen respectTopSafeArea>
     <CompletionReveal index={0} reduceMotion={reduceMotion}><View accessibilityRole="summary" style={styles.successHeader}>
       <View style={styles.successMark}><Text style={styles.successGlyph}>✓</Text></View>
       <Text maxFontSizeMultiplier={1.5} style={styles.eyebrow}>{summary.completionLabel.toUpperCase()}</Text>

@@ -71,6 +71,27 @@
         "buildType": "apk"
       }
     },
+    "preview-simulator": {
+      "extends": "preview",
+      "environment": "preview",
+      "autoIncrement": false,
+      "env": {
+        "EXPO_PUBLIC_DESIGN_QA_MODE": "1",
+        "EXPO_PUBLIC_QA_PREMIUM_FIXTURE": "1",
+        "EXPO_PUBLIC_QA_INITIAL_FIXTURE": "home_active_plan",
+        "EXPO_PUBLIC_QA_BUILD_ID": "oswald-screen-preview",
+        "EXPO_PUBLIC_SUPABASE_URL": "screenshot-disabled",
+        "EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "screenshot-disabled",
+        "EXPO_PUBLIC_REVENUECAT_TEST_API_KEY": "screenshot-disabled",
+        "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "screenshot-disabled",
+        "EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY": "screenshot-disabled"
+      },
+      "ios": {
+        "simulator": true,
+        "scheme": "AdaptiveStrengthCoach",
+        "buildConfiguration": "Release"
+      }
+    },
     "production": {
       "environment": "production",
       "channel": "production",
