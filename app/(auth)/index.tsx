@@ -7,7 +7,7 @@ import { AppInput, AppScreen, ErrorState, HeroPanel, PrimaryButton, SecondaryBut
 import { colors, radius, spacing } from "@/ui/theme";
 
 export default function AuthScreen() {
-  const { signIn, signUp, signInWithApple, signInWithGoogle, continueOffline, error, isLoading, isConfigured } = useAuth();
+  const { signIn, signUp, continueOffline, error, notice, isLoading, isConfigured } = useAuth();
   const [mode, setMode] = useState<"login" | "signup">("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,6 +34,11 @@ export default function AuthScreen() {
       />
 
       {safeError ? <ErrorState message={safeError} /> : null}
+      {notice ? (
+        <Text selectable style={{ color: colors.text, fontSize: 14, lineHeight: 20, padding: spacing.md, borderRadius: radius.md, backgroundColor: colors.surfaceMuted }}>
+          {notice}
+        </Text>
+      ) : null}
       {!isConfigured ? <ErrorState message={accountUnavailableMessage} /> : null}
 
       <View style={{ gap: spacing.lg }}>
@@ -50,10 +55,7 @@ export default function AuthScreen() {
 
       <View style={{ gap: spacing.sm }}>
         <SecondaryButton label="Continue offline" onPress={continueOffline} disabled={isLoading} />
-        <View style={{ flexDirection: "row", gap: spacing.sm }}>
-          <SecondaryButton label="Apple" onPress={signInWithApple} disabled={!isConfigured || isLoading} compact />
-          <SecondaryButton label="Google" onPress={signInWithGoogle} disabled={!isConfigured || isLoading} compact />
-        </View>
+        {/* Apple / Google sign-in are not wired up yet; the buttons were shown but threw. Hidden until implemented. */}
       </View>
 
       <Text selectable style={{ color: colors.textSubtle, fontSize: 12, lineHeight: 18, textAlign: "center" }}>

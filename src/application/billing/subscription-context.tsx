@@ -4,6 +4,7 @@ import { useAuth } from "@/application/auth/auth-context";
 import { createSubscriptionGateway } from "@/application/billing/billing-gateway";
 import { MockRevenueCatGateway } from "@/application/billing/mock-revenuecat";
 import { restoreCloudDataForUser, syncLocalDataForUser } from "@/application/sync/cloud-data-sync";
+import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { cacheSubscription, getCachedSubscription, getOfflineEntitlementFallback } from "@/application/billing/subscription-cache";
 import { elapsedSince, recordStartupTelemetry, STARTUP_RESTORE_DEADLINE_MS, StartupDeadlineError, withStartupDeadline } from "@/application/startup/startup-observability";
 import Constants from "expo-constants";
@@ -29,6 +30,8 @@ import {
   type SubscriptionState,
   type SubscriptionStatus,
 } from "@/application/billing/subscription";
+
+const TRAINING_CHANGE_SYNC_DEBOUNCE_MS = 4_000;
 
 interface SubscriptionContextValue {
   subscription: SubscriptionState;
@@ -259,6 +262,29 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       cancelled = true;
     };
   }, [authLoading, dataHydrationAttempt, user?.id]);
+
+  // Back up shortly after any training change (set logged, workout completed,
+  // plan edited). Previously backups only ran at sign-in and on foreground, so a
+  // user who finished a workout and closed the app could lose it before the
+  // next launch. Debounced so a burst of set logs produces one upload.
+  useEffect(() => {
+    if (!user?.id || dataHydrationStatus !== "ready") return undefined;
+    const userId = user.id;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const unsubscribe = canonicalActivePlanState.subscribe(() => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        syncLocalDataForUser(userId, subscriptionRef.current).catch((nextError) => {
+          if (process.env.NODE_ENV !== "production") console.info("[sync] change sync failed", nextError);
+        });
+      }, TRAINING_CHANGE_SYNC_DEBOUNCE_MS);
+    });
+    return () => {
+      unsubscribe();
+      if (timer) clearTimeout(timer);
+    };
+  }, [dataHydrationStatus, user?.id]);
 
   useEffect(() => {
     if (!user?.id) return undefined;

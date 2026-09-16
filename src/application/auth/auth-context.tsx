@@ -2,9 +2,33 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, 
 import type { Session, User } from "@supabase/supabase-js";
 import { createOptionalAuthService, type AuthService, type AuthState } from "@/application/auth/auth-provider";
 import { elapsedSince, recordStartupTelemetry, STARTUP_AUTH_DEADLINE_MS, StartupDeadlineError, withStartupDeadline } from "@/application/startup/startup-observability";
+import { jsonStore } from "@/data/local/json-store";
+
+// "Continue offline" used to live only in React state, so every cold launch
+// dropped offline users back on the sign-in screen. Persist the choice.
+const offlineModeKey = "iron-logic.auth-offline-mode-v1";
+
+function readPersistedOfflineMode(): boolean {
+  try {
+    return jsonStore.get<boolean>(offlineModeKey, false) === true;
+  } catch {
+    return false;
+  }
+}
+
+function persistOfflineMode(enabled: boolean): void {
+  try {
+    if (enabled) jsonStore.set(offlineModeKey, true);
+    else jsonStore.remove(offlineModeKey);
+  } catch {
+    // Persistence is a convenience; the in-memory flag still governs this launch.
+  }
+}
 
 interface AuthContextValue extends AuthState {
   isOfflineMode: boolean;
+  /** Non-error guidance for the auth screen, e.g. "check your email". */
+  notice: string | null;
   signUp(email: string, password: string): Promise<void>;
   signIn(email: string, password: string): Promise<void>;
   signOut(): Promise<void>;
@@ -24,9 +48,10 @@ function logAuthStage(stage: string) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [{ service, configError }] = useState(() => createOptionalAuthService());
   const [session, setSession] = useState<Session | null>(null);
-  const [isOfflineMode, setIsOfflineMode] = useState(false);
+  const [isOfflineMode, setIsOfflineMode] = useState(() => readPersistedOfflineMode());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(configError);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (!service) {
@@ -58,7 +83,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const unsubscribe = service.onAuthStateChange((nextSession) => {
       setSession(nextSession);
-      if (nextSession) setIsOfflineMode(false);
+      if (nextSession) {
+        setIsOfflineMode(false);
+        persistOfflineMode(false);
+      }
       setIsLoading(false);
       logAuthStage(nextSession ? "auth state: signed in" : "auth state: signed out");
     });
@@ -77,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(true);
     setError(null);
+    setNotice(null);
     try {
       await action(service);
     } catch (nextError) {
@@ -87,6 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [configError, service]);
 
   const signOut = useCallback(async () => {
+    persistOfflineMode(false);
     if (isOfflineMode && !session) {
       setIsOfflineMode(false);
       return;
@@ -95,7 +125,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await runAuthAction((authService) => authService.signOut());
   }, [isOfflineMode, runAuthAction, session]);
 
-  const continueOffline = useCallback(() => setIsOfflineMode(true), []);
+  const continueOffline = useCallback(() => {
+    persistOfflineMode(true);
+    setIsOfflineMode(true);
+  }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -103,16 +136,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session,
       isLoading,
       error,
+      notice,
       isConfigured: Boolean(service),
       isOfflineMode,
-      signUp: (email, password) => runAuthAction((authService) => authService.signUp({ email, password })),
+      signUp: (email, password) => runAuthAction(async (authService) => {
+        const outcome = await authService.signUp({ email, password });
+        if (outcome?.requiresEmailConfirmation) {
+          setNotice("Account created. Check your email for a confirmation link, then come back and log in.");
+        }
+      }),
       signIn: (email, password) => runAuthAction((authService) => authService.signIn({ email, password })),
       signOut,
       signInWithApple: () => runAuthAction((authService) => authService.signInWithApple()),
       signInWithGoogle: () => runAuthAction((authService) => authService.signInWithGoogle()),
       continueOffline,
     }),
-    [continueOffline, error, isLoading, isOfflineMode, runAuthAction, service, session, signOut],
+    [continueOffline, error, isLoading, isOfflineMode, notice, runAuthAction, service, session, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

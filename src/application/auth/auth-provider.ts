@@ -14,9 +14,14 @@ export interface EmailPasswordCredentials {
   password: string;
 }
 
+export interface SignUpOutcome {
+  /** True when Supabase created the account but requires the user to confirm their email before a session exists. */
+  requiresEmailConfirmation: boolean;
+}
+
 export interface AuthService {
   getSession(): Promise<Session | null>;
-  signUp(credentials: EmailPasswordCredentials): Promise<void>;
+  signUp(credentials: EmailPasswordCredentials): Promise<SignUpOutcome | void>;
   signIn(credentials: EmailPasswordCredentials): Promise<void>;
   signOut(): Promise<void>;
   signInWithApple(): Promise<void>;
@@ -33,13 +38,14 @@ export class SupabaseAuthService implements AuthService {
     return data.session;
   }
 
-  async signUp({ email, password }: EmailPasswordCredentials): Promise<void> {
-    const { error } = await this.client.auth.signUp({
+  async signUp({ email, password }: EmailPasswordCredentials): Promise<SignUpOutcome> {
+    const { data, error } = await this.client.auth.signUp({
       email,
       password,
       options: { data: { onboarding_source: "mobile" } },
     });
     if (error) throw error;
+    return { requiresEmailConfirmation: !data.session };
   }
 
   async signIn({ email, password }: EmailPasswordCredentials): Promise<void> {

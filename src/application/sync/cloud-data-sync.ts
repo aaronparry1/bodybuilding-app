@@ -116,7 +116,21 @@ function resolveRepositories(dependencies: CloudDataSyncDependencies, client: Ap
 export function buildCloudUserDataBackup(dependencies: CloudDataSyncDependencies = {}, ownerUserId?: string): CloudUserDataBackup {
   const settingsStore = dependencies.localSettingsStore ?? appSettingsStore;
   const canonical = canonicalActivePlanV2Repository.get();
-  const ownership = canonicalActivePlanOwnerRepository.get();
+  let ownership = canonicalActivePlanOwnerRepository.get();
+  // A plan created before the user signed in (or before ownership existed on
+  // this device) has no owner record. Previously that meant the backup silently
+  // uploaded an empty envelope and reported success. Bind the unowned plan to
+  // the authenticated account here, mirroring reconcileOwnerScope, so the very
+  // first backup after sign-in already carries the plan and its history.
+  if (ownerUserId && canonical.status === "saved" && ownership.status === "missing") {
+    ownership = canonicalActivePlanOwnerRepository.save({
+      planId: canonical.carrier.planId,
+      ownerUserId,
+      boundAt: now(),
+      provenance: "existing_authenticated_device_migration",
+    });
+    logSyncStage(ownership.status === "owned" ? "bound unowned canonical plan to account for backup" : "failed to bind canonical plan ownership for backup");
+  }
   const canonicalMaySync = canonical.status === "saved"
     && (!ownerUserId
       || (ownership.status === "owned"

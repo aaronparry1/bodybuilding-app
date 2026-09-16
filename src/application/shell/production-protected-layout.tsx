@@ -1,6 +1,6 @@
 import { Redirect, useGlobalSearchParams, useSegments } from "expo-router";
 import { Stack } from "expo-router/stack";
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { useAuth } from "@/application/auth/auth-context";
 import { useSubscription } from "@/application/billing/subscription-context";
@@ -34,7 +34,17 @@ export default function ProductionProtectedLayout() {
   const isOnboardingRoute = segments.includes("onboarding");
   const isTrainRoute = segments.includes("train");
   const explicitSetupRestart = isOnboardingRoute && restart === "1";
-  const retainedTraining = inspectCanonicalRetainedTrainingPresence(user?.id ?? null);
+  // Local plan version: bumps whenever the canonical plan store publishes, so
+  // the (expensive) retained-training inspection below only re-reads storage
+  // when training data changed, not on every navigation or context re-render.
+  const [localPlanVersion, setLocalPlanVersion] = useState(0);
+  useEffect(() => canonicalActivePlanState.subscribe(() => setLocalPlanVersion((value) => value + 1)), []);
+  const retainedTraining = useMemo(
+    () => inspectCanonicalRetainedTrainingPresence(user?.id ?? null),
+    // reconciliation / dataHydrationStatus / localPlanVersion are invalidation signals.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user?.id, reconciliation, dataHydrationStatus, localPlanVersion],
+  );
   const startupHydration = resolveCanonicalStartupHydration({
     authLoading: isLoading,
     authenticatedUserId: user?.id ?? null,
@@ -88,6 +98,9 @@ export default function ProductionProtectedLayout() {
       const hydrated = canonicalActivePlanState.hydrate();
       if (hydrated.model) resumePendingCanonicalCoachingWork(hydrated.model.planId);
     }
+    // Recovery/backfill above may have written local training data without a
+    // store publish; make sure the memoised retained-training read refreshes.
+    setLocalPlanVersion((value) => value + 1);
   }, [
     reconciliationAttempt,
     settings.onboardingCompleted,

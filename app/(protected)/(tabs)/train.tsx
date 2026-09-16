@@ -40,6 +40,7 @@ import {
   skipCanonicalRestTimer,
 } from "@/application/training/canonical-rest-timer";
 import {
+  activeElapsedSeconds,
   baseKgFromDisplayLoad,
   projectCanonicalWorkoutPresentation,
   type WorkoutExercisePresentation,
@@ -137,20 +138,37 @@ function CanonicalTrainExperience() {
     if (nextRecordedId !== recordedId) setRecordedId(nextRecordedId);
   }, [plan?.activeRecordedSession?.recordedSessionId, recordedId, route.lifecycle, route.recordedSessionId]);
 
-  const aggregate = recordedId ? canonicalRecordedSessionLedger.get(recordedId) : { status: "not_found" as const };
   const plannedId = route.plannedSessionId ?? plan?.nextSession?.id;
-  const snapshot = aggregate.status === "found"
-    ? aggregate.session.prescriptionSnapshot
-    : plannedId ? loadPlannedSession(plannedId)?.prescriptionSnapshot ?? null : null;
-  const evidence = plan ? canonicalProgressEvidenceRepository.list(plan.planId) : [];
-  const presentation = snapshot ? projectCanonicalWorkoutPresentation({
-    session: aggregate.status === "found" ? aggregate.session : null,
-    snapshot,
-    events: aggregate.status === "found" ? aggregate.events : [],
-    evidence,
-    displayUnit: settings.unit,
-    now: timerTick,
-  }) : null;
+  // The ledger read, evidence read and presentation projection are the
+  // expensive part of this screen. They used to run on every render, including
+  // the once-a-second rest-timer tick, which made the active workout feel
+  // laggy. Now they only re-run when training data actually changes
+  // (renderVersion bumps on every canonicalActivePlanState notification, and
+  // every mutation on this screen calls refresh()). The clock-dependent
+  // elapsed time is recomputed cheaply per tick below.
+  const projected = useMemo(() => {
+    const aggregate = recordedId ? canonicalRecordedSessionLedger.get(recordedId) : { status: "not_found" as const };
+    const snapshot = aggregate.status === "found"
+      ? aggregate.session.prescriptionSnapshot
+      : plannedId ? loadPlannedSession(plannedId)?.prescriptionSnapshot ?? null : null;
+    const evidence = plan ? canonicalProgressEvidenceRepository.list(plan.planId) : [];
+    const base = snapshot ? projectCanonicalWorkoutPresentation({
+      session: aggregate.status === "found" ? aggregate.session : null,
+      snapshot,
+      events: aggregate.status === "found" ? aggregate.events : [],
+      evidence,
+      displayUnit: settings.unit,
+      now: Date.now(),
+    }) : null;
+    return { aggregate, snapshot, base };
+    // renderVersion is the invalidation signal for local training data.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan, plannedId, recordedId, renderVersion, settings.unit]);
+  const aggregate = projected.aggregate;
+  const snapshot = projected.snapshot;
+  const presentation = projected.base && aggregate.status === "found"
+    ? { ...projected.base, elapsedSeconds: activeElapsedSeconds(aggregate.session, aggregate.events, timerTick) }
+    : projected.base;
   const restTimer = recordedId ? restoreCanonicalRestTimer(recordedId) : null;
   const restSeconds = restTimer?.state === "paused"
     ? restTimer.remainingSeconds ?? 0
