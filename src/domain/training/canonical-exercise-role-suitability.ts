@@ -86,15 +86,16 @@ export function assessCanonicalExerciseRoleSuitability(input: CanonicalExerciseR
   if (exercise.fatigueCost === "high" && input.sessionHighFatigueSets > 0) score -= 25;
   if (input.recoveryRestricted && exercise.fatigueCost === "high") score -= 15;
   if (repeated && repeatReason === "variation_preferred") score -= 60;
-  // NOTE: a cross-week variety penalty (recentMicrocyclesVarietyPenalty, below)
-  // was added here and then reverted after it caused 3 production-path test
-  // failures: it prevented the "comparable exposure" accumulation the progress
-  // evaluator needs (3 uses of the same exercise) from ever completing within
-  // the expected number of sessions, since it discouraged repeat selection
-  // more broadly than intended even with the variation_preferred-only guard.
-  // The function is kept, unused, for a future attempt with real test
-  // verification — do not re-enable without confirming the evaluator's
-  // comparable-exposure accumulation still converges normally.
+  // Two attempts at this line have now failed the same way: 3 production-path
+  // test failures, evaluator decisions never converging (30 vs expected 9),
+  // even after gating the penalty to only "graduated" exercises (ones with
+  // an existing real decision — see graduatedExerciseIds in
+  // canonical-active-plan-construction.ts). The gating hypothesis was wrong,
+  // or incomplete, in a way not yet understood. Do not re-enable this line
+  // without first getting real diagnostic output (log
+  // recentMicrocyclesExerciseUsage and graduatedExerciseIds contents during
+  // an actual failing run of tests/canonical-p1a-production-path.test.ts)
+  // rather than theorizing again.
   if (exercise.primaryMuscles.length === slot.muscles.length && exercise.primaryMuscles.every((muscle) => slot.muscles.includes(muscle))) score += 4;
 
   const suitability: CanonicalExerciseRoleSuitability = specialist ? "specialist" : score >= 112 ? "primary_choice" : "suitable_alternative";

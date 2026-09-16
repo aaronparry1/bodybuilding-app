@@ -30,12 +30,16 @@ export type CanonicalGeneratedPlanInput = Readonly<Omit<CanonicalConstructionInp
  * microcycle-tagged history to say anything meaningful, which reproduces
  * prior (no-op) behaviour exactly.
  *
- * STATUS: the scoring penalty that consumes this output was reverted after
- * it caused 3 production-path test failures (it prevented the progress
- * evaluator's comparable-exposure accumulation from converging). This
- * function still runs and its result is still plumbed through, harmlessly
- * unused, so re-enabling the penalty later is a small, contained change
- * rather than re-wiring everything from scratch.
+ * STATUS: two attempts at consuming this output (a plain cross-week penalty,
+ * then a version gated to only exercises with an existing real decision)
+ * both caused the same 3 production-path test failures — evaluator
+ * decisions never converging (30 vs expected 9). The gating hypothesis was
+ * wrong or incomplete in a way not yet understood. This function still runs
+ * and its result is still plumbed through, harmlessly unused, so a future
+ * attempt is a small, contained change — but do not re-enable the
+ * consuming penalty without first getting real diagnostic output from a
+ * failing run of tests/canonical-p1a-production-path.test.ts, not another
+ * theory.
  */
 function recentMicrocyclesExerciseUsageFromHistory(
   history: readonly WorkoutHistorySummary[] | undefined,

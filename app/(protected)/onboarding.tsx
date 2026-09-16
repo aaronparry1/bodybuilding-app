@@ -1,6 +1,6 @@
 import { Stack, router, useGlobalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { useAuth } from "@/application/auth/auth-context";
@@ -452,6 +452,19 @@ export default function OnboardingScreen() {
             unitLabel={labelFor(unitOptions, unit)}
             onSelectUnit={setUnit}
           />
+        ) : null}
+        {step === "review" ? (
+          <Text style={{ ...type.body, color: colors.textMuted, textAlign: "center" }}>
+            By continuing, you agree to our{" "}
+            <Text style={{ color: colors.accent }} onPress={() => Linking.openURL("https://adaptivestrengthcoach.com/terms-of-service")}>
+              Terms of Service
+            </Text>{" "}
+            and{" "}
+            <Text style={{ color: colors.accent }} onPress={() => Linking.openURL("https://adaptivestrengthcoach.com/privacy-policy")}>
+              Privacy Policy
+            </Text>
+            .
+          </Text>
         ) : null}
         {creationError ? <PremiumCard tone="danger"><Text accessibilityRole="alert" style={{ color: colors.danger, ...type.body }}>{creationError}</Text></PremiumCard> : null}
       </AppScreen>
