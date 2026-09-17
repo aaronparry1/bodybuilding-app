@@ -17,6 +17,7 @@
     "expo-sharing": "~56.0.24",
     "expo-sqlite": "~56.0.5",
     "expo-status-bar": "~56.0.4",
+    "expo-store-review": "~56.0.4",
     "expo-symbols": "56.0.7",
     "react": "19.2.3",
     "react-dom": "19.2.3",
