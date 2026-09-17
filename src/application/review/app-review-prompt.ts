@@ -2,6 +2,8 @@ import { jsonStore } from "@/data/local/json-store";
 
 const appReviewPromptStateKey = "iron-logic.app-review-prompt";
 const promptCooldownDays = 30;
+/** Third completed workout: enough to have an opinion, early enough that most people are still here. */
+export const plannedWorkoutsForReviewPrompt = 3;
 const millisecondsPerDay = 24 * 60 * 60 * 1000;
 
 export type AppReviewMilestone = "five_planned_workouts" | "first_pr" | "first_training_week";
@@ -111,7 +113,7 @@ export function normalizeAppReviewPromptState(state: Partial<AppReviewPromptStat
 function resolveMilestone(input: AppReviewEligibilityInput): AppReviewMilestone | null {
   if (input.hasPersonalRecord) return "first_pr";
   if (input.completedTrainingWeeks >= 1) return "first_training_week";
-  if (input.completedPlannedWorkouts >= 5) return "five_planned_workouts";
+  if (input.completedPlannedWorkouts >= plannedWorkoutsForReviewPrompt) return "five_planned_workouts";
   return null;
 }
 

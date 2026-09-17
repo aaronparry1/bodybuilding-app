@@ -184,7 +184,7 @@ function PlanCard({
             {featured ? <PlanBadge label="Best value" /> : null}
           </View>
           <Text selectable style={{ color: colors.textMuted, fontSize: 13, lineHeight: 17, fontWeight: "800" }}>
-            {billingPeriodLabel(pack.id)}
+            {featured && monthlyEquivalentLabel(pack.priceLabel) ? `${monthlyEquivalentLabel(pack.priceLabel)} · ${billingPeriodLabel(pack.id).toLowerCase()}` : billingPeriodLabel(pack.id)}
           </Text>
           {pack.trialLabel ? (
             <Text selectable style={{ color: colors.accent, fontWeight: "800" }}>
@@ -403,6 +403,17 @@ function annualSavingsLabel(annualPrice: string, packages: Array<{ id: string; p
   if (annual >= yearlyMonthlyCost) return null;
   const savings = Math.round(((yearlyMonthlyCost - annual) / yearlyMonthlyCost) * 100);
   return savings > 0 ? `Save ${savings}%` : null;
+}
+
+// "£99 / year" -> "£8.25 a month". Shown on the featured annual card so the
+// comparison with the monthly price is made for the reader, not left to them.
+function monthlyEquivalentLabel(annualPrice: string): string | null {
+  const annual = parsePrice(annualPrice);
+  if (!annual) return null;
+  const symbol = (annualPrice.match(/^[^\d]*?([£$€])/) ?? [])[1] ?? "";
+  const perMonth = annual / 12;
+  const rounded = Number.isInteger(perMonth) ? String(perMonth) : perMonth.toFixed(2);
+  return `${symbol}${rounded} a month`;
 }
 
 function parsePrice(value?: string): number | null {

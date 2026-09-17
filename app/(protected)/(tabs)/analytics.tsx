@@ -1,5 +1,4 @@
 import { router } from "expo-router";
-import { usePremiumAccess, PremiumRequiredScreen } from "@/application/billing/premium-access";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import type { CanonicalProgressPresentationAction } from "@/application/training/canonical-progress-presentation";
@@ -8,8 +7,8 @@ import { useCanonicalProgressPresentation } from "@/ui/canonical-training-presen
 import { AppScreen } from "@/ui/primitives";
 
 export default function ProgressScreen() {
-  const premium = usePremiumAccess();
-  if (!premium) return <PremiumRequiredScreen title="Unlock your progress dashboard" message="Start a 14-day free trial to see consistency, completed training and supported improvements." />;
+  // Free tier: progress and history are free. Seeing the numbers move is the
+  // reason people keep training (and keep the app); the paywall sits on coaching.
   return <CanonicalProgressContent />;
 }
 

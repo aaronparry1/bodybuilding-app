@@ -11,7 +11,7 @@ export function usePremiumAccess(): boolean {
 
 export function PremiumRequiredScreen({
   title = "Start your adaptive strength plan",
-  message = "Start a 14-day free trial to unlock coached workouts, logging, reviews, progression, reports, recovery guidance, and sharing.",
+  message = "Start a 14-day free trial to unlock target loads that adapt to your lifts, progression, recovery guidance and meet prep.",
 }: {
   title?: string;
   message?: string;
@@ -23,10 +23,10 @@ export function PremiumRequiredScreen({
       <HeroPanel eyebrow="Premium required" title={title} subtitle={message} />
       <PremiumCard tone="locked">
         <Text selectable style={{ ...type.section, color: colors.text }}>
-          See the plan first. Train with the full coach when you are ready.
+          Logging and progress are free. Pro adds the coach.
         </Text>
         <Text selectable style={{ ...type.body, color: colors.textMuted }}>
-          Free access includes onboarding, plan preview, the guide, settings, account, and restore purchases.
+          Free includes your programme, set logging, history, progress and cloud backup. Pro sets each target for you and adjusts it from what you lift.
         </Text>
         <View style={{ gap: spacing.sm }}>
           <Link href="/(protected)/paywall" asChild>

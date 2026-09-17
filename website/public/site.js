@@ -1,5 +1,5 @@
 const APP_STORE_URL = "https://apps.apple.com/gb/app/adaptive-strength-coach/id6762462649";
-const PLAY_STORE_URL = "https://adaptivestrengthcoach.com/download#google-play-coming-soon";
+const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.aaronparry.adaptivestrengthcoach";
 
 function detectDeviceStore(userAgent = navigator.userAgent) {
   const ua = userAgent.toLowerCase();

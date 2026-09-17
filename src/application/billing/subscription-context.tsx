@@ -5,6 +5,7 @@ import { createSubscriptionGateway } from "@/application/billing/billing-gateway
 import { MockRevenueCatGateway } from "@/application/billing/mock-revenuecat";
 import { restoreCloudDataForUser, syncLocalDataForUser } from "@/application/sync/cloud-data-sync";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
+import { rescheduleTrainingReminders } from "@/application/notifications/training-reminders";
 import { cacheSubscription, getCachedSubscription, getOfflineEntitlementFallback } from "@/application/billing/subscription-cache";
 import { elapsedSince, recordStartupTelemetry, STARTUP_RESTORE_DEADLINE_MS, StartupDeadlineError, withStartupDeadline } from "@/application/startup/startup-observability";
 import Constants from "expo-constants";
@@ -97,6 +98,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     subscriptionRef.current = subscription;
+    // Subscription state feeds the "trial ends in 2 days" reminder.
+    rescheduleTrainingReminders().catch(() => {});
   }, [subscription]);
 
   useEffect(() => {

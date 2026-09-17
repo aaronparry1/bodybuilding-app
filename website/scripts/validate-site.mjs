@@ -12,6 +12,11 @@ const requiredRoutes = [
   "privacy/index.html",
   "terms/index.html",
   "delete-account/index.html",
+  "cave/index.html",
+  "programmes/index.html",
+  "programmes/4-day-upper-lower-hypertrophy/index.html",
+  "programmes/3-day-full-body-strength/index.html",
+  "programmes/stalled-on-bench/index.html",
   "delete-account/verify/index.html",
   "404.html",
 ];

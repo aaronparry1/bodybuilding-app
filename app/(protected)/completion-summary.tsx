@@ -10,6 +10,9 @@ import { displayLoadFromBaseKg } from "@/application/training/canonical-workout-
 import { exerciseDisplayName, mesocyclePurposeDisplayName, sessionRoleDisplayName } from "@/application/training/display-labels";
 import { useAppSettings } from "@/application/settings/app-settings";
 import { requestTrainingReminderPermission, rescheduleTrainingReminders } from "@/application/notifications/training-reminders";
+import { requestAppReviewIfEligible } from "@/application/review/app-review-prompt";
+import { nativeAppReviewRequester } from "@/application/review/native-app-review-requester";
+import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { buildWorkoutAchievementSharePayload, buildWorkoutSummarySharePayload, type BrandedSharePayload } from "@/domain/training/share-cards";
 import { BrandedShareCardPreviewModal } from "@/features/social-sharing/branded-share-card-preview";
 import { AppScreen, PremiumCard, PrimaryButton, SecondaryButton } from "@/ui/primitives";
@@ -42,6 +45,18 @@ export default function CompletionSummaryScreen() {
 
   const aggregate = recordedSessionId ? canonicalRecordedSessionLedger.get(String(recordedSessionId)) : { status: "not_found" as const };
   const plan = canonicalActivePlanState.getReadModel();
+
+  // Ask for a store rating once the user has finished a few workouts. Asked
+  // here, after the summary is on screen, never on launch or at the paywall.
+  // The policy module enforces the milestone and a 30-day cooldown.
+  useEffect(() => {
+    if (!plan) return;
+    const timer = setTimeout(() => {
+      const completed = canonicalProgressEvidenceRepository.list(plan.planId).filter((item) => item.kind === "completion").length;
+      requestAppReviewIfEligible({ completedPlannedWorkouts: completed, completedTrainingWeeks: 0, hasPersonalRecord: false }, nativeAppReviewRequester).catch(() => {});
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [plan?.planId]);
   if (aggregate.status !== "found") return <AppScreen respectTopSafeArea><Text style={styles.hero}>Workout complete</Text><Text style={styles.muted}>This summary is no longer available, but your retained training history is unchanged.</Text><PrimaryButton label="Return home" onPress={() => router.replace("/(protected)/(tabs)")} /></AppScreen>;
 
   const decision = canonicalProgressDecisionRepository.list(aggregate.session.planId)

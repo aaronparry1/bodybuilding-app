@@ -3,6 +3,7 @@ import { canonicalActivePlanState } from "@/application/training/canonical-activ
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { appSettingsStore } from "@/application/settings/app-settings";
 import { sessionRoleDisplayName } from "@/application/training/display-labels";
+import { getCachedSubscription } from "@/application/billing/subscription-cache";
 
 /**
  * Two local, on-device reminder types. No server/push infrastructure involved —
@@ -20,6 +21,9 @@ import { sessionRoleDisplayName } from "@/application/training/display-labels";
 
 const EVENING_REMINDER_ID = "training-reminder-evening";
 const STREAK_REMINDER_ID = "training-reminder-streak";
+const TRIAL_ENDING_REMINDER_ID = "trial-ending-reminder";
+const TRIAL_REMINDER_DAYS_BEFORE = 2;
+const TRIAL_REMINDER_HOUR = 10;
 const EVENING_REMINDER_HOUR = 19;
 
 function startOfIsoWeek(date: Date): Date {
@@ -97,15 +101,44 @@ export async function requestTrainingReminderPermission(): Promise<boolean> {
 }
 
 /** Cancels and re-schedules both reminder types based on current on-device state. Safe to call often. */
+/**
+ * "Your trial ends in 2 days" — a plain heads-up, scheduled from the cached
+ * subscription state. People cancel trials out of fear of a surprise charge;
+ * telling them exactly when it happens keeps more of them, not fewer. Not
+ * gated on trainingRemindersEnabled: it's about their money, not their training.
+ */
+export function computeTrialReminderDate(now = new Date()): Date | null {
+  const cached = getCachedSubscription();
+  if (cached.status !== "trial" || !cached.trialEndsAt) return null;
+  const endsAt = Date.parse(cached.trialEndsAt);
+  if (!Number.isFinite(endsAt)) return null;
+  const fireAt = new Date(endsAt - TRIAL_REMINDER_DAYS_BEFORE * 24 * 60 * 60 * 1000);
+  fireAt.setHours(TRIAL_REMINDER_HOUR, 0, 0, 0);
+  return fireAt > now ? fireAt : null;
+}
+
 export async function rescheduleTrainingReminders(): Promise<void> {
   await Notifications.cancelScheduledNotificationAsync(EVENING_REMINDER_ID).catch(() => {});
   await Notifications.cancelScheduledNotificationAsync(STREAK_REMINDER_ID).catch(() => {});
-
-  const settings = appSettingsStore.get();
-  if (!settings.trainingRemindersEnabled) return;
+  await Notifications.cancelScheduledNotificationAsync(TRIAL_ENDING_REMINDER_ID).catch(() => {});
 
   const permission = await Notifications.getPermissionsAsync();
   if (!permission.granted) return;
+
+  const trialFireAt = computeTrialReminderDate();
+  if (trialFireAt) {
+    await Notifications.scheduleNotificationAsync({
+      identifier: TRIAL_ENDING_REMINDER_ID,
+      content: {
+        title: "Your free trial ends in 2 days",
+        body: "After that you'll be charged for Pro. Cancel any time in your store subscriptions if it's not for you.",
+      },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: trialFireAt },
+    }).catch(() => {});
+  }
+
+  const settings = appSettingsStore.get();
+  if (!settings.trainingRemindersEnabled) return;
 
   const plan = computeReminderPlan();
 
