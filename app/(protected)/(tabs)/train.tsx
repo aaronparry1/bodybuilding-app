@@ -86,14 +86,12 @@ const TRAIN = workoutColors;
 function operationId(prefix: string): string { return `train:${prefix}:${Date.now()}`; }
 
 export default function TrainScreen() {
-  // Free tier: logging and history are free. Coaching (target loads that adapt
-  // to what you lift, progression, recovery) is what the subscription unlocks.
-  // Free users log their own weights; Pro users see targets and prefilled loads.
   const subscription = useSubscription();
-  return <CanonicalTrainExperience coachingUnlocked={subscription.isPremium} />;
+  if (!subscription.isPremium) return <TrainPaywall onRestore={subscription.restorePurchases} />;
+  return <CanonicalTrainExperience />;
 }
 
-function CanonicalTrainExperience({ coachingUnlocked }: Readonly<{ coachingUnlocked: boolean }>) {
+function CanonicalTrainExperience() {
   const params = useLocalSearchParams<RouteParams>();
   const insets = useSafeAreaInsets();
   const { width, fontScale } = useWindowDimensions();
@@ -344,13 +342,13 @@ function CanonicalTrainExperience({ coachingUnlocked }: Readonly<{ coachingUnloc
   };
 
   const valuesFor = (exercise: WorkoutExercisePresentation, set: WorkoutSetPresentation): SetValues => {
-    const defaultLoad = coachingUnlocked ? (calibrationLoads[exercise.id] ?? set.defaultLoad) : null;
+    const defaultLoad = calibrationLoads[exercise.id] ?? set.defaultLoad;
     return setValues[set.id] ?? { reps: String(set.targetReps), load: defaultLoad === null ? "" : String(defaultLoad) };
   };
 
   const recordSet = (exercise: WorkoutExercisePresentation, set: WorkoutSetPresentation) => {
     if (!plan || aggregate.status !== "found" || aggregate.session.status !== "started") return;
-    if (coachingUnlocked && exercise.calibration?.required && calibrationLoads[exercise.id] === undefined && set.defaultLoad === null) {
+    if (exercise.calibration?.required && calibrationLoads[exercise.id] === undefined && set.defaultLoad === null) {
       setMessage("Confirm the starting load before the first working set.");
       setFieldError("load");
       return;
@@ -479,7 +477,7 @@ function CanonicalTrainExperience({ coachingUnlocked }: Readonly<{ coachingUnloc
         ? { label: "Save set", run: () => { saveEdit(activeExercise, editedSet); Keyboard.dismiss(); } }
         : { label: "Done", run: Keyboard.dismiss };
     }
-    if (coachingUnlocked && activeExercise.calibration?.required && calibrationLoads[activeExercise.id] === undefined) {
+    if (activeExercise.calibration?.required && calibrationLoads[activeExercise.id] === undefined) {
       return { label: "Confirm load", run: () => { confirmCalibration(activeExercise); Keyboard.dismiss(); } };
     }
     const currentSet = activeExercise.sets.find((set) => set.state === "current");
@@ -498,10 +496,6 @@ function CanonicalTrainExperience({ coachingUnlocked }: Readonly<{ coachingUnloc
   >
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex} keyboardVerticalOffset={0}>
       <ScrollView ref={scrollRef} automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" contentContainerStyle={[styles.content, { paddingBottom: Math.max(insets.bottom, 16) + 76 }]}>
-        {!coachingUnlocked ? <Pressable testID="train-free-tier-upsell" accessibilityRole="button" accessibilityLabel="Free plan. Unlock targets that adapt to your lifts with a 14-day free trial" onPress={() => router.push("/(protected)/paywall")} style={({ pressed }) => [styles.freeTierBanner, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.freeTierTitle}>Free plan: log your own weights</Text>
-          <Text style={styles.freeTierBody}>Pro sets each target for you and adjusts it from what you lift. 14-day free trial.</Text>
-        </Pressable> : null}
         {message ? <View testID="train-feedback" accessibilityLiveRegion={positiveFeedback ? "polite" : "assertive"} style={[styles.feedbackBanner, positiveFeedback && styles.feedbackBannerPositive]}><Text style={[styles.feedbackText, positiveFeedback && styles.feedbackTextPositive]}>{message}</Text></View> : null}
         {paused ? <PausedBanner busy={busy} onResume={resume} /> : null}
         {restTimer && restTimer.state !== "skipped" ? <RestPanel timer={restTimer} seconds={restSeconds} nextInstruction={lastInstruction ?? null} onAction={restAction} /> : null}
@@ -515,7 +509,6 @@ function CanonicalTrainExperience({ coachingUnlocked }: Readonly<{ coachingUnloc
           displayUnit={settings.unit}
           paused={paused}
           layout={layout}
-          coachingUnlocked={coachingUnlocked}
           valuesFor={valuesFor}
           setValues={setValues}
           setSetValues={setSetValues}
@@ -631,7 +624,6 @@ function ActiveExerciseCard(props: Readonly<{
   exercise: WorkoutExercisePresentation;
   displayUnit: "kg" | "lb";
   paused: boolean;
-  coachingUnlocked: boolean;
   layout: ReturnType<typeof canonicalTrainNarrowLayout>;
   valuesFor(exercise: WorkoutExercisePresentation, set: WorkoutSetPresentation): SetValues;
   setValues: Record<string, SetValues>;
@@ -665,13 +657,13 @@ function ActiveExerciseCard(props: Readonly<{
         <Text style={styles.eyebrow}>EXERCISE {exercise.order}</Text>
         <Text accessibilityRole="header" accessibilityLabel={`${exercise.name}. ${exercise.methodExecution.sequenceLabel ? `${exercise.methodExecution.sequenceLabel}. ` : ""}${completedSetCount} of ${exercise.sets.length} sets complete. ${firstIncomplete ? `Current set ${firstIncomplete.number}, target ${firstIncomplete.target}. ${firstIncomplete.previous ? `Previous comparable performance ${firstIncomplete.previous}.` : "No previous comparable performance."}` : "All prescribed sets complete."}`} style={styles.activeExerciseName}>{exercise.name}</Text>
         <Text style={styles.body}>{completedSetCount} of {exercise.sets.length} sets complete · {exercise.method}</Text>
-        <Text style={styles.smallMuted}>{firstIncomplete ? (props.coachingUnlocked ? `Current target ${firstIncomplete.target} · ${exercise.loadState}` : `${exercise.sets.length} sets · ${firstIncomplete.targetReps} reps · your choice of load`) : "All prescribed sets complete"}</Text>
+        <Text style={styles.smallMuted}>{firstIncomplete ? `Current target ${firstIncomplete.target} · ${exercise.loadState}` : "All prescribed sets complete"}</Text>
         {exercise.previousPerformance ? <Text style={styles.previous}>Previous: {exercise.previousPerformance}</Text> : null}
         {catalogueEntry?.jointStress === "high" ? <Text style={styles.smallMuted}>⚠ Higher joint stress — warm up thoroughly, stop if you feel joint pain rather than muscle fatigue.</Text> : null}
         {catalogueEntry?.notes[0] ? <Text style={styles.smallMuted}>{catalogueEntry.notes[0]}</Text> : null}
       </View>
     </View>
-    {props.coachingUnlocked && calibration?.required && !props.calibrationConfirmed ? <View style={styles.calibrationPanel}>
+    {calibration?.required && !props.calibrationConfirmed ? <View style={styles.calibrationPanel}>
       <Text style={styles.calibrationTitle}>{calibration.title}</Text>
       <Text style={styles.body}>{calibration.instruction}</Text>
       <Text style={styles.smallMuted}>{calibration.rampInstruction}</Text>
@@ -681,7 +673,7 @@ function ActiveExerciseCard(props: Readonly<{
       </View>
       <Pressable testID="train-confirm-calibration" accessibilityRole="button" accessibilityLabel={`Confirm starting load for ${exercise.name}`} onPress={props.onConfirmCalibration} style={({ pressed }) => [styles.calibrationAction, pressed && styles.primaryActionPressed]}><Text numberOfLines={1} style={styles.calibrationActionText}>Confirm starting load</Text></Pressable>
       <Text style={styles.tinyMuted}>Ramp attempts are not counted as working sets.</Text>
-    </View> : props.coachingUnlocked && calibration && props.calibrationConfirmed ? <View style={styles.calibrationReady}><Text style={styles.successText}>✓ Starting load ready</Text><Text style={styles.smallMuted}>Complete the working sets below; valid evidence is retained for compatible sessions.</Text></View> : null}
+    </View> : calibration && props.calibrationConfirmed ? <View style={styles.calibrationReady}><Text style={styles.successText}>✓ Starting load ready</Text><Text style={styles.smallMuted}>Complete the working sets below; valid evidence is retained for compatible sessions.</Text></View> : null}
     <View style={styles.setHeader}>
       <Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.columnLabel, { width: props.layout.setWidth }]}>Set</Text>
       <Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.columnLabel, styles.flex]}>Reps</Text>
@@ -701,7 +693,7 @@ function ActiveExerciseCard(props: Readonly<{
           <Pressable testID={`train-complete-${exercise.order}-${set.number}`} accessibilityRole="button" accessibilityLabel={completed ? `Set ${set.number} completed; edit available below` : `Complete set ${set.number} of ${exercise.name}`} accessibilityState={{ disabled: completed || !current || props.paused }} disabled={completed || !current || props.paused || (calibration?.required && !props.calibrationConfirmed) || set.loadSemantic === "unavailable"} onPress={() => props.onComplete(set)} style={({ pressed }) => [styles.doneControl, completed && styles.doneControlComplete, (!current || props.paused) && styles.doneControlUpcoming, pressed && styles.doneControlPressed]}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.doneGlyph, completed && styles.doneGlyphComplete]}>{completed ? "✓" : "✓"}</Text></Pressable>
         </View>
         <View style={styles.setDetailRow}>
-          <Text style={styles.tinyMuted}>{set.role === "top_set" ? "Top set · " : set.role === "back_off" ? "Back-off · " : set.role === "activation" ? "Activation · " : set.role === "mini_set" ? "Mini-set · " : ""}{props.coachingUnlocked ? `Target ${set.target}` : `${set.targetReps} reps · target load is Pro`}{set.previous ? ` · Previous ${set.previous}` : ""}</Text>
+          <Text style={styles.tinyMuted}>{set.role === "top_set" ? "Top set · " : set.role === "back_off" ? "Back-off · " : set.role === "activation" ? "Activation · " : set.role === "mini_set" ? "Mini-set · " : ""}Target {set.target}{set.previous ? ` · Previous ${set.previous}` : ""}</Text>
           {completed && !editing ? <Pressable accessibilityRole="button" accessibilityLabel={`Edit completed set ${set.number} of ${exercise.name}`} hitSlop={8} onPress={() => props.onBeginEdit(set)}><Text style={styles.editLink}>Edit</Text></Pressable> : null}
           {editing ? <View style={styles.editActions}><Pressable accessibilityRole="button" accessibilityLabel={`Cancel editing set ${set.number}`} onPress={() => props.setEditState(null)}><Text style={styles.cancelLink}>Cancel</Text></Pressable><Pressable accessibilityRole="button" accessibilityLabel={`Save edits to set ${set.number}`} onPress={() => props.onSaveEdit(set)}><Text style={styles.saveLink}>Save</Text></Pressable></View> : null}
         </View>
@@ -845,9 +837,6 @@ const styles = StyleSheet.create({
   progressTrack: { height: 4, backgroundColor: TRAIN.surfaceRaised },
   progressFill: { height: 4, backgroundColor: TRAIN.accent },
   content: { gap: 12, paddingHorizontal: 12, paddingTop: 12 },
-  freeTierBanner: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.accent, gap: 2 },
-  freeTierTitle: { color: TRAIN.text, fontWeight: "800", fontSize: 14 },
-  freeTierBody: { color: TRAIN.muted, fontSize: 13 },
   feedbackBanner: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, backgroundColor: TRAIN.dangerSoft, borderWidth: 1, borderColor: TRAIN.danger },
   feedbackText: { color: TRAIN.danger, fontSize: 13, lineHeight: 18, fontWeight: "800" },
   feedbackBannerPositive: { backgroundColor: TRAIN.successSoft, borderColor: TRAIN.success },
