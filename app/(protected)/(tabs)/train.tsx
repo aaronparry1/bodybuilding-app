@@ -551,9 +551,9 @@ function CanonicalTrainExperience() {
 }
 
 function TrainShell({ insets, presentation, activeExerciseName, restStatus, onMinimise, onActions, children }: Readonly<{ insets: { top: number; bottom: number }; presentation: WorkoutPresentation; activeExerciseName?: string; restStatus?: string; onMinimise(): void; onActions?: () => void; children: React.ReactNode }>) {
-  const headerTitle = activeExerciseName ?? presentation.title;
+  const headerTitle = presentation.title;
   const headerMeta = activeExerciseName
-    ? [presentation.title, restStatus, `${presentation.completedSets} of ${presentation.totalSets} sets`].filter(Boolean).join(" · ")
+    ? [activeExerciseName, restStatus, `${presentation.completedSets} of ${presentation.totalSets} sets`].filter(Boolean).join(" · ")
     : `${formatElapsed(presentation.elapsedSeconds)} · ${presentation.completedSets} of ${presentation.totalSets} sets`;
   return <View style={[styles.shell, { paddingTop: insets.top }]}>
     <View style={styles.header}>
