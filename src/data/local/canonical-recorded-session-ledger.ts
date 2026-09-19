@@ -1,6 +1,31 @@
 import { jsonStore } from "@/data/local/json-store";
 import { allowedRecordedSessionTransition, validateCanonicalRecordedSession, type CanonicalRecordedSession, type CanonicalRecordedSessionEvent } from "@/domain/training/canonical-recorded-session-ledger";
 const key = "iron-logic.canonical-recorded-session-ledger-v1";
+/**
+ * KNOWN PERFORMANCE DEBT (documented, not yet fixed — 19 Sept 2026):
+ * Every session's events live under this one shared store key. append()
+ * (called on every single set logged) reads, mutates, and synchronously
+ * rewrites this ENTIRE object — every session a user has ever recorded,
+ * not just the current one. This scales with total accumulated workout
+ * history per user, and the underlying write is also genuinely
+ * synchronous (blocks the JS thread) via SQLiteStorage's setItemSync,
+ * confirmed in local-storage.ts.
+ *
+ * Deliberately not fixed yet. Both real fixes are invasive:
+ * (1) making storage truly async requires changing jsonStore's public
+ *     API (currently synchronous) and updating every caller across the
+ *     app that depends on it, not just this file;
+ * (2) storing sessions under individual keys instead of one shared
+ *     object fixes the scaling problem but changes the data format,
+ *     requiring a real migration for any existing user's stored history
+ *     — get that migration wrong and people lose workout data.
+ *
+ * Given the app was mid App Store/Play Store review when this was
+ * found, the judgment call was to defer rather than risk either change
+ * untested. Revisit once there's real room to test a migration properly.
+ * New users are unaffected (empty history costs nothing to rewrite);
+ * this only degrades gradually for long-tenured users.
+ */
 type Store = Record<string, { session: CanonicalRecordedSession; events: CanonicalRecordedSessionEvent[] }>;
 export const canonicalRecordedSessionLedger = {
   create(session: CanonicalRecordedSession, operationId: string) { const valid = validateCanonicalRecordedSession(session); if (valid.status !== "valid") return valid; const store = jsonStore.get<Store>(key, {}); if (store[session.recordedSessionId]) return JSON.stringify(store[session.recordedSessionId].session) === JSON.stringify(session) ? { status: "duplicate" as const, session } : { status: "conflict" as const, reason: "recorded_session_id_conflict" }; jsonStore.set(key, { ...store, [session.recordedSessionId]: { session, events: [{ eventId: `${session.recordedSessionId}:pending:${operationId}`, aggregateId: session.recordedSessionId, expectedVersion: 0, type: "pending_start", occurredAt: session.createdAt, operationId, payload: {} }] } }); return { status: "saved" as const, session }; },

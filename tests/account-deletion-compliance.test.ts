@@ -33,7 +33,7 @@ describe("public account deletion compliance", () => {
     expect(page).toContain('name="email" type="email"');
     expect(page).toContain("Data deleted");
     expect(page).toContain("Data not controlled by the deleted app account");
-    expect(page).toContain('href="/privacy/"');
+    expect(page).toContain('href="/privacy-policy/"');
     expect(page).not.toMatch(/name="password"|type="password"/);
   });
 
