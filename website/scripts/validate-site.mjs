@@ -19,6 +19,8 @@ const requiredRoutes = [
   "programmes/4-day-upper-lower-hypertrophy/index.html",
   "programmes/3-day-full-body-strength/index.html",
   "programmes/stalled-on-bench/index.html",
+  "programmes/sets-per-muscle-group/index.html",
+  "programmes/when-to-deload/index.html",
   "delete-account/verify/index.html",
   "404.html",
 ];
