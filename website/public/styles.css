@@ -1,5 +1,13 @@
 /* Adaptive Strength Coach — site styles. Palette and type mirror the app itself. */
-@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap");
+/* Self-hosted fonts: the CSP is same-origin only (style-src 'self', no font-src
+   exception), so an external Google Fonts @import is silently blocked. Font files
+   live at /assets/fonts/ — see the repo's font README for exact source/licence. */
+@font-face { font-family: "Oswald"; font-style: normal; font-weight: 500; font-display: swap; src: url("/assets/fonts/oswald-500.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-style: normal; font-weight: 600; font-display: swap; src: url("/assets/fonts/oswald-600.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-style: normal; font-weight: 700; font-display: swap; src: url("/assets/fonts/oswald-700.woff2") format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 400; font-display: swap; src: url("/assets/fonts/source-sans-3-400.woff2") format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 600; font-display: swap; src: url("/assets/fonts/source-sans-3-600.woff2") format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-style: italic; font-weight: 400; font-display: swap; src: url("/assets/fonts/source-sans-3-400-italic.woff2") format("woff2"); }
 
 :root {
   --bg: #060b14;
@@ -186,7 +194,7 @@ li { margin-bottom: 6px; }
 .price span { font-family: var(--body); font-size: 15px; color: var(--muted); font-weight: 400; }
 .alert h3 { font-size: 24px; text-transform: uppercase; }
 .alert p { color: var(--muted); margin-top: 8px; }
-.alert a { color: var(--gold); }
+.alert a:not(.button) { color: var(--gold); }
 
 /* Page heroes (subpages) */
 .page-hero { display: grid; gap: 16px; max-width: 70ch; padding-block: 24px 8px; }

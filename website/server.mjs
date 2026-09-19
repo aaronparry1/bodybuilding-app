@@ -27,7 +27,15 @@ const contentTypes = {
   ".jpeg": "image/jpeg",
   ".ico": "image/x-icon",
   ".svg": "image/svg+xml",
+  ".woff2": "font/woff2",
 };
+
+const legalRedirects = new Map([
+  ["/privacy", "/privacy-policy/"],
+  ["/privacy/", "/privacy-policy/"],
+  ["/terms", "/terms-of-service/"],
+  ["/terms/", "/terms-of-service/"],
+]);
 
 function resolvePath(urlPath) {
   const cleanPath = normalize(decodeURIComponent(urlPath.split("?")[0] ?? "/")).replace(/^(\.\.[/\\])+/, "");
@@ -41,6 +49,12 @@ function resolvePath(urlPath) {
 export function createWebsiteServer({ fetchImpl = fetch, config = deletionConfig, rateLimiter = deletionRateLimiter } = {}) {
   return createServer(async (request, response) => {
     const url = new URL(request.url ?? "/", "http://localhost");
+    const redirectTarget = legalRedirects.get(url.pathname);
+    if (redirectTarget) {
+      response.writeHead(301, { Location: redirectTarget, "Cache-Control": "no-cache", ...securityHeaders() });
+      response.end();
+      return;
+    }
     if (request.method === "POST" && url.pathname === ACCOUNT_DELETION_REQUEST_PATH) {
       await handleDeletionRequest({ request, response, fetchImpl, config, rateLimiter });
       return;
@@ -191,7 +205,7 @@ function securityHeaders() {
 const genericRequestMessage = "If an account exists for that address, a secure verification link will be sent. The response is intentionally the same for unknown addresses.";
 
 function deletionResponsePage(title, message) {
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${escapeHtml(title)} | Adaptive Strength Coach</title><link rel="stylesheet" href="/styles.css?v=20260803"></head><body><main class="section legal-page"><section class="page-hero"><p class="eyebrow">Account deletion</p><h1>${escapeHtml(title)}</h1><p class="lede">${escapeHtml(message)}</p><div class="actions"><a class="button button--primary" href="/delete-account/">Back to deletion page</a><a class="button button--secondary" href="/privacy/">Privacy policy</a></div></section></main></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${escapeHtml(title)} | Adaptive Strength Coach</title><link rel="stylesheet" href="/styles.css?v=20260919b"></head><body><main class="section legal-page"><section class="page-hero"><p class="eyebrow">Account deletion</p><h1>${escapeHtml(title)}</h1><p class="lede">${escapeHtml(message)}</p><div class="actions"><a class="button button--primary" href="/delete-account/">Back to deletion page</a><a class="button button--secondary" href="/privacy-policy/">Privacy policy</a></div></section></main></body></html>`;
 }
 
 function escapeHtml(value) {
