@@ -179,6 +179,7 @@ export default function ProtectedLayout() {
         <Stack.Screen name="diagnostics" options={{ title: "Diagnostics" }} />
         <Stack.Screen name="design-qa" options={{ title: "Design QA" }} />
         <Stack.Screen name="v2-benchmark-qa" options={{ title: "V2 QA" }} />
+        <Stack.Screen name="ledger-migration-qa" options={{ title: "Ledger Migration QA" }} />
       </Stack></View>
     </View>
   );
