@@ -10,6 +10,8 @@ import {
 } from "@/domain/training/share-cards";
 import type { PersonalRecordItem } from "@/domain/training/personal-records";
 import type { StrengthLiftDashboardItem, StrengthTotalDashboard } from "@/domain/training/strength-dashboard";
+import fs from "node:fs";
+import path from "node:path";
 
 describe("branded share cards", () => {
   it("generates a branded PR share payload", () => {
@@ -162,6 +164,18 @@ describe("branded share cards", () => {
       expect(payload?.message).toContain(ADAPTIVE_STRENGTH_COACH_DOWNLOAD_URL);
       expect(fallbackShareMessage(payload!)).toContain(ADAPTIVE_STRENGTH_COACH_DOWNLOAD_URL);
     }
+  });
+
+  it("offers an explicit clickable app-link share beside the image share", () => {
+    const preview = fs.readFileSync(path.join(process.cwd(), "src/features/social-sharing/branded-share-card-preview.tsx"), "utf8");
+    const sharing = fs.readFileSync(path.join(process.cwd(), "src/features/social-sharing/share-progress-card.ts"), "utf8");
+    const payload = buildWorkoutSummarySharePayload({ workoutName: "Push", exercisesCompleted: 5, workSetsCompleted: 18, prCount: 0 });
+
+    expect(preview).toContain("Share image");
+    expect(preview).toContain("Share app link");
+    expect(preview).toContain("shareBrandedProgressLink(payload)");
+    expect(sharing).toContain("message: payload.message");
+    expect(payload.message).toContain(ADAPTIVE_STRENGTH_COACH_DOWNLOAD_URL);
   });
 });
 

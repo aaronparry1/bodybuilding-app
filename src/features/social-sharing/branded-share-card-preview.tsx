@@ -2,7 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { forwardRef, useRef, useState } from "react";
 import { ActivityIndicator, Image, Modal, Pressable, Text, View } from "react-native";
 import { ADAPTIVE_STRENGTH_COACH_DOWNLOAD_URL, type BrandedSharePayload } from "@/domain/training/share-cards";
-import { shareCapturedBrandedProgressCard } from "@/features/social-sharing/share-progress-card";
+import { shareBrandedProgressLink, shareCapturedBrandedProgressCard } from "@/features/social-sharing/share-progress-card";
 import { colors, spacing } from "@/ui/theme";
 
 const logo = require("../../../assets/share-card-logo.png");
@@ -28,6 +28,17 @@ export function BrandedShareCardPreviewModal({
     }
   };
 
+  const handleShareLink = async () => {
+    if (!payload || sharing) return;
+    setSharing(true);
+    try {
+      await shareBrandedProgressLink(payload);
+      onClose();
+    } finally {
+      setSharing(false);
+    }
+  };
+
   return (
     <Modal visible={Boolean(payload)} transparent animationType="fade" onRequestClose={onClose}>
       <View style={previewBackdropStyle}>
@@ -47,6 +58,11 @@ export function BrandedShareCardPreviewModal({
                   Share image
                 </Text>
               )}
+            </Pressable>
+            <Pressable accessibilityRole="button" onPress={handleShareLink} disabled={sharing} style={({ pressed }) => ({ ...previewButtonStyle(false, pressed || sharing), flexBasis: "100%" })}>
+              <Text selectable={false} style={previewButtonTextStyle(false)}>
+                Share app link
+              </Text>
             </Pressable>
           </View>
         </Pressable>
