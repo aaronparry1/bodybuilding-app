@@ -8,6 +8,10 @@ export async function shareBrandedProgressCard(payload: BrandedSharePayload): Pr
   return shareTextFallback(payload);
 }
 
+export async function shareBrandedProgressLink(payload: BrandedSharePayload): Promise<boolean> {
+  return shareTextFallback(payload);
+}
+
 export async function shareCapturedBrandedProgressCard(payload: BrandedSharePayload, cardRef: RefObject<View | null>): Promise<boolean> {
   try {
     if (!cardRef.current) return shareTextFallback(payload);
