@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
@@ -21,7 +21,7 @@ export default function WorkoutHistoryScreen() {
   const [exerciseQuery, setExerciseQuery] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [, refresh] = useState(0);
+  const [ledgerVersion, refresh] = useState(0);
   const { entitlement } = useSubscription();
   useEffect(() => {
     canonicalActivePlanState.hydrate();
@@ -30,16 +30,20 @@ export default function WorkoutHistoryScreen() {
     );
   }, []);
   const plan = canonicalActivePlanState.getReadModel();
-  const result = plan
+  const exportedSessions = useMemo(
+    () => plan ? canonicalRecordedSessionLedger.exportPlan(plan.planId) : [],
+    [ledgerVersion, plan?.planId],
+  );
+  const result = useMemo(() => plan
     ? projectCanonicalRecordedSessionHistory({
         athleteId: plan.planId,
         planId: plan.planId,
-        sessions: canonicalRecordedSessionLedger.exportPlan(plan.planId),
+        sessions: exportedSessions,
         exerciseQuery,
         fromDate,
         toDate,
       })
-    : { status: "unavailable" as const, reason: "canonical_plan_unavailable" };
+    : { status: "unavailable" as const, reason: "canonical_plan_unavailable" }, [exerciseQuery, exportedSessions, fromDate, plan?.planId, toDate]);
   const historyEntitlement = entitlement("unlimited_history", {
     historyDaysRequested: fromDate ? 365 : 30,
   });

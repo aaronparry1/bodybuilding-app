@@ -13,11 +13,13 @@ type Aggregate = { session: CanonicalRecordedSession; events: CanonicalRecordedS
 class MemoryStorage implements CanonicalLedgerStorage {
   readonly values = new Map<string, unknown>();
   readonly writes: string[] = [];
+  readonly reads: string[] = [];
   failSet: ((key: string, count: number) => boolean) | null = null;
   truncateReadKey: string | null = null;
   private setCount = 0;
 
   get<T>(key: string, fallback: T): T {
+    this.reads.push(key);
     const value = this.values.has(key) ? this.values.get(key) : fallback;
     if (key === this.truncateReadKey && value && typeof value === "object") return { broken: true } as T;
     return structuredClone(value) as T;
@@ -39,7 +41,7 @@ describe("canonical recorded-session per-session migration", () => {
 
     expect(ledger.exportPlan("plan").map((record) => record.session.recordedSessionId)).toEqual(["r1", "r2"]);
     expect(storage.values.has(CANONICAL_LEDGER_LEGACY_KEY)).toBe(true);
-    expect(storage.values.get(CANONICAL_LEDGER_V2_MANIFEST_KEY)).toEqual({ schemaVersion: 2, legacyImportComplete: true, ids: ["r1", "r2"] });
+    expect(storage.values.get(CANONICAL_LEDGER_V2_MANIFEST_KEY)).toMatchObject({ schemaVersion: 2, legacyImportComplete: true, ids: ["r1", "r2"], indexVersion: 1 });
     expect(storage.values.has(key("r1"))).toBe(true);
     expect(storage.values.has(key("r2"))).toBe(true);
   });
@@ -53,7 +55,7 @@ describe("canonical recorded-session per-session migration", () => {
     storage.failSet = null;
     const resumed = createCanonicalRecordedSessionLedger(storage);
     expect(resumed.exportPlan("plan")).toHaveLength(3);
-    expect(storage.values.get(CANONICAL_LEDGER_V2_MANIFEST_KEY)).toEqual({ schemaVersion: 2, legacyImportComplete: true, ids: ["r1", "r2", "r3"] });
+    expect(storage.values.get(CANONICAL_LEDGER_V2_MANIFEST_KEY)).toMatchObject({ schemaVersion: 2, legacyImportComplete: true, ids: ["r1", "r2", "r3"], indexVersion: 1 });
   });
 
   it("rejects a failed read-back and remains retryable from the untouched legacy value", () => {
@@ -118,6 +120,19 @@ describe("canonical recorded-session per-session migration", () => {
     expect(ledger.append("active", event("active", 0, "started")).status).toBe("saved");
     expect(storage.writes).toEqual([key("active")]);
     expect(JSON.stringify(storage.values.get(key("active")))).not.toContain("history-199");
+  });
+
+  it("uses the indexed manifest to inspect the active workout without reading historical records on cold startup", () => {
+    const history = Array.from({ length: 2_500 }, (_, index) => aggregate(`history-${String(index).padStart(4, "0")}`, { status: "completed", version: 1 }));
+    const active = aggregate("active", { status: "started", version: 1 });
+    const storage = legacyStorage([...history, active]);
+    expect(createCanonicalRecordedSessionLedger(storage).inspectActive()).toMatchObject({ status: "found", sessions: [{ recordedSessionId: "active" }] });
+
+    storage.reads.length = 0;
+    const cold = createCanonicalRecordedSessionLedger(storage).inspectActive();
+
+    expect(cold).toMatchObject({ status: "found", sessions: [{ recordedSessionId: "active" }] });
+    expect(storage.reads.filter((candidate) => candidate.startsWith(CANONICAL_LEDGER_V2_RECORD_PREFIX))).toEqual([key("active")]);
   });
 });
 

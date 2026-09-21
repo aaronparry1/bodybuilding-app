@@ -1,5 +1,6 @@
 import {
   CANONICAL_LEDGER_LEGACY_KEY,
+  CANONICAL_LEDGER_V2_PENDING_KEY,
   CANONICAL_LEDGER_V2_MANIFEST_KEY,
   CANONICAL_LEDGER_V2_RECORD_PREFIX,
   createCanonicalRecordedSessionLedger,
@@ -20,10 +21,14 @@ export type CanonicalLedgerDeviceBenchmarkResult = Readonly<{
   historySessions: number;
   eventsSeeded: number;
   legacyPayloadBytes: number;
+  legacyInspectActiveMs: number;
   legacyAppendMs: number;
   migrationMs: number;
   migratedSessions: number;
+  v2ColdInspectActiveMs: number;
+  v2ExportPlanMs: number;
   v2AppendMs: number;
+  readSpeedup: number;
   speedup: number;
   v2RecordBytes: number;
   completedAt: string;
@@ -34,6 +39,12 @@ export function runCanonicalLedgerDeviceBenchmark(): CanonicalLedgerDeviceBenchm
   const legacy = buildLegacyStore();
   const serializedLegacy = JSON.stringify(legacy);
   jsonStore.set(CANONICAL_LEDGER_LEGACY_KEY, legacy);
+
+  jsonStore.resetCache();
+  const legacyInspectStarted = now();
+  const legacyActive = inspectActiveUsingLegacyWholeLedgerRead();
+  const legacyInspectActiveMs = now() - legacyInspectStarted;
+  if (legacyActive !== ACTIVE_ID) throw new Error("benchmark_legacy_active_inspection_failed");
 
   const legacyAppendStarted = now();
   appendUsingLegacyWholeLedgerWrite();
@@ -47,10 +58,22 @@ export function runCanonicalLedgerDeviceBenchmark(): CanonicalLedgerDeviceBenchm
   const migratedSessions = ledger.exportPlan(PLAN_ID).length;
   const migrationMs = now() - migrationStarted;
 
-  const active = ledger.get(ACTIVE_ID);
+  jsonStore.resetCache();
+  const coldLedger = createCanonicalRecordedSessionLedger();
+  const v2InspectStarted = now();
+  const inspected = coldLedger.inspectActive();
+  const v2ColdInspectActiveMs = now() - v2InspectStarted;
+  if (inspected.status !== "found" || inspected.sessions[0]?.recordedSessionId !== ACTIVE_ID) throw new Error("benchmark_v2_active_inspection_failed");
+
+  const exportStarted = now();
+  const exportedSessions = coldLedger.exportPlan(PLAN_ID).length;
+  const v2ExportPlanMs = now() - exportStarted;
+  if (exportedSessions !== migratedSessions) throw new Error("benchmark_v2_export_mismatch");
+
+  const active = coldLedger.get(ACTIVE_ID);
   if (active.status !== "found") throw new Error("benchmark_active_session_missing");
   const v2AppendStarted = now();
-  const saved = ledger.append(ACTIVE_ID, performanceEvent(active.session.version, "v2"));
+  const saved = coldLedger.append(ACTIVE_ID, performanceEvent(active.session.version, "v2"));
   const v2AppendMs = now() - v2AppendStarted;
   if (saved.status !== "saved") throw new Error(`benchmark_v2_append_${saved.status}`);
 
@@ -61,10 +84,14 @@ export function runCanonicalLedgerDeviceBenchmark(): CanonicalLedgerDeviceBenchm
     historySessions: HISTORY_COUNT,
     eventsSeeded: Object.values(legacy).reduce((total, record) => total + record.events.length, 0),
     legacyPayloadBytes: serializedLegacy.length,
+    legacyInspectActiveMs,
     legacyAppendMs,
     migrationMs,
     migratedSessions,
+    v2ColdInspectActiveMs,
+    v2ExportPlanMs,
     v2AppendMs,
+    readSpeedup: v2ColdInspectActiveMs > 0 ? legacyInspectActiveMs / v2ColdInspectActiveMs : Number.POSITIVE_INFINITY,
     speedup: v2AppendMs > 0 ? legacyAppendMs / v2AppendMs : Number.POSITIVE_INFINITY,
     v2RecordBytes,
     completedAt: new Date().toISOString(),
@@ -74,9 +101,14 @@ export function runCanonicalLedgerDeviceBenchmark(): CanonicalLedgerDeviceBenchm
 function clearBenchmarkData() {
   const storage = getLocalStorage();
   for (const key of getLocalStorageKeys()) {
-    if (key === CANONICAL_LEDGER_LEGACY_KEY || key === CANONICAL_LEDGER_V2_MANIFEST_KEY || key.startsWith(CANONICAL_LEDGER_V2_RECORD_PREFIX)) storage.removeItem(key);
+    if (key === CANONICAL_LEDGER_LEGACY_KEY || key === CANONICAL_LEDGER_V2_MANIFEST_KEY || key === CANONICAL_LEDGER_V2_PENDING_KEY || key.startsWith(CANONICAL_LEDGER_V2_RECORD_PREFIX)) storage.removeItem(key);
   }
   jsonStore.resetCache();
+}
+
+function inspectActiveUsingLegacyWholeLedgerRead(): string | null {
+  const legacy = jsonStore.get<LegacyStore>(CANONICAL_LEDGER_LEGACY_KEY, {});
+  return Object.values(legacy).find((record) => ["pending", "started", "paused"].includes(record.session.status))?.session.recordedSessionId ?? null;
 }
 
 function appendUsingLegacyWholeLedgerWrite() {

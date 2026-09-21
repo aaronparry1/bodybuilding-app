@@ -13,6 +13,7 @@ import { projectCanonicalSupersetAdaptation, type CanonicalSupersetAdaptationPre
 import { isDesignQaModeExplicitlyRequested } from "@/application/design-qa/design-qa-runtime-core";
 
 export const CANONICAL_PROGRESS_PRESENTATION_VERSION = "canonical_progress_presentation_v1" as const;
+export const CANONICAL_PROGRESS_TREND_WINDOW = 12;
 export const PROGRESS_STATUS_MINIMUM_COMPLETED_SESSIONS = 3;
 export const PROGRESS_TREND_MINIMUM_COMPARABLE_OBSERVATIONS = 3;
 
@@ -338,10 +339,12 @@ function strongestTrend(observations: readonly ExerciseObservation[], displayUni
   const groups = [...groupComparable(observations).values()].filter((group) => group.length >= PROGRESS_TREND_MINIMUM_COMPARABLE_OBSERVATIONS && !/assisted/i.test(group[0]!.loadingMode)).sort((a, b) => b.length - a.length || a[0]!.exerciseId.localeCompare(b[0]!.exerciseId));
   const group = groups[0];
   if (!group) return undefined;
-  const useE1rm = group.every((item) => item.bestE1rmKg !== null && item.bestE1rmKg! > 0) && !/bodyweight/i.test(group[0]!.loadingMode);
+  const window = group.slice(-CANONICAL_PROGRESS_TREND_WINDOW);
+  const useE1rm = window.every((item) => item.bestE1rmKg !== null && item.bestE1rmKg! > 0) && !/bodyweight/i.test(window[0]!.loadingMode);
   const metric = useE1rm ? "e1rm" as const : /bodyweight/i.test(group[0]!.loadingMode) ? "reps" as const : "volume" as const;
   const unit = metric === "reps" ? "reps" : displayUnit;
-  const points = group.map((item, index) => ({ sessionId: item.sessionId, label: `${index + 1}`, value: metric === "e1rm" ? displayLoadFromBaseKg(item.bestE1rmKg!, displayUnit) : metric === "reps" ? item.bestReps : displayLoadFromBaseKg(item.volumeKg, displayUnit) }));
+  const firstOrdinal = group.length - window.length + 1;
+  const points = window.map((item, index) => ({ sessionId: item.sessionId, label: `${firstOrdinal + index}`, value: metric === "e1rm" ? displayLoadFromBaseKg(item.bestE1rmKg!, displayUnit) : metric === "reps" ? item.bestReps : displayLoadFromBaseKg(item.volumeKg, displayUnit) }));
   const metricLabel = metric === "e1rm" ? "estimated 1RM" : metric === "reps" ? "reps" : "training volume";
   const direction = points.every((point) => point.value === points[0]!.value) ? "stable" as const : "changing" as const;
   const summary = direction === "stable"

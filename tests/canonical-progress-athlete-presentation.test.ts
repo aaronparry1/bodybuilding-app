@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { applyCanonicalAdaptationVisualState, applyCanonicalHomeVisualState, applyCanonicalProgressVisualState } from "@/application/design-qa/canonical-five-day-plan-fixture";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
-import { projectCanonicalProgressPresentation, readCanonicalProgressPresentation } from "@/application/training/canonical-progress-presentation";
+import { CANONICAL_PROGRESS_TREND_WINDOW, projectCanonicalProgressPresentation, readCanonicalProgressPresentation } from "@/application/training/canonical-progress-presentation";
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
 import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
@@ -53,6 +53,29 @@ describe("athlete-facing canonical Progress presentation", () => {
     expect(progress.recentTraining.every((session) => session.detail.startsWith("15 of 15 working sets completed · "))).toBe(true);
     expect(progress.recentTraining.every((session) => session.action.label === "View workout")).toBe(true);
     expect(new Set(progress.recentTraining.map((session) => session.id)).size).toBe(progress.recentTraining.length);
+  });
+
+  it("bounds the chart to the latest comparable-workout window", () => {
+    applyCanonicalProgressVisualState("established", { planId: "progress-window" });
+    const model = canonicalActivePlanState.getReadModel()!;
+    const source = canonicalRecordedSessionLedger.exportPlan(model.planId);
+    const records = Array.from({ length: 15 }, (_, index) => {
+      const base = source[index % source.length]!;
+      const recordedSessionId = `progress-window:comparison:${String(index + 1).padStart(2, "0")}`;
+      const occurredAt = new Date(Date.UTC(2026, 0, index + 1, 12)).toISOString();
+      return {
+        ...base,
+        session: { ...base.session, recordedSessionId },
+        events: base.events.map((event) => ({ ...event, eventId: `${recordedSessionId}:${event.type}:${event.expectedVersion}`, aggregateId: recordedSessionId, occurredAt })),
+      };
+    });
+
+    const progress = projectCanonicalProgressPresentation({ status: "ready", plan: model, completedAggregates: records, now });
+
+    expect(progress.trend?.observations).toHaveLength(CANONICAL_PROGRESS_TREND_WINDOW);
+    expect(progress.trend?.observations[0]?.label).toBe("4");
+    expect(progress.trend?.observations.at(-1)?.label).toBe("15");
+    expect(progress.trend?.windowLabel).toBe("Last 12 comparable workouts");
   });
 
   it("respects display units without altering canonical performed loads", () => {

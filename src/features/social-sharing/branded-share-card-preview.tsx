@@ -5,7 +5,7 @@ import { ADAPTIVE_STRENGTH_COACH_DOWNLOAD_URL, type BrandedSharePayload } from "
 import { shareBrandedProgressLink, shareCapturedBrandedProgressCard } from "@/features/social-sharing/share-progress-card";
 import { colors, spacing } from "@/ui/theme";
 
-const logo = require("../../../assets/share-card-logo.png");
+const logo = require("../../../assets/share-card-logo-256.png");
 
 export function BrandedShareCardPreviewModal({
   payload,
