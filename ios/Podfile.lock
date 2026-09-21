@@ -1,9 +1,11 @@
 PODS:
   - boost (1.84.0)
   - DoubleConversion (1.1.6)
-  - EXConstants (56.0.23):
+  - EXApplication (56.0.3):
     - ExpoModulesCore
-  - Expo (56.0.19):
+  - EXConstants (56.0.26):
+    - ExpoModulesCore
+  - Expo (56.0.22):
     - boost
     - DoubleConversion
     - ExpoModulesCore
@@ -35,11 +37,11 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - ExpoAsset (56.0.22):
+  - ExpoAsset (56.0.24):
     - ExpoModulesCore
   - ExpoDomWebView (56.0.6):
     - ExpoModulesCore
-  - ExpoFileSystem (56.0.9):
+  - ExpoFileSystem (56.0.11):
     - ExpoModulesCore
   - ExpoFont (56.0.7):
     - ExpoModulesCore
@@ -51,11 +53,11 @@ PODS:
     - ExpoModulesCore
   - ExpoLinearGradient (56.0.4):
     - ExpoModulesCore
-  - ExpoLinking (56.0.16):
+  - ExpoLinking (56.0.18):
     - ExpoModulesCore
   - ExpoLogBox (56.0.14):
     - React-Core
-  - ExpoModulesCore (56.0.23):
+  - ExpoModulesCore (56.0.26):
     - boost
     - DoubleConversion
     - ExpoModulesJSI
@@ -85,29 +87,33 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - ExpoModulesJSI (56.0.12):
+  - ExpoModulesJSI (56.0.13):
     - React-Core
     - ReactCommon
-  - ExpoModulesWorklets (56.0.23):
+  - ExpoModulesWorklets (56.0.26):
     - ExpoModulesCore
     - ExpoModulesJSI
-  - ExpoModulesWorkletsAdapter (56.0.23):
+  - ExpoModulesWorkletsAdapter (56.0.26):
     - ExpoModulesCore
     - ExpoModulesJSI
     - ExpoModulesWorklets
     - RNWorklets
-  - ExpoRouter (56.2.18):
+  - ExpoNotifications (56.0.25):
+    - ExpoModulesCore
+  - ExpoRouter (56.2.21):
     - ExpoModulesCore
     - RNScreens
   - ExpoSecureStore (56.0.4):
     - ExpoModulesCore
-  - ExpoSharing (56.0.24):
+  - ExpoSharing (56.0.26):
     - ExpoModulesCore
-  - ExpoSQLite (56.0.5):
+  - ExpoSQLite (56.0.6):
+    - ExpoModulesCore
+  - ExpoStoreReview (56.0.4):
     - ExpoModulesCore
   - ExpoSymbols (56.0.7):
     - ExpoModulesCore
-  - ExpoUI (56.0.25):
+  - ExpoUI (56.0.26):
     - ExpoModulesCore
     - ExpoModulesWorklets
     - React-RCTFabric
@@ -2997,6 +3003,7 @@ PODS:
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
+  - EXApplication (from `../node_modules/expo-application/ios`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - Expo (from `../node_modules/expo`)
   - ExpoAsset (from `../node_modules/expo-asset/ios`)
@@ -3013,12 +3020,14 @@ DEPENDENCIES:
   - ExpoModulesJSI (from `../node_modules/expo-modules-jsi/apple`)
   - ExpoModulesWorklets (from `../node_modules/expo-modules-core`)
   - ExpoModulesWorkletsAdapter (from `../node_modules/expo-modules-core`)
+  - ExpoNotifications (from `../node_modules/expo-notifications/ios`)
   - ExpoRouter (from `../node_modules/expo-router/ios`)
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
   - ExpoSharing (from `../node_modules/expo-sharing/ios`)
   - ExpoSQLite (from `../node_modules/expo-sqlite/ios`)
+  - ExpoStoreReview (from `../node_modules/expo-store-review/ios`)
   - ExpoSymbols (from `../node_modules/expo-symbols/ios`)
-  - "ExpoUI (from `../node_modules/@expo/ui/ios`)"
+  - "ExpoUI (from `../node_modules/expo-router/node_modules/@expo/ui/ios`)"
   - fast_float (from `../node_modules/react-native/third-party-podspecs/fast_float.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
@@ -3120,6 +3129,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+  EXApplication:
+    :path: "../node_modules/expo-application/ios"
   EXConstants:
     :path: "../node_modules/expo-constants/ios"
   Expo:
@@ -3152,6 +3163,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-modules-core"
   ExpoModulesWorkletsAdapter:
     :path: "../node_modules/expo-modules-core"
+  ExpoNotifications:
+    :path: "../node_modules/expo-notifications/ios"
   ExpoRouter:
     :path: "../node_modules/expo-router/ios"
   ExpoSecureStore:
@@ -3160,10 +3173,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-sharing/ios"
   ExpoSQLite:
     :path: "../node_modules/expo-sqlite/ios"
+  ExpoStoreReview:
+    :path: "../node_modules/expo-store-review/ios"
   ExpoSymbols:
     :path: "../node_modules/expo-symbols/ios"
   ExpoUI:
-    :path: "../node_modules/@expo/ui/ios"
+    :path: "../node_modules/expo-router/node_modules/@expo/ui/ios"
   fast_float:
     :podspec: "../node_modules/react-native/third-party-podspecs/fast_float.podspec"
   FBLazyVector:
@@ -3339,33 +3354,36 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
-  EXConstants: 2b9b16a805cf5bce697037611890e5d73090077e
-  Expo: 8e6f44366653b6a656897312fd43ac21a6b76b3f
-  ExpoAsset: 16c1d38758be9a8d2f781f8e5f8a352f5ecb3626
+  EXApplication: 8e64f7ce47f6c8b86daa2c72da0a4bae427de022
+  EXConstants: e8630c85ce8948acec8d01d93616ee18ef55fac8
+  Expo: 1fdc2a6e8890fcaa561fd85b1826df0e0e3c10e0
+  ExpoAsset: b8dd782d0f10f4ee26b6618f4bfad4e49fedcb59
   ExpoDomWebView: fc6ec6e9a8e1ea00e6b13511768e70ffc7a71e04
-  ExpoFileSystem: 7cebe8a361ad7ec3e77321a68acf8288030ed50e
+  ExpoFileSystem: 06e017fa5765ba13dd9667a2b038fbd483fa557e
   ExpoFont: fac52e4d28848a270f198ec8d7bfa45dde9752c6
   ExpoGlassEffect: d810f0fc327071aa61d129ec2ec5618b60d18707
   ExpoHaptics: 4f104baed863f132c390b802ea2f59ecc55b99a5
   ExpoKeepAwake: edf05a0a5cdeddbb9fe705b49243ec6aef9cfded
   ExpoLinearGradient: debd4f2a2d56b857517588f61707168c8f0b4ff0
-  ExpoLinking: be71b9b94f6e6fd4d4b09c12235aae9cde1f4eae
+  ExpoLinking: 350b0a3075cd9eac58f886b24dfd528892effa0b
   ExpoLogBox: c611a5bdbeaa4110d3c9a6494039b4e8d2c9a4ea
-  ExpoModulesCore: faf9cd3e72c2131eb74a1dae423d972e02554dde
-  ExpoModulesJSI: 420a2dee5f7c1fa87f4a610b550b7671b5d33266
-  ExpoModulesWorklets: c28b609c3a7779575c1d7f8030948e7aa3d57e70
-  ExpoModulesWorkletsAdapter: ff29e1e33b3b0d5d2399f876093f196c08241994
-  ExpoRouter: 5541773a0fe9fb8b67c83967034dbc19920fde1e
+  ExpoModulesCore: 294015bbf60b494b531f22bfdab9bf07ed36bbf9
+  ExpoModulesJSI: 5b92bd8a2ceb114384fc4ba25d5bc5957a2cf504
+  ExpoModulesWorklets: 60d0dce32acdcd9d18322acd81abd36d517f5401
+  ExpoModulesWorkletsAdapter: 6420052115d01323066973e7c50a20fb3b63ca74
+  ExpoNotifications: 8c37a0c0cf9b11ba13f6c1b256879f29c75597fd
+  ExpoRouter: f1655d63834ec95cdef370d07fb114f5161254ab
   ExpoSecureStore: 20be7fe1601ed1726afaf04ea1321a2b6ac549fc
-  ExpoSharing: 593862acda88cda8fd4dc3e3758090349ceddbfd
-  ExpoSQLite: 382ba17b12d8ae04500b842fca99f3396eca3b80
+  ExpoSharing: 6b3877d4ae57df40237d09dc086fda1f16e61673
+  ExpoSQLite: 04745fbd20bbe2855abdbefc188d7a68fe77f0e4
+  ExpoStoreReview: 434285e13c9aa3d27b2436a94bb8803c27e7e38e
   ExpoSymbols: e1c132efafefa4504006449294e41ea33edb30e8
-  ExpoUI: 9d310f3665a486be9aa86afe4913687db94c857d
+  ExpoUI: c1f4df583a9e8d45497dadb52acfb461f490aa18
   fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6
   FBLazyVector: 473b935415b82ae4f7f9aa9d5b3378491143ccbf
   fmt: 530618a01105dae0fa3a2f27c81ae11fa8f67eac
   glog: e56ede4028c4b7418e6b1195a36b1656bb35e225
-  hermes-engine: d176cd6b985cea9637ca9b5ed6bd3f3af0602816
+  hermes-engine: bfa5739f560476fa34f44c1948ed45b2374a292b
   PurchasesHybridCommon: 8563d6a7d832332beb9b30478dbe56eeaa0dd425
   PurchasesHybridCommonUI: 32f7edc00832b451d2fcbcf8ace064a5b8e936de
   RCT-Folly: 957659fd132051eccf60310f242798220177d26e

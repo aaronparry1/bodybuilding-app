@@ -122,6 +122,7 @@ const config: ExpoConfig = {
   },
   plugins: [
     ["expo-router", { root: routerRoot }],
+    "expo-font",
     "expo-sharing",
     "expo-sqlite",
     "expo-secure-store",
