@@ -61,13 +61,13 @@ const revenueCatAnnualProductId = env("EXPO_PUBLIC_REVENUECAT_ANNUAL_PRODUCT_ID"
 const config: ExpoConfig = {
   name: appName,
   slug: env("APP_SLUG", "hypertrophy-app"),
-  version: env("APP_VERSION", "1.1.1"),
+  version: env("APP_VERSION", "1.1.2"),
   orientation: "portrait",
   icon: "./assets/icon.png",
   scheme: env("APP_SCHEME", isProduction ? "ironlogic" : isStaging ? "ironlogic-staging" : "ironlogic-dev"),
   userInterfaceStyle: "dark",
   ios: {
-    version: env("APP_IOS_VERSION", "1.1.1"),
+    version: env("APP_IOS_VERSION", "1.1.2"),
     icon: "./assets/icon.png",
     supportsTablet: true,
     bundleIdentifier: env(
@@ -94,7 +94,7 @@ const config: ExpoConfig = {
           ? "com.aaronparry.adaptivestrengthcoach.staging"
           : "com.aaronparry.adaptivestrengthcoach.dev",
     ),
-    versionCode: Number.parseInt(env("APP_ANDROID_VERSION_CODE", "111"), 10),
+    versionCode: Number.parseInt(env("APP_ANDROID_VERSION_CODE", "112"), 10),
     adaptiveIcon: {
       backgroundColor: "#080A0F",
       foregroundImage: "./assets/android-icon-foreground.png",
