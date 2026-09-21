@@ -5,6 +5,7 @@ import type {
   RevenueCatCustomerInfo,
   RevenueCatPackage,
   SubscriptionGateway,
+  SubscriberIdentityAttributes,
   SubscriptionState,
 } from "@/application/billing/subscription";
 import { mapRevenueCatCustomerInfoToSubscription, resolveRevenueCatApiKey } from "@/application/billing/subscription";
@@ -32,6 +33,9 @@ export function getRevenueCatApiKey(platform: typeof Platform.OS = Platform.OS):
 export class RevenueCatGateway implements SubscriptionGateway {
   private purchases: PurchasesModule | null = null;
   private configured = false;
+  private configuring: Promise<PurchasesModule> | null = null;
+  private identityQueue: Promise<unknown> = Promise.resolve();
+  private lastIdentifiedUserId: string | null = null;
   private packages = new Map<RevenueCatPackage["id"], NativePackage>();
 
   constructor(
@@ -140,18 +144,51 @@ export class RevenueCatGateway implements SubscriptionGateway {
     });
   }
 
-  async identifyUser(userId: string | null): Promise<SubscriptionState | null> {
-    return this.runSafely(async () => {
-      const purchases = await this.getConfiguredPurchases();
-      if (userId) {
-        const result = await purchases.logIn(userId);
-        const subscription = mapRevenueCatCustomerInfoToSubscription(mapNativeCustomerInfo(result.customerInfo, this.premiumEntitlementId), this.premiumEntitlementId);
-        return this.recoverAndroidEntitlement(subscription);
+  async identifyUser(userId: string | null, attributes: SubscriberIdentityAttributes = {}): Promise<SubscriptionState | null> {
+    // Serialize login + attributes + logout so rapid auth changes cannot cross accounts.
+    const operation = this.identityQueue.then(async () => {
+      try {
+        const purchases = await this.getConfiguredPurchases();
+        if (!await purchases.isConfigured()) throw new Error("RevenueCat is not configured yet.");
+        if (userId) {
+          let customerInfo: NativeCustomerInfo;
+          if (this.lastIdentifiedUserId !== userId) {
+            const result = await purchases.logIn(userId);
+            this.lastIdentifiedUserId = userId;
+            customerInfo = result.customerInfo;
+          } else {
+            customerInfo = await purchases.getCustomerInfo();
+          }
+          try {
+            await purchases.setEmail(attributes.email ?? "");
+            if (attributes.displayName !== undefined) {
+              await purchases.setDisplayName(attributes.displayName ?? "");
+            }
+          } catch (error) {
+            // Optional customer metadata must not discard valid subscription state.
+            console.warn("RevenueCat subscriber attributes could not be updated.", error);
+          }
+          const subscription = mapRevenueCatCustomerInfoToSubscription(mapNativeCustomerInfo(customerInfo, this.premiumEntitlementId), this.premiumEntitlementId);
+          return this.recoverAndroidEntitlement(subscription);
+        }
+        let customerInfo: NativeCustomerInfo;
+        // A failed logout can leave native identity uncertain; force the next login.
+        this.lastIdentifiedUserId = null;
+        try {
+          customerInfo = await purchases.logOut();
+        } catch (error) {
+          // RevenueCat LOG_OUT_ANONYMOUS_USER_ERROR (SDK error code 22).
+          if (String((error as { code?: unknown })?.code) !== "22") throw error;
+          customerInfo = await purchases.getCustomerInfo();
+        }
+        return mapRevenueCatCustomerInfoToSubscription(mapNativeCustomerInfo(customerInfo, this.premiumEntitlementId), this.premiumEntitlementId);
+      } catch (error) {
+        console.warn("RevenueCat auth identity could not be synchronized.", error);
+        throw error; // Caught by the subscription effect, independent of Supabase auth.
       }
-      if (await purchases.isAnonymous()) return this.getSubscription();
-      const customerInfo = await purchases.logOut();
-      return mapRevenueCatCustomerInfoToSubscription(mapNativeCustomerInfo(customerInfo, this.premiumEntitlementId), this.premiumEntitlementId);
     });
+    this.identityQueue = operation.catch(() => undefined);
+    return operation;
   }
 
   private async findNativePackage(packageId: RevenueCatPackage["id"]): Promise<NativePackage | null> {
@@ -176,13 +213,24 @@ export class RevenueCatGateway implements SubscriptionGateway {
     if (Platform.OS === "web") throw new Error("RevenueCat native SDK is unavailable on web. Using mock billing instead.");
     if (this.purchases && this.configured) return this.purchases;
 
+    if (!this.configuring) {
+      this.configuring = this.configurePurchases().finally(() => { this.configuring = null; });
+    }
+    return this.configuring;
+  }
+
+  private async configurePurchases(): Promise<PurchasesModule> {
     const module = await import("react-native-purchases");
     const purchases = module.default;
     if (!purchases?.configure) {
       throw new Error("RevenueCat native module is unavailable in this build.");
     }
 
-    purchases.configure({ apiKey: this.apiKey });
+    if (!await purchases.isConfigured()) {
+      purchases.configure({ apiKey: this.apiKey! });
+      this.lastIdentifiedUserId = null;
+    }
+    if (!await purchases.isConfigured()) throw new Error("RevenueCat configuration did not complete.");
     this.purchases = purchases;
     this.configured = true;
     return purchases;

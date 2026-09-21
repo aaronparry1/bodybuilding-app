@@ -58,9 +58,9 @@ describe("subscription restore and startup recovery", () => {
   it("RevenueCat identifyUser returns mapped CustomerInfo instead of discarding it", () => {
     const source = gatewaySource();
 
-    expect(source).toContain("async identifyUser(userId: string | null): Promise<SubscriptionState | null>");
+    expect(source).toContain("async identifyUser(userId: string | null, attributes: SubscriberIdentityAttributes = {}): Promise<SubscriptionState | null>");
     expect(source).toContain("const result = await purchases.logIn(userId);");
-    expect(source).toContain("const subscription = mapRevenueCatCustomerInfoToSubscription(mapNativeCustomerInfo(result.customerInfo");
+    expect(source).toContain("const subscription = mapRevenueCatCustomerInfoToSubscription(mapNativeCustomerInfo(customerInfo");
     expect(source).toContain("return this.recoverAndroidEntitlement(subscription);");
     expect(source).not.toContain("async identifyUser(userId: string | null): Promise<void>");
   });
@@ -88,22 +88,22 @@ describe("subscription restore and startup recovery", () => {
   it("SubscriptionProvider applies and caches identify state without overwriting it with a second refresh", () => {
     const source = contextSource();
 
-    expect(source).toContain("const { user, isLoading: authLoading } = useAuth();");
+    expect(source).toContain("const { user, session, isLoading: authLoading } = useAuth();");
     expect(source).toContain("if (authLoading) return undefined;");
-    expect(source).toContain("const identifiedSubscription = await gateway.current.identifyUser(user.id) ?? await gateway.current.getSubscription();");
+    expect(source).toContain("const identifiedSubscription = await syncRevenueCatAuthSession(gateway.current, session) ?? await gateway.current.getSubscription();");
     expect(source).toContain("setSubscription(cacheSubscription(identifiedSubscription));");
     expect(source).toContain("await loadPackages();");
     expect(source).toContain("setIsLoading(false);");
     expect(source.indexOf("setSubscription(cacheSubscription(identifiedSubscription));")).toBeLessThan(source.indexOf("await loadPackages();"));
     expect(source.indexOf("await loadPackages();")).toBeLessThan(source.indexOf("logBillingStage(\"identified user and loaded subscription packages\")"));
-    const identifyBranch = source.slice(source.indexOf("const identifiedSubscription = await gateway.current.identifyUser(user.id) ?? await gateway.current.getSubscription();"), source.indexOf("logBillingStage(\"identified user and loaded subscription packages\")"));
+    const identifyBranch = source.slice(source.indexOf("const identifiedSubscription = await syncRevenueCatAuthSession(gateway.current, session) ?? await gateway.current.getSubscription();"), source.indexOf("logBillingStage(\"identified user and loaded subscription packages\")"));
     expect(identifyBranch).not.toContain("await refreshSubscription();");
   });
 
   it("authenticated startup falls back to a direct CustomerInfo refresh if identify returns no state", () => {
     const source = contextSource();
 
-    expect(source).toContain("const identifiedSubscription = await gateway.current.identifyUser(user.id) ?? await gateway.current.getSubscription();");
+    expect(source).toContain("const identifiedSubscription = await syncRevenueCatAuthSession(gateway.current, session) ?? await gateway.current.getSubscription();");
   });
 
   it("anonymous startup still refreshes CustomerInfo so account creation is not required", () => {

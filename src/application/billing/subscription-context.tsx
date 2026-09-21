@@ -1,3 +1,4 @@
+import { syncRevenueCatAuthSession } from "@/application/billing/revenuecat-auth-listener";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { useAuth } from "@/application/auth/auth-context";
@@ -74,7 +75,7 @@ function logBillingStage(stage: string) {
 }
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, session, isLoading: authLoading } = useAuth();
   const fallbackGateway = useRef<SubscriptionGateway>(new MockRevenueCatGateway());
   const gateway = useRef<SubscriptionGateway>(fallbackGateway.current);
   const [subscription, setSubscription] = useState<SubscriptionState>(() => getCachedSubscription() ?? defaultSubscription);
@@ -169,7 +170,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         setError(null);
         try {
-          const identifiedSubscription = await gateway.current.identifyUser(user.id) ?? await gateway.current.getSubscription();
+          const identifiedSubscription = await syncRevenueCatAuthSession(gateway.current, session) ?? await gateway.current.getSubscription();
           if (cancelled) return;
           if (identifiedSubscription) {
             setSubscription(cacheSubscription(identifiedSubscription));
@@ -193,7 +194,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
       if (!user?.id && gateway.current.identifyUser && gateway.current.getProvider?.() === "revenuecat") {
         try {
-          const anonymousSubscription = await gateway.current.identifyUser(null);
+          const anonymousSubscription = await syncRevenueCatAuthSession(gateway.current, null);
           if (cancelled) return;
           if (anonymousSubscription) setSubscription(cacheSubscription(anonymousSubscription));
         } catch (nextError) {
@@ -209,7 +210,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, loadPackages, refreshSubscription, user?.id]);
+  }, [authLoading, loadPackages, refreshSubscription, user?.id, user?.email]);
 
   useEffect(() => {
     if (authLoading) {

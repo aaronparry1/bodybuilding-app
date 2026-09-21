@@ -208,6 +208,12 @@ export interface RevenueCatApiKeyInput {
   androidKey?: string;
 }
 
+export interface SubscriberIdentityAttributes {
+  email?: string | null;
+  /** Supply only when the current user’s profiles.display_name has already loaded. */
+  displayName?: string | null;
+}
+
 export interface SubscriptionGateway {
   isConfigured(): boolean;
   getProvider?(): BillingProvider;
@@ -219,7 +225,7 @@ export interface SubscriptionGateway {
   syncPurchases?(): Promise<SubscriptionState>;
   presentPaywall?(): Promise<SubscriptionState | null>;
   presentCustomerCenter?(): Promise<void>;
-  identifyUser?(userId: string | null): Promise<SubscriptionState | null>;
+  identifyUser?(userId: string | null, attributes?: SubscriberIdentityAttributes): Promise<SubscriptionState | null>;
   setMockStatus?(status: SubscriptionStatus): Promise<SubscriptionState>;
 }
 
