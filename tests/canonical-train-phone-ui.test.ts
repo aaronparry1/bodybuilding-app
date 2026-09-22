@@ -8,7 +8,7 @@ const tabsSource = readFileSync("app/(protected)/(tabs)/_layout.tsx", "utf8");
 
 describe("phone-first canonical Train UI", () => {
   it("keeps preview read-only until its explicit Start action", () => {
-    const preview = trainSource.slice(trainSource.indexOf("function WorkoutPreview"), trainSource.indexOf("function WorkoutExerciseList"));
+    const preview = trainSource.slice(trainSource.indexOf("function WorkoutPreview"), trainSource.indexOf("function WorkoutExerciseRow"));
     expect(preview).toContain("Start workout");
     expect(preview.indexOf('testID="train-start"')).toBeLessThan(preview.indexOf("presentation.exercises.map"));
     expect(preview).toContain('testID="train-preview-details-toggle"');
@@ -59,11 +59,9 @@ describe("phone-first canonical Train UI", () => {
   });
 
   it("turns numeric keyboard completion into the current validated workout action", () => {
-    expect(trainSource).toContain('label: "Confirm load"');
     expect(trainSource).toContain('label: "Log set"');
     expect(trainSource).toContain('label: "Save set"');
     expect(trainSource).toContain('testID="train-keyboard-action"');
-    expect(trainSource).toContain("onSubmit={props.onConfirmCalibration}");
     expect(trainSource).toContain("onSubmitEditing={() => editing ? props.onSaveEdit(set) : current ? props.onComplete(set) : undefined}");
     expect(trainSource).not.toContain('testID="train-keyboard-done"');
   });
@@ -82,7 +80,7 @@ describe("phone-first canonical Train UI", () => {
       ["assistance", "Assistance", true],
     ]);
     expect(project({ state: "calibration_required", loadingMode: "rep_progression" }).exercises[0]?.calibration?.title).toBe("Find today’s starting load");
-    expect(trainSource).toContain("Confirm starting load");
+    expect(trainSource).toContain("First set sets today's working weight for this exercise.");
   });
 
   it("wires persisted rest controls, completed-set editing, and truthful completion affordances", () => {
@@ -99,11 +97,10 @@ describe("phone-first canonical Train UI", () => {
   });
 
   it("keeps the current set focused while the complete workout remains directly browsable", () => {
-    expect(trainSource).toContain("function WorkoutExerciseList");
+    expect(trainSource).toContain("function WorkoutExerciseRow");
     expect(trainSource).toContain('testID="train-workout-exercise-list"');
     expect(trainSource).toContain('testID="train-return-current"');
-    expect(trainSource).toContain("Tap to view · prescription unchanged");
-    expect(trainSource).toContain('testID="train-all-sets-toggle"');
+    expect(trainSource).toContain("const displayedSets = exercise.sets;");
     expect(trainSource).not.toContain("function ExerciseSwitcherModal");
   });
 

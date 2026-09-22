@@ -57,18 +57,16 @@ describe("active Train navigation and focus repair", () => {
   });
 
   it("keeps one current-set editor expanded while the complete exercise order remains inline", () => {
-    expect(train).toContain("function WorkoutExerciseList");
+    expect(train).toContain("function WorkoutExerciseRow");
     expect(train).toContain('testID="train-workout-exercise-list"');
     expect(train).toContain('testID="train-return-current"');
-    expect(train).toContain("firstIncomplete ? [firstIncomplete] : exercise.sets.slice(-1)");
-    expect(train).toContain("All sets ·");
-    expect(train).toContain("Method and coaching details");
+    expect(train).toContain("const displayedSets = exercise.sets;");
+    expect(train).toContain('testID={`train-more-${exercise.order}`}');
     expect(train).not.toContain("function ExerciseRail");
   });
 
   it("retains grouped-method context in the directly browsable workout list", () => {
     expect(train).toContain("exercise.methodExecution.sequenceLabel ?? (exercise.groupType");
-    expect(train).toContain("Tap to view · prescription unchanged");
   });
 
   it("uses accessible non-blocking completion feedback instead of a loose page-bottom message", () => {

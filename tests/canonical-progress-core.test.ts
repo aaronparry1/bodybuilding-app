@@ -4,7 +4,7 @@ import { evaluateCanonicalProgress } from "@/domain/training/canonical-progress-
 import { canonicalProgressDecisionRepository } from "@/data/local/canonical-progress-decision-repository";
 import type { CanonicalActivePlanReadModel } from "@/application/training/canonical-active-plan-application";
 
-const plan = { schemaVersion: "canonical_active_plan_read_model_v1", planId: "p", revision: 1, macrocycle: { goal: "hypertrophy", rolling: true }, mesocycle: { id: "hypertrophy_accumulation_1", position: 0, purpose: "accumulate" }, microcycle: { id: "p:micro", sequenceNumber: 1, trainingDays: 2, sessionRoles: ["Full body 1", "Full body 2"] }, plannedSessions: [], nextSession: null, progress: { evidenceVersion: "progress_v1", revision: 0 } } as CanonicalActivePlanReadModel;
+const plan = { schemaVersion: "canonical_active_plan_read_model_v1", planId: "p", revision: 1, equipment: ["barbell", "dumbbell", "machine", "cable", "bodyweight"], macrocycle: { goal: "hypertrophy", rolling: true }, mesocycle: { id: "hypertrophy_accumulation_1", position: 0, purpose: "accumulate" }, microcycle: { id: "p:micro", sequenceNumber: 1, trainingDays: 2, sessionRoles: ["Full body 1", "Full body 2"] }, plannedSessions: [], nextSession: null, progress: { evidenceVersion: "progress_v1", revision: 0 } } as CanonicalActivePlanReadModel;
 
 describe("canonical Progress core", () => {
   beforeEach(() => canonicalProgressEvidenceRepository.clear());

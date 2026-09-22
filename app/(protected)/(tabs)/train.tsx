@@ -19,8 +19,11 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useExerciseLibrary } from "@/features/exercise-library/use-exercise-library";
+import { filterExercises } from "@/domain/training/exercise-library";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { loadPlannedSession } from "@/application/training/canonical-active-plan-application";
+import { editCanonicalExercise, rankExerciseReplacements, type ExerciseSubstitutionReason } from "@/application/training/canonical-exercise-management";
+import { exerciseDisplayName } from "@/application/training/display-labels";
 import {
   completeCanonicalSession,
   discardLatestCanonicalSessionAttempt,
@@ -103,12 +106,18 @@ function CanonicalTrainExperience() {
   const [message, setMessage] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<"reps" | "load" | null>(null);
   const [setValues, setSetValues] = useState<Record<string, SetValues>>({});
-  const [calibrationDrafts, setCalibrationDrafts] = useState<Record<string, SetValues>>({});
   const [calibrationLoads, setCalibrationLoads] = useState<Record<string, number>>({});
   const [editState, setEditState] = useState<EditState | null>(null);
   const [recordedId, setRecordedId] = useState<string | undefined>(undefined);
   const [activeExerciseId, setActiveExerciseId] = useState<string | null>(null);
   const [modal, setModal] = useState<TrainModal>(null);
+  const [swapSlotId, setSwapSlotId] = useState<string | null>(null);
+  const [swapExerciseId, setSwapExerciseId] = useState<string | null>(null);
+  const [swapReason, setSwapReason] = useState<ExerciseSubstitutionReason>("preference");
+  const [swapFutureToo, setSwapFutureToo] = useState(false);
+  const [swapSaving, setSwapSaving] = useState(false);
+  const [swapSearchOpen, setSwapSearchOpen] = useState(false);
+  const [swapSearchQuery, setSwapSearchQuery] = useState("");
   const [busy, setBusy] = useState(false);
   const [timerTick, setTimerTick] = useState(() => Date.now());
   const [nextInstruction, setNextInstruction] = useState<string | null>(null);
@@ -121,6 +130,11 @@ function CanonicalTrainExperience() {
   useEffect(() => {
     if (params.exerciseEditMessage) setMessage(String(params.exerciseEditMessage));
   }, [params.exerciseEditMessage]);
+  useEffect(() => {
+    if (!message || !isPositiveTrainFeedback(message)) return;
+    const timeout = setTimeout(() => setMessage(null), 3000);
+    return () => clearTimeout(timeout);
+  }, [message]);
 
   const plan = canonicalActivePlanState.getReadModel();
   const route = useMemo(() => ({
@@ -325,33 +339,60 @@ function CanonicalTrainExperience() {
     canonicalActivePlanState.refresh();
   };
 
-  const confirmCalibration = (exercise: WorkoutExercisePresentation) => {
-    const calibration = exercise.calibration;
-    if (!calibration) return;
-    const draft = calibrationDrafts[exercise.id] ?? { reps: String(calibration.targetReps), load: "" };
-    const result = validateCanonicalCalibrationEntry({ repsText: draft.reps, loadText: draft.load, exactTargetReps: calibration.targetReps, displayUnit: settings.unit });
-    if (result.status === "invalid") { setFieldError(result.field); setMessage(result.reason); return; }
-    setFieldError(null);
-    const displayLoad = Number(draft.load);
-    setCalibrationLoads((current) => ({ ...current, [exercise.id]: displayLoad }));
-    setSetValues((current) => ({
-      ...current,
-      ...Object.fromEntries(exercise.sets.filter((set) => set.state !== "completed").map((set) => [set.id, { reps: String(set.targetReps), load: String(displayLoad) }])),
-    }));
-    setMessage("Starting load confirmed. Ramp work remains separate; completed working sets will retain the evidence.");
-  };
+
 
   const valuesFor = (exercise: WorkoutExercisePresentation, set: WorkoutSetPresentation): SetValues => {
     const defaultLoad = calibrationLoads[exercise.id] ?? set.defaultLoad;
     return setValues[set.id] ?? { reps: String(set.targetReps), load: defaultLoad === null ? "" : String(defaultLoad) };
   };
 
+  const availableEquipment = plan?.equipment ?? [];
+  const slotsForSwap = Array.isArray((snapshot as Record<string, unknown> | undefined)?.slots) ? ((snapshot as { slots: readonly Record<string, unknown>[] }).slots) : [];
+  const swapSlot = slotsForSwap.find((candidate) => String(candidate.id) === swapSlotId);
+  const swapOptions = swapSlot && plan ? rankExerciseReplacements(swapSlot, availableEquipment).slice(0, 8) : [];
+  const { filteredExercises: fullExerciseCatalogue } = useExerciseLibrary();
+  const swapSearchResults = swapSearchQuery.trim().length > 0 ? filterExercises(fullExerciseCatalogue, { query: swapSearchQuery }).filter((exercise) => exercise.id !== String(swapSlot?.exerciseId)).slice(0, 30) : [];
+  const applySwap = () => {
+    if (!plan || !swapSlot || !swapExerciseId) return;
+    setSwapSaving(true);
+    const result = editCanonicalExercise({
+      action: "replace",
+      scope: swapFutureToo ? "future_programme" : "current_session",
+      planId: plan.planId,
+      expectedPlanRevision: plan.revision,
+      operationId: `train-swap:${swapSlotId}:${swapExerciseId}:${Date.now()}`,
+      occurredAt: new Date().toISOString(),
+      recordedSessionId: aggregate.status === "found" ? aggregate.session.recordedSessionId : undefined,
+      expectedLedgerVersion: aggregate.status === "found" ? aggregate.session.version : undefined,
+      slotId: swapSlotId ?? undefined,
+      sourceExerciseId: String(swapSlot.exerciseId),
+      exerciseId: swapExerciseId,
+      reason: swapReason,
+    });
+    setSwapSaving(false);
+    setMessage(friendlyTrainMessage(result.reason));
+    if (result.status === "applied" || result.status === "idempotent") {
+      canonicalActivePlanState.refresh();
+      setSwapSlotId(null);
+      setSwapExerciseId(null);
+      setSwapFutureToo(false);
+      setSwapReason("preference");
+      setSwapSearchOpen(false);
+      setSwapSearchQuery("");
+    }
+  };
   const recordSet = (exercise: WorkoutExercisePresentation, set: WorkoutSetPresentation) => {
     if (!plan || aggregate.status !== "found" || aggregate.session.status !== "started") return;
     if (exercise.calibration?.required && calibrationLoads[exercise.id] === undefined && set.defaultLoad === null) {
-      setMessage("Confirm the starting load before the first working set.");
-      setFieldError("load");
-      return;
+      const values = valuesFor(exercise, set);
+      const calibrationResult = validateCanonicalCalibrationEntry({ repsText: values.reps, loadText: values.load, exactTargetReps: exercise.calibration.targetReps, displayUnit: settings.unit });
+      if (calibrationResult.status === "invalid") { setFieldError(calibrationResult.field); setMessage(calibrationResult.reason); return; }
+      const displayLoad = Number(values.load);
+      setCalibrationLoads((current) => ({ ...current, [exercise.id]: displayLoad }));
+      setSetValues((current) => ({
+        ...current,
+        ...Object.fromEntries(exercise.sets.filter((candidate) => candidate.id !== set.id && candidate.state !== "completed").map((candidate) => [candidate.id, { reps: String(candidate.targetReps), load: String(displayLoad) }])),
+      }));
     }
     if (inFlightSets.current.has(set.id)) return;
     const values = valuesFor(exercise, set);
@@ -477,9 +518,6 @@ function CanonicalTrainExperience() {
         ? { label: "Save set", run: () => { saveEdit(activeExercise, editedSet); Keyboard.dismiss(); } }
         : { label: "Done", run: Keyboard.dismiss };
     }
-    if (activeExercise.calibration?.required && calibrationLoads[activeExercise.id] === undefined) {
-      return { label: "Confirm load", run: () => { confirmCalibration(activeExercise); Keyboard.dismiss(); } };
-    }
     const currentSet = activeExercise.sets.find((set) => set.state === "current");
     return currentSet
       ? { label: "Log set", run: () => { recordSet(activeExercise, currentSet); Keyboard.dismiss(); } }
@@ -503,32 +541,28 @@ function CanonicalTrainExperience() {
           ? <View testID="train-next-instruction" accessibilityRole="summary" style={styles.nextInstruction}><Text style={styles.nextInstructionLabel}>UP NEXT</Text><Text style={styles.nextInstructionText}>{lastInstruction}</Text></View>
           : null}
         {prescribedExercise && activeExercise?.id !== prescribedExercise.id ? <Pressable testID="train-return-current" accessibilityRole="button" accessibilityLabel={`Return to current set, ${prescribedExercise.name}`} onPress={() => selectExercise(prescribedExercise.id)} style={({ pressed }) => [styles.returnCurrent, pressed && styles.pressed]}><Text style={styles.returnCurrentText}>Return to current set · {prescribedExercise.name}</Text></Pressable> : null}
-        {activeExercise ? <ActiveExerciseCard
-          key={activeExercise.id}
-          exercise={activeExercise}
-          displayUnit={settings.unit}
-          paused={paused}
-          layout={layout}
-          valuesFor={valuesFor}
-          setValues={setValues}
-          setSetValues={setSetValues}
-          calibrationDraft={calibrationDrafts[activeExercise.id]}
-          setCalibrationDraft={(value) => setCalibrationDrafts((current) => ({ ...current, [activeExercise.id]: value }))}
-          calibrationConfirmed={calibrationLoads[activeExercise.id] !== undefined || activeExercise.calibration?.required === false}
-          onConfirmCalibration={() => confirmCalibration(activeExercise)}
-          fieldError={fieldError}
-          editState={editState}
-          setEditState={setEditState}
-          onBeginEdit={beginEdit}
-          onSaveEdit={(set) => saveEdit(activeExercise, set)}
-          onComplete={(set) => recordSet(activeExercise, set)}
-        /> : null}
-        <WorkoutExerciseList
-          exercises={presentation.exercises}
-          focusedId={activeExercise?.id ?? ""}
-          prescribedId={prescribedExercise?.id ?? null}
-          onSelect={selectExercise}
-        />
+        <View testID="train-workout-exercise-list" accessibilityRole="list" style={styles.workoutExerciseList}>
+          {presentation.exercises.filter((exercise) => activeExercise && exercise.order < activeExercise.order).map((exercise) => <WorkoutExerciseRow key={exercise.id} exercise={exercise} allExercises={presentation.exercises} focusedId={activeExercise?.id ?? ""} prescribedId={prescribedExercise?.id ?? null} onSelect={selectExercise} />)}
+          {activeExercise ? <ActiveExerciseCard
+            key={activeExercise.id}
+            exercise={activeExercise}
+            displayUnit={settings.unit}
+            paused={paused}
+            layout={layout}
+            valuesFor={valuesFor}
+            setValues={setValues}
+            setSetValues={setSetValues}
+            calibrationConfirmed={calibrationLoads[activeExercise.id] !== undefined || activeExercise.calibration?.required === false}
+            fieldError={fieldError}
+            editState={editState}
+            setEditState={setEditState}
+            onBeginEdit={beginEdit}
+            onRequestSwap={(slotId) => setSwapSlotId(slotId)}
+            onSaveEdit={(set) => saveEdit(activeExercise, set)}
+            onComplete={(set) => recordSet(activeExercise, set)}
+          /> : null}
+          {presentation.exercises.filter((exercise) => activeExercise && exercise.order > activeExercise.order).map((exercise) => <WorkoutExerciseRow key={exercise.id} exercise={exercise} allExercises={presentation.exercises} focusedId={activeExercise?.id ?? ""} prescribedId={prescribedExercise?.id ?? null} onSelect={selectExercise} />)}
+        </View>
         <Pressable testID={stableUiIdentifier("action", "Swap or add exercise")} accessibilityRole="button" accessibilityLabel="Swap or add exercise" onPress={() => router.push({ pathname: "/(protected)/programmes/manage", params: { recordedSessionId: aggregate.session.recordedSessionId, plannedSessionId: aggregate.session.plannedSessionId } })} style={({ pressed }) => [styles.exerciseEditAction, pressed && styles.pressed]}><Text style={styles.exerciseEditActionText}>Swap or add exercise</Text><Text accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.exerciseEditGlyph}>›</Text></Pressable>
         {completion.normalFinishAvailable ? <FinishPanel presentation={presentation} busy={busy} onFinish={() => setModal("finish_complete")} /> : null}
       </ScrollView>
@@ -547,6 +581,31 @@ function CanonicalTrainExperience() {
       onRequestFinishEarly={() => setModal("finish_early")}
       onFinish={finish}
     />
+    <Modal visible={swapSlotId !== null} transparent animationType={reduceMotion ? "none" : "fade"} onRequestClose={() => setSwapSlotId(null)}>
+      <View style={styles.modalBackdrop}><View accessibilityViewIsModal accessibilityRole="none" style={styles.modalSheet}>
+        <ScrollView bounces={false} showsVerticalScrollIndicator contentContainerStyle={styles.modalContent}>
+          <Text style={styles.modalTitle}>Swap {swapSlot ? exerciseDisplayName(String(swapSlot.exerciseId)) : "exercise"}</Text>
+          <Text style={styles.body}>Completed sets stay recorded under the original exercise. The replacement keeps its own load history.</Text>
+          {swapOptions.length === 0 ? <Text style={styles.smallMuted}>No close match found for the equipment available — search below for any exercise.</Text> : swapOptions.map(({ exercise, compatibility }) => <Pressable key={exercise.id} accessibilityRole="button" accessibilityState={{ selected: swapExerciseId === exercise.id }} onPress={() => setSwapExerciseId(exercise.id)} style={[styles.choice, swapExerciseId === exercise.id && styles.choiceSelected]}><Text style={[styles.choiceText, swapExerciseId === exercise.id && styles.choiceTextSelected]}>{exercise.name}{compatibility === "equivalent" ? " · compatible" : " · new starting load required"}</Text></Pressable>)}
+          <Pressable testID="train-swap-search-toggle" accessibilityRole="button" accessibilityState={{ expanded: swapSearchOpen }} onPress={() => setSwapSearchOpen((open) => !open)} style={({ pressed }) => [styles.moreButton, pressed && styles.pressed]}><Text style={styles.moreButtonText}>{swapSearchOpen ? "Hide search" : "Search all exercises"}</Text><Text style={styles.moreButtonGlyph}>{swapSearchOpen ? "⌃" : "⌄"}</Text></Pressable>
+          {swapSearchOpen ? <>
+            <TextInput testID="train-swap-search-input" value={swapSearchQuery} onChangeText={setSwapSearchQuery} placeholder="Search exercises" placeholderTextColor={TRAIN.muted} style={styles.searchInput} autoCorrect={false} />
+            {swapSearchQuery.trim().length > 0 ? swapSearchResults.length === 0 ? <Text style={styles.smallMuted}>No exercises match "{swapSearchQuery}".</Text> : swapSearchResults.map((exercise) => <Pressable key={exercise.id} accessibilityRole="button" accessibilityState={{ selected: swapExerciseId === exercise.id }} onPress={() => setSwapExerciseId(exercise.id)} style={[styles.choice, swapExerciseId === exercise.id && styles.choiceSelected]}><Text style={[styles.choiceText, swapExerciseId === exercise.id && styles.choiceTextSelected]}>{exercise.name}</Text></Pressable>) : null}
+          </> : null}
+          {swapExerciseId ? <>
+            <Text style={styles.smallMuted}>Why are you changing it?</Text>
+            <View style={styles.reasonRow}>
+              <Pressable accessibilityRole="button" accessibilityState={{ selected: swapReason === "equipment_unavailable" }} onPress={() => setSwapReason("equipment_unavailable")} style={[styles.reasonPill, swapReason === "equipment_unavailable" && styles.choiceSelected]}><Text style={[styles.choiceText, swapReason === "equipment_unavailable" && styles.choiceTextSelected]}>Equipment</Text></Pressable>
+              <Pressable accessibilityRole="button" accessibilityState={{ selected: swapReason === "discomfort" }} onPress={() => setSwapReason("discomfort")} style={[styles.reasonPill, swapReason === "discomfort" && styles.choiceSelected]}><Text style={[styles.choiceText, swapReason === "discomfort" && styles.choiceTextSelected]}>Injury/discomfort</Text></Pressable>
+              <Pressable accessibilityRole="button" accessibilityState={{ selected: swapReason === "preference" }} onPress={() => setSwapReason("preference")} style={[styles.reasonPill, swapReason === "preference" && styles.choiceSelected]}><Text style={[styles.choiceText, swapReason === "preference" && styles.choiceTextSelected]}>Preference</Text></Pressable>
+            </View>
+            <Pressable testID="train-swap-future-toggle" accessibilityRole="button" accessibilityState={{ checked: swapFutureToo }} onPress={() => setSwapFutureToo((value) => !value)} style={({ pressed }) => [styles.disclosureRow, pressed && styles.pressed]}><Text style={styles.disclosureText}>{swapFutureToo ? "✓ " : ""}Also update future planned workouts</Text></Pressable>
+            <Pressable testID="train-swap-confirm" accessibilityRole="button" accessibilityLabel="Confirm swap" disabled={swapSaving} onPress={applySwap} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>{swapSaving ? "Swapping…" : "Swap exercise"}</Text></Pressable>
+          </> : null}
+          <Pressable testID="train-swap-cancel" accessibilityRole="button" accessibilityLabel="Cancel" onPress={() => { setSwapSlotId(null); setSwapExerciseId(null); setSwapFutureToo(false); setSwapReason("preference"); setSwapSearchOpen(false); setSwapSearchQuery(""); }} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>Cancel</Text></Pressable>
+        </ScrollView>
+      </View></View>
+    </Modal>
   </TrainShell>;
 }
 
@@ -595,29 +654,31 @@ function WorkoutPreview({ presentation, busy, onStart, message }: Readonly<{ pre
   </ScrollView>;
 }
 
-function WorkoutExerciseList({ exercises, focusedId, prescribedId, onSelect }: Readonly<{
-  exercises: readonly WorkoutExercisePresentation[];
+function WorkoutExerciseRow({ exercise, allExercises, focusedId, prescribedId, onSelect }: Readonly<{
+  exercise: WorkoutExercisePresentation;
+  allExercises: readonly WorkoutExercisePresentation[];
   focusedId: string;
   prescribedId: string | null;
   onSelect(id: string): void;
 }>) {
-  return <View testID="train-workout-exercise-list" style={styles.workoutExerciseList}>
-    <View style={styles.workoutExerciseListHeading}><View><Text style={styles.eyebrow}>FULL WORKOUT</Text><Text style={styles.workoutExerciseListTitle}>{exercises.length} exercises</Text></View><Text style={styles.tinyMuted}>Tap to view · prescription unchanged</Text></View>
-    <View accessibilityRole="list" style={styles.switcherList}>{exercises.map((exercise) => {
-          const completedSets = exercise.sets.filter((set) => set.state === "completed").length;
-          const complete = completedSets === exercise.sets.length;
-          const focused = exercise.id === focusedId;
-          const prescribed = exercise.id === prescribedId;
-          const status = complete ? "completed" : prescribed ? "current set" : "upcoming";
-          const method = exercise.methodExecution.sequenceLabel ?? (exercise.groupType === "straight_set" ? exercise.method : `${exercise.groupType.replace("_", " ")} · ${exercise.method}`);
-          const group = exercise.methodExecution.kind === "linked_rounds" ? `, ${exercise.methodExecution.sequenceLabel ?? "superset member"}` : exercise.methodExecution.kind === "rest_pause" ? ", rest-pause exercise" : "";
-          return <Pressable key={exercise.id} testID={`train-exercise-${exercise.order}`} accessibilityRole="button" accessibilityState={{ selected: focused }} accessibilityActions={[{ name: "increment", label: "Next exercise" }, { name: "decrement", label: "Previous exercise" }]} onAccessibilityAction={(event) => { const delta = event.nativeEvent.actionName === "increment" ? 1 : event.nativeEvent.actionName === "decrement" ? -1 : 0; const candidate = exercises[Math.max(0, Math.min(exercises.length - 1, exercise.order - 1 + delta))]; if (candidate) onSelect(candidate.id); }} accessibilityLabel={`Exercise ${exercise.order} of ${exercises.length}, ${exercise.name}${group}, ${status}, ${completedSets} of ${exercise.sets.length} sets complete${focused ? ", viewing" : ""}`} onPress={() => onSelect(exercise.id)} style={({ pressed }) => [styles.switcherItem, focused && styles.switcherItemActive, complete && styles.workoutExerciseComplete, pressed && styles.pressed]}>
-            <View style={[styles.switcherIndex, complete && styles.switcherIndexComplete]}><Text style={styles.switcherIndexText}>{complete ? "✓" : exercise.order}</Text></View>
-            <View style={styles.flex}><Text numberOfLines={2} style={[styles.exerciseTabName, focused && styles.accentText, complete && styles.workoutExerciseNameComplete]}>{exercise.name}</Text><Text numberOfLines={2} style={styles.tinyMuted}>{completedSets} of {exercise.sets.length} sets · {method}</Text></View>
-            <View style={styles.exerciseStatusColumn}><Text style={[styles.switcherStatus, complete && styles.successText, prescribed && styles.accentText]}>{status}</Text>{focused && !prescribed ? <Text style={styles.viewingStatus}>VIEWING</Text> : null}</View>
-          </Pressable>;
-        })}</View>
-  </View>;
+  const completedSets = exercise.sets.filter((set) => set.state === "completed");
+  const complete = completedSets.length === exercise.sets.length;
+  const focused = exercise.id === focusedId;
+  const prescribed = exercise.id === prescribedId;
+  const status = complete ? "completed" : prescribed ? "current set" : "upcoming";
+  const method = exercise.methodExecution.sequenceLabel ?? (exercise.groupType === "straight_set" ? exercise.method : `${exercise.groupType.replace("_", " ")} · ${exercise.method}`);
+  const group = exercise.methodExecution.kind === "linked_rounds" ? `, ${exercise.methodExecution.sequenceLabel ?? "superset member"}` : exercise.methodExecution.kind === "rest_pause" ? ", rest-pause exercise" : "";
+  // Completed rows show real results (last set's actual reps/load) so the row
+  // reads as part of the workout's history, not just a name in a checklist.
+  const lastCompleted = completedSets[completedSets.length - 1];
+  const resultSummary = complete && lastCompleted
+    ? lastCompleted.loadSemantic === "bodyweight" ? `${completedSets.length} sets` : `${lastCompleted.actualLoad} ${lastCompleted.unit} × ${completedSets.map((set) => set.actualReps).join(", ")}`
+    : `${completedSets.length} of ${exercise.sets.length} sets · ${method}`;
+  return <Pressable key={exercise.id} testID={`train-exercise-${exercise.order}`} accessibilityRole="button" accessibilityState={{ selected: focused }} accessibilityActions={[{ name: "increment", label: "Next exercise" }, { name: "decrement", label: "Previous exercise" }]} onAccessibilityAction={(event) => { const delta = event.nativeEvent.actionName === "increment" ? 1 : event.nativeEvent.actionName === "decrement" ? -1 : 0; const candidate = allExercises[Math.max(0, Math.min(allExercises.length - 1, exercise.order - 1 + delta))]; if (candidate) onSelect(candidate.id); }} accessibilityLabel={`Exercise ${exercise.order} of ${allExercises.length}, ${exercise.name}${group}, ${status}, ${completedSets.length} of ${exercise.sets.length} sets complete${focused ? ", viewing" : ""}`} onPress={() => onSelect(exercise.id)} style={({ pressed }) => [styles.switcherItem, focused && styles.switcherItemActive, complete && styles.workoutExerciseComplete, pressed && styles.pressed]}>
+    <View style={[styles.switcherIndex, complete && styles.switcherIndexComplete]}><Text style={styles.switcherIndexText}>{complete ? "✓" : exercise.order}</Text></View>
+    <View style={styles.flex}><Text numberOfLines={2} style={[styles.exerciseTabName, focused && styles.accentText, complete && styles.workoutExerciseNameComplete]}>{exercise.name}</Text><Text numberOfLines={2} style={styles.tinyMuted}>{resultSummary}</Text></View>
+    <View style={styles.exerciseStatusColumn}><Text style={[styles.switcherStatus, complete && styles.successText, prescribed && styles.accentText]}>{status}</Text>{focused && !prescribed ? <Text style={styles.viewingStatus}>Viewing</Text> : null}</View>
+  </Pressable>;
 }
 
 function ActiveExerciseCard(props: Readonly<{
@@ -628,52 +689,48 @@ function ActiveExerciseCard(props: Readonly<{
   valuesFor(exercise: WorkoutExercisePresentation, set: WorkoutSetPresentation): SetValues;
   setValues: Record<string, SetValues>;
   setSetValues(value: React.SetStateAction<Record<string, SetValues>>): void;
-  calibrationDraft?: SetValues;
-  setCalibrationDraft(value: SetValues): void;
   calibrationConfirmed: boolean;
-  onConfirmCalibration(): void;
   fieldError: "reps" | "load" | null;
   editState: EditState | null;
   setEditState(value: EditState | null): void;
   onBeginEdit(set: WorkoutSetPresentation): void;
+  onRequestSwap(slotId: string): void;
   onSaveEdit(set: WorkoutSetPresentation): void;
   onComplete(set: WorkoutSetPresentation): void;
 }>) {
   const { exercise } = props;
   const { filteredExercises } = useExerciseLibrary();
   const catalogueEntry = filteredExercises.find((candidate) => candidate.name === exercise.name);
-  const [allSetsOpen, setAllSetsOpen] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [calibrationHelpOpen, setCalibrationHelpOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const firstIncomplete = exercise.sets.find((set) => set.state !== "completed");
   const completedSetCount = exercise.sets.filter((set) => set.state === "completed").length;
-  const displayedSets = allSetsOpen
-    ? exercise.sets
-    : firstIncomplete ? [firstIncomplete] : exercise.sets.slice(-1);
+  const displayedSets = exercise.sets;
   const calibration = exercise.calibration;
-  const draft = props.calibrationDraft ?? { reps: String(calibration?.targetReps ?? firstIncomplete?.targetReps ?? ""), load: "" };
   return <View style={styles.exerciseCard}>
     <View style={styles.exerciseHeading}>
       <View style={styles.exerciseHeadingText}>
-        <Text style={styles.eyebrow}>EXERCISE {exercise.order}</Text>
+        <Text style={styles.eyebrow}>Exercise {exercise.order}</Text>
         <Text accessibilityRole="header" accessibilityLabel={`${exercise.name}. ${exercise.methodExecution.sequenceLabel ? `${exercise.methodExecution.sequenceLabel}. ` : ""}${completedSetCount} of ${exercise.sets.length} sets complete. ${firstIncomplete ? `Current set ${firstIncomplete.number}, target ${firstIncomplete.target}. ${firstIncomplete.previous ? `Previous comparable performance ${firstIncomplete.previous}.` : "No previous comparable performance."}` : "All prescribed sets complete."}`} style={styles.activeExerciseName}>{exercise.name}</Text>
-        <Text style={styles.body}>{completedSetCount} of {exercise.sets.length} sets complete · {exercise.method}</Text>
-        <Text style={styles.smallMuted}>{firstIncomplete ? `Current target ${firstIncomplete.target} · ${exercise.loadState}` : "All prescribed sets complete"}</Text>
-        {exercise.previousPerformance ? <Text style={styles.previous}>Previous: {exercise.previousPerformance}</Text> : null}
-        {catalogueEntry?.jointStress === "high" ? <Text style={styles.smallMuted}>⚠ Higher joint stress — warm up thoroughly, stop if you feel joint pain rather than muscle fatigue.</Text> : null}
-        {catalogueEntry?.notes[0] ? <Text style={styles.smallMuted}>{catalogueEntry.notes[0]}</Text> : null}
+        <Text style={styles.body}>{completedSetCount} of {exercise.sets.length} sets · {exercise.method}</Text>
+        {catalogueEntry?.jointStress === "high" ? <Text style={styles.smallMuted}>⚠ Higher joint stress — warm up thoroughly.</Text> : null}
       </View>
     </View>
-    {calibration?.required && !props.calibrationConfirmed ? <View style={styles.calibrationPanel}>
-      <Text style={styles.calibrationTitle}>{calibration.title}</Text>
-      <Text style={styles.body}>{calibration.instruction}</Text>
-      <Text style={styles.smallMuted}>{calibration.rampInstruction}</Text>
-      <View style={styles.calibrationInputs}>
-        <Field testID="train-calibration-reps" label="Successful reps" value={draft.reps} unit="reps" keyboardType="number-pad" error={props.fieldError === "reps"} onChange={(reps) => props.setCalibrationDraft({ ...draft, reps })} />
-        <Field testID="train-calibration-load" label="Successful load" value={draft.load} unit={props.displayUnit} keyboardType="decimal-pad" error={props.fieldError === "load"} onChange={(load) => props.setCalibrationDraft({ ...draft, load })} onSubmit={props.onConfirmCalibration} />
-      </View>
-      <Pressable testID="train-confirm-calibration" accessibilityRole="button" accessibilityLabel={`Confirm starting load for ${exercise.name}`} onPress={props.onConfirmCalibration} style={({ pressed }) => [styles.calibrationAction, pressed && styles.primaryActionPressed]}><Text numberOfLines={1} style={styles.calibrationActionText}>Confirm starting load</Text></Pressable>
-      <Text style={styles.tinyMuted}>Ramp attempts are not counted as working sets.</Text>
-    </View> : calibration && props.calibrationConfirmed ? <View style={styles.calibrationReady}><Text style={styles.successText}>✓ Starting load ready</Text><Text style={styles.smallMuted}>Complete the working sets below; valid evidence is retained for compatible sessions.</Text></View> : null}
+    {calibration?.required && !props.calibrationConfirmed ? <View style={styles.calibrationHeadingRow}>
+      <Text style={styles.smallMuted}>First set sets today's working weight for this exercise.</Text>
+      <Pressable testID="train-calibration-help-toggle" accessibilityRole="button" accessibilityLabel="How to find your starting weight" onPress={() => setCalibrationHelpOpen(true)} style={({ pressed }) => [styles.helpGlyph, pressed && styles.pressed]}><Text style={styles.helpGlyphText}>?</Text></Pressable>
+      <Modal visible={calibrationHelpOpen} transparent animationType="fade" onRequestClose={() => setCalibrationHelpOpen(false)}>
+        <View style={styles.modalBackdrop}><View accessibilityViewIsModal accessibilityRole="none" style={styles.modalSheet}>
+          <ScrollView bounces={false} showsVerticalScrollIndicator contentContainerStyle={styles.modalContent}>
+            <Text style={styles.modalTitle}>{calibration.title}</Text>
+            <Text style={styles.body}>{calibration.instruction}</Text>
+            <Text style={styles.smallMuted}>{calibration.rampInstruction}</Text>
+            <Text style={styles.tinyMuted}>Ramp attempts are not counted as working sets.</Text>
+            <Pressable testID="train-calibration-help-close" accessibilityRole="button" accessibilityLabel="Close" onPress={() => setCalibrationHelpOpen(false)} style={({ pressed }) => [styles.modalAction, pressed && styles.pressed]}><Text style={styles.modalActionText}>Got it</Text></Pressable>
+          </ScrollView>
+        </View></View>
+      </Modal>
+    </View> : null}
     <View style={styles.setHeader}>
       <Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.columnLabel, { width: props.layout.setWidth }]}>Set</Text>
       <Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.columnLabel, styles.flex]}>Reps</Text>
@@ -690,7 +747,7 @@ function ActiveExerciseCard(props: Readonly<{
           <View style={[styles.setIdentity, { width: props.layout.setWidth }]}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={styles.setNumber}>{set.number}</Text><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.setStateText, current && styles.accentText, completed && styles.successText]}>{completed ? "Done" : current ? "Now" : "Next"}</Text></View>
           {completed && !editing ? <Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75} style={[styles.completedValue, styles.flex]}>{set.actualReps} reps</Text> : <NumericTextInput testID={`train-reps-${exercise.order}-${set.number}`} accessibilityLabel={`Actual reps for set ${set.number} of ${exercise.name}`} keyboardType="number-pad" returnKeyType="next" editable={!props.paused && (!completed || editing)} selectTextOnFocus value={editing ? props.editState!.reps : values.reps} onChangeText={(reps) => editing ? props.setEditState({ ...props.editState!, reps }) : props.setSetValues((currentValues) => ({ ...currentValues, [set.id]: { ...values, reps } }))} style={[styles.compactInput, styles.flex, props.fieldError === "reps" && current && styles.inputError, (completed && !editing) && styles.lockedInput]} />}
           {set.loadSemantic === "bodyweight" ? <View style={styles.bodyweightCell}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={styles.bodyweightText}>Bodyweight</Text></View> : completed && !editing ? <Text maxFontSizeMultiplier={1.35} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={[styles.completedValue, styles.loadColumn]}>{set.actualLoad} {set.unit}</Text> : set.loadSemantic === "unavailable" ? <View style={styles.loadColumn}><Text maxFontSizeMultiplier={1.35} numberOfLines={2} style={styles.unavailableText}>Unavailable</Text></View> : <View style={styles.loadInputWrap}><NumericTextInput testID={`train-load-${exercise.order}-${set.number}`} accessibilityLabel={`${set.loadInputLabel} for set ${set.number} of ${exercise.name}, ${props.displayUnit}`} keyboardType="decimal-pad" returnKeyType="done" editable={!props.paused && (!completed || editing)} selectTextOnFocus value={editing ? props.editState!.load : values.load} onChangeText={(load) => editing ? props.setEditState({ ...props.editState!, load }) : props.setSetValues((currentValues) => ({ ...currentValues, [set.id]: { ...values, load } }))} onSubmitEditing={() => editing ? props.onSaveEdit(set) : current ? props.onComplete(set) : undefined} style={[styles.compactInput, styles.loadInput, props.fieldError === "load" && current && styles.inputError]} /><Text maxFontSizeMultiplier={1.35} style={styles.unitLabel}>{props.displayUnit}</Text></View>}
-          <Pressable testID={`train-complete-${exercise.order}-${set.number}`} accessibilityRole="button" accessibilityLabel={completed ? `Set ${set.number} completed; edit available below` : `Complete set ${set.number} of ${exercise.name}`} accessibilityState={{ disabled: completed || !current || props.paused }} disabled={completed || !current || props.paused || (calibration?.required && !props.calibrationConfirmed) || set.loadSemantic === "unavailable"} onPress={() => props.onComplete(set)} style={({ pressed }) => [styles.doneControl, completed && styles.doneControlComplete, (!current || props.paused) && styles.doneControlUpcoming, pressed && styles.doneControlPressed]}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.doneGlyph, completed && styles.doneGlyphComplete]}>{completed ? "✓" : "✓"}</Text></Pressable>
+          <Pressable testID={`train-complete-${exercise.order}-${set.number}`} accessibilityRole="button" accessibilityLabel={completed ? `Set ${set.number} completed; edit available below` : `Complete set ${set.number} of ${exercise.name}`} accessibilityState={{ disabled: completed || !current || props.paused }} disabled={completed || !current || props.paused || set.loadSemantic === "unavailable"} onPress={() => props.onComplete(set)} style={({ pressed }) => [styles.doneControl, completed && styles.doneControlComplete, (!current || props.paused) && styles.doneControlUpcoming, pressed && styles.doneControlPressed]}><Text maxFontSizeMultiplier={1.35} numberOfLines={1} style={[styles.doneGlyph, completed && styles.doneGlyphComplete]}>{completed ? "✓" : "✓"}</Text></Pressable>
         </View>
         <View style={styles.setDetailRow}>
           <Text style={styles.tinyMuted}>{set.role === "top_set" ? "Top set · " : set.role === "back_off" ? "Back-off · " : set.role === "activation" ? "Activation · " : set.role === "mini_set" ? "Mini-set · " : ""}Target {set.target}{set.previous ? ` · Previous ${set.previous}` : ""}</Text>
@@ -699,9 +756,8 @@ function ActiveExerciseCard(props: Readonly<{
         </View>
       </View>;
     })}</View>
-    {exercise.sets.length > 1 ? <Pressable testID="train-all-sets-toggle" accessibilityRole="button" accessibilityState={{ expanded: allSetsOpen }} accessibilityLabel={`${allSetsOpen ? "Hide" : "Show"} all sets for ${exercise.name}`} onPress={() => setAllSetsOpen((open) => !open)} style={({ pressed }) => [styles.disclosureRow, pressed && styles.pressed]}><Text style={styles.disclosureText}>{allSetsOpen ? "Show current set only" : `All sets · ${completedSetCount} of ${exercise.sets.length} complete`}</Text><Text style={styles.disclosureGlyph}>{allSetsOpen ? "⌃" : "⌄"}</Text></Pressable> : null}
-    <Pressable testID={`train-details-${exercise.order}`} accessibilityRole="button" accessibilityState={{ expanded: detailsOpen }} accessibilityLabel={`${detailsOpen ? "Hide" : "Show"} method and coaching details for ${exercise.name}`} onPress={() => setDetailsOpen((open) => !open)} style={({ pressed }) => [styles.disclosureRow, pressed && styles.pressed]}><Text style={styles.disclosureText}>Method and coaching details</Text><Text style={styles.disclosureGlyph}>{detailsOpen ? "⌃" : "⌄"}</Text></Pressable>
-    {detailsOpen ? <>
+    <Pressable testID={`train-more-${exercise.order}`} accessibilityRole="button" accessibilityState={{ expanded: moreOpen }} accessibilityLabel={`${moreOpen ? "Hide" : "Show"} more options for ${exercise.name}`} onPress={() => setMoreOpen((open) => !open)} style={({ pressed }) => [styles.moreButton, pressed && styles.pressed]}><Text style={styles.moreButtonText}>More</Text><Text style={styles.moreButtonGlyph}>{moreOpen ? "⌃" : "⌄"}</Text></Pressable>
+    {moreOpen ? <>
       <View testID={`train-method-${exercise.order}`} style={styles.methodPanel}>
         <Text style={styles.methodTitle}>{exercise.methodExecution.sequenceLabel ? `${exercise.methodExecution.sequenceLabel} · ` : ""}{exercise.method}</Text>
         <Text style={styles.methodSummary}>{exercise.methodExecution.instruction}</Text>
@@ -712,6 +768,8 @@ function ActiveExerciseCard(props: Readonly<{
             : `${exercise.methodExecution.interRoundRestSeconds}s between sets`}</Text>
       </View>
       {exercise.coachingNote ? <View style={styles.coaching}><Text style={styles.coachingText}>{exercise.coachingNote}</Text></View> : null}
+      {catalogueEntry?.notes[0] ? <Text style={styles.smallMuted}>{catalogueEntry.notes[0]}</Text> : null}
+      <Pressable testID={`train-swap-${exercise.order}`} accessibilityRole="button" accessibilityLabel={`Swap ${exercise.name} for a different exercise`} onPress={() => props.onRequestSwap(exercise.id)} style={({ pressed }) => [styles.disclosureRow, pressed && styles.pressed]}><Text style={styles.disclosureText}>Swap this exercise</Text></Pressable>
     </> : null}
   </View>;
 }
@@ -816,6 +874,17 @@ function friendlyReason(reason: string): string {
   };
   return labels[reason] ?? reason.replace(/_/g, " ");
 }
+function friendlyTrainMessage(reason: string): string {
+  return ({
+    exercise_replaced: "Exercise replaced for the remaining sets. Earlier work and each exercise's history stay separate.",
+    exercise_replaced_recalibration_required: "Exercise replaced for the remaining sets. Earlier work is saved; establish a safe starting load for the replacement.",
+    future_exercises_replaced: "Future exercises updated. Completed workouts are unchanged.",
+    required_exercise_requires_replacement: "Required primary work cannot be removed. Choose a compatible replacement instead.",
+    duplicate_exercise_not_allowed: "That exercise is already in this workout.",
+    incompatible_replacement: "That exercise does not meet this slot's role, muscle target, method or equipment requirements.",
+  } as Record<string, string>)[reason] ?? "The change could not be saved safely. Nothing was modified.";
+}
+
 function isPositiveTrainFeedback(message: string): boolean {
   return ["Exercise replaced", "Optional exercise", "Workout restored", "Workout started", "Workout paused", "Workout resumed", "Workout complete", "Set updated", "Starting load confirmed", "Active attempt discarded"].some((prefix) => message.startsWith(prefix));
 }
@@ -869,16 +938,16 @@ const styles = StyleSheet.create({
   switcherClose: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: TRAIN.surfaceRaised },
   switcherCloseText: { color: TRAIN.text, fontSize: 28, lineHeight: 30 },
   switcherList: { gap: 8 },
-  switcherItem: { minHeight: 64, flexDirection: "row", alignItems: "center", gap: 10, padding: 10, borderRadius: 13, backgroundColor: TRAIN.background, borderWidth: 1, borderColor: TRAIN.line },
-  switcherItemActive: { borderColor: TRAIN.accent, backgroundColor: TRAIN.accentSoft },
+  switcherItem: { minHeight: 56, flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 11, borderBottomWidth: 1, borderBottomColor: TRAIN.line },
+  switcherItemActive: {},
   switcherIndex: { width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center", backgroundColor: TRAIN.surfaceRaised },
   switcherIndexComplete: { backgroundColor: TRAIN.success },
   switcherIndexText: { color: TRAIN.text, fontSize: 13, fontWeight: "900" },
   switcherStatus: { color: TRAIN.subtle, fontSize: 10, fontWeight: "900" },
-  workoutExerciseList: { gap: 10, padding: 12, borderRadius: 16, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.line },
+  workoutExerciseList: { gap: 0 },
   workoutExerciseListHeading: { minHeight: 38, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12 },
   workoutExerciseListTitle: { color: TRAIN.text, fontSize: 18, lineHeight: 23, fontFamily: "Oswald_600SemiBold" },
-  workoutExerciseComplete: { opacity: 0.72, backgroundColor: TRAIN.surfaceRaised },
+  workoutExerciseComplete: { opacity: 0.6 },
   workoutExerciseNameComplete: { color: TRAIN.muted },
   exerciseStatusColumn: { minWidth: 58, alignItems: "flex-end", gap: 3 },
   viewingStatus: { color: TRAIN.muted, fontSize: 9, fontWeight: "900", letterSpacing: 0.4 },
@@ -890,7 +959,7 @@ const styles = StyleSheet.create({
   exerciseTabName: { flex: 1, minWidth: 0, color: TRAIN.muted, fontSize: 14, fontWeight: "800" },
   accentText: { color: TRAIN.accent },
   successText: { color: TRAIN.success, fontWeight: "900" },
-  exerciseCard: { gap: 12, padding: 14, borderRadius: 18, backgroundColor: TRAIN.surface, borderWidth: 1, borderColor: TRAIN.lineStrong },
+  exerciseCard: { gap: 12, paddingVertical: 16, borderTopWidth: 2, borderTopColor: TRAIN.accent, borderBottomWidth: 1, borderBottomColor: TRAIN.line },
   exerciseHeading: { flexDirection: "row", gap: 10 },
   exerciseHeadingText: { flex: 1, minWidth: 0, gap: 4 },
   activeExerciseName: { color: TRAIN.text, fontSize: 24, lineHeight: 29, fontFamily: "Oswald_600SemiBold" },
@@ -900,15 +969,18 @@ const styles = StyleSheet.create({
   disclosureRow: { minHeight: 46, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, paddingHorizontal: 12, borderRadius: 11, backgroundColor: TRAIN.surfaceRaised, borderWidth: 1, borderColor: TRAIN.line },
   disclosureText: { flex: 1, color: TRAIN.text, fontSize: 13, fontWeight: "800" },
   disclosureGlyph: { color: TRAIN.accent, fontSize: 18, fontWeight: "900" },
-  methodPanel: { gap: 3, padding: 10, borderRadius: 10, backgroundColor: TRAIN.accentSoft, borderWidth: 1, borderColor: TRAIN.line },
+  moreButton: { alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: 4, minHeight: 32, paddingHorizontal: 4 },
+  moreButtonText: { color: TRAIN.muted, fontSize: 13, fontWeight: "700" },
+  moreButtonGlyph: { color: TRAIN.muted, fontSize: 13, fontWeight: "700" },
+  methodPanel: { gap: 3, paddingVertical: 4, paddingLeft: 12, borderLeftWidth: 3, borderLeftColor: TRAIN.line },
   methodTitle: { color: TRAIN.accent, fontSize: 13, lineHeight: 18, fontWeight: "900" },
   methodSummary: { color: TRAIN.muted, fontSize: 12, lineHeight: 17, fontWeight: "700" },
   nextInstruction: { gap: 3, padding: 12, borderRadius: 12, backgroundColor: TRAIN.accentSoft, borderWidth: 1, borderColor: TRAIN.accent },
   nextInstructionLabel: { color: TRAIN.accent, fontSize: 11, lineHeight: 15, fontWeight: "900", letterSpacing: 0.8 },
   nextInstructionText: { color: TRAIN.text, fontSize: 14, lineHeight: 20, fontWeight: "800" },
-  calibrationPanel: { gap: 10, padding: 14, borderRadius: 14, backgroundColor: TRAIN.accentSoft, borderWidth: 1, borderColor: TRAIN.accent },
-  calibrationTitle: { color: TRAIN.text, fontSize: 20, lineHeight: 25, fontFamily: "Oswald_600SemiBold" },
-  calibrationInputs: { flexDirection: "row", gap: 8 },
+  calibrationHeadingRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  helpGlyph: { width: 26, height: 26, borderRadius: 13, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: TRAIN.line },
+  helpGlyphText: { color: TRAIN.muted, fontSize: 13, fontWeight: "700" },
   field: { flex: 1, minWidth: 0, gap: 5 },
   fieldInputWrap: { minHeight: 48, flexDirection: "row", alignItems: "center", borderRadius: 10, backgroundColor: TRAIN.background, borderWidth: 1, borderColor: TRAIN.lineStrong },
   fieldInput: { flex: 1, minWidth: 0, minHeight: 46, color: TRAIN.text, fontSize: 17, fontFamily: "Oswald_600SemiBold", paddingLeft: 10, paddingRight: 42 },
@@ -916,9 +988,6 @@ const styles = StyleSheet.create({
   keyboardDone: { minWidth: 56, minHeight: 44, alignItems: "center", justifyContent: "center" },
   keyboardDoneText: { color: TRAIN.accent, fontSize: 16, fontWeight: "900" },
   unitLabel: { position: "absolute", right: 0, color: TRAIN.muted, fontSize: 11, fontWeight: "900", paddingRight: 8 },
-  calibrationAction: { minHeight: 50, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: TRAIN.accent, paddingHorizontal: 12 },
-  calibrationActionText: { color: TRAIN.background, fontSize: 15, fontWeight: "900" },
-  calibrationReady: { gap: 3, padding: 10, borderRadius: 10, backgroundColor: TRAIN.successSoft, borderWidth: 1, borderColor: TRAIN.success },
   setHeader: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 8 },
   columnLabel: { color: TRAIN.subtle, fontSize: 10, lineHeight: 14, fontWeight: "900", letterSpacing: 0.5 },
   loadColumn: { flex: 1.18, minWidth: 0 },
@@ -970,6 +1039,13 @@ const styles = StyleSheet.create({
   modalContent: { gap: 10, padding: 18, paddingBottom: 24 },
   modalTitle: { color: TRAIN.text, fontSize: 23, lineHeight: 28, fontWeight: "900" },
   modalAction: { minHeight: 52, alignItems: "center", justifyContent: "center", borderRadius: 13, backgroundColor: TRAIN.surfaceRaised, borderWidth: 1, borderColor: TRAIN.lineStrong, paddingHorizontal: 12 },
+  choice: { minHeight: 48, justifyContent: "center", paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, borderColor: TRAIN.line, backgroundColor: TRAIN.background },
+  searchInput: { minHeight: 46, borderRadius: 12, borderWidth: 1, borderColor: TRAIN.line, backgroundColor: TRAIN.background, paddingHorizontal: 14, color: TRAIN.text, fontSize: 15 },
+  choiceSelected: { borderColor: TRAIN.accent, backgroundColor: TRAIN.accentSoft },
+  choiceText: { color: TRAIN.muted, fontSize: 14, fontWeight: "700" },
+  choiceTextSelected: { color: TRAIN.accent },
+  reasonRow: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
+  reasonPill: { minHeight: 40, justifyContent: "center", paddingHorizontal: 12, borderRadius: 20, borderWidth: 1, borderColor: TRAIN.line, backgroundColor: TRAIN.background },
   modalActionText: { color: TRAIN.text, fontSize: 15, fontWeight: "900" },
   modalDangerOutline: { borderColor: TRAIN.danger, backgroundColor: TRAIN.dangerSoft },
   modalDangerText: { color: TRAIN.danger, fontSize: 15, fontWeight: "900" },

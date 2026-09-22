@@ -38,7 +38,7 @@ describe("canonical Home projection", () => {
 });
 
 function plannedModel(): CanonicalActivePlanReadModel {
-  return { schemaVersion: "canonical_active_plan_read_model_v1", planId: "p", revision: 2, macrocycle: { goal: "hypertrophy", rolling: true }, mesocycle: { id: "m", position: 0, purpose: "hypertrophy" }, microcycle: { id: "mi", sequenceNumber: 1, trainingDays: 2, sessionRoles: ["Upper", "Lower"] }, plannedSessions: [{ id: "s", microcycleId: "mi", role: "Upper", planSessionIndex: 0, status: "planned", constructionVersion: "canonical_plan_v3", revision: 0, snapshot: snapshot() }], historicalRecordedSessions: [], nextSession: { id: "s", role: "Upper" }, progress: { evidenceVersion: "v1", revision: 2 } };
+  return { schemaVersion: "canonical_active_plan_read_model_v1", planId: "p", revision: 2, equipment: ["barbell", "dumbbell", "machine", "cable", "bodyweight"], macrocycle: { goal: "hypertrophy", rolling: true }, mesocycle: { id: "m", position: 0, purpose: "hypertrophy" }, microcycle: { id: "mi", sequenceNumber: 1, trainingDays: 2, sessionRoles: ["Upper", "Lower"] }, plannedSessions: [{ id: "s", microcycleId: "mi", role: "Upper", planSessionIndex: 0, status: "planned", constructionVersion: "canonical_plan_v3", revision: 0, snapshot: snapshot() }], historicalRecordedSessions: [], nextSession: { id: "s", role: "Upper" }, progress: { evidenceVersion: "v1", revision: 2 } };
 }
 
 function snapshot() {
