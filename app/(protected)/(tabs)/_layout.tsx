@@ -45,7 +45,6 @@ export default function MainTabsLayout() {
       void AccessibilityInfo.announceForAccessibility("The workout could not be saved for later. Stay in Train and try again.");
       return false;
     }
-    canonicalActivePlanState.refresh();
     return true;
   };
   return <Tabs

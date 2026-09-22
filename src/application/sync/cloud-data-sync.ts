@@ -114,6 +114,27 @@ function resolveRepositories(dependencies: CloudDataSyncDependencies, client: Ap
 }
 
 export function buildCloudUserDataBackup(dependencies: CloudDataSyncDependencies = {}, ownerUserId?: string): CloudUserDataBackup {
+  const scope = resolveCanonicalBackupScope(dependencies, ownerUserId);
+  return assembleCloudUserDataBackup(
+    dependencies,
+    scope,
+    scope.canonicalMaySync && scope.canonical.status === "saved" ? canonicalRecordedSessionLedger.exportPlan(scope.canonical.carrier.planId) : [],
+    scope.canonicalMaySync && scope.canonical.status === "saved" ? canonicalProgressEvidenceRepository.list(scope.canonical.carrier.planId) : [],
+  );
+}
+
+export async function buildCloudUserDataBackupAsync(dependencies: CloudDataSyncDependencies = {}, ownerUserId?: string): Promise<CloudUserDataBackup> {
+  const scope = resolveCanonicalBackupScope(dependencies, ownerUserId);
+  const [sessions, evidence] = scope.canonicalMaySync && scope.canonical.status === "saved"
+    ? await Promise.all([
+        canonicalRecordedSessionLedger.exportPlanAsync(scope.canonical.carrier.planId),
+        canonicalProgressEvidenceRepository.listAsync(scope.canonical.carrier.planId),
+      ])
+    : [[], []] as const;
+  return assembleCloudUserDataBackup(dependencies, scope, sessions, evidence);
+}
+
+function resolveCanonicalBackupScope(dependencies: CloudDataSyncDependencies, ownerUserId?: string) {
   const settingsStore = dependencies.localSettingsStore ?? appSettingsStore;
   const canonical = canonicalActivePlanV2Repository.get();
   let ownership = canonicalActivePlanOwnerRepository.get();
@@ -136,6 +157,16 @@ export function buildCloudUserDataBackup(dependencies: CloudDataSyncDependencies
       || (ownership.status === "owned"
         && ownership.record.ownerUserId === ownerUserId
         && ownership.record.planId === canonical.carrier.planId));
+  return { settingsStore, canonical, canonicalMaySync };
+}
+
+function assembleCloudUserDataBackup(
+  dependencies: CloudDataSyncDependencies,
+  scope: ReturnType<typeof resolveCanonicalBackupScope>,
+  sessions: NonNullable<CloudUserDataBackup["canonicalRecordedSessions"]>,
+  evidence: NonNullable<CloudUserDataBackup["canonicalProgressEvidence"]>,
+): CloudUserDataBackup {
+  const { settingsStore, canonical, canonicalMaySync } = scope;
   return {
     schema: cloudBackupSchema,
     version: cloudBackupVersion,
@@ -144,8 +175,8 @@ export function buildCloudUserDataBackup(dependencies: CloudDataSyncDependencies
     activeTrainingPlan: null,
     canonicalActivePlan: canonicalMaySync && canonical.status === "saved" ? serializeCanonicalActivePlan(canonical.carrier) : null,
     canonicalActivePlanRevision: canonicalMaySync && canonical.status === "saved" ? canonical.carrier.revision : undefined,
-    canonicalRecordedSessions: canonicalMaySync && canonical.status === "saved" ? canonicalRecordedSessionLedger.exportPlan(canonical.carrier.planId) : [],
-    canonicalProgressEvidence: canonicalMaySync && canonical.status === "saved" ? canonicalProgressEvidenceRepository.list(canonical.carrier.planId) : [],
+    canonicalRecordedSessions: sessions,
+    canonicalProgressEvidence: evidence,
     trainingYear: (dependencies.localTrainingYearRepository ?? legacyTrainingYearArchive).read(),
     recoveryCapacityIgnore: (dependencies.localRecoveryIgnoreRepository ?? recoveryCapacityIgnoreRepository).get(),
   };
@@ -295,7 +326,7 @@ export async function restoreCloudDataForUser(
           if (ledgerRestore.status !== "restored") {
             logSyncStage("canonical ledger restore rejected", ledgerRestore);
           } else {
-            for (const evidence of cloudSettings.canonicalProgressEvidence ?? []) canonicalProgressEvidenceRepository.record(evidence);
+            canonicalProgressEvidenceRepository.recordBatch(cloudSettings.canonicalProgressEvidence ?? []);
           }
           const local = canonicalActivePlanV2Repository.get();
           const referencesResolve = (parsed.carrier.recordedSessionReferences ?? []).every((reference) => canonicalRecordedSessionLedger.get(reference.sessionId).status === "found");
@@ -365,13 +396,29 @@ export function enqueueLocalDataForAutomaticSync(
   return queue.count();
 }
 
+export async function enqueueLocalDataForAutomaticSyncAsync(
+  userId: string,
+  dependencies: CloudDataSyncDependencies = {},
+): Promise<number> {
+  const queue = dependencies.queue ?? defaultQueue;
+  const localProgrammeRepository = dependencies.localProgrammeRepository ?? programmeRepository;
+  const localExerciseRepository = dependencies.localExerciseRepository ?? customExerciseRepository;
+  const backup = await buildCloudUserDataBackupAsync(dependencies, userId);
+  queue.enqueueMany([
+    ...localExerciseRepository.listCustom().map((exercise) => ({ entityType: "custom_exercise" as const, entityId: exercise.id, payload: { ...exercise, createdByUserId: exercise.createdByUserId ?? userId }, ownerUserId: userId })),
+    ...localProgrammeRepository.listCustom().map((programme) => ({ entityType: "programme" as const, entityId: programme.id, payload: { ...programme, createdByUserId: programme.createdByUserId ?? userId }, ownerUserId: userId })),
+    { entityType: "user_settings" as const, entityId: userId, payload: backup, ownerUserId: userId },
+  ]);
+  return queue.count();
+}
+
 export async function syncLocalDataForUser(
   userId: string,
   subscription: SubscriptionState = { status: "active", provider: "mock" },
   dependencies: CloudDataSyncDependencies = {},
 ): Promise<CloudDataSyncResult> {
   const queue = dependencies.queue ?? defaultQueue;
-  enqueueLocalDataForAutomaticSync(userId, { ...dependencies, queue });
+  await enqueueLocalDataForAutomaticSyncAsync(userId, { ...dependencies, queue });
   const client = await resolveClient(dependencies);
   if (!client) {
     return { synced: 0, skipped: 0, failed: queue.count() };

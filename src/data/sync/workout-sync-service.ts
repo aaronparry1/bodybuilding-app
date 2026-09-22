@@ -52,6 +52,8 @@ export class WorkoutSyncService {
     let synced = 0;
     let skipped = 0;
     let failed = 0;
+    const syncedIds: string[] = [];
+    const failures = new Map<string, string>();
     for (const item of this.queue.list()) {
       if (item.ownerUserId && item.ownerUserId !== this.userId) {
         skipped += 1;
@@ -81,17 +83,19 @@ export class WorkoutSyncService {
           const saved = await this.userSettingsRepository.loadUserSettingsBlob(this.userId);
           if (stableJson(saved) !== stableJson(item.payload)) throw new Error("Account backup envelope verification failed.");
         } else {
-          this.queue.markFailed(item.id, "Unsupported backup entity type.");
+          failures.set(item.id, "Unsupported backup entity type.");
           failed += 1;
           continue;
         }
-        this.queue.markSynced(item.id);
+        syncedIds.push(item.id);
         synced += 1;
       } catch {
-        this.queue.markFailed(item.id, "Sync failed. Check staging diagnostics for the failing entity.");
+        failures.set(item.id, "Sync failed. Check staging diagnostics for the failing entity.");
         failed += 1;
       }
     }
+
+    this.queue.settle(syncedIds, failures);
 
     return { synced, skipped, failed };
   }

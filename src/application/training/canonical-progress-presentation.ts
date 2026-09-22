@@ -281,7 +281,9 @@ function exerciseObservations(aggregate: Aggregate): ExerciseObservation[] {
   for (const event of work) {
     const exerciseId = String(event.payload.exerciseId ?? "");
     if (!exerciseId) continue;
-    groups.set(exerciseId, [...(groups.get(exerciseId) ?? []), event]);
+    const group = groups.get(exerciseId);
+    if (group) group.push(event);
+    else groups.set(exerciseId, [event]);
   }
   return [...groups.entries()].flatMap(([exerciseId, events]) => {
     const slot = slots.find((candidate) => String(candidate.exerciseId) === exerciseId);
@@ -359,7 +361,12 @@ function highlightBase(observation: ExerciseObservation, category: "reps" | "loa
 
 function groupComparable(observations: readonly ExerciseObservation[]): Map<string, ExerciseObservation[]> {
   const groups = new Map<string, ExerciseObservation[]>();
-  observations.slice().sort((a, b) => a.completedAt.localeCompare(b.completedAt) || a.sessionId.localeCompare(b.sessionId)).forEach((item) => { const key = `${item.exerciseId}:${item.loadingMode}`; groups.set(key, [...(groups.get(key) ?? []), item]); });
+  observations.slice().sort((a, b) => a.completedAt.localeCompare(b.completedAt) || a.sessionId.localeCompare(b.sessionId)).forEach((item) => {
+    const key = `${item.exerciseId}:${item.loadingMode}`;
+    const group = groups.get(key);
+    if (group) group.push(item);
+    else groups.set(key, [item]);
+  });
   return groups;
 }
 

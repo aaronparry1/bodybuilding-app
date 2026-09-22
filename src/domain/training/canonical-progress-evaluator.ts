@@ -134,20 +134,24 @@ export function evaluateCanonicalPostWorkoutProgress(input: Readonly<{
     explanation: string,
     facts: Pick<CanonicalPostWorkoutEvaluation, "targetCompletion" | "comparableExposureCount" | "repDropOff" | "recoveryEvidence" | "transitionEligible" | "calibrationCandidates" | "affectedExerciseIds">
       & Readonly<{ boundaryResolution?: CanonicalCycleBoundaryResolution }>,
-  ): CanonicalPostWorkoutEvaluation => ({
-    ...base,
-    evidenceIds: [...new Set([...evidenceIds, ...numericDecisions.flatMap((item) => item.evidenceIds)])].sort(),
-    evidenceVersions: Object.fromEntries(relevant
-      .filter((item) => evidenceIds.includes(item.evidenceId) || numericDecisions.some((decision) => decision.evidenceIds.includes(item.evidenceId)))
-      .map((item) => [item.evidenceId, item.evidenceVersion])),
-    evaluationId: `${input.plan.planId}:post-workout:${input.session.recordedSessionId}:${input.session.version}:${outcome}:${[...new Set([...evidenceIds, ...numericDecisions.flatMap((item) => item.evidenceIds)])].sort().join(",")}`,
-    outcome,
-    reasonCodes,
-    explanation,
-    deloadEligible: false,
-    numericDecisions,
-    ...facts,
-  });
+  ): CanonicalPostWorkoutEvaluation => {
+    const selectedEvidenceIds = [...new Set([...evidenceIds, ...numericDecisions.flatMap((item) => item.evidenceIds)])].sort();
+    const selectedEvidenceIdSet = new Set(selectedEvidenceIds);
+    return {
+      ...base,
+      evidenceIds: selectedEvidenceIds,
+      evidenceVersions: Object.fromEntries(relevant
+        .filter((item) => selectedEvidenceIdSet.has(item.evidenceId))
+        .map((item) => [item.evidenceId, item.evidenceVersion])),
+      evaluationId: `${input.plan.planId}:post-workout:${input.session.recordedSessionId}:${input.session.version}:${outcome}:${selectedEvidenceIds.join(",")}`,
+      outcome,
+      reasonCodes,
+      explanation,
+      deloadEligible: false,
+      numericDecisions,
+      ...facts,
+    };
+  };
   const emptyFacts = {
     targetCompletion: "failed" as const,
     comparableExposureCount: 0,

@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { canonicalMethodOutcomeRepository } from "@/data/local/canonical-method-outcome-repository";
 import { methodOutcomeFromPerformanceEvidence, validateCanonicalMethodOutcome } from "@/domain/training/canonical-method-outcome";
 import type { CanonicalProgressEvidence } from "@/domain/training/canonical-progress-evidence";
+import { getLocalStorage } from "@/data/local/local-storage";
 
 describe("canonical method outcome", () => {
   beforeEach(() => canonicalMethodOutcomeRepository.clear());
@@ -40,6 +41,20 @@ describe("canonical method outcome", () => {
     expect(canonicalMethodOutcomeRepository.saveEffective(corrected).status).toBe("duplicate");
     expect(canonicalMethodOutcomeRepository.list("plan")).toHaveLength(1);
     expect(canonicalMethodOutcomeRepository.list("plan")[0]).toMatchObject({ performedRepetitions: 7, correctionProvenance: "corrected", originalExecutionEventId: "performance-1" });
+  });
+
+  it("persists a history replay as one validated batch", () => {
+    const outcomes = Array.from({ length: 200 }, (_, index) => methodOutcomeFromPerformanceEvidence(evidence({
+      evidenceId: `session:evidence:set-${index}`,
+      slotId: `slot-${index}`,
+      observations: { ...evidence().observations, executionEventId: `performance-${index}` },
+    }))!);
+    const writes = vi.spyOn(getLocalStorage(), "setItem");
+    expect(canonicalMethodOutcomeRepository.saveEffectiveBatch(outcomes).status).toBe("saved");
+    expect(writes).toHaveBeenCalledTimes(1);
+    writes.mockRestore();
+    expect(canonicalMethodOutcomeRepository.list("plan")).toHaveLength(200);
+    expect(canonicalMethodOutcomeRepository.saveEffectiveBatch(outcomes).status).toBe("duplicate");
   });
 
   it("fails closed for old evidence without a comparable exposure identity", () => {

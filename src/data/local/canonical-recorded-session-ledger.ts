@@ -217,6 +217,20 @@ export function createCanonicalRecordedSessionLedger(storage: CanonicalLedgerSto
       }
     },
     exportPlan(planId: string) { return values(planId).filter((value) => value.session.planId === planId).sort((a, b) => a.session.recordedSessionId.localeCompare(b.session.recordedSessionId)).map((value) => ({ session: value.session, events: value.events.slice() })); },
+    async exportPlanAsync(planId: string, batchSize = 50) {
+      const manifest = ensureReady();
+      const ids = isIndexedManifest(manifest) ? manifest.ids.filter((id) => manifest.entries[id]?.planId === planId) : manifest.ids;
+      const records: Aggregate[] = [];
+      for (let index = 0; index < ids.length; index += 1) {
+        const record = readRecord(ids[index]!);
+        if (record) {
+          if (!validRecord(record)) throw new Error("recorded_session_storage_invalid");
+          if (record.session.planId === planId) records.push(record);
+        }
+        if ((index + 1) % Math.max(1, batchSize) === 0) await yieldToEventLoop();
+      }
+      return records.sort((a, b) => a.session.recordedSessionId.localeCompare(b.session.recordedSessionId)).map((value) => ({ session: value.session, events: value.events.slice() }));
+    },
     deleteActive(recordedSessionId: string, expectedVersion: number) {
       try {
         const manifest = ensureReady();
@@ -266,6 +280,10 @@ export function createCanonicalRecordedSessionLedger(storage: CanonicalLedgerSto
       writeManifestVerified({ schemaVersion: 2, legacyImportComplete: true, ids: [], indexVersion: 1, entries: {} });
     },
   };
+}
+
+function yieldToEventLoop(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
 export const canonicalRecordedSessionLedger = createCanonicalRecordedSessionLedger();

@@ -238,7 +238,6 @@ function CanonicalTrainExperience() {
     });
     if (result.recordedSessionId) setRecordedId(result.recordedSessionId);
     setMessage(friendlyReason(result.reason));
-    canonicalActivePlanState.refresh();
     setBusy(false);
   };
 
@@ -246,7 +245,6 @@ function CanonicalTrainExperience() {
     if (!plan || !recordedId) { setMessage("This recorded session cannot be restored."); return; }
     const result = restoreCanonicalRecordedSessionFromLedger(plan.planId, recordedId);
     setMessage(result.status === "restored" ? "Workout restored" : friendlyReason(result.reason));
-    canonicalActivePlanState.refresh();
   };
 
   const pauseAndLeave = () => {
@@ -263,7 +261,6 @@ function CanonicalTrainExperience() {
       provenance: "canonical_train",
     });
     setMessage(result.status === "applied" || result.status === "idempotent" ? null : friendlyReason(result.reason));
-    canonicalActivePlanState.refresh();
     setBusy(false);
     if (result.status === "applied" || result.status === "idempotent") { setModal(null); router.replace("/(protected)/(tabs)"); }
   };
@@ -287,7 +284,6 @@ function CanonicalTrainExperience() {
     setBusy(true);
     const result = resumeCanonicalSession(lifecycleCommand(plan.planId, plan.revision, aggregate.session.recordedSessionId, aggregate.session.version, "resume"));
     setMessage(friendlyReason(result.reason));
-    canonicalActivePlanState.refresh();
     setBusy(false);
   };
 
@@ -371,7 +367,6 @@ function CanonicalTrainExperience() {
     setSwapSaving(false);
     setMessage(friendlyTrainMessage(result.reason));
     if (result.status === "applied" || result.status === "idempotent") {
-      canonicalActivePlanState.refresh();
       setSwapSlotId(null);
       setSwapExerciseId(null);
       setSwapFutureToo(false);
@@ -429,7 +424,6 @@ function CanonicalTrainExperience() {
       const remainingInExercise = exercise.sets.filter((candidate) => candidate.state !== "completed" && candidate.id !== set.id);
       if (remainingInExercise.length === 0) setActiveExerciseId(null);
     }
-    canonicalActivePlanState.refresh();
     inFlightSets.current.delete(set.id);
     requestAnimationFrame(() => scrollRef.current?.scrollTo({ y: 0, animated: !reduceMotion }));
   };
@@ -468,7 +462,6 @@ function CanonicalTrainExperience() {
     setMessage(friendlyReason(result.reason));
     setNextInstruction(result.nextInstruction ?? null);
     if (result.status === "applied") setEditState(null);
-    canonicalActivePlanState.refresh();
   };
 
   const restAction = (action: "pause" | "resume" | "add" | "skip") => {

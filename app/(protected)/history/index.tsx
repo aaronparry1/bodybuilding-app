@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
@@ -21,6 +21,9 @@ export default function WorkoutHistoryScreen() {
   const [exerciseQuery, setExerciseQuery] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const deferredExerciseQuery = useDeferredValue(exerciseQuery);
+  const deferredFromDate = useDeferredValue(fromDate);
+  const deferredToDate = useDeferredValue(toDate);
   const [ledgerVersion, refresh] = useState(0);
   const { entitlement } = useSubscription();
   useEffect(() => {
@@ -39,11 +42,11 @@ export default function WorkoutHistoryScreen() {
         athleteId: plan.planId,
         planId: plan.planId,
         sessions: exportedSessions,
-        exerciseQuery,
-        fromDate,
-        toDate,
+        exerciseQuery: deferredExerciseQuery,
+        fromDate: deferredFromDate,
+        toDate: deferredToDate,
       })
-    : { status: "unavailable" as const, reason: "canonical_plan_unavailable" }, [exerciseQuery, exportedSessions, fromDate, plan?.planId, toDate]);
+    : { status: "unavailable" as const, reason: "canonical_plan_unavailable" }, [deferredExerciseQuery, deferredFromDate, deferredToDate, exportedSessions, plan?.planId]);
   const historyEntitlement = entitlement("unlimited_history", {
     historyDaysRequested: fromDate ? 365 : 30,
   });

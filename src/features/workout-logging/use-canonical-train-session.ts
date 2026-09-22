@@ -10,7 +10,6 @@ export function useCanonicalTrainSession(route: CanonicalTrainRouteInput) {
   const [recordedSessionId, setRecordedSessionId] = useState(route.recordedSessionId);
   const [projection, setProjection] = useState<CanonicalTrainProjectionResult>({ status: "rejected", reason: "recorded_session_not_found" });
   const reload = useCallback(() => {
-    canonicalActivePlanState.refresh();
     if (recordedSessionId) setProjection(projectCanonicalTrainSession(route.planId, recordedSessionId));
     refresh((value) => value + 1);
   }, [recordedSessionId, route.planId]);

@@ -3,7 +3,7 @@ import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-
 import { canonicalProgressEvidenceRepository } from "@/data/local/canonical-progress-evidence-repository";
 import { deriveCanonicalCompletionSummary } from "@/domain/training/canonical-completion-summary";
 import { completeCanonicalSession, discardCanonicalSessionAttempt, editCanonicalPerformedWork, pauseCanonicalSession, recordCanonicalPerformedWork, resumeCanonicalSession, restoreCanonicalRecordedSessionFromLedger, startCanonicalSession, type CanonicalPerformedWorkCommand, type CanonicalRecordedLifecycleCommand, type CanonicalStartSessionCommand } from "@/application/training/canonical-recorded-session-application";
-import { effectiveCanonicalPerformedWork } from "@/domain/training/canonical-performed-work";
+import { effectiveCanonicalPerformedWork, type CanonicalEffectivePerformedWork } from "@/domain/training/canonical-performed-work";
 
 export const CANONICAL_TRAIN_SESSION_PROJECTION_VERSION = "canonical_train_session_projection_v1" as const;
 
@@ -41,8 +41,15 @@ export function projectCanonicalTrainSession(planId: string, recordedSessionId: 
   const slots = Array.isArray(snapshot.slots) ? snapshot.slots as Array<Record<string, unknown>> : [];
   if (slots.some((slot) => typeof slot.id !== "string" || typeof slot.exerciseId !== "string") || hasLegacyFields(snapshot)) return { status: "rejected", reason: "invalid_prescription_snapshot" };
   const events = effectiveCanonicalPerformedWork(aggregate.events);
+  const eventsBySlot = new Map<string, CanonicalEffectivePerformedWork[]>();
+  for (const event of events) {
+    const slotId = String((event.payload as Record<string, unknown>).slotId);
+    const group = eventsBySlot.get(slotId);
+    if (group) group.push(event);
+    else eventsBySlot.set(slotId, [event]);
+  }
   const slotProjections = slots.slice().sort((a, b) => Number(a.index) - Number(b.index)).map((slot) => {
-    const performed: readonly Readonly<Record<string, unknown>>[] = events.filter((event) => String((event.payload as Record<string, unknown>).slotId) === slot.id).map((event) => ({ ...(event.payload as Record<string, unknown>), eventId: event.eventId }));
+    const performed: readonly Readonly<Record<string, unknown>>[] = (eventsBySlot.get(String(slot.id)) ?? []).map((event) => ({ ...(event.payload as Record<string, unknown>), eventId: event.eventId }));
     const substitutionIds = performed.flatMap((event) => event.substitutionId ? [String(event.substitutionId)] : []);
     return { slotId: String(slot.id), exerciseId: String(slot.exerciseId), index: Number(slot.index), prescription: { ...slot }, performed, substitutionIds: [...new Set(substitutionIds)].sort(), status: substitutionIds.length ? "substituted" as const : performed.length ? "performed" as const : "pending" as const };
   });

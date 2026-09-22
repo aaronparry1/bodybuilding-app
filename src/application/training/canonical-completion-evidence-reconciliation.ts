@@ -52,13 +52,14 @@ export function reconcileCanonicalCompletedSessionEvidence(input: Readonly<{
   const slots = Array.isArray((aggregate.session.prescriptionSnapshot as Record<string, unknown>).slots)
     ? (aggregate.session.prescriptionSnapshot as Record<string, unknown>).slots as Array<Record<string, unknown>>
     : [];
+  const slotsByIdentity = new Map(slots.map((slot) => [`${String(slot.id)}\u0000${String(slot.exerciseId)}`, slot]));
   let derived = 0;
   let blockedReason: "performed_work_identity_unavailable" | "performed_evidence_identity_conflict" | null = null;
   for (const event of performed) {
     const setId = String(event.payload.setId ?? "");
     const slotId = String(event.payload.slotId ?? "");
     const exerciseId = String(event.payload.exerciseId ?? "");
-    const slot = slots.find((candidate) => String(candidate.id) === slotId && String(candidate.exerciseId) === exerciseId);
+    const slot = slotsByIdentity.get(`${slotId}\u0000${exerciseId}`);
     if (!setId || !slot) {
       blockedReason = "performed_work_identity_unavailable";
       continue;

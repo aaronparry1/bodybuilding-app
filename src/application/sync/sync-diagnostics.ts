@@ -1,5 +1,5 @@
 import type { SubscriptionState } from "@/application/billing/subscription";
-import { enqueueLocalDataForAutomaticSync } from "@/application/sync/cloud-data-sync";
+import { enqueueLocalDataForAutomaticSync, enqueueLocalDataForAutomaticSyncAsync } from "@/application/sync/cloud-data-sync";
 import { jsonStore } from "@/data/local/json-store";
 import { LocalSyncQueueStore } from "@/data/sync/local-sync-queue-store";
 import { SyncQueue } from "@/data/sync/sync-queue";
@@ -52,7 +52,7 @@ export async function runManualSync(userId: string, subscription: SubscriptionSt
     return { synced: 0, skipped: 0, failed: queue.count() };
   }
 
-  enqueueLocalDataForSync(userId);
+  await enqueueLocalDataForAutomaticSyncAsync(userId, { queue });
 
   try {
     const result = await new WorkoutSyncService(userId, client, queue, undefined, undefined, undefined, undefined, subscription, true).flushQueue();

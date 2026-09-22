@@ -102,18 +102,22 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
   // Close earlier adaptation loops before making the next decision. Outcomes
   // are immutable and idempotent, so replay/restart cannot double-apply them.
   const allEvidence = canonicalProgressEvidenceRepository.list(input.planId);
-  for (const evidence of allEvidence) {
-    const methodOutcome = methodOutcomeFromPerformanceEvidence(evidence);
-    if (methodOutcome) canonicalMethodOutcomeRepository.saveEffective(methodOutcome);
-  }
+  const priorDecisions = canonicalProgressDecisionRepository.list(input.planId);
+  canonicalMethodOutcomeRepository.saveEffectiveBatch(
+    allEvidence.flatMap((evidence) => {
+      const methodOutcome = methodOutcomeFromPerformanceEvidence(evidence);
+      return methodOutcome ? [methodOutcome] : [];
+    }),
+  );
   const superset = reconcileCanonicalSupersetAuthority({ planId: input.planId, occurredAt: input.occurredAt });
   if (superset.status === "applied" || superset.status === "unchanged") return { status: superset.status, reason: superset.reason, operationId, decisionId: superset.decisionId, explanation: superset.explanation, priorRevision: superset.priorRevision, newRevision: superset.newRevision };
   if (superset.status === "retryable") return { status: "retryable", reason: superset.reason, operationId, decisionId: superset.decisionId };
-  for (const priorDecision of canonicalProgressDecisionRepository.list(input.planId)) {
-    if (canonicalAdaptationOutcomeRepository.get(priorDecision.decisionId).status === "found") continue;
+  const existingOutcomeIds = new Set(canonicalAdaptationOutcomeRepository.list(input.planId).map((outcome) => outcome.decisionId));
+  canonicalAdaptationOutcomeRepository.saveBatch(priorDecisions.flatMap((priorDecision) => {
+    if (existingOutcomeIds.has(priorDecision.decisionId)) return [];
     const outcome = evaluateCanonicalAdaptationOutcome({ decision: priorDecision, evidence: allEvidence });
-    if (outcome) canonicalAdaptationOutcomeRepository.save(outcome);
-  }
+    return outcome ? [outcome] : [];
+  }));
 
   const mesocycle = mesocycleById(raw.carrier.mesocycle.id);
   const policy = resolveMesocyclePrescriptionPolicy(raw.carrier.mesocycle.id, { goal: raw.carrier.macrocycle.output.goal });
@@ -151,7 +155,7 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
     completedMicrocyclesInMesocycle,
     microcycleComplete,
   });
-  const stabilizedNumericDecisions = stabilizeCanonicalNumericDecisions(evaluated.numericDecisions, canonicalProgressDecisionRepository.list(input.planId));
+  const stabilizedNumericDecisions = stabilizeCanonicalNumericDecisions(evaluated.numericDecisions, priorDecisions);
   const stabilityHeld = stabilizedNumericDecisions.some((item, index) => item.reasonCode !== evaluated.numericDecisions[index]?.reasonCode);
   const currentEvaluation = stabilityHeld ? {
     ...evaluated,
@@ -164,7 +168,7 @@ export function orchestrateCanonicalPostWorkoutAdaptation(input: Readonly<{
   const decisionIdentity = priorAttempt.status === "found"
     && priorAttempt.attempt.reason === "boundary_resolution_event_detected"
     ? `${operationId}:review:${canonicalDeterministicFingerprintId({
-      evidence: canonicalProgressEvidenceRepository.list(input.planId),
+      evidence: allEvidence,
       revision: raw.carrier.revision,
       mesocycleId: raw.carrier.mesocycle.id,
       microcycleId: raw.carrier.microcycle.id,

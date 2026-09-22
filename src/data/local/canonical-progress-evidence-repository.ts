@@ -5,6 +5,25 @@ const key = "iron-logic.canonical-progress-evidence-v1";
 type Records = Record<string, unknown>;
 
 export const canonicalProgressEvidenceRepository = {
+  recordBatch(inputs: readonly CanonicalProgressEvidence[]) {
+    const records = jsonStore.get<Records>(key, {});
+    const next = { ...records };
+    let changed = false;
+    for (const input of inputs) {
+      const validated = validateCanonicalProgressEvidence(input);
+      if (validated.status !== "valid") return validated;
+      const existing = next[input.evidenceId];
+      if (existing) {
+        const prior = validateCanonicalProgressEvidence(existing);
+        if (prior.status !== "valid" || JSON.stringify(prior.evidence) !== JSON.stringify(validated.evidence)) return { status: "conflict" as const, reason: "evidence_id_conflict" };
+        continue;
+      }
+      next[input.evidenceId] = validated.evidence;
+      changed = true;
+    }
+    if (changed) jsonStore.set(key, next);
+    return { status: changed ? "saved" as const : "duplicate" as const };
+  },
   record(input: CanonicalProgressEvidence) {
     const validated = validateCanonicalProgressEvidence(input);
     if (validated.status !== "valid") return validated;
@@ -41,6 +60,16 @@ export const canonicalProgressEvidenceRepository = {
       const validated = validateCanonicalProgressEvidence(value);
       return validated.status === "valid" && validated.evidence.planId === planId && (!microcycleId || validated.evidence.microcycleId === microcycleId) ? [validated.evidence] : [];
     }).sort((a, b) => a.observedAt.localeCompare(b.observedAt) || a.evidenceId.localeCompare(b.evidenceId));
+  },
+  async listAsync(planId: string, microcycleId?: string, batchSize = 100) {
+    const values = Object.values(jsonStore.get<Records>(key, {}));
+    const evidence: CanonicalProgressEvidence[] = [];
+    for (let index = 0; index < values.length; index += 1) {
+      const validated = validateCanonicalProgressEvidence(values[index]);
+      if (validated.status === "valid" && validated.evidence.planId === planId && (!microcycleId || validated.evidence.microcycleId === microcycleId)) evidence.push(validated.evidence);
+      if ((index + 1) % Math.max(1, batchSize) === 0) await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    }
+    return evidence.sort((a, b) => a.observedAt.localeCompare(b.observedAt) || a.evidenceId.localeCompare(b.evidenceId));
   },
   removeSession(planId: string, sessionId: string) {
     const records = jsonStore.get<Records>(key, {});

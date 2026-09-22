@@ -88,7 +88,9 @@ function resolveExerciseScopedLoadEvidence(
   const byExercise = new Map<string, typeof relevant>();
   for (const item of relevant) {
     const exerciseId = String(item.observations.exerciseId);
-    byExercise.set(exerciseId, [...(byExercise.get(exerciseId) ?? []), item]);
+    const records = byExercise.get(exerciseId);
+    if (records) records.push(item);
+    else byExercise.set(exerciseId, [item]);
   }
   for (const [exerciseId, records] of byExercise) {
     const latest = records.at(-1);

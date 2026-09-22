@@ -4,6 +4,19 @@ import { validateCanonicalAdaptationOutcome, type CanonicalAdaptationOutcome } f
 const key = "iron-logic.canonical-adaptation-outcomes-v1";
 
 export const canonicalAdaptationOutcomeRepository = {
+  saveBatch(outcomes: readonly CanonicalAdaptationOutcome[]) {
+    const all = jsonStore.get<Record<string, unknown>>(key, {});
+    const next = { ...all };
+    let changed = false;
+    for (const outcome of outcomes) {
+      if (!validateCanonicalAdaptationOutcome(outcome)) return { status: "invalid" as const };
+      const existing = next[outcome.decisionId];
+      if (existing && JSON.stringify(existing) !== JSON.stringify(outcome)) return { status: "conflict" as const };
+      if (!existing) { next[outcome.decisionId] = outcome; changed = true; }
+    }
+    if (changed) jsonStore.set(key, next);
+    return { status: changed ? "saved" as const : "duplicate" as const };
+  },
   save(outcome: CanonicalAdaptationOutcome) {
     if (!validateCanonicalAdaptationOutcome(outcome)) return { status: "invalid" as const };
     const all = jsonStore.get<Record<string, unknown>>(key, {});

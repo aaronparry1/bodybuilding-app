@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { canonicalRecordedSessionLedger } from "@/data/local/canonical-recorded-session-ledger";
@@ -43,7 +43,7 @@ export default function CompletionSummaryScreen() {
       .catch(() => {});
   }, [settings.trainingRemindersPermissionRequested, updateSettings]);
 
-  const aggregate = recordedSessionId ? canonicalRecordedSessionLedger.get(String(recordedSessionId)) : { status: "not_found" as const };
+  const aggregate = useMemo(() => recordedSessionId ? canonicalRecordedSessionLedger.get(String(recordedSessionId)) : { status: "not_found" as const }, [recordedSessionId]);
   const plan = canonicalActivePlanState.getReadModel();
 
   // Ask for a store rating once the user has finished a few workouts. Asked
@@ -57,17 +57,21 @@ export default function CompletionSummaryScreen() {
     }, 2500);
     return () => clearTimeout(timer);
   }, [plan?.planId]);
-  if (aggregate.status !== "found") return <AppScreen respectTopSafeArea><Text style={styles.hero}>Workout complete</Text><Text style={styles.muted}>This summary is no longer available, but your retained training history is unchanged.</Text><PrimaryButton label="Return home" onPress={() => router.replace("/(protected)/(tabs)")} /></AppScreen>;
-
-  const decision = canonicalProgressDecisionRepository.list(aggregate.session.planId)
+  const completionData = useMemo(() => aggregate.status === "found" ? {
+    decision: canonicalProgressDecisionRepository.list(aggregate.session.planId)
     .filter((candidate) => candidate.phaseOne?.sourceRecordedSessionId === aggregate.session.recordedSessionId)
     .sort((left, right) => left.phaseOne!.decidedAt.localeCompare(right.phaseOne!.decidedAt) || left.decisionId.localeCompare(right.decisionId))
-    .at(-1);
+    .at(-1),
+    history: canonicalRecordedSessionLedger.exportPlan(aggregate.session.planId),
+  } : { decision: undefined, history: [] }, [aggregate]);
+  if (aggregate.status !== "found") return <AppScreen respectTopSafeArea><Text style={styles.hero}>Workout complete</Text><Text style={styles.muted}>This summary is no longer available, but your retained training history is unchanged.</Text><PrimaryButton label="Return home" onPress={() => router.replace("/(protected)/(tabs)")} /></AppScreen>;
+
+  const decision = completionData.decision;
   const nextPlanned = plan?.nextSession ? plan.plannedSessions.find((candidate) => candidate.id === plan.nextSession!.id) : undefined;
   const summary = projectCanonicalCompletionSummary({
     session: aggregate.session,
     events: aggregate.events,
-    history: canonicalRecordedSessionLedger.exportPlan(aggregate.session.planId),
+    history: completionData.history,
     decision,
     displayUnit: settings.unit,
     coachingExplanation: decision?.explanation,

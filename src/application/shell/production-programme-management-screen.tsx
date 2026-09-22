@@ -61,7 +61,6 @@ export default function ProductionProgrammeManagementScreen() {
     const resultMessage = friendly(result.reason);
     setMessage(resultMessage);
     if (result.status === "applied" || result.status === "idempotent") {
-      canonicalActivePlanState.refresh();
       setAction(null);
       setSlotId(null);
       setExerciseId(null);

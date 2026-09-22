@@ -14,6 +14,25 @@ class MemorySyncQueueStore implements SyncQueueStore {
 }
 
 describe("SyncQueue", () => {
+  it("enqueues and settles a backlog with one persisted write per batch", () => {
+    class CountingStore extends MemorySyncQueueStore {
+      writes = 0;
+      override write(items: SyncQueueItem[]) { this.writes += 1; super.write(items); }
+    }
+    const store = new CountingStore();
+    const queue = new SyncQueue(store);
+    const items = queue.enqueueMany(Array.from({ length: 500 }, (_, index) => ({
+      entityType: "custom_exercise" as const,
+      entityId: `exercise-${index}`,
+      payload: { index },
+      ownerUserId: "user",
+    })));
+    expect(store.writes).toBe(1);
+    queue.settle(items.map((item) => item.id), new Map());
+    expect(store.writes).toBe(2);
+    expect(queue.count()).toBe(0);
+  });
+
   it("enqueues local-first work and removes it after sync", () => {
     const queue = new SyncQueue(new MemorySyncQueueStore());
     const item = queue.enqueue("workout_session", "session-1", { id: "session-1" });

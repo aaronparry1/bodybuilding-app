@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { evaluateCanonicalAdaptationOutcome } from "@/domain/training/canonical-adaptation-outcome";
+import { canonicalAdaptationOutcomeRepository } from "@/data/local/canonical-adaptation-outcome-repository";
 
 const decision = {
   schemaVersion: "canonical_progress_decision_v1", decisionId: "decision-1", planId: "plan-1", expectedPlanRevision: 1,
@@ -33,5 +34,14 @@ describe("adaptation outcome evaluation", () => {
     const outcome = evaluateCanonicalAdaptationOutcome({ decision, evidence: [performance("session-2", "later-1", 5), performance("session-3", "later-2", 6)] });
     expect(outcome?.status).toBe("unsuccessful");
     expect(decision.phaseOne.boundedAdjustment.numericDecisions[0].after.exactTargets).toEqual([7]);
+  });
+
+  it("persists multiple evaluated outcomes in one idempotent batch", () => {
+    canonicalAdaptationOutcomeRepository.clear();
+    const first = evaluateCanonicalAdaptationOutcome({ decision, evidence: [performance("session-2", "later-1", 7), performance("session-3", "later-2", 8)] })!;
+    const outcomes = Array.from({ length: 100 }, (_, index) => ({ ...first, decisionId: `decision-${index}` }));
+    expect(canonicalAdaptationOutcomeRepository.saveBatch(outcomes).status).toBe("saved");
+    expect(canonicalAdaptationOutcomeRepository.list("plan-1")).toHaveLength(100);
+    expect(canonicalAdaptationOutcomeRepository.saveBatch(outcomes).status).toBe("duplicate");
   });
 });
