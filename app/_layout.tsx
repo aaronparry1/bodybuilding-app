@@ -8,6 +8,14 @@ import { SubscriptionProvider } from "@/application/billing/subscription-context
 import { canonicalActivePlanState } from "@/application/training/canonical-active-plan-state";
 import { rescheduleTrainingReminders } from "@/application/notifications/training-reminders";
 import { colors, radius, spacing, type } from "@/ui/theme";
+import * as Sentry from "@sentry/react-native";
+
+Sentry.init({
+  dsn: "https://8e2fbe3f7d78fecc167ddcaa39ae39be@o4512130122579968.ingest.de.sentry.io/4512130944794704",
+
+  sendDefaultPii: false,
+  enableLogs: false,
+});
 
 export function ErrorBoundary({ error, retry }: { error: Error; retry: () => void }) {
   return (
@@ -29,7 +37,7 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => voi
   );
 }
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   const [fontsLoaded] = useFonts({ Oswald_500Medium, Oswald_600SemiBold, Oswald_700Bold });
 
   useEffect(() => {
@@ -66,4 +74,4 @@ export default function RootLayout() {
       </SubscriptionProvider>
     </AuthProvider>
   );
-}
+});

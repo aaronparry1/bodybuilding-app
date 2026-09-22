@@ -4,6 +4,7 @@
   "main": "expo-router/entry",
   "dependencies": {
     "@expo-google-fonts/oswald": "^0.2.3",
+    "@sentry/react-native": "~7.11.0",
     "@supabase/supabase-js": "^2.106.2",
     "expo": "~56.0.22",
     "expo-build-properties": "~56.0.27",

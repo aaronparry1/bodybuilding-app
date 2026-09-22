@@ -122,6 +122,14 @@ const config: ExpoConfig = {
   },
   plugins: [
     ["expo-router", { root: routerRoot }],
+    [
+      "@sentry/react-native/expo",
+      {
+        url: "https://sentry.io/",
+        project: "adaptive-strength-coach",
+        organization: "arx-algorithms",
+      },
+    ],
     "expo-font",
     "expo-sharing",
     "expo-sqlite",
