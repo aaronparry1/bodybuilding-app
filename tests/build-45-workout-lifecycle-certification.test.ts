@@ -40,6 +40,15 @@ describe("Build 45 workout lifecycle certification", () => {
     expect(source).toContain('accessibilityLabel="Cancel discard" onPress={onContinue}');
     expect(source).toContain('testID="train-discard-confirm"');
     expect(source).toContain('accessibilityLabel="Discard workout" disabled={busy} onPress={onDiscard}');
+    const discardHandler = source.slice(source.indexOf("  const discard = () =>"), source.indexOf("  const finish = () =>"));
+    expect(discardHandler).not.toContain("canonicalActivePlanState.refresh()");
+  });
+
+  it("hydrates discard results with one indexed evidence pass instead of one full scan per historical session", () => {
+    const source = readFileSync("src/application/training/canonical-active-plan-application.ts", "utf8");
+    expect(source).toContain("const completionEvidenceSessionIds = new Set(");
+    expect(source).toContain("!completionEvidenceSessionIds.has(aggregate.session.recordedSessionId)");
+    expect(source).not.toContain("function canonicalProgressEvidenceExists");
   });
 
   it("discards multiple completed sets without creating coaching evidence or decisions", () => {

@@ -312,7 +312,6 @@ function CanonicalTrainExperience() {
       });
       setMessage(friendlyReason(result.reason));
       if (result.status === "applied" || result.status === "idempotent") {
-        canonicalActivePlanState.refresh();
         setRecordedId(undefined);
         setModal(null);
         router.replace("/(protected)/(tabs)");
