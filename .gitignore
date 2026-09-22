@@ -78,3 +78,5 @@ yarn-error.*
 /android/.gradle/
 /android/app/build/
 *.xcarchive
+
+.env.local

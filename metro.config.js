@@ -1,9 +1,9 @@
-const { getDefaultConfig } = require("expo/metro-config");
 const exclusionListModule = require("metro-config/private/defaults/exclusionList");
 const path = require("node:path");
+const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const exclusionList = exclusionListModule.default ?? exclusionListModule;
 
-const config = getDefaultConfig(__dirname);
+const config = getSentryExpoConfig(__dirname);
 
 const blockedProjectFolders = [
   "dist",
